@@ -314,7 +314,7 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
           seq1.elementAt(0).accept(this);
           // add the field if not a JavaCodeProduction
           if (!jcpHT.containsKey(ident)) {
-            curClass.addField(ident, nameGen.genCommentFieldName(ident));
+            curClass.addField(Globals.getQualifiedName(ident), nameGen.genCommentFieldName(ident));
           }
         } else {
           // &1 $0 RegularExpression() $1 [ £0 "." £1 < IDENTIFIER > ] )

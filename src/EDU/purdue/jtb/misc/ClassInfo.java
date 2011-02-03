@@ -54,7 +54,7 @@ public class ClassInfo {
   /** The node */
   final INode                astNode;
   /** The class name */
-  final String               className;
+  private final String               className;
   /** The list of the types of the class fields representing the node's children */
   final ArrayList<String>    fieldTypes;
   /** The list of the names of the class fields representing the node's children */
@@ -102,8 +102,17 @@ public class ClassInfo {
    *
    * @return the class name
    */
+  public String getQualifiedName() {
+    return Globals.getQualifiedName(className);
+  }
+
+  /**
+   * Getter for the class name.
+   *
+   * @return the class name
+   */
   public String getClassName() {
-    return className;
+    return Globals.getClassName(className);
   }
 
   /**
@@ -201,7 +210,7 @@ public class ClassInfo {
      * class declaration
      */
 
-    sb.append(spc.spc).append("public class " + className);
+    sb.append(spc.spc).append("public class " + getClassName());
 
     if (Globals.nodesSuperclass != null)
       sb.append(" extends ").append(Globals.nodesSuperclass);
@@ -247,7 +256,7 @@ public class ClassInfo {
         sb.append(spc.spc).append(" * @param n").append(i).append(" next child node").append(LS);
       sb.append(spc.spc).append(" */").append(LS);
     }
-    sb.append(spc.spc).append("public ").append(className).append("(");
+    sb.append(spc.spc).append("public ").append(getClassName()).append("(");
     types = fieldTypes.iterator();
     if (types.hasNext())
       sb.append("final ").append(types.next()).append(" n0");
@@ -306,7 +315,7 @@ public class ClassInfo {
         }
         sb.append(spc.spc).append(" */").append(LS);
       }
-      sb.append(spc.spc).append("public ").append(className).append("(");
+      sb.append(spc.spc).append("public ").append(getClassName()).append("(");
       count = 0;
       firstTime = true;
       types = fieldTypes.iterator();
@@ -378,7 +387,7 @@ public class ClassInfo {
     sb.append(spc.spc).append("public <").append(Globals.genRetType).append(", ")
       .append(Globals.genArguType).append("> " + Globals.genRetType).append(" accept(final ")
       .append(Globals.iRetArguVisitorName).append("<" + Globals.genRetType).append(", ")
-      .append(Globals.genArguType).append("> vis, final " + Globals.genArguType).append(" argu) {")
+      .append(Globals.genArguType).append("> vis, final " + (Globals.varargs ? Globals.genArgusType : Globals.genArguType)).append(" argu) {")
       .append(LS);
     spc.updateSpc(+1);
     sb.append(spc.spc).append("return vis.visit(this, argu);").append(LS);
@@ -419,7 +428,7 @@ public class ClassInfo {
     }
     sb.append(spc.spc).append("public <").append(Globals.genArguType)
       .append("> void accept(final " + Globals.iVoidArguVisitorName).append("<")
-      .append(Globals.genArguType).append("> vis, final " + Globals.genArguType).append(" argu) {")
+      .append(Globals.genArguType).append("> vis, final " + (Globals.varargs ? Globals.genArgusType : Globals.genArguType)).append(" argu) {")
       .append(LS);
     spc.updateSpc(+1);
     sb.append(spc.spc).append("vis.visit(this, argu);").append(LS);

@@ -84,10 +84,12 @@ import EDU.purdue.jtb.visitor.SemanticChecker;
  * @author Kevin Tao
  * @author Wanjun Wang, wanjun@purdue.edu
  * @author Marc Mazas, mmazas@sopragroup.com
+ * @author Francis Andre, francis.andre.kampbell@orange.fr
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5<br>
  *          1.4.0 : 11/2009 : MMa : added input file options management
  * @version 1.4.0.3 : 02/2010 : MMa : added static flag
  * @version 1.4.5 : 12/2010 : MMa : convert nodes and visitors output directories to absolute paths
+ * @version 1.4.6 : 01/2011 : FA  : add -va and -npfx and -nsfx options
  */
 public class JTB {
 
@@ -346,6 +348,8 @@ public class JTB {
   private static void getFileOptionsAndOverwrite() {
     String str = null;
 
+    Globals.varargs = ((Boolean) jtbOpt.get("JTB_VA")).booleanValue();
+
     Globals.printClassList = ((Boolean) jtbOpt.get("JTB_CL")).booleanValue();
 
     Globals.depthLevel = ((Boolean) jtbOpt.get("JTB_DL")).booleanValue();
@@ -361,6 +365,10 @@ public class JTB {
     Globals.nodesDirName = (String) jtbOpt.get("JTB_ND");
 
     Globals.nodesPackageName = (String) jtbOpt.get("JTB_NP");
+
+    Globals.nodePrefix = (String) jtbOpt.get("JTB_NPFX");
+
+    Globals.nodeSuffix = (String) jtbOpt.get("JTB_NSFX");
 
     str = (String) jtbOpt.get("JTB_NS");
     Globals.nodesSuperclass = "".equals(str) ? null : str;
@@ -441,6 +449,11 @@ public class JTB {
           jtbOpt.put("JTB_CL", Boolean.TRUE);
         }
 
+        else if (args[i].equals("-va")) {
+          Globals.varargs = true;
+          jtbOpt.put("JTB_VA", Boolean.TRUE);
+        }
+
         else if (args[i].equals("-d")) {
           ++i;
           if (i >= args.length || args[i].charAt(0) == '-')
@@ -506,6 +519,28 @@ public class JTB {
           else {
             Globals.nodesSuperclass = args[i];
             jtbOpt.put("JTB_NS", Globals.nodesSuperclass);
+          }
+        }
+
+        else if (args[i].equals("-npfx")) {
+          ++i;
+          if (i >= args.length || args[i].charAt(0) == '-') {
+            throw new InvalCmdLineException("Option \"-npfx\" must be followed by a prefix.");
+          }
+          else {
+            Globals.nodePrefix = args[i];
+            jtbOpt.put("JTB_NPFX", Globals.nodePrefix);
+          }
+        }
+
+        else if (args[i].equals("-nsfx")) {
+          ++i;
+          if (i >= args.length || args[i].charAt(0) == '-') {
+            throw new InvalCmdLineException("Option \"-nsfx\" must be followed by a suffix.");
+          }
+          else {
+            Globals.nodeSuffix = args[i];
+            jtbOpt.put("JTB_NSFX", Globals.nodeSuffix);
           }
         }
 
@@ -639,6 +674,8 @@ public class JTB {
                      "  -jd         Generate JavaDoc-friendly comments in the nodes and visitor.\n" +
                      "  -nd dir     Use dir as the package for the syntax tree nodes.\n" +
                      "  -np pkg     Use pkg as the package for the syntax tree nodes.\n" +
+                     "  -npfx str   Use str as prefix for the syntax tree nodes.\n" +
+                     "  -nsfx str   Use str as suffix for the syntax tree nodes.\n" +
                      "  -ns class   Use class as the class which all node classes will extend.\n" +
                      "  -o file     Use file as the filename for the annotated output grammar.\n" +
                      "  -p pkg      \"-p pkg\" is short for (and overwrites) \"-np pkg.syntaxtree -vp pkg.visitor\".\n" +
@@ -647,6 +684,7 @@ public class JTB {
                      "  -si         Read from standard input rather than a file.\n" +
                      "  -scheme     Generate Scheme records representing the grammar and a Scheme tree building visitor.\n" +
                      "  -tk         Generate special tokens into the tree.\n" +
+                     "  -va         Generate visitor with a variable number of argument.\n" +
                      "  -vd dir     Use dir as the package for the default visitor classes.\n" +
                      "  -vp pkg     Use pkg as the package for the default visitor classes.\n" +
                      "  -w          Do not overwrite existing files.\n" + "\n");

@@ -221,7 +221,7 @@ public class DepthFirstVisitorsGenerator {
                                                       .concat(", ").concat(Globals.genArguType)
                                                       .concat(">");
     final String consBeg = Globals.genRetType.concat(" visit(final ");
-    final String consEnd = " n, final ".concat(Globals.genArguType).concat(" argu)");
+    final String consEnd = " n, final ".concat(Globals.varargs ? Globals.genArgusType : Globals.genArguType).concat(" argu)");
     return genAnyDepthFirstVisitor(Globals.retArguVisitorComment, clDecl, consBeg, consEnd, true,
                                    true);
   }
@@ -253,7 +253,7 @@ public class DepthFirstVisitorsGenerator {
                                                        .concat("<").concat(Globals.genArguType)
                                                        .concat(">");
     final String consBeg = "void visit(final ";
-    final String consEnd = " n, final ".concat(Globals.genArguType).concat(" argu)");
+    final String consEnd = " n, final ".concat(Globals.varargs ? Globals.genArgusType : Globals.genArguType).concat(" argu)");
     return genAnyDepthFirstVisitor(Globals.voidArguVisitorComment, clDecl, consBeg, consEnd, false,
                                    true);
   }
@@ -350,7 +350,7 @@ public class DepthFirstVisitorsGenerator {
         sb.append(spc.spc).append(" */").append(LS);
       }
 
-      sb.append(spc.spc).append("public ").append(aConsBeg).append(className).append(aConsEnd)
+      sb.append(spc.spc).append("public ").append(aConsBeg).append(classInfo.getQualifiedName()).append(aConsEnd)
         .append(" {").append(LS);
 
       spc.updateSpc(+1);
@@ -489,7 +489,7 @@ public class DepthFirstVisitorsGenerator {
     sb.append(spc.spc).append("public ").append(aRet ? Globals.genRetType : "void")
       .append(" visit(final ").append(Globals.nodeChoiceName).append(" n");
     if (aArgu)
-      sb.append(", final ").append(Globals.genArguType).append(" argu");
+      sb.append(", final ").append(Globals.varargs ? Globals.genArgusType : Globals.genArguType).append(" argu");
     sb.append(") {").append(LS);
     spc.updateSpc(+1);
     if (Globals.depthLevel)
@@ -544,7 +544,7 @@ public class DepthFirstVisitorsGenerator {
     sb.append(spc.spc).append("public ").append(aRet ? Globals.genRetType : "void")
       .append(" visit(final ").append(Globals.nodeListName).append(" n");
     if (aArgu)
-      sb.append(", final ").append(Globals.genArguType).append(" argu");
+      sb.append(", final ").append(Globals.varargs ? Globals.genArgusType : Globals.genArguType).append(" argu");
     sb.append(") {").append(LS);
     spc.updateSpc(+1);
     if (aRet)
@@ -601,7 +601,7 @@ public class DepthFirstVisitorsGenerator {
     sb.append(spc.spc).append("public ").append(aRet ? Globals.genRetType : "void")
       .append(" visit(final ").append(Globals.nodeListOptName).append(" n");
     if (aArgu)
-      sb.append(", final ").append(Globals.genArguType).append(" argu");
+      sb.append(", final ").append(Globals.varargs ? Globals.genArgusType : Globals.genArguType).append(" argu");
     sb.append(") {").append(LS);
     spc.updateSpc(+1);
     sb.append(spc.spc).append("if (n.present()) {").append(LS);
@@ -665,7 +665,7 @@ public class DepthFirstVisitorsGenerator {
     sb.append(spc.spc).append("public ").append(aRet ? Globals.genRetType : "void")
       .append(" visit(final ").append(Globals.nodeOptName).append(" n");
     if (aArgu)
-      sb.append(", final ").append(Globals.genArguType).append(" argu");
+      sb.append(", final ").append(Globals.varargs ? Globals.genArgusType : Globals.genArguType).append(" argu");
     sb.append(") {").append(LS);
     spc.updateSpc(+1);
     if (aRet) {
@@ -730,7 +730,7 @@ public class DepthFirstVisitorsGenerator {
     sb.append(spc.spc).append("public ").append(aRet ? Globals.genRetType : "void")
       .append(" visit(final ").append(Globals.nodeSeqName).append(" n");
     if (aArgu)
-      sb.append(", final ").append(Globals.genArguType).append(" argu");
+      sb.append(", final ").append(Globals.varargs ? Globals.genArgusType : Globals.genArguType).append(" argu");
     sb.append(") {").append(LS);
     spc.updateSpc(+1);
     if (aRet)
@@ -787,7 +787,7 @@ public class DepthFirstVisitorsGenerator {
     sb.append(spc.spc).append("public ").append(aRet ? Globals.genRetType : "void")
       .append(" visit(final ").append(Globals.nodeTokenName).append(" n");
     if (aArgu)
-      sb.append(", @SuppressWarnings(\"unused\") final ").append(Globals.genArguType)
+      sb.append(", @SuppressWarnings(\"unused\") final ").append(Globals.varargs ? Globals.genArgusType : Globals.genArguType)
         .append(" argu");
     sb.append(") {").append(LS);
     spc.updateSpc(+1);

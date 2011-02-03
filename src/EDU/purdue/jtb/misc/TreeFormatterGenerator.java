@@ -442,7 +442,7 @@ public class TreeFormatterGenerator {
 
     for (final Iterator<ClassInfo> e = classList.iterator(); e.hasNext();) {
       final ClassInfo cur = e.next();
-      final String className = cur.getClassName();
+      final String className = cur.getQualifiedName();
 
       if (Globals.javaDocComments) {
         sb.append(spc.spc).append("/**").append(LS);
