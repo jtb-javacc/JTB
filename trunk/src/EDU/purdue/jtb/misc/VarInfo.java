@@ -137,7 +137,8 @@ public class VarInfo {
     if (declaration == null) {
       final StringBuilder buf = new StringBuilder(64);
       // always initialize even if initializer is null
-      buf.append(type).append(" ").append(name).append(" = ").append(initializer).append(";");
+      final String fullName = Globals.getQualifiedName(type);
+      buf.append(fullName).append(" ").append(name).append(" = ").append(initializer).append(";");
       declaration = buf.toString();
     }
     return declaration;

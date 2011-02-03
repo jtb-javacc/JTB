@@ -411,7 +411,7 @@ public class FilesGenerator {
           aSB.append(spc.spc).append(" * @return the user return information").append(LS);
         aSB.append(spc.spc).append(" */").append(LS);
       }
-      aSB.append(spc.spc).append("public ").append(aConsBeg).append(className).append(aConsEnd)
+      aSB.append(spc.spc).append("public ").append(aConsBeg).append(classInfo.getQualifiedName()).append(aConsEnd)
          .append(";").append(LS).append(LS);
     }
     spc.updateSpc(-1);
@@ -668,7 +668,7 @@ public class FilesGenerator {
    */
   static String genClassEndArgList(final boolean arg) {
     if (arg) {
-      return " n, final " + Globals.genArguType + " argu)";
+      return " n, final " + (Globals.varargs ? Globals.genArgusType : Globals.genArguType) + " argu)";
     } else {
       return " n)";
     }

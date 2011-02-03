@@ -168,6 +168,10 @@ public class Options {
       optionValues.put("JTB_ND", Globals.nodesDirName);
     if (optionValues.get("JTB_NP") == null)
       optionValues.put("JTB_NP", Globals.nodesPackageName);
+    if (optionValues.get("JTB_NPFX") == null)
+      optionValues.put("JTB_NPFX", Globals.nodePrefix);
+    if (optionValues.get("JTB_NSFX") == null)
+      optionValues.put("JTB_NSFX", Globals.nodeSuffix);
     if (optionValues.get("JTB_NS") == null)
       optionValues.put("JTB_NS", "");
     if (optionValues.get("JTB_O") == null)
@@ -182,6 +186,8 @@ public class Options {
       optionValues.put("JTB_SCHEME", new Boolean(Globals.schemeToolkit));
     if (optionValues.get("JTB_TK") == null)
       optionValues.put("JTB_TK", new Boolean(Globals.keepSpecialTokens));
+    if (optionValues.get("JTB_VA") == null)
+      optionValues.put("JTB_VA", Boolean.FALSE);
     if (optionValues.get("JTB_VD") == null)
       optionValues.put("JTB_VD", Globals.visitorsDirName);
     if (optionValues.get("JTB_VP") == null)

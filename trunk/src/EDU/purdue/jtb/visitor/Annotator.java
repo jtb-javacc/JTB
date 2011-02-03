@@ -434,7 +434,7 @@ public class Annotator extends JavaCCPrinter {
     // just print the f1 specials, then print the Identifier instead of the ResultType
     getResultTypeSpecials(n.f1);
     sb.append(resultTypeSpecials);
-    sb.append(curProduction);
+    sb.append(Globals.getQualifiedName(curProduction));
     sb.append(" ");
     // f2 -> Identifier()
     n.f2.accept(this);
@@ -604,7 +604,7 @@ public class Annotator extends JavaCCPrinter {
     // outerVars will be set further down the tree in finalActions
     // f8 -> ExpansionChoices(c)
     n.f8.accept(this);
-    sb.append("{ return new ").append(n.f2.f0.tokenImage).append("(");
+    sb.append("{ return new ").append(Globals.getClassName(n.f2.f0.tokenImage)).append("(");
     final Iterator<VarInfo> e = outerVars.iterator();
     if (e.hasNext()) {
       sb.append(e.next().getName());
@@ -1962,7 +1962,7 @@ public class Annotator extends JavaCCPrinter {
       n.f2.accept(this);
     } else {
       // change return statement
-      sb.append(Globals.JTBRT_PREFIX).append(curProduction).append(" = ");
+      sb.append(Globals.JTBRT_PREFIX).append(Globals.getQualifiedName(curProduction)).append(" = ");
       if (n.f1.present()) { // should always be present !
         // f1 -> [ Expression(null) ]
         sb.append(genJavaBranch(n.f1));
