@@ -51,8 +51,9 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR ANY PARTICULAR PURPOSE.
  */
-
 package EDU.purdue.jtb.misc;
+
+import static EDU.purdue.jtb.misc.Globals.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -67,9 +68,11 @@ import java.util.Iterator;
  * nodes java files, the visitor interfaces and the default visitors classes files.<br>
  * It must be constructed with the list of the grammar {@link ClassInfo} classes.
  * 
- * @author Marc Mazas, mmazas@sopragroup.com
+ * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5<br>
- *          1.4.0 : 11/09 : MMa : fixed directories creation errors
+ *          1.4.0 : 11/2009 : MMa : fixed directories creation errors
+ * @version 1.4.6 : 01/2011 : FA/MMa : added -va and -npfx and -nsfx options
+ * @version 1.4.7 : 09/2012 : MMa : added missing generated visit methods (NodeChoice and NodeTCF)
  */
 public class FilesGenerator {
 
@@ -79,41 +82,39 @@ public class FilesGenerator {
   private final File                 nodesDir;
   /** The (generated) visitors directory */
   private final File                 visitorsDir;
-  /** The OS line separator */
-  public static final String         LS = System.getProperty("line.separator");
 
   /**
    * Constructor. Creates the nodes and visitors directories if they do not exist.
    * 
-   * @param classesList the list of {@link ClassInfo} classes instances
+   * @param classesList - the list of {@link ClassInfo} classes instances
    */
   public FilesGenerator(final ArrayList<ClassInfo> classesList) {
     classes = classesList;
 
-    nodesDir = new File(Globals.nodesDirName);
-    visitorsDir = new File(Globals.visitorsDirName);
+    nodesDir = new File(nodesDirName);
+    visitorsDir = new File(visitorsDirName);
 
     if (!nodesDir.exists())
       if (nodesDir.mkdirs())
-        Messages.info("\"" + Globals.nodesDirName + "\" directory created.");
+        Messages.info("\"" + nodesDirName + "\" directory created.");
       else
-        Messages.softErr("Unable to create \"" + Globals.nodesDirName + "\" directory.");
+        Messages.softErr("Unable to create \"" + nodesDirName + "\" directory.");
     else if (!nodesDir.isDirectory())
-      Messages.softErr("\"" + Globals.nodesDirName + "\" exists but is not a directory.");
+      Messages.softErr("\"" + nodesDirName + "\" exists but is not a directory.");
 
     if (!visitorsDir.exists())
       if (visitorsDir.mkdirs())
-        Messages.info("\"" + Globals.visitorsDirName + "\" directory created.");
+        Messages.info("\"" + visitorsDirName + "\" directory created.");
       else
-        Messages.softErr("Unable to create \"" + Globals.visitorsDirName + "\" directory.");
+        Messages.softErr("Unable to create \"" + visitorsDirName + "\" directory.");
     else if (!visitorsDir.isDirectory())
-      Messages.softErr("\"" + Globals.visitorsDirName + "\" exists but is not a directory.");
+      Messages.softErr("\"" + visitorsDirName + "\" exists but is not a directory.");
   }
 
   /**
    * Outputs the formatted nodes classes list.
    * 
-   * @param out a PrintWriter to output on
+   * @param out - a PrintWriter to output on
    */
   public void outputFormattedNodesClassesList(final PrintWriter out) {
     final StringBuilder sb = null;
@@ -124,26 +125,26 @@ public class FilesGenerator {
   /**
    * Formats the nodes classes list.
    * 
-   * @param aSB a StringBuilder, used if not null
+   * @param aSb - a buffer, used if not null
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the formatted nodes classes list
    */
-  public StringBuilder formatNodesClassesList(final StringBuilder aSB) {
-    final Spacing spc = new Spacing(Globals.INDENT_AMT);
+  public StringBuilder formatNodesClassesList(final StringBuilder aSb) {
+    final Spacing spc = new Spacing(INDENT_AMT);
 
-    StringBuilder sb = aSB;
+    StringBuilder sb = aSb;
     if (sb == null)
       sb = new StringBuilder(classes.size() * 100);
 
     for (final Iterator<ClassInfo> e = classes.iterator(); e.hasNext();) {
       final ClassInfo classInfo = e.next();
-      final String className = classInfo.getClassName();
+      final String className = classInfo.className;
 
       sb.append("class ").append(className).append(":").append(LS);
       spc.updateSpc(+1);
 
-      final Iterator<String> types = classInfo.getFieldTypes().iterator();
-      final Iterator<String> names = classInfo.getFieldNames().iterator();
+      final Iterator<String> types = classInfo.fieldTypes.iterator();
+      final Iterator<String> names = classInfo.fieldNames.iterator();
 
       for (; types.hasNext();)
         sb.append(spc.spc).append(types.next()).append(" ").append(names.next()).append(LS);
@@ -157,7 +158,7 @@ public class FilesGenerator {
   /**
    * Generates nodes (classes source) files.
    * 
-   * @throws FileExistsException if one or more files exist and no overwrite flag has been set
+   * @throws FileExistsException - if one or more files exist and no overwrite flag has been set
    */
   public void genNodesFiles() throws FileExistsException {
     try {
@@ -165,9 +166,9 @@ public class FilesGenerator {
 
       for (final Iterator<ClassInfo> e = classes.iterator(); e.hasNext();) {
         final ClassInfo classInfo = e.next();
-        final File file = new File(nodesDir, classInfo.getClassName() + ".java");
-        if (Globals.noOverwrite && file.exists()) {
-          Messages.softErr(classInfo.getClassName() + " exists but no overwrite flag has been set");
+        final File file = new File(nodesDir, classInfo.className + ".java");
+        if (noOverwrite && file.exists()) {
+          Messages.softErr(classInfo.className + " exists but no overwrite flag has been set");
           exists = true;
           break;
         }
@@ -175,7 +176,7 @@ public class FilesGenerator {
         out.print(genNodeClass(null, classInfo));
         out.close();
       }
-      if (Globals.noOverwrite && exists)
+      if (noOverwrite && exists)
         throw new FileExistsException("Some of the generated nodes classes files exist");
     }
     catch (final IOException e) {
@@ -186,26 +187,27 @@ public class FilesGenerator {
   /**
    * Generates a node class source string.
    * 
-   * @param aSB a StringBuilder, used if not null
-   * @param aClassInfo the class to generate the source string
+   * @param aSb - a buffer, used if not null
+   * @param aClassInfo - the class to generate the source string
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the node class source
    */
-  public StringBuilder genNodeClass(final StringBuilder aSB, final ClassInfo aClassInfo) {
-    final Spacing spc = new Spacing(Globals.INDENT_AMT);
-    StringBuilder sb = aSB;
+  public StringBuilder genNodeClass(final StringBuilder aSb, final ClassInfo aClassInfo) {
+    final Spacing spc = new Spacing(INDENT_AMT);
+    StringBuilder sb = aSb;
     if (sb == null)
       sb = new StringBuilder(2048);
 
-    sb.append(Globals.genFileHeaderComment()).append(LS);
-    sb.append("package ").append(Globals.nodesPackageName).append(";").append(LS).append(LS);
-    sb.append("import ").append(Globals.visitorsPackageName).append(".*;").append(LS).append(LS);
-    if (Globals.javaDocComments) {
+    sb.append(genFileHeaderComment()).append(LS);
+    sb.append("package ").append(nodesPackageName).append(";").append(LS).append(LS);
+    sb.append("import ").append(visitorsPackageName).append(".*;").append(LS).append(LS);
+    if (javaDocComments) {
       sb.append("/**").append(LS);
-      sb.append(" * JTB node class for the production ").append(aClassInfo.getClassName())
+      sb.append(" * JTB node class for the production ").append(aClassInfo.className)
         .append(":<br>").append(LS);
-      sb.append(" * Corresponding grammar :<br>").append(LS);
-      sb.append(aClassInfo.genAllFieldsComment(spc));
+      sb.append(" * Corresponding grammar:<br>").append(LS);
+      // generate the javadoc for the class fields, with no indentation
+      aClassInfo.fmtFieldsJavadocCmts(sb, spc);
       sb.append(" */").append(LS);
     }
     sb.append(aClassInfo.genClassString(spc));
@@ -215,22 +217,23 @@ public class FilesGenerator {
   /**
    * Generates the base nodes source files.
    * 
-   * @throws FileExistsException if one or more files exist and no overwrite flag has been set
+   * @throws FileExistsException - if one or more files exist and no overwrite flag has been set
    */
   public void genBaseNodesFiles() throws FileExistsException {
     try {
       boolean b = true;
 
-      b = b && fillFile(Globals.iNodeName + ".java", BaseClasses.genINodeInterface(null));
-      b = b && fillFile(Globals.iNodeListName + ".java", BaseClasses.genINodeListInterface(null));
-      b = b && fillFile(Globals.nodeChoiceName + ".java", BaseClasses.genNodeChoiceClass(null));
-      b = b && fillFile(Globals.nodeListName + ".java", BaseClasses.genNodeListClass(null));
-      b = b && fillFile(Globals.nodeListOptName + ".java", BaseClasses.genNodeListOptClass(null));
-      b = b && fillFile(Globals.nodeOptName + ".java", BaseClasses.genNodeOptClass(null));
-      b = b && fillFile(Globals.nodeSeqName + ".java", BaseClasses.genNodeSeqClass(null));
-      b = b && fillFile(Globals.nodeTokenName + ".java", BaseClasses.genNodeTokenClass(null));
+      b = b && fillFile(iNode + ".java", BaseClasses.genINodeInterface(null));
+      b = b && fillFile(iNodeList + ".java", BaseClasses.genINodeListInterface(null));
+      b = b && fillFile(nodeChoice + ".java", BaseClasses.genNodeChoiceClass(null));
+      b = b && fillFile(nodeList + ".java", BaseClasses.genNodeListClass(null));
+      b = b && fillFile(nodeListOpt + ".java", BaseClasses.genNodeListOptClass(null));
+      b = b && fillFile(nodeOpt + ".java", BaseClasses.genNodeOptClass(null));
+      b = b && fillFile(nodeSeq + ".java", BaseClasses.genNodeSeqClass(null));
+      b = b && fillFile(nodeToken + ".java", BaseClasses.genNodeTokenClass(null));
+      b = b && fillFile(nodeTCF + ".java", BaseClasses.genNodeTCFClass(null));
 
-      if (Globals.noOverwrite && !b)
+      if (noOverwrite && !b)
         throw new FileExistsException("Some of the base nodes classes files exist");
     }
     catch (final IOException e) {
@@ -242,20 +245,20 @@ public class FilesGenerator {
    * Fills a class file given its class source. It adds the file header comment
    * ("Generated by JTB version").
    * 
-   * @param fileName the class file name
-   * @param classSource the class source
-   * @throws IOException if any IO Exception
+   * @param fileName - the class file name
+   * @param classSource - the class source
+   * @throws IOException - if any IO Exception
    * @return false if the file exists and the no overwrite flag is set, true otherwise
    */
   public boolean fillFile(final String fileName, final StringBuilder classSource)
                                                                                  throws IOException {
-    final File file = new File(Globals.nodesDirName, fileName);
+    final File file = new File(nodesDirName, fileName);
 
-    if (Globals.noOverwrite && file.exists())
+    if (noOverwrite && file.exists())
       return false;
 
     final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 2048));
-    out.println(Globals.genFileHeaderComment());
+    out.println(genFileHeaderComment());
     out.print(classSource);
     out.close();
     return true;
@@ -265,19 +268,19 @@ public class FilesGenerator {
    * Generates the "RetArgu" IVisitor interface source (with return type and a user object
    * argument).
    * 
-   * @param aSB a StringBuilder, used if not null
+   * @param aSb - a buffer, used if not null
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the visitor class source
    */
-  public StringBuilder genRetArguIVisitor(final StringBuilder aSB) {
-    final String intf = Globals.iRetArguVisitorName.concat(genClassParamType(true, true));
+  public StringBuilder genRetArguIVisitor(final StringBuilder aSb) {
+    final String intf = iRetArguVisitor.concat(genClassParamType(true, true));
     final String consBeg = genClassBegArgList(true);
     final String consEnd = genClassEndArgList(true);
-    StringBuilder sb = aSB;
+    StringBuilder sb = aSb;
     if (sb == null)
       sb = new StringBuilder(1500);
 
-    genAnyIVisitorBeg(sb, Globals.retArguVisitorComment, intf, true, true);
+    genAnyIVisitorBeg(sb, retArguVisitorCmt, intf, true, true);
     genBaseRetArguVisitMethods(sb);
     genAnyIVisitorEnd(sb, consBeg, consEnd, true, true);
     return sb;
@@ -286,19 +289,19 @@ public class FilesGenerator {
   /**
    * Generates the "Ret" IVisitor interface source (with return type and no user object argument).
    * 
-   * @param aSB a StringBuilder, used if not null
+   * @param aSb - a buffer, used if not null
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the visitor class source
    */
-  public StringBuilder genRetIVisitor(final StringBuilder aSB) {
-    final String intf = Globals.iRetVisitorName.concat(genClassParamType(true, false));
+  public StringBuilder genRetIVisitor(final StringBuilder aSb) {
+    final String intf = iRetVisitor.concat(genClassParamType(true, false));
     final String consBeg = genClassBegArgList(true);
     final String consEnd = genClassEndArgList(false);
-    StringBuilder sb = aSB;
+    StringBuilder sb = aSb;
     if (sb == null)
       sb = new StringBuilder(1500);
 
-    genAnyIVisitorBeg(sb, Globals.retVisitorComment, intf, true, false);
+    genAnyIVisitorBeg(sb, retVisitorCmt, intf, true, false);
     genBaseRetVisitMethods(sb);
     genAnyIVisitorEnd(sb, consBeg, consEnd, true, false);
     return sb;
@@ -308,19 +311,19 @@ public class FilesGenerator {
    * Generates the "VoidArgu" IVisitor interface source (with no return type and a user object
    * argument).
    * 
-   * @param aSB a StringBuilder, used if not null
+   * @param aSb - a buffer, used if not null
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the visitor class source
    */
-  public StringBuilder genVoidArguIVisitor(final StringBuilder aSB) {
-    final String intf = Globals.iVoidArguVisitorName.concat(genClassParamType(false, true));
+  public StringBuilder genVoidArguIVisitor(final StringBuilder aSb) {
+    final String intf = iVoidArguVisitor.concat(genClassParamType(false, true));
     final String consBeg = genClassBegArgList(false);
     final String consEnd = genClassEndArgList(true);
-    StringBuilder sb = aSB;
+    StringBuilder sb = aSb;
     if (sb == null)
       sb = new StringBuilder(1500);
 
-    genAnyIVisitorBeg(sb, Globals.voidArguVisitorComment, intf, false, true);
+    genAnyIVisitorBeg(sb, voidArguVisitorCmt, intf, false, true);
     genBaseVoidArguVisitMethods(sb);
     genAnyIVisitorEnd(sb, consBeg, consEnd, false, true);
     return sb;
@@ -330,19 +333,19 @@ public class FilesGenerator {
    * Generates the "Void" IVisitor interface source (with no return type and no user object
    * argument).
    * 
-   * @param aSB a StringBuilder, used if not null
+   * @param aSb - a buffer, used if not null
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the visitor class source
    */
-  public StringBuilder genVoidIVisitor(final StringBuilder aSB) {
-    final String intf = Globals.iVoidVisitorName.concat(genClassParamType(false, false));
+  public StringBuilder genVoidIVisitor(final StringBuilder aSb) {
+    final String intf = iVoidVisitor.concat(genClassParamType(false, false));
     final String consBeg = genClassBegArgList(false);
     final String consEnd = genClassEndArgList(false);
-    StringBuilder sb = aSB;
+    StringBuilder sb = aSb;
     if (sb == null)
       sb = new StringBuilder(1500);
 
-    genAnyIVisitorBeg(sb, Globals.voidVisitorComment, intf, false, false);
+    genAnyIVisitorBeg(sb, voidVisitorCmt, intf, false, false);
     genBaseVoidVisitMethods(sb);
     genAnyIVisitorEnd(sb, consBeg, consEnd, false, false);
     return sb;
@@ -351,84 +354,85 @@ public class FilesGenerator {
   /**
    * Generates the start for all visitor interfaces.
    * 
-   * @param aSB the buffer to output into (must be non null)
-   * @param aComment the target visitors names to insert in the interface comment
-   * @param aIntf the interface name
-   * @param aRet true if there is a user return parameter type, false otherwise
-   * @param aArgu true if there is a user argument parameter type, false otherwise
+   * @param aSb - the buffer to output into (must be non null)
+   * @param aComment - the target visitors names to insert in the interface comment
+   * @param aIntf - the interface name
+   * @param aRet - true if there is a user return parameter type, false otherwise
+   * @param aArgu - true if there is a user argument parameter type, false otherwise
    */
-  void genAnyIVisitorBeg(final StringBuilder aSB, final String aComment, final String aIntf,
+  void genAnyIVisitorBeg(final StringBuilder aSb, final String aComment, final String aIntf,
                          final boolean aRet, final boolean aArgu) {
-    aSB.append(Globals.genFileHeaderComment()).append(LS);
-    aSB.append("package ").append(Globals.visitorsPackageName).append(";").append(LS).append(LS);
-    if (!Globals.visitorsPackageName.equals(Globals.nodesPackageName))
-      aSB.append("import ").append(Globals.nodesPackageName).append(".*;").append(LS).append(LS);
-    if (Globals.javaDocComments) {
-      aSB.append("/**").append(LS);
-      aSB.append(" * All \"").append(aComment).append("\" visitors must implement this interface.")
+    aSb.append(genFileHeaderComment()).append(LS);
+    aSb.append("package ").append(visitorsPackageName).append(";").append(LS).append(LS);
+    if (!visitorsPackageName.equals(nodesPackageName))
+      aSb.append("import ").append(nodesPackageName).append(".*;").append(LS).append(LS);
+    if (javaDocComments) {
+      aSb.append("/**").append(LS);
+      aSb.append(" * All \"").append(aComment).append("\" visitors must implement this interface.")
          .append(LS);
       if (aRet)
-        aSB.append(" * @param <R> The user return information type").append(LS);
+        aSb.append(" * @param <R> - The user return information type").append(LS);
       if (aArgu)
-        aSB.append(" * @param <A> The user argument type").append(LS);
-      aSB.append(" */").append(LS);
+        aSb.append(" * @param <A> - The user argument type").append(LS);
+      aSb.append(" */").append(LS);
     }
-    aSB.append("public interface ").append(aIntf).append(" {").append(LS);
+    aSb.append("public interface ").append(aIntf).append(" {").append(LS);
   }
 
   /**
    * Generates the end for all visitor interfaces.
    * 
-   * @param aSB the buffer to output into (must be non null)
-   * @param aConsBeg the beginning of the visit methods
-   * @param aConsEnd the end of the visit methods
-   * @param aRet true if there is a user return parameter type, false otherwise
-   * @param aArgu true if there is a user argument parameter type, false otherwise
+   * @param aSb - the buffer to output into (must be non null)
+   * @param aConsBeg - the beginning of the visit methods
+   * @param aConsEnd - the end of the visit methods
+   * @param aRet - true if there is a user return parameter type, false otherwise
+   * @param aArgu - true if there is a user argument parameter type, false otherwise
    */
-  void genAnyIVisitorEnd(final StringBuilder aSB, final String aConsBeg, final String aConsEnd,
+  void genAnyIVisitorEnd(final StringBuilder aSb, final String aConsBeg, final String aConsEnd,
                          final boolean aRet, final boolean aArgu) {
-    final Spacing spc = new Spacing(Globals.INDENT_AMT);
+    final Spacing spc = new Spacing(INDENT_AMT);
     spc.updateSpc(+1);
-    if (Globals.javaDocComments) {
-      aSB.append(spc.spc).append("/*").append(LS);
-      aSB.append(spc.spc).append(" * User grammar generated visit methods").append(LS);
-      aSB.append(spc.spc).append(" */").append(LS).append(LS);
+    if (javaDocComments) {
+      aSb.append(spc.spc).append("/*").append(LS);
+      aSb.append(spc.spc).append(" * User grammar generated visit methods").append(LS);
+      aSb.append(spc.spc).append(" */").append(LS).append(LS);
     }
     for (final Iterator<ClassInfo> e = classes.iterator(); e.hasNext();) {
       final ClassInfo classInfo = e.next();
-      final String className = classInfo.getClassName();
-      if (Globals.javaDocComments) {
-        aSB.append(spc.spc).append("/**").append(LS);
-        aSB.append(spc.spc).append(" * Visits a {@link ").append(className)
+      final String className = classInfo.className;
+      if (javaDocComments) {
+        aSb.append(spc.spc).append("/**").append(LS);
+        aSb.append(spc.spc).append(" * Visits a {@link ").append(className)
            .append("} node, whose children are the following :").append(LS);
-        aSB.append(spc.spc).append(" * <p>").append(LS);
-        aSB.append(classInfo.genAllFieldsComment(spc));
-        aSB.append(spc.spc).append(" *").append(LS);
-        aSB.append(spc.spc).append(" * @param n the node to visit").append(LS);
+        aSb.append(spc.spc).append(" * <p>").append(LS);
+        // generate the javadoc for the class fields, with indentation of 1
+        classInfo.fmtFieldsJavadocCmts(aSb, spc);
+        aSb.append(spc.spc).append(" *").append(LS);
+        aSb.append(spc.spc).append(" * @param n - the node to visit").append(LS);
         if (aArgu)
-          aSB.append(spc.spc).append(" * @param argu the user argument").append(LS);
+          aSb.append(spc.spc).append(" * @param argu - the user argument").append(LS);
         if (aRet)
-          aSB.append(spc.spc).append(" * @return the user return information").append(LS);
-        aSB.append(spc.spc).append(" */").append(LS);
+          aSb.append(spc.spc).append(" * @return the user return information").append(LS);
+        aSb.append(spc.spc).append(" */").append(LS);
       }
-      aSB.append(spc.spc).append("public ").append(aConsBeg).append(classInfo.getQualifiedName()).append(aConsEnd)
+      aSb.append(spc.spc).append("public ").append(aConsBeg).append(className).append(aConsEnd)
          .append(";").append(LS).append(LS);
     }
     spc.updateSpc(-1);
-    aSB.append("}").append(LS);
+    aSb.append("}").append(LS);
   }
 
   /**
    * Generates the "RetArgu" IVisitor (interface source) file.
    * 
-   * @throws FileExistsException if the file already exists and the no overwrite flag has been set
+   * @throws FileExistsException - if the file already exists and the no overwrite flag has been set
    */
   public void genRetArguIVisitorFile() throws FileExistsException {
     try {
-      final File file = new File(visitorsDir, Globals.iRetArguVisitorName + ".java");
+      final File file = new File(visitorsDir, iRetArguVisitor + ".java");
 
-      if (Globals.noOverwrite && file.exists())
-        throw new FileExistsException(Globals.iRetArguVisitorName + ".java");
+      if (noOverwrite && file.exists())
+        throw new FileExistsException(iRetArguVisitor + ".java");
 
       final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 1500));
       out.print(genRetArguIVisitor(null));
@@ -442,14 +446,14 @@ public class FilesGenerator {
   /**
    * Generates the "Ret" IVisitor (interface source) file.
    * 
-   * @throws FileExistsException if the file already exists and the no overwrite flag has been set
+   * @throws FileExistsException - if the file already exists and the no overwrite flag has been set
    */
   public void genRetIVisitorFile() throws FileExistsException {
     try {
-      final File file = new File(visitorsDir, Globals.iRetVisitorName + ".java");
+      final File file = new File(visitorsDir, iRetVisitor + ".java");
 
-      if (Globals.noOverwrite && file.exists())
-        throw new FileExistsException(Globals.iRetVisitorName + ".java");
+      if (noOverwrite && file.exists())
+        throw new FileExistsException(iRetVisitor + ".java");
 
       final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 1500));
       out.print(genRetIVisitor(null));
@@ -463,14 +467,14 @@ public class FilesGenerator {
   /**
    * Generates the "VoidArgu" IVisitor (interface source) file.
    * 
-   * @throws FileExistsException if the file already exists and the no overwrite flag has been set
+   * @throws FileExistsException - if the file already exists and the no overwrite flag has been set
    */
   public void genVoidArguIVisitorFile() throws FileExistsException {
     try {
-      final File file = new File(visitorsDir, Globals.iVoidArguVisitorName + ".java");
+      final File file = new File(visitorsDir, iVoidArguVisitor + ".java");
 
-      if (Globals.noOverwrite && file.exists())
-        throw new FileExistsException(Globals.iVoidArguVisitorName + ".java");
+      if (noOverwrite && file.exists())
+        throw new FileExistsException(iVoidArguVisitor + ".java");
 
       final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 1500));
       out.print(genVoidArguIVisitor(null));
@@ -484,14 +488,14 @@ public class FilesGenerator {
   /**
    * Generates the "Void" IVisitor (interface source) file.
    * 
-   * @throws FileExistsException if the file already exists and the no overwrite flag has been set
+   * @throws FileExistsException - if the file already exists and the no overwrite flag has been set
    */
   public void genVoidIVisitorFile() throws FileExistsException {
     try {
-      final File file = new File(visitorsDir, Globals.iVoidVisitorName + ".java");
+      final File file = new File(visitorsDir, iVoidVisitor + ".java");
 
-      if (Globals.noOverwrite && file.exists())
-        throw new FileExistsException(Globals.iVoidVisitorName + ".java");
+      if (noOverwrite && file.exists())
+        throw new FileExistsException(iVoidVisitor + ".java");
 
       final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 1500));
       out.print(genVoidIVisitor(null));
@@ -505,20 +509,22 @@ public class FilesGenerator {
   /**
    * Generates the base "RetArgu" visit methods.
    * 
-   * @param aSB a buffer, used if not null
+   * @param aSb - a buffer, used if not null
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the base visitor methods source
    */
-  StringBuilder genBaseRetArguVisitMethods(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
+  StringBuilder genBaseRetArguVisitMethods(final StringBuilder aSb) {
+    StringBuilder sb = aSb;
     if (sb == null)
       sb = new StringBuilder(100);
     sb.append(LS);
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /*").append(LS);
       sb.append("   * Base \"RetArgu\" visit methods").append(LS);
       sb.append("   */").append(LS).append(LS);
     }
+    BaseClasses.genRetArguVisitNodeChoice(sb);
+    sb.append(LS);
     BaseClasses.genRetArguVisitNodeList(sb);
     sb.append(LS);
     BaseClasses.genRetArguVisitNodeListOpt(sb);
@@ -526,6 +532,8 @@ public class FilesGenerator {
     BaseClasses.genRetArguVisitNodeOpt(sb);
     sb.append(LS);
     BaseClasses.genRetArguVisitNodeSeq(sb);
+    sb.append(LS);
+    BaseClasses.genRetArguVisitNodeTCF(sb);
     sb.append(LS);
     BaseClasses.genRetArguVisitNodeToken(sb);
     sb.append(LS);
@@ -535,20 +543,22 @@ public class FilesGenerator {
   /**
    * Generates the base "Ret" visit methods.
    * 
-   * @param aSB a buffer, used if not null
+   * @param aSb - a buffer, used if not null
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the base visitor methods source
    */
-  StringBuilder genBaseRetVisitMethods(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
+  StringBuilder genBaseRetVisitMethods(final StringBuilder aSb) {
+    StringBuilder sb = aSb;
     if (sb == null)
       sb = new StringBuilder(100);
     sb.append(LS);
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /*").append(LS);
       sb.append("   * Base \"Ret\" visit methods").append(LS);
       sb.append("   */").append(LS).append(LS);
     }
+    BaseClasses.genRetVisitNodeChoice(sb);
+    sb.append(LS);
     BaseClasses.genRetVisitNodeList(sb);
     sb.append(LS);
     BaseClasses.genRetVisitNodeListOpt(sb);
@@ -556,6 +566,8 @@ public class FilesGenerator {
     BaseClasses.genRetVisitNodeOpt(sb);
     sb.append(LS);
     BaseClasses.genRetVisitNodeSeq(sb);
+    sb.append(LS);
+    BaseClasses.genRetVisitNodeTCF(sb);
     sb.append(LS);
     BaseClasses.genRetVisitNodeToken(sb);
     sb.append(LS);
@@ -565,28 +577,31 @@ public class FilesGenerator {
   /**
    * Generates the base "VoidArgu" visit methods.
    * 
-   * @param aSB a buffer, used if not null
+   * @param aSb - a buffer, used if not null
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the base visitor methods source
    */
-  StringBuilder genBaseVoidArguVisitMethods(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
+  StringBuilder genBaseVoidArguVisitMethods(final StringBuilder aSb) {
+    StringBuilder sb = aSb;
     if (sb == null)
       sb = new StringBuilder(100);
     sb.append(LS);
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /*").append(LS);
       sb.append("   * Base \"VoidArgu\" visit methods").append(LS);
       sb.append("   */").append(LS).append(LS);
     }
+    BaseClasses.genVoidArguVisitNodeChoice(sb);
+    sb.append(LS);
     BaseClasses.genVoidArguVisitNodeList(sb);
     sb.append(LS);
     BaseClasses.genVoidArguVisitNodeListOpt(sb);
     sb.append(LS);
     BaseClasses.genVoidArguVisitNodeOpt(sb);
     sb.append(LS);
-    sb.append(LS);
     BaseClasses.genVoidArguVisitNodeSeq(sb);
+    sb.append(LS);
+    BaseClasses.genVoidArguVisitNodeTCF(sb);
     sb.append(LS);
     BaseClasses.genVoidArguVisitNodeToken(sb);
     sb.append(LS);
@@ -596,20 +611,22 @@ public class FilesGenerator {
   /**
    * Generates the base "Void" visit methods.
    * 
-   * @param aSB a buffer, used if not null
+   * @param aSb - a buffer, used if not null
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the base visitor methods source
    */
-  StringBuilder genBaseVoidVisitMethods(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
+  StringBuilder genBaseVoidVisitMethods(final StringBuilder aSb) {
+    StringBuilder sb = aSb;
     if (sb == null)
       sb = new StringBuilder(100);
     sb.append(LS);
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /*").append(LS);
       sb.append("   * Base \"Void\" visit methods").append(LS);
       sb.append("   */").append(LS).append(LS);
     }
+    BaseClasses.genVoidVisitNodeChoice(sb);
+    sb.append(LS);
     BaseClasses.genVoidVisitNodeList(sb);
     sb.append(LS);
     BaseClasses.genVoidVisitNodeListOpt(sb);
@@ -617,6 +634,8 @@ public class FilesGenerator {
     BaseClasses.genVoidVisitNodeOpt(sb);
     sb.append(LS);
     BaseClasses.genVoidVisitNodeSeq(sb);
+    sb.append(LS);
+    BaseClasses.genVoidVisitNodeTCF(sb);
     sb.append(LS);
     BaseClasses.genVoidVisitNodeToken(sb);
     sb.append(LS);
@@ -626,20 +645,20 @@ public class FilesGenerator {
   /**
    * Generates the class parameter types.
    * 
-   * @param ret true if there is a user return parameter type, false otherwise
-   * @param arg true if there is a user argument parameter type, false otherwise
+   * @param ret - true if there is a user return parameter type, false otherwise
+   * @param arg - true if there is a user argument parameter type, false otherwise
    * @return the class parameter types string
    */
   static String genClassParamType(final boolean ret, final boolean arg) {
     if (ret) {
       if (arg) {
-        return "<" + Globals.genRetType + ", " + Globals.genArguType + ">";
+        return "<".concat(genRetType).concat(", ").concat(genArguType).concat(">");
       } else {
-        return "<" + Globals.genRetType + ">";
+        return "<".concat(genRetType).concat(">");
       }
     } else {
       if (arg) {
-        return "<" + Globals.genArguType + ">";
+        return "<".concat(genArguType).concat(">");
       } else {
         return "";
       }
@@ -649,12 +668,12 @@ public class FilesGenerator {
   /**
    * Generates the beginning of the visit methods.
    * 
-   * @param arg true if there is a user argument parameter type, false otherwise
+   * @param arg - true if there is a user argument parameter type, false otherwise
    * @return the beginning of the visit methods
    */
   static String genClassBegArgList(final boolean arg) {
     if (arg) {
-      return Globals.genRetType + " visit(final ";
+      return genRetType + " visit(final ";
     } else {
       return "void visit(final ";
     }
@@ -663,12 +682,12 @@ public class FilesGenerator {
   /**
    * Generates the end of the visit methods.
    * 
-   * @param arg true if there is a user argument parameter type, false otherwise
+   * @param arg - true if there is a user argument parameter type, false otherwise
    * @return the end of the visit methods
    */
   static String genClassEndArgList(final boolean arg) {
     if (arg) {
-      return " n, final " + (Globals.varargs ? Globals.genArgusType : Globals.genArguType) + " argu)";
+      return " n, final ".concat(varargs ? genArgusType : genArguType).concat(" argu)");
     } else {
       return " n)";
     }

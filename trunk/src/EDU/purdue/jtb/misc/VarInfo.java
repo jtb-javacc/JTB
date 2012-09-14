@@ -57,10 +57,11 @@ package EDU.purdue.jtb.misc;
 /**
  * Class VarInfo stores information for a variable : type, name, initializer, and constructs its
  * declaration.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : enhanced
  * @version 1.4.3 : 03/2010 : MMa : added node declarations initialization in all cases
+ * @version 1.4.6 : 01/2011 : FA/MMa : added -va and -npfx and -nsfx options
  */
 public class VarInfo {
 
@@ -75,9 +76,9 @@ public class VarInfo {
 
   /**
    * Creates a new instance with no initializer.
-   *
-   * @param tp the variable type
-   * @param nm the variable name
+   * 
+   * @param tp - the variable type
+   * @param nm - the variable name
    */
   public VarInfo(final String tp, final String nm) {
     this(tp, nm, null);
@@ -85,10 +86,10 @@ public class VarInfo {
 
   /**
    * Creates a new instance with an initializer.
-   *
-   * @param tp the variable type
-   * @param nm the variable name
-   * @param init the variable initializer
+   * 
+   * @param tp - the variable type
+   * @param nm - the variable name
+   * @param init - the variable initializer
    */
   public VarInfo(final String tp, final String nm, final String init) {
     type = tp;
@@ -120,7 +121,7 @@ public class VarInfo {
 
   /**
    * Same as {@link #generateNodeDeclaration()}.
-   *
+   * 
    * @return the whole variable declaration string
    */
   @Override
@@ -130,14 +131,14 @@ public class VarInfo {
 
   /**
    * Generates and stores, if not yet done, and returns the variable declaration string.
-   *
+   * 
    * @return the variable declaration string
    */
   public String generateNodeDeclaration() {
     if (declaration == null) {
       final StringBuilder buf = new StringBuilder(64);
       // always initialize even if initializer is null
-      final String fullName = Globals.getQualifiedName(type);
+      final String fullName = Globals.getFixedName(type);
       buf.append(fullName).append(" ").append(name).append(" = ").append(initializer).append(";");
       declaration = buf.toString();
     }
