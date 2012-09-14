@@ -143,6 +143,8 @@ public class ClassInfo {
    */
   public void fmtFieldsJavadocCmts(final StringBuilder aSb, final Spacing aSpc) {
     genCommentsData();
+    if (fieldCmts == null)
+      return;
     if (aSpc.indentLevel == 1) {
       // for visit methods that have an indentation of 1, store the result
       if (visitFieldCmts == null) {
@@ -190,6 +192,8 @@ public class ClassInfo {
    */
   public void fmt1JavacodeFieldCmt(final StringBuilder aSb, final Spacing aSpc, final int i) {
     genCommentsData();
+    if (fieldCmts == null)
+      return;
     final CommentData fieldCmt = fieldCmts.get(i);
     for (final CommentLineData line : fieldCmt.lines) {
       aSb.append(aSpc.spc).append("// ").append(line.bare);
@@ -208,6 +212,8 @@ public class ClassInfo {
    */
   public void fmt1JavacodeSubCmt(final StringBuilder aSb, final Spacing aSpc, final int i) {
     genCommentsData();
+    if (subCmts == null)
+      return;
     if (i >= subCmts.size()) {
       aSb.append(aSpc.spc).append("// invalid sub comment index (").append(i).append("), size = ")
          .append(subCmts.size()).append(LS);

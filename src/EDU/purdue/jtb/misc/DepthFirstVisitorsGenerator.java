@@ -853,7 +853,7 @@ public class DepthFirstVisitorsGenerator {
    * @param aSb - the buffer to output into (will be allocated if null)
    * @param aSpc - the indentation
    */
-  static void decreaseDepthLevel(final StringBuilder aSb, final Spacing aSpc) {
+  public static void decreaseDepthLevel(final StringBuilder aSb, final Spacing aSpc) {
     aSb.append(aSpc.spc).append("--").append(genDepthLevelVar).append(';').append(LS);
   }
 
@@ -863,7 +863,7 @@ public class DepthFirstVisitorsGenerator {
    * @param aSb - the buffer to output into (will be allocated if null)
    * @param aSpc - the indentation
    */
-  static void increaseDepthLevel(final StringBuilder aSb, final Spacing aSpc) {
+  public static void increaseDepthLevel(final StringBuilder aSb, final Spacing aSpc) {
     aSb.append(aSpc.spc).append("++").append(genDepthLevelVar).append(';').append(LS);
   }
 

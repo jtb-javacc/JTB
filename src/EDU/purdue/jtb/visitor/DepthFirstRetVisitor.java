@@ -571,14 +571,14 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
           // %0 #0 "<" #1 "*" #2 ">"
           final NodeSequence n0CHS0 = (NodeSequence) n0CH;
           // #0 "<"
-          final INode n0CHS0A0 = n0CHS0.elementAt(0);
-          nRes = n0CHS0A0.accept(this);
+          final INode n0CHS00A0 = n0CHS0.elementAt(0);
+          nRes = n0CHS00A0.accept(this);
           // #1 "*"
-          final INode n0CHS0A1 = n0CHS0.elementAt(1);
-          nRes = n0CHS0A1.accept(this);
+          final INode n0CHS00A1 = n0CHS0.elementAt(1);
+          nRes = n0CHS00A1.accept(this);
           // #2 ">"
-          final INode n0CHS0A2 = n0CHS0.elementAt(2);
-          nRes = n0CHS0A2.accept(this);
+          final INode n0CHS00A2 = n0CHS0.elementAt(2);
+          nRes = n0CHS00A2.accept(this);
           break;
         case 1:
           // %1 #0 "<" #1 < IDENTIFIER >
@@ -586,24 +586,24 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
           // .. #3 ">"
           final NodeSequence n0CHS1 = (NodeSequence) n0CH;
           // #0 "<"
-          final INode n0CHS1A0 = n0CHS1.elementAt(0);
-          nRes = n0CHS1A0.accept(this);
+          final INode n0CHS11A0 = n0CHS1.elementAt(0);
+          nRes = n0CHS11A0.accept(this);
           // #1 < IDENTIFIER >
-          final INode n0CHS1A1 = n0CHS1.elementAt(1);
-          nRes = n0CHS1A1.accept(this);
+          final INode n0CHS11A1 = n0CHS1.elementAt(1);
+          nRes = n0CHS11A1.accept(this);
           // #2 ( $0 "," $1 < IDENTIFIER > )*
-          final INode n0CHS1A2 = n0CHS1.elementAt(2);
-          final NodeListOptional n0CHS1A2T = (NodeListOptional) n0CHS1A2;
-          if (n0CHS1A2T.present()) {
-            for (int i = 0; i < n0CHS1A2T.size(); i++) {
-              final INode n0CHS1A2TMi = n0CHS1A2T.elementAt(i);
-              final NodeSequence n0CHS1A2TMiS2 = (NodeSequence) n0CHS1A2TMi;
+          final INode n0CHS11A2 = n0CHS1.elementAt(2);
+          final NodeListOptional n0CHS11A2T = (NodeListOptional) n0CHS11A2;
+          if (n0CHS11A2T.present()) {
+            for (int i = 0; i < n0CHS11A2T.size(); i++) {
+              final INode n0CHS11A2TMi = n0CHS11A2T.elementAt(i);
+              final NodeSequence n0CHS11A2TMiS2 = (NodeSequence) n0CHS11A2TMi;
               // $0 ","
-              final INode n0CHS1A2TMiS2A0 = n0CHS1A2TMiS2.elementAt(0);
-              nRes = n0CHS1A2TMiS2A0.accept(this);
+              final INode n0CHS11A2TMiS2A0 = n0CHS11A2TMiS2.elementAt(0);
+              nRes = n0CHS11A2TMiS2A0.accept(this);
               // $1 < IDENTIFIER >
-              final INode n0CHS1A2TMiS2A1 = n0CHS1A2TMiS2.elementAt(1);
-              nRes = n0CHS1A2TMiS2A1.accept(this);
+              final INode n0CHS11A2TMiS2A1 = n0CHS11A2TMiS2.elementAt(1);
+              nRes = n0CHS11A2TMiS2A1.accept(this);
             }
           }
           // #3 ">"
@@ -921,17 +921,17 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "LOOKAHEAD"
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        nRes = n0CHS0A0.accept(this);
+        final INode n0CHS00A0 = n0CHS0.elementAt(0);
+        nRes = n0CHS00A0.accept(this);
         // #1 "("
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        nRes = n0CHS0A1.accept(this);
+        final INode n0CHS00A1 = n0CHS0.elementAt(1);
+        nRes = n0CHS00A1.accept(this);
         // #2 LocalLookahead()
-        final INode n0CHS0A2 = n0CHS0.elementAt(2);
-        nRes = n0CHS0A2.accept(this);
+        final INode n0CHS00A2 = n0CHS0.elementAt(2);
+        nRes = n0CHS00A2.accept(this);
         // #3 ")"
-        final INode n0CHS0A3 = n0CHS0.elementAt(3);
-        nRes = n0CHS0A3.accept(this);
+        final INode n0CHS00A3 = n0CHS0.elementAt(3);
+        nRes = n0CHS00A3.accept(this);
         break;
       case 1:
         // %1 Block()
@@ -941,14 +941,14 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // %2 #0 "[" #1 ExpansionChoices() #2 "]"
         final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "["
-        final INode n0CHS1A0 = n0CHS1.elementAt(0);
-        nRes = n0CHS1A0.accept(this);
+        final INode n0CHS12A0 = n0CHS1.elementAt(0);
+        nRes = n0CHS12A0.accept(this);
         // #1 ExpansionChoices()
-        final INode n0CHS1A1 = n0CHS1.elementAt(1);
-        nRes = n0CHS1A1.accept(this);
+        final INode n0CHS12A1 = n0CHS1.elementAt(1);
+        nRes = n0CHS12A1.accept(this);
         // #2 "]"
-        final INode n0CHS1A2 = n0CHS1.elementAt(2);
-        nRes = n0CHS1A2.accept(this);
+        final INode n0CHS12A2 = n0CHS1.elementAt(2);
+        nRes = n0CHS12A2.accept(this);
         break;
       case 3:
         // %3 ExpansionUnitTCF()
@@ -961,16 +961,16 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. .. .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )
         final NodeSequence n0CHS2 = (NodeSequence) n0CH;
         // #0 [ $0 PrimaryExpression() $1 "=" ]
-        final INode n0CHS2A0 = n0CHS2.elementAt(0);
-        final NodeOptional n0CHS2A0P = (NodeOptional) n0CHS2A0;
-        if (n0CHS2A0P.present()) {
-          final NodeSequence n0CHS2A0PS3 = (NodeSequence) n0CHS2A0P.node;
+        final INode n0CHS24A0 = n0CHS2.elementAt(0);
+        final NodeOptional n0CHS24A0P = (NodeOptional) n0CHS24A0;
+        if (n0CHS24A0P.present()) {
+          final NodeSequence n0CHS24A0PS3 = (NodeSequence) n0CHS24A0P.node;
           // $0 PrimaryExpression()
-          final INode n0CHS2A0PS3A0 = n0CHS2A0PS3.elementAt(0);
-          nRes = n0CHS2A0PS3A0.accept(this);
+          final INode n0CHS24A0PS3A0 = n0CHS24A0PS3.elementAt(0);
+          nRes = n0CHS24A0PS3A0.accept(this);
           // $1 "="
-          final INode n0CHS2A0PS3A1 = n0CHS2A0PS3.elementAt(1);
-          nRes = n0CHS2A0PS3A1.accept(this);
+          final INode n0CHS24A0PS3A1 = n0CHS24A0PS3.elementAt(1);
+          nRes = n0CHS24A0PS3A1.accept(this);
         }
         // #1 ( &0 $0 IdentifierAsString() $1 Arguments()
         // .. | &1 $0 RegularExpression()
@@ -983,30 +983,30 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
             // &0 $0 IdentifierAsString() $1 Arguments()
             final NodeSequence n0CHS2A1CHS3 = (NodeSequence) n0CHS2A1CH;
             // $0 IdentifierAsString()
-            final INode n0CHS2A1CHS3A0 = n0CHS2A1CHS3.elementAt(0);
-            nRes = n0CHS2A1CHS3A0.accept(this);
+            final INode n0CHS2A1CHS30A0 = n0CHS2A1CHS3.elementAt(0);
+            nRes = n0CHS2A1CHS30A0.accept(this);
             // $1 Arguments()
-            final INode n0CHS2A1CHS3A1 = n0CHS2A1CHS3.elementAt(1);
-            nRes = n0CHS2A1CHS3A1.accept(this);
+            final INode n0CHS2A1CHS30A1 = n0CHS2A1CHS3.elementAt(1);
+            nRes = n0CHS2A1CHS30A1.accept(this);
             break;
           case 1:
             // &1 $0 RegularExpression()
             // .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
             final NodeSequence n0CHS2A1CHS4 = (NodeSequence) n0CHS2A1CH;
             // $0 RegularExpression()
-            final INode n0CHS2A1CHS4A0 = n0CHS2A1CHS4.elementAt(0);
-            nRes = n0CHS2A1CHS4A0.accept(this);
+            final INode n0CHS2A1CHS41A0 = n0CHS2A1CHS4.elementAt(0);
+            nRes = n0CHS2A1CHS41A0.accept(this);
             // $1 [ ?0 "." ?1 < IDENTIFIER > ]
-            final INode n0CHS2A1CHS4A1 = n0CHS2A1CHS4.elementAt(1);
-            final NodeOptional n0CHS2A1CHS4A1P = (NodeOptional) n0CHS2A1CHS4A1;
-            if (n0CHS2A1CHS4A1P.present()) {
-              final NodeSequence n0CHS2A1CHS4A1PS5 = (NodeSequence) n0CHS2A1CHS4A1P.node;
+            final INode n0CHS2A1CHS41A1 = n0CHS2A1CHS4.elementAt(1);
+            final NodeOptional n0CHS2A1CHS41A1P = (NodeOptional) n0CHS2A1CHS41A1;
+            if (n0CHS2A1CHS41A1P.present()) {
+              final NodeSequence n0CHS2A1CHS41A1PS5 = (NodeSequence) n0CHS2A1CHS41A1P.node;
               // ?0 "."
-              final INode n0CHS2A1CHS4A1PS5A0 = n0CHS2A1CHS4A1PS5.elementAt(0);
-              nRes = n0CHS2A1CHS4A1PS5A0.accept(this);
+              final INode n0CHS2A1CHS41A1PS5A0 = n0CHS2A1CHS41A1PS5.elementAt(0);
+              nRes = n0CHS2A1CHS41A1PS5A0.accept(this);
               // ?1 < IDENTIFIER >
-              final INode n0CHS2A1CHS4A1PS5A1 = n0CHS2A1CHS4A1PS5.elementAt(1);
-              nRes = n0CHS2A1CHS4A1PS5A1.accept(this);
+              final INode n0CHS2A1CHS41A1PS5A1 = n0CHS2A1CHS41A1PS5.elementAt(1);
+              nRes = n0CHS2A1CHS41A1PS5A1.accept(this);
             }
             break;
           default:
@@ -1021,34 +1021,34 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. .. | &2 "?" )?
         final NodeSequence n0CHS3 = (NodeSequence) n0CH;
         // #0 "("
-        final INode n0CHS3A0 = n0CHS3.elementAt(0);
-        nRes = n0CHS3A0.accept(this);
+        final INode n0CHS35A0 = n0CHS3.elementAt(0);
+        nRes = n0CHS35A0.accept(this);
         // #1 ExpansionChoices()
-        final INode n0CHS3A1 = n0CHS3.elementAt(1);
-        nRes = n0CHS3A1.accept(this);
+        final INode n0CHS35A1 = n0CHS3.elementAt(1);
+        nRes = n0CHS35A1.accept(this);
         // #2 ")"
-        final INode n0CHS3A2 = n0CHS3.elementAt(2);
-        nRes = n0CHS3A2.accept(this);
+        final INode n0CHS35A2 = n0CHS3.elementAt(2);
+        nRes = n0CHS35A2.accept(this);
         // #3 ( &0 "+"
         // .. | &1 "*"
         // .. | &2 "?" )?
-        final INode n0CHS3A3 = n0CHS3.elementAt(3);
-        final NodeOptional n0CHS3A3P = (NodeOptional) n0CHS3A3;
-        if (n0CHS3A3P.present()) {
-          final NodeChoice n0CHS3A3PC = (NodeChoice) n0CHS3A3P.node;
-          final INode n0CHS3A3PCH = n0CHS3A3PC.choice;
-          switch (n0CHS3A3PC.which) {
+        final INode n0CHS35A3 = n0CHS3.elementAt(3);
+        final NodeOptional n0CHS35A3P = (NodeOptional) n0CHS35A3;
+        if (n0CHS35A3P.present()) {
+          final NodeChoice n0CHS35A3PC = (NodeChoice) n0CHS35A3P.node;
+          final INode n0CHS35A3PCH = n0CHS35A3PC.choice;
+          switch (n0CHS35A3PC.which) {
             case 0:
               // &0 "+"
-              nRes = n0CHS3A3PCH.accept(this);
+              nRes = n0CHS35A3PCH.accept(this);
               break;
             case 1:
               // &1 "*"
-              nRes = n0CHS3A3PCH.accept(this);
+              nRes = n0CHS35A3PCH.accept(this);
               break;
             case 2:
               // &2 "?"
-              nRes = n0CHS3A3PCH.accept(this);
+              nRes = n0CHS35A3PCH.accept(this);
               break;
             default:
               // should not occur !!!
@@ -1167,26 +1167,26 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. #2 ComplexRegularExpressionChoices() #3 ">"
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "<"
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        nRes = n0CHS0A0.accept(this);
+        final INode n0CHS01A0 = n0CHS0.elementAt(0);
+        nRes = n0CHS01A0.accept(this);
         // #1 [ $0 [ "#" ]
         // .. . $1 IdentifierAsString() $2 ":" ]
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        final NodeOptional n0CHS0A1P = (NodeOptional) n0CHS0A1;
-        if (n0CHS0A1P.present()) {
-          final NodeSequence n0CHS0A1PS1 = (NodeSequence) n0CHS0A1P.node;
+        final INode n0CHS01A1 = n0CHS0.elementAt(1);
+        final NodeOptional n0CHS01A1P = (NodeOptional) n0CHS01A1;
+        if (n0CHS01A1P.present()) {
+          final NodeSequence n0CHS01A1PS1 = (NodeSequence) n0CHS01A1P.node;
           // $0 [ "#" ]
-          final INode n0CHS0A1PS1A0 = n0CHS0A1PS1.elementAt(0);
-          final NodeOptional n0CHS0A1PS1A0P = (NodeOptional) n0CHS0A1PS1A0;
-          if (n0CHS0A1PS1A0P.present()) {
-            nRes = n0CHS0A1PS1A0P.accept(this);
+          final INode n0CHS01A1PS1A0 = n0CHS01A1PS1.elementAt(0);
+          final NodeOptional n0CHS01A1PS1A0P = (NodeOptional) n0CHS01A1PS1A0;
+          if (n0CHS01A1PS1A0P.present()) {
+            nRes = n0CHS01A1PS1A0P.accept(this);
           }
           // $1 IdentifierAsString()
-          final INode n0CHS0A1PS1A1 = n0CHS0A1PS1.elementAt(1);
-          nRes = n0CHS0A1PS1A1.accept(this);
+          final INode n0CHS01A1PS1A1 = n0CHS01A1PS1.elementAt(1);
+          nRes = n0CHS01A1PS1A1.accept(this);
           // $2 ":"
-          final INode n0CHS0A1PS1A2 = n0CHS0A1PS1.elementAt(2);
-          nRes = n0CHS0A1PS1A2.accept(this);
+          final INode n0CHS01A1PS1A2 = n0CHS01A1PS1.elementAt(2);
+          nRes = n0CHS01A1PS1A2.accept(this);
         }
         // #2 ComplexRegularExpressionChoices()
         final INode n0CHS0A2 = n0CHS0.elementAt(2);
@@ -1199,27 +1199,27 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // %2 #0 "<" #1 IdentifierAsString() #2 ">"
         final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "<"
-        final INode n0CHS1A0 = n0CHS1.elementAt(0);
-        nRes = n0CHS1A0.accept(this);
+        final INode n0CHS12A0 = n0CHS1.elementAt(0);
+        nRes = n0CHS12A0.accept(this);
         // #1 IdentifierAsString()
-        final INode n0CHS1A1 = n0CHS1.elementAt(1);
-        nRes = n0CHS1A1.accept(this);
+        final INode n0CHS12A1 = n0CHS1.elementAt(1);
+        nRes = n0CHS12A1.accept(this);
         // #2 ">"
-        final INode n0CHS1A2 = n0CHS1.elementAt(2);
-        nRes = n0CHS1A2.accept(this);
+        final INode n0CHS12A2 = n0CHS1.elementAt(2);
+        nRes = n0CHS12A2.accept(this);
         break;
       case 3:
         // %3 #0 "<" #1 "EOF" #2 ">"
         final NodeSequence n0CHS2 = (NodeSequence) n0CH;
         // #0 "<"
-        final INode n0CHS2A0 = n0CHS2.elementAt(0);
-        nRes = n0CHS2A0.accept(this);
+        final INode n0CHS23A0 = n0CHS2.elementAt(0);
+        nRes = n0CHS23A0.accept(this);
         // #1 "EOF"
-        final INode n0CHS2A1 = n0CHS2.elementAt(1);
-        nRes = n0CHS2A1.accept(this);
+        final INode n0CHS23A1 = n0CHS2.elementAt(1);
+        nRes = n0CHS23A1.accept(this);
         // #2 ">"
-        final INode n0CHS2A2 = n0CHS2.elementAt(2);
-        nRes = n0CHS2A2.accept(this);
+        final INode n0CHS23A2 = n0CHS2.elementAt(2);
+        nRes = n0CHS23A2.accept(this);
         break;
       default:
         // should not occur !!!
@@ -1320,14 +1320,14 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // %1 #0 "<" #1 IdentifierAsString() #2 ">"
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "<"
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        nRes = n0CHS0A0.accept(this);
+        final INode n0CHS01A0 = n0CHS0.elementAt(0);
+        nRes = n0CHS01A0.accept(this);
         // #1 IdentifierAsString()
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        nRes = n0CHS0A1.accept(this);
+        final INode n0CHS01A1 = n0CHS0.elementAt(1);
+        nRes = n0CHS01A1.accept(this);
         // #2 ">"
-        final INode n0CHS0A2 = n0CHS0.elementAt(2);
-        nRes = n0CHS0A2.accept(this);
+        final INode n0CHS01A2 = n0CHS0.elementAt(2);
+        nRes = n0CHS01A2.accept(this);
         break;
       case 2:
         // %2 CharacterList()
@@ -1344,14 +1344,14 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. .. .. $3 "}" )?
         final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "("
-        final INode n0CHS1A0 = n0CHS1.elementAt(0);
-        nRes = n0CHS1A0.accept(this);
+        final INode n0CHS13A0 = n0CHS1.elementAt(0);
+        nRes = n0CHS13A0.accept(this);
         // #1 ComplexRegularExpressionChoices()
-        final INode n0CHS1A1 = n0CHS1.elementAt(1);
-        nRes = n0CHS1A1.accept(this);
+        final INode n0CHS13A1 = n0CHS1.elementAt(1);
+        nRes = n0CHS13A1.accept(this);
         // #2 ")"
-        final INode n0CHS1A2 = n0CHS1.elementAt(2);
-        nRes = n0CHS1A2.accept(this);
+        final INode n0CHS13A2 = n0CHS1.elementAt(2);
+        nRes = n0CHS13A2.accept(this);
         // #3 ( &0 "+"
         // .. | &1 "*"
         // .. | &2 "?"
@@ -1359,55 +1359,55 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. .. $2 [ ?0 ","
         // .. .. .. . ?1 [ IntegerLiteral() ] ]
         // .. .. $3 "}" )?
-        final INode n0CHS1A3 = n0CHS1.elementAt(3);
-        final NodeOptional n0CHS1A3P = (NodeOptional) n0CHS1A3;
-        if (n0CHS1A3P.present()) {
-          final NodeChoice n0CHS1A3PC = (NodeChoice) n0CHS1A3P.node;
-          final INode n0CHS1A3PCH = n0CHS1A3PC.choice;
-          switch (n0CHS1A3PC.which) {
+        final INode n0CHS13A3 = n0CHS1.elementAt(3);
+        final NodeOptional n0CHS13A3P = (NodeOptional) n0CHS13A3;
+        if (n0CHS13A3P.present()) {
+          final NodeChoice n0CHS13A3PC = (NodeChoice) n0CHS13A3P.node;
+          final INode n0CHS13A3PCH = n0CHS13A3PC.choice;
+          switch (n0CHS13A3PC.which) {
             case 0:
               // &0 "+"
-              nRes = n0CHS1A3PCH.accept(this);
+              nRes = n0CHS13A3PCH.accept(this);
               break;
             case 1:
               // &1 "*"
-              nRes = n0CHS1A3PCH.accept(this);
+              nRes = n0CHS13A3PCH.accept(this);
               break;
             case 2:
               // &2 "?"
-              nRes = n0CHS1A3PCH.accept(this);
+              nRes = n0CHS13A3PCH.accept(this);
               break;
             case 3:
               // &3 $0 "{" $1 IntegerLiteral()
               // .. $2 [ ?0 ","
               // .. .. . ?1 [ IntegerLiteral() ] ]
               // .. $3 "}"
-              final NodeSequence n0CHS1A3PCHS2 = (NodeSequence) n0CHS1A3PCH;
+              final NodeSequence n0CHS13A3PCHS2 = (NodeSequence) n0CHS13A3PCH;
               // $0 "{"
-              final INode n0CHS1A3PCHS2A0 = n0CHS1A3PCHS2.elementAt(0);
-              nRes = n0CHS1A3PCHS2A0.accept(this);
+              final INode n0CHS13A3PCHS23A0 = n0CHS13A3PCHS2.elementAt(0);
+              nRes = n0CHS13A3PCHS23A0.accept(this);
               // $1 IntegerLiteral()
-              final INode n0CHS1A3PCHS2A1 = n0CHS1A3PCHS2.elementAt(1);
-              nRes = n0CHS1A3PCHS2A1.accept(this);
+              final INode n0CHS13A3PCHS23A1 = n0CHS13A3PCHS2.elementAt(1);
+              nRes = n0CHS13A3PCHS23A1.accept(this);
               // $2 [ ?0 ","
               // .. . ?1 [ IntegerLiteral() ] ]
-              final INode n0CHS1A3PCHS2A2 = n0CHS1A3PCHS2.elementAt(2);
-              final NodeOptional n0CHS1A3PCHS2A2P = (NodeOptional) n0CHS1A3PCHS2A2;
-              if (n0CHS1A3PCHS2A2P.present()) {
-                final NodeSequence n0CHS1A3PCHS2A2PS3 = (NodeSequence) n0CHS1A3PCHS2A2P.node;
+              final INode n0CHS13A3PCHS23A2 = n0CHS13A3PCHS2.elementAt(2);
+              final NodeOptional n0CHS13A3PCHS23A2P = (NodeOptional) n0CHS13A3PCHS23A2;
+              if (n0CHS13A3PCHS23A2P.present()) {
+                final NodeSequence n0CHS13A3PCHS23A2PS3 = (NodeSequence) n0CHS13A3PCHS23A2P.node;
                 // ?0 ","
-                final INode n0CHS1A3PCHS2A2PS3A0 = n0CHS1A3PCHS2A2PS3.elementAt(0);
-                nRes = n0CHS1A3PCHS2A2PS3A0.accept(this);
+                final INode n0CHS13A3PCHS23A2PS3A0 = n0CHS13A3PCHS23A2PS3.elementAt(0);
+                nRes = n0CHS13A3PCHS23A2PS3A0.accept(this);
                 // ?1 [ IntegerLiteral() ]
-                final INode n0CHS1A3PCHS2A2PS3A1 = n0CHS1A3PCHS2A2PS3.elementAt(1);
-                final NodeOptional n0CHS1A3PCHS2A2PS3A1P = (NodeOptional) n0CHS1A3PCHS2A2PS3A1;
-                if (n0CHS1A3PCHS2A2PS3A1P.present()) {
-                  nRes = n0CHS1A3PCHS2A2PS3A1P.accept(this);
+                final INode n0CHS13A3PCHS23A2PS3A1 = n0CHS13A3PCHS23A2PS3.elementAt(1);
+                final NodeOptional n0CHS13A3PCHS23A2PS3A1P = (NodeOptional) n0CHS13A3PCHS23A2PS3A1;
+                if (n0CHS13A3PCHS23A2PS3A1P.present()) {
+                  nRes = n0CHS13A3PCHS23A2PS3A1P.accept(this);
                 }
               }
               // $3 "}"
-              final INode n0CHS1A3PCHS2A3 = n0CHS1A3PCHS2.elementAt(3);
-              nRes = n0CHS1A3PCHS2A3.accept(this);
+              final INode n0CHS13A3PCHS2A3 = n0CHS13A3PCHS2.elementAt(3);
+              nRes = n0CHS13A3PCHS2A3.accept(this);
               break;
             default:
               // should not occur !!!
@@ -1842,26 +1842,26 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. .. | &2 AnnotationTypeDeclaration() )
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 Modifiers()
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        nRes = n0CHS0A0.accept(this);
+        final INode n0CHS01A0 = n0CHS0.elementAt(0);
+        nRes = n0CHS01A0.accept(this);
         // #1 ( &0 ClassOrInterfaceDeclaration()
         // .. | &1 EnumDeclaration()
         // .. | &2 AnnotationTypeDeclaration() )
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        final NodeChoice n0CHS0A1C = (NodeChoice) n0CHS0A1;
-        final INode n0CHS0A1CH = n0CHS0A1C.choice;
-        switch (n0CHS0A1C.which) {
+        final INode n0CHS01A1 = n0CHS0.elementAt(1);
+        final NodeChoice n0CHS01A1C = (NodeChoice) n0CHS01A1;
+        final INode n0CHS01A1CH = n0CHS01A1C.choice;
+        switch (n0CHS01A1C.which) {
           case 0:
             // &0 ClassOrInterfaceDeclaration()
-            nRes = n0CHS0A1CH.accept(this);
+            nRes = n0CHS01A1CH.accept(this);
             break;
           case 1:
             // &1 EnumDeclaration()
-            nRes = n0CHS0A1CH.accept(this);
+            nRes = n0CHS01A1CH.accept(this);
             break;
           case 2:
             // &2 AnnotationTypeDeclaration()
-            nRes = n0CHS0A1CH.accept(this);
+            nRes = n0CHS01A1CH.accept(this);
             break;
           default:
             // should not occur !!!
@@ -2303,36 +2303,36 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. .. | &4 MethodDeclaration() )
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 Modifiers()
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        nRes = n0CHS0A0.accept(this);
+        final INode n0CHS01A0 = n0CHS0.elementAt(0);
+        nRes = n0CHS01A0.accept(this);
         // #1 ( &0 ClassOrInterfaceDeclaration()
         // .. | &1 EnumDeclaration()
         // .. | &2 ConstructorDeclaration()
         // .. | &3 FieldDeclaration()
         // .. | &4 MethodDeclaration() )
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        final NodeChoice n0CHS0A1C = (NodeChoice) n0CHS0A1;
-        final INode n0CHS0A1CH = n0CHS0A1C.choice;
-        switch (n0CHS0A1C.which) {
+        final INode n0CHS01A1 = n0CHS0.elementAt(1);
+        final NodeChoice n0CHS01A1C = (NodeChoice) n0CHS01A1;
+        final INode n0CHS01A1CH = n0CHS01A1C.choice;
+        switch (n0CHS01A1C.which) {
           case 0:
             // &0 ClassOrInterfaceDeclaration()
-            nRes = n0CHS0A1CH.accept(this);
+            nRes = n0CHS01A1CH.accept(this);
             break;
           case 1:
             // &1 EnumDeclaration()
-            nRes = n0CHS0A1CH.accept(this);
+            nRes = n0CHS01A1CH.accept(this);
             break;
           case 2:
             // &2 ConstructorDeclaration()
-            nRes = n0CHS0A1CH.accept(this);
+            nRes = n0CHS01A1CH.accept(this);
             break;
           case 3:
             // &3 FieldDeclaration()
-            nRes = n0CHS0A1CH.accept(this);
+            nRes = n0CHS01A1CH.accept(this);
             break;
           case 4:
             // &4 MethodDeclaration()
-            nRes = n0CHS0A1CH.accept(this);
+            nRes = n0CHS01A1CH.accept(this);
             break;
           default:
             // should not occur !!!
@@ -2783,30 +2783,30 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // %0 #0 "this" #1 Arguments() #2 ";"
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "this"
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        nRes = n0CHS0A0.accept(this);
+        final INode n0CHS00A0 = n0CHS0.elementAt(0);
+        nRes = n0CHS00A0.accept(this);
         // #1 Arguments()
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        nRes = n0CHS0A1.accept(this);
+        final INode n0CHS00A1 = n0CHS0.elementAt(1);
+        nRes = n0CHS00A1.accept(this);
         // #2 ";"
-        final INode n0CHS0A2 = n0CHS0.elementAt(2);
-        nRes = n0CHS0A2.accept(this);
+        final INode n0CHS00A2 = n0CHS0.elementAt(2);
+        nRes = n0CHS00A2.accept(this);
         break;
       case 1:
         // %1 #0 [ $0 PrimaryExpression() $1 "." ]
         // .. #1 "super" #2 Arguments() #3 ";"
         final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 [ $0 PrimaryExpression() $1 "." ]
-        final INode n0CHS1A0 = n0CHS1.elementAt(0);
-        final NodeOptional n0CHS1A0P = (NodeOptional) n0CHS1A0;
-        if (n0CHS1A0P.present()) {
-          final NodeSequence n0CHS1A0PS2 = (NodeSequence) n0CHS1A0P.node;
+        final INode n0CHS11A0 = n0CHS1.elementAt(0);
+        final NodeOptional n0CHS11A0P = (NodeOptional) n0CHS11A0;
+        if (n0CHS11A0P.present()) {
+          final NodeSequence n0CHS11A0PS2 = (NodeSequence) n0CHS11A0P.node;
           // $0 PrimaryExpression()
-          final INode n0CHS1A0PS2A0 = n0CHS1A0PS2.elementAt(0);
-          nRes = n0CHS1A0PS2A0.accept(this);
+          final INode n0CHS11A0PS2A0 = n0CHS11A0PS2.elementAt(0);
+          nRes = n0CHS11A0PS2A0.accept(this);
           // $1 "."
-          final INode n0CHS1A0PS2A1 = n0CHS1A0PS2.elementAt(1);
-          nRes = n0CHS1A0PS2A1.accept(this);
+          final INode n0CHS11A0PS2A1 = n0CHS11A0PS2.elementAt(1);
+          nRes = n0CHS11A0PS2A1.accept(this);
         }
         // #1 "super"
         final INode n0CHS1A1 = n0CHS1.elementAt(1);
@@ -2903,20 +2903,20 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. #1 ( $0 "[" $1 "]" )+
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 PrimitiveType()
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        nRes = n0CHS0A0.accept(this);
+        final INode n0CHS00A0 = n0CHS0.elementAt(0);
+        nRes = n0CHS00A0.accept(this);
         // #1 ( $0 "[" $1 "]" )+
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        final NodeList n0CHS0A1L = (NodeList) n0CHS0A1;
-        for (int i = 0; i < n0CHS0A1L.size(); i++) {
-          final INode n0CHS0A1LEi = n0CHS0A1L.elementAt(i);
-          final NodeSequence n0CHS0A1LEiS1 = (NodeSequence) n0CHS0A1LEi;
+        final INode n0CHS00A1 = n0CHS0.elementAt(1);
+        final NodeList n0CHS00A1L = (NodeList) n0CHS00A1;
+        for (int i = 0; i < n0CHS00A1L.size(); i++) {
+          final INode n0CHS00A1LEi = n0CHS00A1L.elementAt(i);
+          final NodeSequence n0CHS00A1LEiS1 = (NodeSequence) n0CHS00A1LEi;
           // $0 "["
-          final INode n0CHS0A1LEiS1A0 = n0CHS0A1LEiS1.elementAt(0);
-          nRes = n0CHS0A1LEiS1A0.accept(this);
+          final INode n0CHS00A1LEiS1A0 = n0CHS00A1LEiS1.elementAt(0);
+          nRes = n0CHS00A1LEiS1A0.accept(this);
           // $1 "]"
-          final INode n0CHS0A1LEiS1A1 = n0CHS0A1LEiS1.elementAt(1);
-          nRes = n0CHS0A1LEiS1A1.accept(this);
+          final INode n0CHS00A1LEiS1A1 = n0CHS00A1LEiS1.elementAt(1);
+          nRes = n0CHS00A1LEiS1A1.accept(this);
         }
         break;
       case 1:
@@ -2924,21 +2924,21 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. #1 ( $0 "[" $1 "]" )*
         final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 ClassOrInterfaceType()
-        final INode n0CHS1A0 = n0CHS1.elementAt(0);
-        nRes = n0CHS1A0.accept(this);
+        final INode n0CHS11A0 = n0CHS1.elementAt(0);
+        nRes = n0CHS11A0.accept(this);
         // #1 ( $0 "[" $1 "]" )*
-        final INode n0CHS1A1 = n0CHS1.elementAt(1);
-        final NodeListOptional n0CHS1A1T = (NodeListOptional) n0CHS1A1;
-        if (n0CHS1A1T.present()) {
-          for (int i = 0; i < n0CHS1A1T.size(); i++) {
-            final INode n0CHS1A1TMi = n0CHS1A1T.elementAt(i);
-            final NodeSequence n0CHS1A1TMiS2 = (NodeSequence) n0CHS1A1TMi;
+        final INode n0CHS11A1 = n0CHS1.elementAt(1);
+        final NodeListOptional n0CHS11A1T = (NodeListOptional) n0CHS11A1;
+        if (n0CHS11A1T.present()) {
+          for (int i = 0; i < n0CHS11A1T.size(); i++) {
+            final INode n0CHS11A1TMi = n0CHS11A1T.elementAt(i);
+            final NodeSequence n0CHS11A1TMiS2 = (NodeSequence) n0CHS11A1TMi;
             // $0 "["
-            final INode n0CHS1A1TMiS2A0 = n0CHS1A1TMiS2.elementAt(0);
-            nRes = n0CHS1A1TMiS2A0.accept(this);
+            final INode n0CHS11A1TMiS2A0 = n0CHS11A1TMiS2.elementAt(0);
+            nRes = n0CHS11A1TMiS2A0.accept(this);
             // $1 "]"
-            final INode n0CHS1A1TMiS2A1 = n0CHS1A1TMiS2.elementAt(1);
-            nRes = n0CHS1A1TMiS2A1.accept(this);
+            final INode n0CHS11A1TMiS2A1 = n0CHS11A1TMiS2.elementAt(1);
+            nRes = n0CHS11A1TMiS2A1.accept(this);
           }
         }
         break;
@@ -3060,13 +3060,13 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. #1 [ WildcardBounds() ]
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "?"
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        nRes = n0CHS0A0.accept(this);
+        final INode n0CHS01A0 = n0CHS0.elementAt(0);
+        nRes = n0CHS01A0.accept(this);
         // #1 [ WildcardBounds() ]
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        final NodeOptional n0CHS0A1P = (NodeOptional) n0CHS0A1;
-        if (n0CHS0A1P.present()) {
-          nRes = n0CHS0A1P.accept(this);
+        final INode n0CHS01A1 = n0CHS0.elementAt(1);
+        final NodeOptional n0CHS01A1P = (NodeOptional) n0CHS01A1;
+        if (n0CHS01A1P.present()) {
+          nRes = n0CHS01A1P.accept(this);
         }
         break;
       default:
@@ -3096,21 +3096,21 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // %0 #0 "extends" #1 ReferenceType()
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "extends"
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        nRes = n0CHS0A0.accept(this);
+        final INode n0CHS00A0 = n0CHS0.elementAt(0);
+        nRes = n0CHS00A0.accept(this);
         // #1 ReferenceType()
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        nRes = n0CHS0A1.accept(this);
+        final INode n0CHS00A1 = n0CHS0.elementAt(1);
+        nRes = n0CHS00A1.accept(this);
         break;
       case 1:
         // %1 #0 "super" #1 ReferenceType()
         final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "super"
-        final INode n0CHS1A0 = n0CHS1.elementAt(0);
-        nRes = n0CHS1A0.accept(this);
+        final INode n0CHS11A0 = n0CHS1.elementAt(0);
+        nRes = n0CHS11A0.accept(this);
         // #1 ReferenceType()
-        final INode n0CHS1A1 = n0CHS1.elementAt(1);
-        nRes = n0CHS1A1.accept(this);
+        final INode n0CHS11A1 = n0CHS1.elementAt(1);
+        nRes = n0CHS11A1.accept(this);
         break;
       default:
         // should not occur !!!
@@ -3631,8 +3631,8 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
             break;
         }
         // #1 InstanceOfExpression()
-        final INode n1MiS0A1 = n1MiS0.elementAt(1);
-        nRes = n1MiS0A1.accept(this);
+        final INode n1MiS01A1 = n1MiS0.elementAt(1);
+        nRes = n1MiS01A1.accept(this);
       }
     }
     return nRes;
@@ -3723,8 +3723,8 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
             break;
         }
         // #1 ShiftExpression()
-        final INode n1MiS0A1 = n1MiS0.elementAt(1);
-        nRes = n1MiS0A1.accept(this);
+        final INode n1MiS03A1 = n1MiS0.elementAt(1);
+        nRes = n1MiS03A1.accept(this);
       }
     }
     return nRes;
@@ -3780,8 +3780,8 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
             break;
         }
         // #1 AdditiveExpression()
-        final INode n1MiS0A1 = n1MiS0.elementAt(1);
-        nRes = n1MiS0A1.accept(this);
+        final INode n1MiS02A1 = n1MiS0.elementAt(1);
+        nRes = n1MiS02A1.accept(this);
       }
     }
     return nRes;
@@ -3862,8 +3862,8 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
             break;
         }
         // #1 MultiplicativeExpression()
-        final INode n1MiS0A1 = n1MiS0.elementAt(1);
-        nRes = n1MiS0A1.accept(this);
+        final INode n1MiS01A1 = n1MiS0.elementAt(1);
+        nRes = n1MiS01A1.accept(this);
       }
     }
     return nRes;
@@ -3919,8 +3919,8 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
             break;
         }
         // #1 UnaryExpression()
-        final INode n1MiS0A1 = n1MiS0.elementAt(1);
-        nRes = n1MiS0A1.accept(this);
+        final INode n1MiS02A1 = n1MiS0.elementAt(1);
+        nRes = n1MiS02A1.accept(this);
       }
     }
     return nRes;
@@ -3957,25 +3957,25 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 ( &0 "+"
         // .. | &1 "-" )
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        final NodeChoice n0CHS0A0C = (NodeChoice) n0CHS0A0;
-        final INode n0CHS0A0CH = n0CHS0A0C.choice;
-        switch (n0CHS0A0C.which) {
+        final INode n0CHS00A0 = n0CHS0.elementAt(0);
+        final NodeChoice n0CHS00A0C = (NodeChoice) n0CHS00A0;
+        final INode n0CHS00A0CH = n0CHS00A0C.choice;
+        switch (n0CHS00A0C.which) {
           case 0:
             // &0 "+"
-            nRes = n0CHS0A0CH.accept(this);
+            nRes = n0CHS00A0CH.accept(this);
             break;
           case 1:
             // &1 "-"
-            nRes = n0CHS0A0CH.accept(this);
+            nRes = n0CHS00A0CH.accept(this);
             break;
           default:
             // should not occur !!!
             break;
         }
         // #1 UnaryExpression()
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        nRes = n0CHS0A1.accept(this);
+        final INode n0CHS01A1 = n0CHS0.elementAt(1);
+        nRes = n0CHS01A1.accept(this);
         break;
       case 1:
         // %1 PreIncrementExpression()
@@ -4065,25 +4065,25 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 ( &0 "~"
         // .. | &1 "!" )
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        final NodeChoice n0CHS0A0C = (NodeChoice) n0CHS0A0;
-        final INode n0CHS0A0CH = n0CHS0A0C.choice;
-        switch (n0CHS0A0C.which) {
+        final INode n0CHS00A0 = n0CHS0.elementAt(0);
+        final NodeChoice n0CHS00A0C = (NodeChoice) n0CHS00A0;
+        final INode n0CHS00A0CH = n0CHS00A0C.choice;
+        switch (n0CHS00A0C.which) {
           case 0:
             // &0 "~"
-            nRes = n0CHS0A0CH.accept(this);
+            nRes = n0CHS00A0CH.accept(this);
             break;
           case 1:
             // &1 "!"
-            nRes = n0CHS0A0CH.accept(this);
+            nRes = n0CHS00A0CH.accept(this);
             break;
           default:
             // should not occur !!!
             break;
         }
         // #1 UnaryExpression()
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        nRes = n0CHS0A1.accept(this);
+        final INode n0CHS01A1 = n0CHS0.elementAt(1);
+        nRes = n0CHS01A1.accept(this);
         break;
       case 1:
         // %1 CastExpression()
@@ -4138,27 +4138,27 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // %0 #0 "(" #1 PrimitiveType()
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "("
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        nRes = n0CHS0A0.accept(this);
+        final INode n0CHS00A0 = n0CHS0.elementAt(0);
+        nRes = n0CHS00A0.accept(this);
         // #1 PrimitiveType()
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        nRes = n0CHS0A1.accept(this);
+        final INode n0CHS00A1 = n0CHS0.elementAt(1);
+        nRes = n0CHS00A1.accept(this);
         break;
       case 1:
         // %1 #0 "(" #1 Type() #2 "[" #3 "]"
         final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "("
-        final INode n0CHS1A0 = n0CHS1.elementAt(0);
-        nRes = n0CHS1A0.accept(this);
+        final INode n0CHS11A0 = n0CHS1.elementAt(0);
+        nRes = n0CHS11A0.accept(this);
         // #1 Type()
-        final INode n0CHS1A1 = n0CHS1.elementAt(1);
-        nRes = n0CHS1A1.accept(this);
+        final INode n0CHS11A1 = n0CHS1.elementAt(1);
+        nRes = n0CHS11A1.accept(this);
         // #2 "["
-        final INode n0CHS1A2 = n0CHS1.elementAt(2);
-        nRes = n0CHS1A2.accept(this);
+        final INode n0CHS11A2 = n0CHS1.elementAt(2);
+        nRes = n0CHS11A2.accept(this);
         // #3 "]"
-        final INode n0CHS1A3 = n0CHS1.elementAt(3);
-        nRes = n0CHS1A3.accept(this);
+        final INode n0CHS11A3 = n0CHS1.elementAt(3);
+        nRes = n0CHS11A3.accept(this);
         break;
       case 2:
         // %2 #0 "(" #1 Type() #2 ")"
@@ -4172,14 +4172,14 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. .. | &7 Literal() )
         final NodeSequence n0CHS2 = (NodeSequence) n0CH;
         // #0 "("
-        final INode n0CHS2A0 = n0CHS2.elementAt(0);
-        nRes = n0CHS2A0.accept(this);
+        final INode n0CHS22A0 = n0CHS2.elementAt(0);
+        nRes = n0CHS22A0.accept(this);
         // #1 Type()
-        final INode n0CHS2A1 = n0CHS2.elementAt(1);
-        nRes = n0CHS2A1.accept(this);
+        final INode n0CHS22A1 = n0CHS2.elementAt(1);
+        nRes = n0CHS22A1.accept(this);
         // #2 ")"
-        final INode n0CHS2A2 = n0CHS2.elementAt(2);
-        nRes = n0CHS2A2.accept(this);
+        final INode n0CHS22A2 = n0CHS2.elementAt(2);
+        nRes = n0CHS22A2.accept(this);
         // #3 ( &0 "~"
         // .. | &1 "!"
         // .. | &2 "("
@@ -4188,41 +4188,41 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. | &5 "super"
         // .. | &6 "new"
         // .. | &7 Literal() )
-        final INode n0CHS2A3 = n0CHS2.elementAt(3);
-        final NodeChoice n0CHS2A3C = (NodeChoice) n0CHS2A3;
-        final INode n0CHS2A3CH = n0CHS2A3C.choice;
-        switch (n0CHS2A3C.which) {
+        final INode n0CHS22A3 = n0CHS2.elementAt(3);
+        final NodeChoice n0CHS22A3C = (NodeChoice) n0CHS22A3;
+        final INode n0CHS22A3CH = n0CHS22A3C.choice;
+        switch (n0CHS22A3C.which) {
           case 0:
             // &0 "~"
-            nRes = n0CHS2A3CH.accept(this);
+            nRes = n0CHS22A3CH.accept(this);
             break;
           case 1:
             // &1 "!"
-            nRes = n0CHS2A3CH.accept(this);
+            nRes = n0CHS22A3CH.accept(this);
             break;
           case 2:
             // &2 "("
-            nRes = n0CHS2A3CH.accept(this);
+            nRes = n0CHS22A3CH.accept(this);
             break;
           case 3:
             // &3 < IDENTIFIER >
-            nRes = n0CHS2A3CH.accept(this);
+            nRes = n0CHS22A3CH.accept(this);
             break;
           case 4:
             // &4 "this"
-            nRes = n0CHS2A3CH.accept(this);
+            nRes = n0CHS22A3CH.accept(this);
             break;
           case 5:
             // &5 "super"
-            nRes = n0CHS2A3CH.accept(this);
+            nRes = n0CHS22A3CH.accept(this);
             break;
           case 6:
             // &6 "new"
-            nRes = n0CHS2A3CH.accept(this);
+            nRes = n0CHS22A3CH.accept(this);
             break;
           case 7:
             // &7 Literal()
-            nRes = n0CHS2A3CH.accept(this);
+            nRes = n0CHS22A3CH.accept(this);
             break;
           default:
             // should not occur !!!
@@ -4294,33 +4294,33 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // %0 #0 "(" #1 Type() #2 ")" #3 UnaryExpression()
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "("
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        nRes = n0CHS0A0.accept(this);
+        final INode n0CHS00A0 = n0CHS0.elementAt(0);
+        nRes = n0CHS00A0.accept(this);
         // #1 Type()
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        nRes = n0CHS0A1.accept(this);
+        final INode n0CHS00A1 = n0CHS0.elementAt(1);
+        nRes = n0CHS00A1.accept(this);
         // #2 ")"
-        final INode n0CHS0A2 = n0CHS0.elementAt(2);
-        nRes = n0CHS0A2.accept(this);
+        final INode n0CHS00A2 = n0CHS0.elementAt(2);
+        nRes = n0CHS00A2.accept(this);
         // #3 UnaryExpression()
-        final INode n0CHS0A3 = n0CHS0.elementAt(3);
-        nRes = n0CHS0A3.accept(this);
+        final INode n0CHS00A3 = n0CHS0.elementAt(3);
+        nRes = n0CHS00A3.accept(this);
         break;
       case 1:
         // %1 #0 "(" #1 Type() #2 ")" #3 UnaryExpressionNotPlusMinus()
         final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "("
-        final INode n0CHS1A0 = n0CHS1.elementAt(0);
-        nRes = n0CHS1A0.accept(this);
+        final INode n0CHS11A0 = n0CHS1.elementAt(0);
+        nRes = n0CHS11A0.accept(this);
         // #1 Type()
-        final INode n0CHS1A1 = n0CHS1.elementAt(1);
-        nRes = n0CHS1A1.accept(this);
+        final INode n0CHS11A1 = n0CHS1.elementAt(1);
+        nRes = n0CHS11A1.accept(this);
         // #2 ")"
-        final INode n0CHS1A2 = n0CHS1.elementAt(2);
-        nRes = n0CHS1A2.accept(this);
+        final INode n0CHS11A2 = n0CHS1.elementAt(2);
+        nRes = n0CHS11A2.accept(this);
         // #3 UnaryExpressionNotPlusMinus()
-        final INode n0CHS1A3 = n0CHS1.elementAt(3);
-        nRes = n0CHS1A3.accept(this);
+        final INode n0CHS11A3 = n0CHS1.elementAt(3);
+        nRes = n0CHS11A3.accept(this);
         break;
       default:
         // should not occur !!!
@@ -4416,27 +4416,27 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // %2 #0 "super" #1 "." #2 < IDENTIFIER >
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "super"
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        nRes = n0CHS0A0.accept(this);
+        final INode n0CHS02A0 = n0CHS0.elementAt(0);
+        nRes = n0CHS02A0.accept(this);
         // #1 "."
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        nRes = n0CHS0A1.accept(this);
+        final INode n0CHS02A1 = n0CHS0.elementAt(1);
+        nRes = n0CHS02A1.accept(this);
         // #2 < IDENTIFIER >
-        final INode n0CHS0A2 = n0CHS0.elementAt(2);
-        nRes = n0CHS0A2.accept(this);
+        final INode n0CHS02A2 = n0CHS0.elementAt(2);
+        nRes = n0CHS02A2.accept(this);
         break;
       case 3:
         // %3 #0 "(" #1 Expression() #2 ")"
         final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "("
-        final INode n0CHS1A0 = n0CHS1.elementAt(0);
-        nRes = n0CHS1A0.accept(this);
+        final INode n0CHS13A0 = n0CHS1.elementAt(0);
+        nRes = n0CHS13A0.accept(this);
         // #1 Expression()
-        final INode n0CHS1A1 = n0CHS1.elementAt(1);
-        nRes = n0CHS1A1.accept(this);
+        final INode n0CHS13A1 = n0CHS1.elementAt(1);
+        nRes = n0CHS13A1.accept(this);
         // #2 ")"
-        final INode n0CHS1A2 = n0CHS1.elementAt(2);
-        nRes = n0CHS1A2.accept(this);
+        final INode n0CHS13A2 = n0CHS1.elementAt(2);
+        nRes = n0CHS13A2.accept(this);
         break;
       case 4:
         // %4 AllocationExpression()
@@ -4446,14 +4446,14 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // %5 #0 ResultType() #1 "." #2 "class"
         final NodeSequence n0CHS2 = (NodeSequence) n0CH;
         // #0 ResultType()
-        final INode n0CHS2A0 = n0CHS2.elementAt(0);
-        nRes = n0CHS2A0.accept(this);
+        final INode n0CHS25A0 = n0CHS2.elementAt(0);
+        nRes = n0CHS25A0.accept(this);
         // #1 "."
-        final INode n0CHS2A1 = n0CHS2.elementAt(1);
-        nRes = n0CHS2A1.accept(this);
+        final INode n0CHS25A1 = n0CHS2.elementAt(1);
+        nRes = n0CHS25A1.accept(this);
         // #2 "class"
-        final INode n0CHS2A2 = n0CHS2.elementAt(2);
-        nRes = n0CHS2A2.accept(this);
+        final INode n0CHS25A2 = n0CHS2.elementAt(2);
+        nRes = n0CHS25A2.accept(this);
         break;
       case 6:
         // %6 Name()
@@ -4494,21 +4494,21 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // %0 #0 "." #1 "this"
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "."
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        nRes = n0CHS0A0.accept(this);
+        final INode n0CHS00A0 = n0CHS0.elementAt(0);
+        nRes = n0CHS00A0.accept(this);
         // #1 "this"
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        nRes = n0CHS0A1.accept(this);
+        final INode n0CHS00A1 = n0CHS0.elementAt(1);
+        nRes = n0CHS00A1.accept(this);
         break;
       case 1:
         // %1 #0 "." #1 AllocationExpression()
         final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "."
-        final INode n0CHS1A0 = n0CHS1.elementAt(0);
-        nRes = n0CHS1A0.accept(this);
+        final INode n0CHS11A0 = n0CHS1.elementAt(0);
+        nRes = n0CHS11A0.accept(this);
         // #1 AllocationExpression()
-        final INode n0CHS1A1 = n0CHS1.elementAt(1);
-        nRes = n0CHS1A1.accept(this);
+        final INode n0CHS11A1 = n0CHS1.elementAt(1);
+        nRes = n0CHS11A1.accept(this);
         break;
       case 2:
         // %2 MemberSelector()
@@ -4518,24 +4518,24 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // %3 #0 "[" #1 Expression() #2 "]"
         final NodeSequence n0CHS2 = (NodeSequence) n0CH;
         // #0 "["
-        final INode n0CHS2A0 = n0CHS2.elementAt(0);
-        nRes = n0CHS2A0.accept(this);
+        final INode n0CHS23A0 = n0CHS2.elementAt(0);
+        nRes = n0CHS23A0.accept(this);
         // #1 Expression()
-        final INode n0CHS2A1 = n0CHS2.elementAt(1);
-        nRes = n0CHS2A1.accept(this);
+        final INode n0CHS23A1 = n0CHS2.elementAt(1);
+        nRes = n0CHS23A1.accept(this);
         // #2 "]"
-        final INode n0CHS2A2 = n0CHS2.elementAt(2);
-        nRes = n0CHS2A2.accept(this);
+        final INode n0CHS23A2 = n0CHS2.elementAt(2);
+        nRes = n0CHS23A2.accept(this);
         break;
       case 4:
         // %4 #0 "." #1 < IDENTIFIER >
         final NodeSequence n0CHS3 = (NodeSequence) n0CH;
         // #0 "."
-        final INode n0CHS3A0 = n0CHS3.elementAt(0);
-        nRes = n0CHS3A0.accept(this);
+        final INode n0CHS34A0 = n0CHS3.elementAt(0);
+        nRes = n0CHS34A0.accept(this);
         // #1 < IDENTIFIER >
-        final INode n0CHS3A1 = n0CHS3.elementAt(1);
-        nRes = n0CHS3A1.accept(this);
+        final INode n0CHS34A1 = n0CHS3.elementAt(1);
+        nRes = n0CHS34A1.accept(this);
         break;
       case 5:
         // %5 Arguments()
@@ -4767,14 +4767,14 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // %0 #0 "new" #1 PrimitiveType() #2 ArrayDimsAndInits()
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "new"
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        nRes = n0CHS0A0.accept(this);
+        final INode n0CHS00A0 = n0CHS0.elementAt(0);
+        nRes = n0CHS00A0.accept(this);
         // #1 PrimitiveType()
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        nRes = n0CHS0A1.accept(this);
+        final INode n0CHS00A1 = n0CHS0.elementAt(1);
+        nRes = n0CHS00A1.accept(this);
         // #2 ArrayDimsAndInits()
-        final INode n0CHS0A2 = n0CHS0.elementAt(2);
-        nRes = n0CHS0A2.accept(this);
+        final INode n0CHS00A2 = n0CHS0.elementAt(2);
+        nRes = n0CHS00A2.accept(this);
         break;
       case 1:
         // %1 #0 "new" #1 ClassOrInterfaceType()
@@ -4784,16 +4784,16 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. .. .. $1 [ ClassOrInterfaceBody() ] )
         final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "new"
-        final INode n0CHS1A0 = n0CHS1.elementAt(0);
-        nRes = n0CHS1A0.accept(this);
+        final INode n0CHS11A0 = n0CHS1.elementAt(0);
+        nRes = n0CHS11A0.accept(this);
         // #1 ClassOrInterfaceType()
-        final INode n0CHS1A1 = n0CHS1.elementAt(1);
-        nRes = n0CHS1A1.accept(this);
+        final INode n0CHS11A1 = n0CHS1.elementAt(1);
+        nRes = n0CHS11A1.accept(this);
         // #2 [ TypeArguments() ]
-        final INode n0CHS1A2 = n0CHS1.elementAt(2);
-        final NodeOptional n0CHS1A2P = (NodeOptional) n0CHS1A2;
-        if (n0CHS1A2P.present()) {
-          nRes = n0CHS1A2P.accept(this);
+        final INode n0CHS11A2 = n0CHS1.elementAt(2);
+        final NodeOptional n0CHS11A2P = (NodeOptional) n0CHS11A2;
+        if (n0CHS11A2P.present()) {
+          nRes = n0CHS11A2P.accept(this);
         }
         // #3 ( &0 ArrayDimsAndInits()
         // .. | &1 $0 Arguments()
@@ -4811,13 +4811,13 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
             // .. $1 [ ClassOrInterfaceBody() ]
             final NodeSequence n0CHS1A3CHS2 = (NodeSequence) n0CHS1A3CH;
             // $0 Arguments()
-            final INode n0CHS1A3CHS2A0 = n0CHS1A3CHS2.elementAt(0);
-            nRes = n0CHS1A3CHS2A0.accept(this);
+            final INode n0CHS1A3CHS21A0 = n0CHS1A3CHS2.elementAt(0);
+            nRes = n0CHS1A3CHS21A0.accept(this);
             // $1 [ ClassOrInterfaceBody() ]
-            final INode n0CHS1A3CHS2A1 = n0CHS1A3CHS2.elementAt(1);
-            final NodeOptional n0CHS1A3CHS2A1P = (NodeOptional) n0CHS1A3CHS2A1;
-            if (n0CHS1A3CHS2A1P.present()) {
-              nRes = n0CHS1A3CHS2A1P.accept(this);
+            final INode n0CHS1A3CHS21A1 = n0CHS1A3CHS2.elementAt(1);
+            final NodeOptional n0CHS1A3CHS21A1P = (NodeOptional) n0CHS1A3CHS21A1;
+            if (n0CHS1A3CHS21A1P.present()) {
+              nRes = n0CHS1A3CHS21A1P.accept(this);
             }
             break;
           default:
@@ -4857,20 +4857,20 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. #1 ( $0 "[" $1 "]" )*
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 ( $0 "[" $1 Expression() $2 "]" )+
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        final NodeList n0CHS0A0L = (NodeList) n0CHS0A0;
-        for (int i = 0; i < n0CHS0A0L.size(); i++) {
-          final INode n0CHS0A0LEi = n0CHS0A0L.elementAt(i);
-          final NodeSequence n0CHS0A0LEiS1 = (NodeSequence) n0CHS0A0LEi;
+        final INode n0CHS00A0 = n0CHS0.elementAt(0);
+        final NodeList n0CHS00A0L = (NodeList) n0CHS00A0;
+        for (int i = 0; i < n0CHS00A0L.size(); i++) {
+          final INode n0CHS00A0LEi = n0CHS00A0L.elementAt(i);
+          final NodeSequence n0CHS00A0LEiS1 = (NodeSequence) n0CHS00A0LEi;
           // $0 "["
-          final INode n0CHS0A0LEiS1A0 = n0CHS0A0LEiS1.elementAt(0);
-          nRes = n0CHS0A0LEiS1A0.accept(this);
+          final INode n0CHS00A0LEiS1A0 = n0CHS00A0LEiS1.elementAt(0);
+          nRes = n0CHS00A0LEiS1A0.accept(this);
           // $1 Expression()
-          final INode n0CHS0A0LEiS1A1 = n0CHS0A0LEiS1.elementAt(1);
-          nRes = n0CHS0A0LEiS1A1.accept(this);
+          final INode n0CHS00A0LEiS1A1 = n0CHS00A0LEiS1.elementAt(1);
+          nRes = n0CHS00A0LEiS1A1.accept(this);
           // $2 "]"
-          final INode n0CHS0A0LEiS1A2 = n0CHS0A0LEiS1.elementAt(2);
-          nRes = n0CHS0A0LEiS1A2.accept(this);
+          final INode n0CHS00A0LEiS1A2 = n0CHS00A0LEiS1.elementAt(2);
+          nRes = n0CHS00A0LEiS1A2.accept(this);
         }
         // #1 ( $0 "[" $1 "]" )*
         final INode n0CHS0A1 = n0CHS0.elementAt(1);
@@ -4893,17 +4893,17 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. #1 ArrayInitializer()
         final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 ( $0 "[" $1 "]" )+
-        final INode n0CHS1A0 = n0CHS1.elementAt(0);
-        final NodeList n0CHS1A0L1 = (NodeList) n0CHS1A0;
-        for (int i = 0; i < n0CHS1A0L1.size(); i++) {
-          final INode n0CHS1A0L1Ei = n0CHS1A0L1.elementAt(i);
-          final NodeSequence n0CHS1A0L1EiS2 = (NodeSequence) n0CHS1A0L1Ei;
+        final INode n0CHS11A0 = n0CHS1.elementAt(0);
+        final NodeList n0CHS11A0L1 = (NodeList) n0CHS11A0;
+        for (int i = 0; i < n0CHS11A0L1.size(); i++) {
+          final INode n0CHS11A0L1Ei = n0CHS11A0L1.elementAt(i);
+          final NodeSequence n0CHS11A0L1EiS2 = (NodeSequence) n0CHS11A0L1Ei;
           // $0 "["
-          final INode n0CHS1A0L1EiS2A0 = n0CHS1A0L1EiS2.elementAt(0);
-          nRes = n0CHS1A0L1EiS2A0.accept(this);
+          final INode n0CHS11A0L1EiS2A0 = n0CHS11A0L1EiS2.elementAt(0);
+          nRes = n0CHS11A0L1EiS2A0.accept(this);
           // $1 "]"
-          final INode n0CHS1A0L1EiS2A1 = n0CHS1A0L1EiS2.elementAt(1);
-          nRes = n0CHS1A0L1EiS2A1.accept(this);
+          final INode n0CHS11A0L1EiS2A1 = n0CHS11A0L1EiS2.elementAt(1);
+          nRes = n0CHS11A0L1EiS2A1.accept(this);
         }
         // #1 ArrayInitializer()
         final INode n0CHS1A1 = n0CHS1.elementAt(1);
@@ -4980,11 +4980,11 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // %04 #0 StatementExpression() #1 ";"
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 StatementExpression()
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        nRes = n0CHS0A0.accept(this);
+        final INode n0CHS04A0 = n0CHS0.elementAt(0);
+        nRes = n0CHS04A0.accept(this);
         // #1 ";"
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        nRes = n0CHS0A1.accept(this);
+        final INode n0CHS04A1 = n0CHS0.elementAt(1);
+        nRes = n0CHS04A1.accept(this);
         break;
       case 5:
         // %05 SwitchStatement()
@@ -5148,11 +5148,11 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // %0 #0 LocalVariableDeclaration() #1 ";"
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 LocalVariableDeclaration()
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        nRes = n0CHS0A0.accept(this);
+        final INode n0CHS00A0 = n0CHS0.elementAt(0);
+        nRes = n0CHS00A0.accept(this);
         // #1 ";"
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        nRes = n0CHS0A1.accept(this);
+        final INode n0CHS00A1 = n0CHS0.elementAt(1);
+        nRes = n0CHS00A1.accept(this);
         break;
       case 1:
         // %1 Statement()
@@ -5300,34 +5300,34 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. .. | &2 $0 AssignmentOperator() $1 Expression() ]
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 PrimaryExpression()
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        nRes = n0CHS0A0.accept(this);
+        final INode n0CHS02A0 = n0CHS0.elementAt(0);
+        nRes = n0CHS02A0.accept(this);
         // #1 [ &0 "++"
         // .. | &1 "--"
         // .. | &2 $0 AssignmentOperator() $1 Expression() ]
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        final NodeOptional n0CHS0A1P = (NodeOptional) n0CHS0A1;
-        if (n0CHS0A1P.present()) {
-          final NodeChoice n0CHS0A1PC = (NodeChoice) n0CHS0A1P.node;
-          final INode n0CHS0A1PCH = n0CHS0A1PC.choice;
-          switch (n0CHS0A1PC.which) {
+        final INode n0CHS02A1 = n0CHS0.elementAt(1);
+        final NodeOptional n0CHS02A1P = (NodeOptional) n0CHS02A1;
+        if (n0CHS02A1P.present()) {
+          final NodeChoice n0CHS02A1PC = (NodeChoice) n0CHS02A1P.node;
+          final INode n0CHS02A1PCH = n0CHS02A1PC.choice;
+          switch (n0CHS02A1PC.which) {
             case 0:
               // &0 "++"
-              nRes = n0CHS0A1PCH.accept(this);
+              nRes = n0CHS02A1PCH.accept(this);
               break;
             case 1:
               // &1 "--"
-              nRes = n0CHS0A1PCH.accept(this);
+              nRes = n0CHS02A1PCH.accept(this);
               break;
             case 2:
               // &2 $0 AssignmentOperator() $1 Expression()
-              final NodeSequence n0CHS0A1PCHS1 = (NodeSequence) n0CHS0A1PCH;
+              final NodeSequence n0CHS02A1PCHS1 = (NodeSequence) n0CHS02A1PCH;
               // $0 AssignmentOperator()
-              final INode n0CHS0A1PCHS1A0 = n0CHS0A1PCHS1.elementAt(0);
-              nRes = n0CHS0A1PCHS1A0.accept(this);
+              final INode n0CHS02A1PCHS12A0 = n0CHS02A1PCHS1.elementAt(0);
+              nRes = n0CHS02A1PCHS12A0.accept(this);
               // $1 Expression()
-              final INode n0CHS0A1PCHS1A1 = n0CHS0A1PCHS1.elementAt(1);
-              nRes = n0CHS0A1PCHS1A1.accept(this);
+              final INode n0CHS02A1PCHS12A1 = n0CHS02A1PCHS1.elementAt(1);
+              nRes = n0CHS02A1PCHS12A1.accept(this);
               break;
             default:
               // should not occur !!!
@@ -5421,24 +5421,24 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // %0 #0 "case" #1 Expression() #2 ":"
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "case"
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        nRes = n0CHS0A0.accept(this);
+        final INode n0CHS00A0 = n0CHS0.elementAt(0);
+        nRes = n0CHS00A0.accept(this);
         // #1 Expression()
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        nRes = n0CHS0A1.accept(this);
+        final INode n0CHS00A1 = n0CHS0.elementAt(1);
+        nRes = n0CHS00A1.accept(this);
         // #2 ":"
-        final INode n0CHS0A2 = n0CHS0.elementAt(2);
-        nRes = n0CHS0A2.accept(this);
+        final INode n0CHS00A2 = n0CHS0.elementAt(2);
+        nRes = n0CHS00A2.accept(this);
         break;
       case 1:
         // %1 #0 "default" #1 ":"
         final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "default"
-        final INode n0CHS1A0 = n0CHS1.elementAt(0);
-        nRes = n0CHS1A0.accept(this);
+        final INode n0CHS11A0 = n0CHS1.elementAt(0);
+        nRes = n0CHS11A0.accept(this);
         // #1 ":"
-        final INode n0CHS1A1 = n0CHS1.elementAt(1);
-        nRes = n0CHS1A1.accept(this);
+        final INode n0CHS11A1 = n0CHS1.elementAt(1);
+        nRes = n0CHS11A1.accept(this);
         break;
       default:
         // should not occur !!!
@@ -5602,20 +5602,20 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // %0 #0 VariableModifiers() #1 Type() #2 < IDENTIFIER > #3 ":" #4 Expression()
         final NodeSequence n2CHS0 = (NodeSequence) n2CH;
         // #0 VariableModifiers()
-        final INode n2CHS0A0 = n2CHS0.elementAt(0);
-        nRes = n2CHS0A0.accept(this);
+        final INode n2CHS00A0 = n2CHS0.elementAt(0);
+        nRes = n2CHS00A0.accept(this);
         // #1 Type()
-        final INode n2CHS0A1 = n2CHS0.elementAt(1);
-        nRes = n2CHS0A1.accept(this);
+        final INode n2CHS00A1 = n2CHS0.elementAt(1);
+        nRes = n2CHS00A1.accept(this);
         // #2 < IDENTIFIER >
-        final INode n2CHS0A2 = n2CHS0.elementAt(2);
-        nRes = n2CHS0A2.accept(this);
+        final INode n2CHS00A2 = n2CHS0.elementAt(2);
+        nRes = n2CHS00A2.accept(this);
         // #3 ":"
-        final INode n2CHS0A3 = n2CHS0.elementAt(3);
-        nRes = n2CHS0A3.accept(this);
+        final INode n2CHS00A3 = n2CHS0.elementAt(3);
+        nRes = n2CHS00A3.accept(this);
         // #4 Expression()
-        final INode n2CHS0A4 = n2CHS0.elementAt(4);
-        nRes = n2CHS0A4.accept(this);
+        final INode n2CHS00A4 = n2CHS0.elementAt(4);
+        nRes = n2CHS00A4.accept(this);
         break;
       case 1:
         // %1 #0 [ ForInit() ]
@@ -5625,10 +5625,10 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. #4 [ ForUpdate() ]
         final NodeSequence n2CHS1 = (NodeSequence) n2CH;
         // #0 [ ForInit() ]
-        final INode n2CHS1A0 = n2CHS1.elementAt(0);
-        final NodeOptional n2CHS1A0P = (NodeOptional) n2CHS1A0;
-        if (n2CHS1A0P.present()) {
-          nRes = n2CHS1A0P.accept(this);
+        final INode n2CHS11A0 = n2CHS1.elementAt(0);
+        final NodeOptional n2CHS11A0P = (NodeOptional) n2CHS11A0;
+        if (n2CHS11A0P.present()) {
+          nRes = n2CHS11A0P.accept(this);
         }
         // #1 ";"
         final INode n2CHS1A1 = n2CHS1.elementAt(1);
@@ -6288,8 +6288,8 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. .. | &4 FieldDeclaration() )
         final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 Modifiers()
-        final INode n0CHS0A0 = n0CHS0.elementAt(0);
-        nRes = n0CHS0A0.accept(this);
+        final INode n0CHS00A0 = n0CHS0.elementAt(0);
+        nRes = n0CHS00A0.accept(this);
         // #1 ( &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"
         // .. .. $4 [ DefaultValue() ]
         // .. .. $5 ";"
@@ -6297,52 +6297,52 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. | &2 EnumDeclaration()
         // .. | &3 AnnotationTypeDeclaration()
         // .. | &4 FieldDeclaration() )
-        final INode n0CHS0A1 = n0CHS0.elementAt(1);
-        final NodeChoice n0CHS0A1C = (NodeChoice) n0CHS0A1;
-        final INode n0CHS0A1CH = n0CHS0A1C.choice;
-        switch (n0CHS0A1C.which) {
+        final INode n0CHS00A1 = n0CHS0.elementAt(1);
+        final NodeChoice n0CHS00A1C = (NodeChoice) n0CHS00A1;
+        final INode n0CHS00A1CH = n0CHS00A1C.choice;
+        switch (n0CHS00A1C.which) {
           case 0:
             // &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"
             // .. $4 [ DefaultValue() ]
             // .. $5 ";"
-            final NodeSequence n0CHS0A1CHS1 = (NodeSequence) n0CHS0A1CH;
+            final NodeSequence n0CHS00A1CHS1 = (NodeSequence) n0CHS00A1CH;
             // $0 Type()
-            final INode n0CHS0A1CHS1A0 = n0CHS0A1CHS1.elementAt(0);
-            nRes = n0CHS0A1CHS1A0.accept(this);
+            final INode n0CHS00A1CHS10A0 = n0CHS00A1CHS1.elementAt(0);
+            nRes = n0CHS00A1CHS10A0.accept(this);
             // $1 < IDENTIFIER >
-            final INode n0CHS0A1CHS1A1 = n0CHS0A1CHS1.elementAt(1);
-            nRes = n0CHS0A1CHS1A1.accept(this);
+            final INode n0CHS00A1CHS10A1 = n0CHS00A1CHS1.elementAt(1);
+            nRes = n0CHS00A1CHS10A1.accept(this);
             // $2 "("
-            final INode n0CHS0A1CHS1A2 = n0CHS0A1CHS1.elementAt(2);
-            nRes = n0CHS0A1CHS1A2.accept(this);
+            final INode n0CHS00A1CHS10A2 = n0CHS00A1CHS1.elementAt(2);
+            nRes = n0CHS00A1CHS10A2.accept(this);
             // $3 ")"
-            final INode n0CHS0A1CHS1A3 = n0CHS0A1CHS1.elementAt(3);
-            nRes = n0CHS0A1CHS1A3.accept(this);
+            final INode n0CHS00A1CHS10A3 = n0CHS00A1CHS1.elementAt(3);
+            nRes = n0CHS00A1CHS10A3.accept(this);
             // $4 [ DefaultValue() ]
-            final INode n0CHS0A1CHS1A4 = n0CHS0A1CHS1.elementAt(4);
-            final NodeOptional n0CHS0A1CHS1A4P = (NodeOptional) n0CHS0A1CHS1A4;
-            if (n0CHS0A1CHS1A4P.present()) {
-              nRes = n0CHS0A1CHS1A4P.accept(this);
+            final INode n0CHS00A1CHS10A4 = n0CHS00A1CHS1.elementAt(4);
+            final NodeOptional n0CHS00A1CHS10A4P = (NodeOptional) n0CHS00A1CHS10A4;
+            if (n0CHS00A1CHS10A4P.present()) {
+              nRes = n0CHS00A1CHS10A4P.accept(this);
             }
             // $5 ";"
-            final INode n0CHS0A1CHS1A5 = n0CHS0A1CHS1.elementAt(5);
-            nRes = n0CHS0A1CHS1A5.accept(this);
+            final INode n0CHS00A1CHS1A5 = n0CHS00A1CHS1.elementAt(5);
+            nRes = n0CHS00A1CHS1A5.accept(this);
             break;
           case 1:
             // &1 ClassOrInterfaceDeclaration()
-            nRes = n0CHS0A1CH.accept(this);
+            nRes = n0CHS00A1CH.accept(this);
             break;
           case 2:
             // &2 EnumDeclaration()
-            nRes = n0CHS0A1CH.accept(this);
+            nRes = n0CHS00A1CH.accept(this);
             break;
           case 3:
             // &3 AnnotationTypeDeclaration()
-            nRes = n0CHS0A1CH.accept(this);
+            nRes = n0CHS00A1CH.accept(this);
             break;
           case 4:
             // &4 FieldDeclaration()
-            nRes = n0CHS0A1CH.accept(this);
+            nRes = n0CHS00A1CH.accept(this);
             break;
           default:
             // should not occur !!!
