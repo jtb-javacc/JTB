@@ -34,7 +34,7 @@ import java.util.Set;
 /**
  * Describes JavaCC productions.
  *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public class NormalProduction {
@@ -102,8 +102,8 @@ public class NormalProduction {
   private Token              firstToken;
   protected String           eol                   = System.getProperty("line.separator", "\n");
 
-  protected StringBuffer dumpPrefix(final int indent) {
-    final StringBuffer sb = new StringBuffer(128);
+  protected StringBuilder dumpPrefix(final int indent) {
+    final StringBuilder sb = new StringBuilder(128);
     for (int i = 0; i < indent; i++)
       sb.append("  ");
     return sb;
@@ -114,8 +114,8 @@ public class NormalProduction {
     return name.substring(name.lastIndexOf(".") + 1); // strip the package name
   }
 
-  public StringBuffer dump(final int indent, final Set<Object> alreadyDumped) {
-    final StringBuffer sb = dumpPrefix(indent).append(System.identityHashCode(this)).append(' ').append(
+  public StringBuilder dump(final int indent, final Set<Object> alreadyDumped) {
+    final StringBuilder sb = dumpPrefix(indent).append(System.identityHashCode(this)).append(' ').append(
                                                                                                         getSimpleName()).append(
                                                                                                                                 ' ').append(
                                                                                                                                             getLhs());
@@ -129,7 +129,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param line the line to set
+   * @param line - the line to set
    */
   public final void setLine(final int ln) {
     line = ln;
@@ -143,7 +143,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param column the column to set
+   * @param column - the column to set
    */
   public final void setColumn(final int cl) {
     column = cl;
@@ -157,7 +157,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param parents the parents to set
+   * @param parents - the parents to set
    */
   final void setParents(final List<Object> pa) {
     parents = pa;
@@ -171,7 +171,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param accessMod the accessMod to set
+   * @param accessMod - the accessMod to set
    */
   public final void setAccessMod(final String am) {
     accessMod = am;
@@ -185,7 +185,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param lhs the lhs to set
+   * @param lhs - the lhs to set
    */
   public final void setLhs(final String l) {
     lhs = l;
@@ -213,7 +213,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param throws_list the throws_list to set
+   * @param throws_list - the throws_list to set
    */
   public final void setThrowsList(final List<List<Token>> tl) {
     throws_list = tl;
@@ -227,7 +227,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param expansion the expansion to set
+   * @param expansion - the expansion to set
    */
   public final void setExpansion(final Expansion_ ex) {
     expansion = ex;
@@ -241,7 +241,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param emptyPossible the emptyPossible to set
+   * @param emptyPossible - the emptyPossible to set
    */
   final void setEmptyPossible(final boolean ep) {
     emptyPossible = ep;
@@ -255,7 +255,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param leftExpansions the leftExpansions to set
+   * @param leftExpansions - the leftExpansions to set
    */
   final void setLeftExpansions(final NormalProduction[] le) {
     leftExpansions = le;
@@ -269,7 +269,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param walkStatus the walkStatus to set
+   * @param walkStatus - the walkStatus to set
    */
   final void setWalkStatus(final int ws) {
     walkStatus = ws;
@@ -283,7 +283,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param firstToken the firstToken to set
+   * @param firstToken - the firstToken to set
    */
   public final void setFirstToken(final Token ft) {
     firstToken = ft;
@@ -297,7 +297,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param lastToken the lastToken to set
+   * @param lastToken - the lastToken to set
    */
   public final void setLastToken(final Token lt) {
     lastToken = lt;

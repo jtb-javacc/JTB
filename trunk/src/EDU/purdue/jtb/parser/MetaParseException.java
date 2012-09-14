@@ -31,7 +31,7 @@ package EDU.purdue.jtb.parser;
 /**
  * Thrown when there is a mis-configuration or a bug.
  *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public class MetaParseException extends ParseException

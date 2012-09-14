@@ -31,27 +31,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Describes regular expressions which are choices from
- * from among included regular expressions.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * Describes regular expressions which are choices from from among included regular expressions.
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public class RChoice extends RegularExpression_ {
 
   /**
-   * The list of choices of this regular expression.  Each
-   * list component will narrow to RegularExpression_.
+   * The list of choices of this regular expression. Each list component will narrow to
+   * RegularExpression_.
    */
   private List<RegularExpression_> choices = new ArrayList<RegularExpression_>();
 
-  // ModMMa : added to get rid of 'instanceof' in ExpansionTreeWalker
   public RChoice() {
     expType = EXP_TYPE.R_CHOICE;
   }
 
   /**
-   * @param choices the choices to set
+   * @param choices - the choices to set
    */
   public final void setChoices(final List<RegularExpression_> ch) {
     choices = ch;
@@ -64,6 +62,7 @@ public class RChoice extends RegularExpression_ {
     return choices;
   }
 
+  /** {@inheritDoc} */
   @Override
   public Nfa GenerateNfa(final boolean ignoreCase) {
     CompressCharLists();

@@ -51,8 +51,12 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR ANY PARTICULAR PURPOSE.
  */
-
 package EDU.purdue.jtb.misc;
+
+import static EDU.purdue.jtb.misc.Globals.descriptiveFieldNames;
+import static EDU.purdue.jtb.misc.Globals.nodeList;
+import static EDU.purdue.jtb.misc.Globals.nodeListOpt;
+import static EDU.purdue.jtb.misc.Globals.nodeOpt;
 
 import java.util.Hashtable;
 
@@ -67,9 +71,11 @@ import java.util.Hashtable;
  * lowercase first letter), where X is either nothing if this is the first WhileStatement in this
  * production or 1 through the number of children - 1 for any additional children of the same type.
  * <p>
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
+ * @version 1.4.7 : 08/2012 : MMa : fixed javadoc and renamed the {@link #genFieldName(String)}
+ *          method
  */
 public class FieldNameGenerator {
 
@@ -88,7 +94,7 @@ public class FieldNameGenerator {
    * is set.
    */
   public FieldNameGenerator() {
-    if (Globals.descriptiveFieldNames)
+    if (descriptiveFieldNames)
       nameTable = new Hashtable<String, Integer>();
   }
 
@@ -97,21 +103,21 @@ public class FieldNameGenerator {
    */
   public void reset() {
     fieldNum = 0;
-    if (Globals.descriptiveFieldNames)
+    if (descriptiveFieldNames)
       nameTable.clear();
   }
 
   /**
-   * Generates the field name used in the comment for a given class field name.
-   *
-   * @param fieldName the class field name
+   * Generates the field name of a given class name.
+   * 
+   * @param className - the class name
    * @return the comment field name
    */
-  public String genCommentFieldName(final String fieldName) {
-    if (!Globals.descriptiveFieldNames)
+  public String genFieldName(final String className) {
+    if (!descriptiveFieldNames)
       return "f" + String.valueOf(fieldNum++);
     else {
-      final String prefix = varNameForClass(fieldName);
+      final String prefix = varNameForClass(className);
       Integer suffix = nameTable.get(prefix);
 
       if (suffix == null) {
@@ -129,33 +135,29 @@ public class FieldNameGenerator {
   /**
    * Returns a variable name for the name of the given class.<br>
    * Ex : class is "TipTop", variable will be "tipTop".
-   *
-   * @param className the class name
+   * 
+   * @param className - the class name
    * @return the variable name
    */
   public String varNameForClass(final String className) {
-    //      final StringBuffer buf = new StringBuffer(
-    //         String.valueOf(Character.toLowerCase(className.charAt(0))));
-    //      buf.append(className.substring(1, className.length()));
-    //      return buf.toString();
-    final StringBuffer buf = new StringBuffer(className);
+    final StringBuilder buf = new StringBuilder(className);
     buf.setCharAt(0, Character.toLowerCase(className.charAt(0)));
     return buf.toString();
   }
 
   /**
    * Gets the node type corresponding to the modifier.
-   *
-   * @param mod the modifier
+   * 
+   * @param mod - the modifier
    * @return the node type
    */
   public String getNameForMod(final String mod) {
     if (mod.equals("+"))
-      return Globals.nodeListName;
+      return nodeList;
     else if (mod.equals("*"))
-      return Globals.nodeListOptName;
+      return nodeListOpt;
     else if (mod.equals("?"))
-      return Globals.nodeOptName;
+      return nodeOpt;
     else {
       Messages.hardErr("Illegal EBNF modifier in " + "ExpansionUnit: mod = " + mod);
       return "";

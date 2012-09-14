@@ -30,7 +30,7 @@ package EDU.purdue.jtb.parser;
 /**
  * Output error messages and keep track of totals.
  *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public final class JavaCCErrors {

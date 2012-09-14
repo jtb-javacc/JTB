@@ -1,13 +1,3 @@
-/**
- * JavaCC Grammar used by JTB.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
- * @version 1.4.x : 05-11/2009 : MMa
- *  adapted from JavaCC v4.2 grammar (JavaCC.jj)
- *   to fit with JTB.java and 
- *   to use the try-ExpansionChoices-catch-finally syntax
- *    through the ExpansionUnitInTCF production
-*/
 /*
  * Copyright (c) 2004,2005 UCLA Compilers Group. 
  * All rights reserved.
@@ -38,11 +28,11 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
+ */
 /*
-  * JTB 1.3.x is a derivation of JTB 1.2.1 which has the following 
-  * license:
-  **/
+ * JTB 1.3.x is a derivation of JTB 1.2.1 which has the following 
+ * license:
+ */
 /*
  * All files in the distribution of JTB, The Java Tree Builder are
  * Copyright 1997, 1998, 1999 by the Purdue Research Foundation of Purdue
@@ -76,7 +66,7 @@
 // documentation.  A few changes have been made to fix possible bugs in the
 // grammar.
 //
-/***************************************************************************/
+/* ************************************************************************* */
 /*
  *
  * Copyright (C) 1996, 1997 Sun Microsystems Inc.
@@ -95,6 +85,25 @@
  * This file contains a Java grammar and actions that implement a front-end.
  *
  */
+
+/*
+ * JavaCC Grammar used by JTB.
+ *
+ * @author Marc Mazas
+ * @version 1.4.x : 05-11/2009-2010-2011-2012 : MMa
+ *  adapted from JavaCC v4.2 grammar (JavaCC.jj)
+ *   to fit with JTB.java and 
+ *   to use the try-ExpansionChoices-catch-finally syntax through the ExpansionUnitInTCF production
+ */
+// MMa 06/2012 : modified AccessModifier(), BlockStatement(), LocalVariableDeclaration(), added VariableModifiers()
+// MMa 07/2012 : added assert, enum & strictfp java keywords
+//               fixed ForStatement() ; ForInit()
+//               renamed RSIGNEDSHIFT in RSignedShift and fixed it
+//               renamed RUNSIGNEDSHIFT in RUnsignedShift and fixed it
+//               modified RegularExpression (remove LANGLE & RANGLE definitions)
+//               TODO found problems in TypeDeclaration(), ExplicitConstructorInvocation(), PrimaryPrefix()
+//               renamed ExpansionUnitInTCF into ExpansionUnitTCF
+
 options
 {
 // MMa : added (does not exist in JavaCC.jj nor in jtbgram.jj, but needed for Eclipse plugin)
@@ -168,8 +177,8 @@ public class JTBParser extends JavaCCParserInternals
   }
 
   /**
-    * Class to hold modifiers.
-    */
+   * Class to hold modifiers.
+   */
   static public final class ModifierSet
   {
     /* Definitions of the bits in the modifiers field */
@@ -309,9 +318,8 @@ TOKEN :
 }
 
 /*
- * The remainder of the tokens are exactly (except for the removal of tokens
- * containing ">>" and "<<") as in the Java grammar and must be diff equivalent
- * (again with the exceptions above) to it.
+ * The remainder of the tokens are exactly (except for the removal of tokens containing ">>" and "<<")
+ * as in the Java grammar and must be equivalent (again with the exceptions above) to it
  */
 /* WHITE SPACE */
 SKIP :
@@ -399,7 +407,7 @@ TOKEN :
 | < ELSE : "else" >
 | < ENUM : "enum" >
 | < EXTENDS : "extends" >
-| < FALSE : "false" >
+| < FALSE : "false" > // boolean literal
 | < FINAL : "final" >
 | < FINALLY : "finally" >
 | < FLOAT : "float" >
@@ -414,7 +422,7 @@ TOKEN :
 | < LONG : "long" >
 | < NATIVE : "native" >
 | < NEW : "new" >
-| < NULL : "null" >
+| < NULL : "null" > // null literal
 | < PACKAGE : "package" >
 | < PRIVATE : "private" >
 | < PROTECTED : "protected" >
@@ -430,7 +438,7 @@ TOKEN :
 | < THROW : "throw" >
 | < THROWS : "throws" >
 | < TRANSIENT : "transient" >
-| < TRUE : "true" >
+| < TRUE : "true" > // boolean literal
 | < TRY : "try" >
 | < VOID : "void" >
 | < VOLATILE : "volatile" >
@@ -441,55 +449,52 @@ TOKEN :
 TOKEN :
 {
   < INTEGER_LITERAL :
-    < DECIMAL_LITERAL > ([ "l", "L" ])?
-  | < HEX_LITERAL > ([ "l", "L" ])?
-  | < OCTAL_LITERAL > ([ "l", "L" ])? >
-| < #DECIMAL_LITERAL : [ "1"-"9" ] ([ "0"-"9" ])* >
-| < #HEX_LITERAL : "0" [ "x", "X" ] ([ "0"-"9", "a"-"f", "A"-"F" ])+ >
-| < #OCTAL_LITERAL : "0" ([ "0"-"7" ])* >
+    < DECIMAL_LITERAL > (< LONG_LETTER >)?
+  | < HEX_LITERAL > (< LONG_LETTER >)?
+  | < OCTAL_LITERAL > (< LONG_LETTER >)? >
 | < FLOATING_POINT_LITERAL :
     < DECIMAL_FLOATING_POINT_LITERAL >
   | < HEXADECIMAL_FLOATING_POINT_LITERAL > >
-| < #DECIMAL_FLOATING_POINT_LITERAL :
-    ([ "0"-"9" ])+ "." ([ "0"-"9" ])* (< DECIMAL_EXPONENT >)? ([ "f", "F", "d", "D" ])?
-  | "." ([ "0"-"9" ])+ (< DECIMAL_EXPONENT >)? ([ "f", "F", "d", "D" ])?
-  | ([ "0"-"9" ])+ < DECIMAL_EXPONENT > ([ "f", "F", "d", "D" ])?
-  | ([ "0"-"9" ])+ (< DECIMAL_EXPONENT >)? [ "f", "F", "d", "D" ] >
-| < #DECIMAL_EXPONENT : [ "e", "E" ] ([ "+", "-" ])? ([ "0"-"9" ])+ >
-| < #HEXADECIMAL_FLOATING_POINT_LITERAL :
-    "0" [ "x", "X" ] ([ "0"-"9", "a"-"f", "A"-"F" ])+ (".")? < HEXADECIMAL_EXPONENT > ([ "f", "F", "d", "D" ])?
-  | "0" [ "x", "X" ] ([ "0"-"9", "a"-"f", "A"-"F" ])* "." ([ "0"-"9", "a"-"f", "A"-"F" ])+ < HEXADECIMAL_EXPONENT > ([ "f", "F", "d", "D" ])? >
-| < #HEXADECIMAL_EXPONENT : [ "p", "P" ] ([ "+", "-" ])? ([ "0"-"9" ])+ >
 | < CHARACTER_LITERAL :
     "'"
     (
       (~[ "'", "\\", "\n", "\r" ])
-    |
-      (
-        "\\"
-        (
-          [ "n", "t", "b", "r", "f", "\\", "'", "\"" ]
-        | [ "0"-"7" ] ([ "0"-"7" ])?
-        | [ "0"-"3" ] [ "0"-"7" ] [ "0"-"7" ]
-        )
-      )
+    | < ESCAPED_CHARACTER >
     )
     "'" >
 | < STRING_LITERAL :
     "\""
     (
       (~[ "\"", "\\", "\n", "\r" ])
-    |
-      (
-        "\\"
-        (
-          [ "n", "t", "b", "r", "f", "\\", "'", "\"" ]
-        | [ "0"-"7" ] ([ "0"-"7" ])?
-        | [ "0"-"3" ] [ "0"-"7" ] [ "0"-"7" ]
-        )
-      )
+    | < ESCAPED_CHARACTER >
     )*
     "\"" >
+| < #DEC_DIGIT : [ "0"-"9" ] >
+| < #HEX_DIGIT : [ "0"-"9", "a"-"f", "A"-"F" ] >
+| < #OCTAL_DIGIT : [ "0"-"7" ] >
+| < #OCTAL_FIRST_DIGIT : [ "0"-"3" ] >
+| < #DECIMAL_LITERAL : [ "1"-"9" ] (< DEC_DIGIT >)* >
+| < #HEX_LITERAL : "0" [ "x", "X" ] (< HEX_DIGIT >)+ >
+| < #OCTAL_LITERAL : "0" (< OCTAL_DIGIT >)* >
+| < #DECIMAL_EXPONENT : [ "e", "E" ] ([ "+", "-" ])? (< DEC_DIGIT >)+ >
+| < #HEXADECIMAL_EXPONENT : [ "p", "P" ] ([ "+", "-" ])? (< DEC_DIGIT >)+ >
+| < #FLOATING_POINT_LETTER : [ "f", "F", "d", "D" ] >
+| < #LONG_LETTER : [ "l", "L" ] >
+| < #DECIMAL_FLOATING_POINT_LITERAL :
+    (< DEC_DIGIT >)+ "." (< DEC_DIGIT >)* (< DECIMAL_EXPONENT >)? (< FLOATING_POINT_LETTER >)?
+  | "." (< DEC_DIGIT >)+ (< DECIMAL_EXPONENT >)? (< FLOATING_POINT_LETTER >)?
+  | (< DEC_DIGIT >)+ < DECIMAL_EXPONENT > (< FLOATING_POINT_LETTER >)?
+  | (< DEC_DIGIT >)+ (< DECIMAL_EXPONENT >)? < FLOATING_POINT_LETTER > >
+| < #HEXADECIMAL_FLOATING_POINT_LITERAL :
+    "0" [ "x", "X" ] (< HEX_DIGIT >)+ (".")? < HEXADECIMAL_EXPONENT > (< FLOATING_POINT_LETTER >)?
+  | "0" [ "x", "X" ] (< HEX_DIGIT >)* "." (< HEX_DIGIT >)+ < HEXADECIMAL_EXPONENT > (< FLOATING_POINT_LETTER >)? >
+| < #ESCAPED_CHARACTER :
+      "\\"
+      (
+        [ "n", "t", "b", "r", "f", "\\", "'", "\"" ]
+      | < OCTAL_DIGIT > (< OCTAL_DIGIT >)?
+      | < OCTAL_FIRST_DIGIT > < OCTAL_DIGIT > < OCTAL_DIGIT >
+      ) >
 }
 
 /* SEPARATORS */
@@ -510,6 +515,7 @@ TOKEN :
 TOKEN :
 {
   < ASSIGN : "=" >
+  // (moved to next TOKEN declaration)
   //| < GT: ">" >
 | < LT : "<" >
 | < BANG : "!" >
@@ -548,7 +554,8 @@ TOKEN :
   //	| < RUNSIGNEDSHIFTASSIGN: ">>>=" >
 }
 
-/* >'s need special attention due to generics syntax. */
+/* >'s need special attention due to generics syntax */
+// (see also RUnsignedShift() and RSignedShift())
 TOKEN :
 {
   < RUNSIGNEDSHIFT : ">>>" >
@@ -571,46 +578,6 @@ TOKEN :
 /************************************************
  * THE JAVACC GRAMMAR SPECIFICATION STARTS HERE *
  ************************************************/
-// ModMMa: added to test try-expansion_choices-catch-finally syntax
-void AFancyProduction() :
-{
-//  INode ls = null;
-}
-{
-  try
-  {
-    (
-      ( Annotation() )*
-      (
-      LOOKAHEAD(2)
-//      ls = LabeledStatement()
-      LabeledStatement()
-    | AssertStatement()
-    | Block(null)
-    | EmptyStatement()
-    | StatementExpression() ";"
-    | SwitchStatement()
-    | TryStatement()
-      )
-      [ MarkerAnnotation() ]
-    )
-  }
-  catch (Exception fancy_e)
-  {
-    fancy_e = null;
-  }
-  catch (Throwable fancy_t)
-  {
-    fancy_t = null;
-  }
-  finally
-  {
-    String fancy_s = "";
-    if (fancy_s == " ")
-      fancy_s = null;
-//    if (ls != null)//      ls = null;
-  }
-}
 
 // MMa : changed all javacc_input into JavaCCInput to conform to class name convention
 void JavaCCInput() :
@@ -622,11 +589,11 @@ void JavaCCInput() :
 }
 {
   JavaCCOptions()
-  "PARSER_BEGIN" "(" id1 = Identifier() { addcuname(id1); } ")"
+  "PARSER_BEGIN" "(" id1 = IdentifierAsString() { addcuname(id1); } ")"
   { processing_cu = true; parser_class_name = id1; }
   CompilationUnit()
   { processing_cu = false; }
-  "PARSER_END" "(" id2 = Identifier() { compare(getToken(0), id1, id2); } ")"
+  "PARSER_END" "(" id2 = IdentifierAsString() { compare(getToken(0), id1, id2); } ")"
   ( Production() )+
 }
 
@@ -680,22 +647,19 @@ void Production() :
   LOOKAHEAD(1)
   /*
    * Since JAVACODE is both a JavaCC reserved word and a Java identifier,
-   * we need to give preference to "JavaCodeProduction" over
-   * "BNFProduction".
+   * we need to give preference to "JavaCodeProduction" over "BNFProduction"
    */
   JavaCodeProduction()
 | LOOKAHEAD(1)
   /*
-   * Since SKIP, TOKEN, etc. are both JavaCC reserved words and Java
-   * identifiers, we need to give preference to "RegularExprProduction"
-   * over "BNFProduction".
+   * Since SKIP, TOKEN, etc. are both JavaCC reserved words and Java identifiers,
+   * we need to give preference to "RegularExprProduction" over "BNFProduction"
    */
   RegularExprProduction()
 | LOOKAHEAD(1)
   /*
    * Since TOKEN_MGR_DECLS is both a JavaCC reserved word and a Java identifier,
-   * we need to give preference to "TokenManagerDecls" over
-   * "BNFProduction".
+   * we need to give preference to "TokenManagerDecls" over "BNFProduction"
    */
   TokenManagerDecls()
 | BNFProduction()
@@ -714,8 +678,10 @@ void JavaCodeProduction() :
   p.setColumn(t.beginColumn);
 }
 {
-  "JAVACODE" AccessModifier(p) ResultType(p.getReturnTypeTokens())
-  lhs = Identifier() { p.setLhs(lhs); }
+  "JAVACODE" AccessModifier(p)
+  // MMa 07/2012 : seems to lack [ TypeParameters() ] here
+  ResultType(p.getReturnTypeTokens())
+  lhs = IdentifierAsString() { p.setLhs(lhs); }
   FormalParameters(p.getParameterListTokens())
   [
     "throws"
@@ -737,6 +703,7 @@ void JavaCodeProduction() :
     )*
   ]
   Block
+  // MMa 07/2012 : seems to lack ' | ";"' here
   (
     p.getCodeTokens()
   )
@@ -763,7 +730,7 @@ void BNFProduction() :
 }
 {
   AccessModifier(p) ResultType(p.getReturnTypeTokens())
-  lhs = Identifier() { p.setLhs(lhs); }
+  lhs = IdentifierAsString() { p.setLhs(lhs); }
   FormalParameters(p.getParameterListTokens())
   [
     "throws"
@@ -784,6 +751,7 @@ void BNFProduction() :
       }
     )*
   ]
+  // MMa 07/2012 : '[node_descriptor()]' is missing here
   ":" Block
   (
     p.getDeclarationTokens()
@@ -797,7 +765,11 @@ void AccessModifier(NormalProduction p) :
   Token t = null;
 }
 {
-  (    t = "public"  | t = "protected"  | t = "private"  )?
+  (    t = "public"  | t = "protected"  | t = "private"  // added MMa 07/2012
+  |  "final"
+  // modified MMa 07/2012
+  // )?
+  )*
   {
     if (t != null)
     {
@@ -817,8 +789,7 @@ void RegularExprProduction() :
 }
 {
   {
-    // set p.lexStates assuming there is no state spec.
-    // and then override if necessary.
+    /* Set p.lexStates assuming there is no lexical state specified, and then override if necessary */
     p.lexStates = new String [ ] { "DEFAULT" };
   }
   [
@@ -840,10 +811,10 @@ void RegularExprProduction() :
     {
       p.lexStates = new String [ states.size() ];
       for (int i = 0;
-// ModMMa : workaround for sf plugin color syntaxing problem
-//      i < states.size();
+      // modified MMa : workaround for Eclipse plugin color syntax problem
+      //      i < states.size();
       i != states.size();
-        i++)
+      i++)
         {
           p.lexStates [ i ] = states.get(i);
         }
@@ -1013,6 +984,7 @@ void Expansion(Container c1) :
         ((Expansion_) c2.member).parent = seq;
         ((Expansion_) c2.member).ordinal = seq.units.size() - 1;
       }
+      // MMa 07/2012 : '[node_descriptor()]' is missing here
     )+
     {
       if (la.getLaExpansion() == null)
@@ -1040,11 +1012,10 @@ Lookahead LocalLookahead() :
   {
     [
       /*
-     * The lookahead of 1 is to turn off the warning message that lets
-     * us know that an expansion choice can also start with an integer
-     * literal because a primary expression can do the same.  But we
-     * know that this is what we want.
-     */
+       * The lookahead of 1 is to turn off the warning message that lets us know that an expansion choice
+       * can also start with an integer literal because a primary expression can do the same.
+       * But we know that this is what we want.
+       */
       LOOKAHEAD(1)
       laAmount = IntegerLiteral()      {        emptyLA = false;        la.setAmount(laAmount);      }
     ]
@@ -1104,14 +1075,12 @@ void ExpansionUnit(Container c) :
   {
     LOOKAHEAD(1)
     /*
-   * We give this priority over primary expressions which use LOOKAHEAD as the
-   * name of its identifier.
-   */
+     * We give this priority over primary expressions which use LOOKAHEAD as the name of its identifier */
     t = "LOOKAHEAD" "(" la = LocalLookahead() ")"
     {
-      // Now set the la_expansion field of la with a dummy expansion (we use EOF).
+      // Now set the la_expansion field of la with a dummy expansion (we use EOF)
       la.setLaExpansion(new REndOfFile());
-      // Create a singleton choice with an empty action.
+      // Create a singleton choice with an empty action
       Choice ch = new Choice(t);
       Sequence seq = new Sequence(t, la);
       la.parent = seq;
@@ -1162,11 +1131,8 @@ void ExpansionUnit(Container c) :
     {
       c.member = new ZeroOrOne(t, (Expansion_) c.member);
     }
-    // MMa : replaced by new production ExpansionUnitInTCF
-//  |
-//    {//      Container expch = new Container();//      List<List<Token>> types = new ArrayList<List<Token>>();//      List<Token> ids = new ArrayList<Token>();//      List<List<Token>> catchblks = new ArrayList<List<Token>>();//      List<Token> finallyblk = null;//      List<Token> vec = new ArrayList<Token>();//      Token t0;//    }//    t0 = "try" "{" ExpansionChoices(expch) "}"//    (//      "catch" "(" Name(vec) t = < IDENTIFIER > ")"//      {//        types.add(vec);//        ids.add(t);//        vec = new ArrayList<Token>();//        inAction = true;//      }//      Block(vec)//      {//        inAction = false;//        catchblks.add(vec);//        vec = new ArrayList<Token>();//      }//    )*//    [//      {//        inAction = true;//      }//      "finally" Block(vec)//      {//        inAction = false;//        finallyblk = vec;//      }//    ]//    {//      makeTryBlock(t0, c, expch, types, ids, catchblks, finallyblk);//    }
-  | ExpansionUnitInTCF(c)
-  | LOOKAHEAD(Identifier() | StringLiteral() | "<" | PrimaryExpression() "=")
+  | ExpansionUnitTCF(c)
+  | LOOKAHEAD(IdentifierAsString() | StringLiteral() | "<" | PrimaryExpression() "=")
     [
       LOOKAHEAD(PrimaryExpression() "=")
       {
@@ -1188,7 +1154,9 @@ void ExpansionUnit(Container c) :
       }
     ]
     (
-      LOOKAHEAD(Identifier() "(")
+      // MMa 07/2012 : here inside we have IA | RE instead of RE | IA in JavaCC1.5.jjt
+      // and an extra LOOKAHEAD
+      LOOKAHEAD(IdentifierAsString() "(")
       {
         nt = new NonTerminal();
         t = getToken(1);
@@ -1196,7 +1164,7 @@ void ExpansionUnit(Container c) :
         nt.setColumn(t.beginColumn);
         nt.setLhsTokens(lhsTokens);
       }
-      name = Identifier() Arguments(nt.getArgumentTokens())
+      name = IdentifierAsString() Arguments(nt.getArgumentTokens())
       {
         nt.setName(name);
         c.member = nt;
@@ -1230,8 +1198,8 @@ void ExpansionUnit(Container c) :
     )?
   }
 
-// MMa : added to create a node
-void ExpansionUnitInTCF(Container c) :
+// MMa : added to create a node ; renamed from ExpansionUnitInTCF
+void ExpansionUnitTCF(Container c) :
   {
     Token t;
   }
@@ -1291,7 +1259,9 @@ void RegularExpression(Container c) :
     {
       image = "";
     }
-    < LANGLE : "<" >
+    // modified MMa 07/2012 : no definition needed (otherwise it supercedes LT)
+    //    < LANGLE : "<" >
+    "<"
     [
       [
         "#"
@@ -1299,9 +1269,12 @@ void RegularExpression(Container c) :
           private_rexp = true;
         }
       ]
-      image = Identifier() ":"
+      image = IdentifierAsString() ":"
     ]
-    ComplexRegularExpressionChoices(c) < RANGLE : ">" >
+    ComplexRegularExpressionChoices(c)
+    // modified MMa 07/2012 : no definition needed (otherwise it supercedes GT)
+    //    < RANGLE : ">" >
+    ">"
     {
       RegularExpression_ re;
       if (c.member instanceof RJustName)
@@ -1321,7 +1294,7 @@ void RegularExpression(Container c) :
       c.member = re;
     }
   | LOOKAHEAD(2)
-    "<" image = Identifier() ">"
+    "<" image = IdentifierAsString() ">"
     {      c.member = new RJustName(t, image);    }
   | "<" "EOF" ">"
     {
@@ -1415,7 +1388,7 @@ void ComplexRegularExpressionUnit(Container c) :
   boolean hasMax = false;
 }
 {
-  image = StringLiteral()  {    c.member = new RStringLiteral(t, image);  }| "<" image = Identifier() ">"
+  image = StringLiteral()  {    c.member = new RStringLiteral(t, image);  }| "<" image = IdentifierAsString() ">"
   {    c.member = new RJustName(t, image);  }
 | CharacterList(c)
 | "(" ComplexRegularExpressionChoices(c) ")"
@@ -1488,7 +1461,7 @@ void CharacterList(Container c1) :
 // MMa : changed all character_descriptor into CharacterDescriptor to conform to class name convention
 void CharacterDescriptor(Container c) :
 {
-  char c1, c2 = ' '; // unnecessary initialization to make Java compiler happy!
+  char c1, c2 = ' '; // "unnecessary" initialization to make the Java compiler happy!
   boolean isrange = false;
   String imageL, imageR;
   Token t = getToken(1);
@@ -1517,25 +1490,25 @@ void CharacterDescriptor(Container c) :
 }
 
 // MMa : changed all identifier into Identifier to conform to class name convention
-String Identifier() :
+// MMa 07/2012 : renamed from Identifier to IdentifierAsString
+String IdentifierAsString() :
 {  Token t = null;}{  t = < IDENTIFIER >  {    return t.image;  }}
 
 /**********************************************
  * THE JAVA GRAMMAR SPECIFICATION STARTS HERE *
  **********************************************/
 /*
- * The Java grammar is modified to use sequences of tokens
- * for the missing tokens - those that include "<<" and ">>".
+ * The Java grammar is modified to use sequences of tokens for the missing tokens
+ * (those that include "<<" and ">>")
  */
-/*
- * The following production defines Java identifiers - it
- * includes the reserved words of JavaCC also.
- */
+/* Java identifiers and JavaCC reserved words */
+// MMa 07/2012 : is it useful to return a Token ? Seems not in Name() and BlockStatement()
 Token JavaIdentifier() :
 {}
 {
   (
     < IDENTIFIER >
+  // | "options"
   | "LOOKAHEAD"
   | "IGNORE_CASE"
   | "PARSER_BEGIN"
@@ -1553,14 +1526,8 @@ Token JavaIdentifier() :
   }
 }
 
-/*
- * Program structuring syntax follows.
- */
 void CompilationUnit() :
-/*
- * The <EOF> is deleted since the compilation unit is embedded
- * within grammar code.
- */
+/* The <EOF> is deleted since the compilation unit is embedded within grammar code */
 {
   set_initial_cu_token
   (
@@ -1570,7 +1537,8 @@ void CompilationUnit() :
 }
 {
   [
-    LOOKAHEAD((Annotation())* "package")
+    // MMa 07/2012 : fixed grammar
+    // LOOKAHEAD((Annotation())* "package")
     PackageDeclaration()
   ]
   (
@@ -1587,9 +1555,10 @@ void CompilationUnit() :
 void PackageDeclaration() :
 {}
 {
-  // MMa : fixed grammar
-//  Modifiers() "package" Name(null) ";"
-  ( Annotation() )* "package" Name(null) ";"
+  // MMa 07/2012 : fixed grammar : only at most one Annotation is permitted,
+  // and must be in package-info.java, so we should not encounter it in the parsed file
+  // Modifiers() "package" Name(null) ";"
+  "package" Name(null) ";"
 }
 
 void ImportDeclaration() :
@@ -1599,9 +1568,10 @@ void ImportDeclaration() :
 }
 
 /*
- * Modifiers. We match all modifiers in a single rule to reduce the chances of
- * syntax errors for simple modifier mistakes. It will also enable us to give
- * better error messages.
+ * We match all modifiers in a single rule to reduce the chances of syntax errors
+ * for simple modifier mistakes. It will also enable us to give better error messages.
+ * Used for class, interface, constant, field, method, constructor & abstract method modifiers,
+ * but not for variable modifiers (see VariableModifiers()).
  */
 int Modifiers() :
 {
@@ -1661,13 +1631,11 @@ int Modifiers() :
   {    return modifiers;  }
 }
 
-/*
- * Declaration syntax follows.
- */
 void TypeDeclaration() :
 {}
 {
   ";"
+// MMa 07/2012 : problem ! Modifiers include Annotation() which prevent from finding AnnotationTypeDeclaration()
 | Modifiers()
   (
     ClassOrInterfaceDeclaration()
@@ -1790,10 +1758,7 @@ void TypeBound() :
 }
 
 void ClassOrInterfaceBody(boolean isInterface, List<Token> tokens) :
-/*
- * Parsing this fills "tokens" with all tokens of the block
- * excluding the braces at each end.
- */
+/* Parsing this fills "tokens" with all tokens of the block excluding the braces at each end */
 {
   Token first, last;
   if (tokens == null) tokens = new ArrayList<Token>();
@@ -1832,8 +1797,9 @@ void ClassOrInterfaceBodyDeclaration(boolean isInterface) :
   {
     if (isInterface) throw new ParseException("An interface cannot have initializers");
   }
-| Modifiers() // Just get all the modifiers out of the way. If you want to do
-  // more checks, pass the modifiers down to the member
+| Modifiers()
+  // Just get all the modifiers out of the way.
+  // If you want to do more checks, pass the modifiers down to the member
   (
     ClassOrInterfaceDeclaration()
   | EnumDeclaration()
@@ -1851,7 +1817,7 @@ void ClassOrInterfaceBodyDeclaration(boolean isInterface) :
 void FieldDeclaration() :
 {}
 {
-  // Modifiers are already matched in the caller
+  // Modifiers already matched in the caller
   Type() VariableDeclarator()
   (
     "," VariableDeclarator()
@@ -1895,8 +1861,9 @@ void ArrayInitializer() :
 void MethodDeclaration() :
 {}
 {
-  // Modifiers already matched in the caller!
+  // Modifiers already matched in the caller
   [ TypeParameters() ] ResultType(null) MethodDeclarator() [ "throws" NameList() ]
+  // MMa 07/2012 : '[node_descriptor()]' is missing here
   (
     Block(null)
   | ";"
@@ -1910,10 +1877,7 @@ void MethodDeclarator() :
 }
 
 void FormalParameters(List<Token> tokens) :
-/*
- * Parsing this fills "tokens" with all tokens of the formal
- * parameters excluding the parentheses at each end.
- */
+/* Parsing this fills "tokens" with all tokens of the formal parameters excluding the parentheses at each end */
 {
   Token first, last;
   if (tokens == null) tokens = new ArrayList<Token>();
@@ -1956,7 +1920,8 @@ void FormalParameter() :
 void ConstructorDeclaration() :
 {}
 {
-  [ TypeParameters() ]  // Modifiers matched in the caller
+  // Modifiers already matched in the caller
+  [ TypeParameters() ]
   < IDENTIFIER > FormalParameters(null) [ "throws" NameList() ] "{"
   [
     LOOKAHEAD(ExplicitConstructorInvocation())
@@ -1971,6 +1936,7 @@ void ConstructorDeclaration() :
 void ExplicitConstructorInvocation() :
 {}
 {
+  // MMa 07/2012 : problem ! both lack optional NonWildTypeArguments (< ReferenceTypeList >)
   LOOKAHEAD("this" Arguments(null) ";")
   "this" Arguments(null) ";"
 |
@@ -1987,9 +1953,6 @@ void Initializer() :
   [ "static" ] Block(null)
 }
 
-/*
- * Type, name and expression syntax follows.
- */
 void Type() :
 {}
 {
@@ -2127,18 +2090,13 @@ void NameList() :
   )*
 }
 
-/*
- * Expression syntax follows.
- */
 void Expression(List<Token> tokens) :
 /*
- * This expansion has been written this way instead of:
+ * This expansion has been written this way for performance reasons instead of:
  *   Assignment() | ConditionalExpression()
- * for performance reasons.
- * However, it is a weakening of the grammar for it allows the LHS of
- * assignments to be any conditional expression whereas it can only be
- * a primary expression.  Consider adding a semantic predicate to work
- * around this.
+ * However, it is a weakening of the grammar for it allows the LHS of assignments to be
+ * any conditional expression whereas it can only be a primary expression.
+ * Consider adding a semantic predicate to work around this.
  */
 {
   Token first = getToken(1);
@@ -2271,11 +2229,32 @@ void ShiftExpression() :
   (
     (
       "<<"
-    | RSIGNEDSHIFT()
-    | RUNSIGNEDSHIFT()
+      // MMa 07/2012 : renamed from RUNSIGNEDSHIFT() and put before RSignedShift
+    | RUnsignedShift()
+      // MMa 07/2012 : renamed from RSIGNEDSHIFT()
+    | RSignedShift()
     )
     AdditiveExpression()
   )*
+}
+
+/* We use productions to match >>>, >> and > so that we can keep the type declaration syntax with generics clean */
+// MMa 07/2012 : moved from after TryStatement() and renamed from RSIGNEDSHIFT()
+void RSignedShift() :
+{}
+{
+  LOOKAHEAD({ getToken(1).kind == GT && ((Token.GTToken) getToken(1)).realKind == RSIGNEDSHIFT })
+  // modified MMa 07/2012 : '">" ">"' changed to '">>"' ?
+  ">>"
+}
+
+// MMa 07/2012 : moved from after TryStatement() and renamed from RUNSIGNEDSHIFT()
+void RUnsignedShift() :
+{}
+{
+  LOOKAHEAD({ getToken(1).kind == GT && ((Token.GTToken) getToken(1)).realKind == RUNSIGNEDSHIFT })
+  // modified MMa 07/2012 : '">" ">" ">"' changed to '"> >>"' ?
+  ">>>"
 }
 
 void AdditiveExpression() :
@@ -2343,9 +2322,10 @@ void UnaryExpressionNotPlusMinus() :
 | PostfixExpression()
 }
 
-// This production is to determine lookahead only.  The LOOKAHEAD specifications
-// below are not used, but they are there just to indicate that we know about
-// this.
+/*
+ * This production is to determine lookahead only.
+ * The LOOKAHEAD specifications below are not used, but they are there just to indicate that we know about this.
+ */
 void CastLookahead() :
 {}
 {
@@ -2406,6 +2386,7 @@ void PrimaryPrefix() :
   Literal()
 | "this"
 | "super" "." < IDENTIFIER >
+// MMa 07/2012 : problem ! does not seem to be found
 | "(" Expression(null) ")"
 | AllocationExpression()
 | LOOKAHEAD(ResultType(null) "." "class")
@@ -2451,10 +2432,7 @@ void NullLiteral() :
 }
 
 void Arguments(List<Token> tokens) :
-/*
- * Parsing this fills "tokens" with all tokens of the arguments
- * excluding the parentheses at each end.
- */
+/* Parsing this fills "tokens" with all tokens of the arguments excluding the parentheses at each end */
 {
   Token first, last;
   if (tokens == null) tokens = new ArrayList<Token>();
@@ -2506,7 +2484,7 @@ void AllocationExpression() :
 
 /*
  * The third LOOKAHEAD specification below is to parse to PrimarySuffix
- * if there is an expression between the "[...]".
+ * if there is an expression between the "[...]"
  */
 void ArrayDimsAndInits() :
 {}
@@ -2523,9 +2501,6 @@ void ArrayDimsAndInits() :
 | ("[" "]")+ ArrayInitializer()
 }
 
-/*
- * Statement syntax follows.
- */
 void Statement() :{}{  LOOKAHEAD(2)  LabeledStatement()| AssertStatement()| Block(null)| EmptyStatement()| StatementExpression() ";"| SwitchStatement()| IfStatement()| WhileStatement()| DoStatement()| ForStatement()| BreakStatement()| ContinueStatement()| ReturnStatement()| ThrowStatement()| SynchronizedStatement()| TryStatement()}
 void AssertStatement() :
 {}
@@ -2540,10 +2515,7 @@ void LabeledStatement() :
 }
 
 void Block(List<Token> tokens) :
-/*
- * Parsing this fills "tokens" with all tokens of the block
- * excluding the braces at each end.
- */
+/* Parsing this fills "tokens" with all tokens of the block excluding the braces at each end */
 {
   Token first, last;
   if (tokens == null) tokens = new ArrayList<Token>();
@@ -2577,7 +2549,9 @@ void Block(List<Token> tokens) :
 void BlockStatement() :
 {}
 {
-  LOOKAHEAD(Modifiers() Type() < IDENTIFIER >)
+  // modified MMa 07/2012
+  //  LOOKAHEAD(Modifiers() Type() JavaIdentifier())
+  LOOKAHEAD(VariableModifiers() Type() JavaIdentifier())
   LocalVariableDeclaration() ";"
 | Statement()
 | ClassOrInterfaceDeclaration()
@@ -2586,9 +2560,24 @@ void BlockStatement() :
 void LocalVariableDeclaration() :
 {}
 {
-  Modifiers() Type() VariableDeclarator()
+  // modified MMa 06/2012
+  //  Modifiers() Type() VariableDeclarator()
+  VariableModifiers() Type() VariableDeclarator()
   (
     "," VariableDeclarator()
+  )*
+}
+
+// added MMa 06/2012
+void VariableModifiers() :
+{}
+{
+  (
+    LOOKAHEAD(2)
+    (
+      "final"
+    | Annotation()
+    )
   )*
 }
 
@@ -2600,9 +2589,8 @@ void EmptyStatement() :
 
 void StatementExpression() :
 /*
- * The last expansion of this production accepts more than the legal
- * Java expansions for StatementExpression.  This expansion does not
- * use PostfixExpression for performance reasons.
+ * The last expansion of this production accepts more than the legal Java expansions for StatementExpression.
+ * This expansion does not use PostfixExpression for performance reasons.
  */
 {}
 {
@@ -2638,9 +2626,8 @@ void SwitchLabel() :
 
 void IfStatement() :
 /*
- * The disambiguating algorithm of JavaCC automatically binds dangling
- * else's to the innermost if statement.  The LOOKAHEAD specification
- * is to tell JavaCC that we know what we are doing.
+ * The disambiguating algorithm of JavaCC automatically binds dangling else's to the innermost if statement.
+ * The LOOKAHEAD specification is to tell JavaCC that we know what we are doing.
  */
 {}
 {
@@ -2668,8 +2655,10 @@ void ForStatement() :
 {
   "for" "("
   (
-    LOOKAHEAD(Modifiers() Type() < IDENTIFIER > ":")
-    Modifiers() Type() < IDENTIFIER > ":" Expression(null)
+    // modified MMa : fixed grammar
+    // LOOKAHEAD(Modifiers() Type() < IDENTIFIER > ":")    // Modifiers() Type() < IDENTIFIER > ":" Expression(null)
+    LOOKAHEAD(VariableModifiers() Type() < IDENTIFIER > ":")
+    VariableModifiers() Type() < IDENTIFIER > ":" Expression(null)
   | [ ForInit() ] ";" [ Expression(null) ] ";" [ ForUpdate() ]
   )
   ")" Statement()
@@ -2678,7 +2667,9 @@ void ForStatement() :
 void ForInit() :
 {}
 {
-  LOOKAHEAD(Modifiers() Type() < IDENTIFIER >)
+  // modified MMa : fixed grammar
+  // LOOKAHEAD(Modifiers() Type() < IDENTIFIER >)
+  LOOKAHEAD(VariableModifiers() Type() < IDENTIFIER >)
   LocalVariableDeclaration()
 | StatementExpressionList()
 }
@@ -2716,8 +2707,7 @@ void ReturnStatement() :
 }
 {
   t = "return"  {
-    // Add if statement to prevent subsequent code generated
-    // from being dead code.
+    // Add if statement to prevent subsequent code generated from being dead code
     if (inAction)
     {
       t.image = "{if (true) return";
@@ -2725,7 +2715,7 @@ void ReturnStatement() :
     }
   }
   [ Expression(null) ] t = ";"  {
-    // Add closing brace for above if statement.
+    // Add closing brace for above if statement
     if (inAction)
     {
       t.image = ";}";
@@ -2739,8 +2729,7 @@ void ThrowStatement() :
 }
 {
   t = "throw"  {
-    // Add if statement to prevent subsequent code generated
-    // from being dead code.
+    // Add if statement to prevent subsequent code generated from being dead code
     if (inAction)
     {
       t.image = "{if (true) throw";
@@ -2748,7 +2737,7 @@ void ThrowStatement() :
     }
   }
   Expression(null) t = ";"  {
-    // Add closing brace for above if statement.
+    // Add closing brace for above if statement
     if (inAction)
     {
       t.image = ";}";
@@ -2763,10 +2752,7 @@ void SynchronizedStatement() :
 }
 
 void TryStatement() :
-/*
- * Semantic check required here to make sure that at least one
- * finally/catch is present.
- */
+/* Semantic check required here to make sure that at least one finally/catch is present */
 {}
 {
   "try" Block(null)
@@ -2776,24 +2762,6 @@ void TryStatement() :
   [ "finally" Block(null) ]
 }
 
-/* We use productions to match >>>, >> and > so that we can keep the
- * type declaration syntax with generics clean
- */
-void RUNSIGNEDSHIFT() :
-{}
-{
-  LOOKAHEAD({ getToken(1).kind == GT && ((Token.GTToken) getToken(1)).realKind == RUNSIGNEDSHIFT })
-  ">" ">" ">"
-}
-
-void RSIGNEDSHIFT() :
-{}
-{
-  LOOKAHEAD({ getToken(1).kind == GT && ((Token.GTToken) getToken(1)).realKind == RSIGNEDSHIFT })
-  ">" ">"
-}
-
-/* Annotation syntax follows. */
 void Annotation() :
 {}
 {
@@ -2857,7 +2825,6 @@ void MemberValueArrayInitializer() :
   [ "," ] "}"
 }
 
-/* Annotation Types. */
 void AnnotationTypeDeclaration() :
 {}
 {

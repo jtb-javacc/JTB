@@ -30,11 +30,12 @@ package EDU.purdue.jtb.parser;
 
 /**
  * Supply the version number.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public interface Version {
-   String version = "4.2.mma";
-}
 
+  // TODO see if it should be something like 5.0.mma
+  String version = "4.2.mma";
+}

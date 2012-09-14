@@ -52,9 +52,10 @@
  */
 package EDU.purdue.jtb.visitor;
 
+import static EDU.purdue.jtb.misc.Globals.*;
+
 import java.util.Iterator;
 
-import EDU.purdue.jtb.misc.Globals;
 import EDU.purdue.jtb.misc.Messages;
 import EDU.purdue.jtb.syntaxtree.BNFProduction;
 import EDU.purdue.jtb.syntaxtree.Block;
@@ -64,7 +65,7 @@ import EDU.purdue.jtb.syntaxtree.DoStatement;
 import EDU.purdue.jtb.syntaxtree.Expansion;
 import EDU.purdue.jtb.syntaxtree.ExpansionChoices;
 import EDU.purdue.jtb.syntaxtree.ExpansionUnit;
-import EDU.purdue.jtb.syntaxtree.ExpansionUnitInTCF;
+import EDU.purdue.jtb.syntaxtree.ExpansionUnitTCF;
 import EDU.purdue.jtb.syntaxtree.ForStatement;
 import EDU.purdue.jtb.syntaxtree.INode;
 import EDU.purdue.jtb.syntaxtree.IfStatement;
@@ -98,23 +99,23 @@ import EDU.purdue.jtb.syntaxtree.WhileStatement;
 /**
  * SemanticChecker visitor checks and report informations, warnings or errors for the following
  * conditions}<br>
- *<ul>
- *<li>When productions have a return value other than "void" (information) (JTB will alter the
+ * <ul>
+ * <li>When productions have a return value other than "void" (information) (JTB will alter the
  * code).
- *<li>When JavaCode productions exist (information) (JTB will alter the code).
- *<li>When a user declared variable is not initialized (warning) (javac may complain while
+ * <li>When JavaCode productions exist (information) (JTB will alter the code).
+ * <li>When a user declared variable is not initialized (warning) (javac may complain while
  * compiling the generated parser).
- *<li>When there are extraneous parentheses in a production (warning) (should be better to remove
+ * <li>When there are extraneous parentheses in a production (warning) (should be better to remove
  * them).
- *<li>When a production has a name reserved by an automatically generated JTB class (e.g. INode,
+ * <li>When a production has a name reserved by an automatically generated JTB class (e.g. INode,
  * INodeList, ...) (error) (the project will not compile).
- *</ul>
+ * </ul>
  * <p>
  * Note: the warning}<br>
  * "No blocks of Java code must exist within ExpansionUnit" (since the JTB first authors believed
  * they are generally unnecessary in JTB grammars)<br>
  * has been replaced by the following new information}<br>
- *"Return statement in a Java block in production '...' . It will be transformed in an assign
+ * "Return statement in a Java block in production '...' . It will be transformed in an assign
  * statement to the corresponding new parser class variable."<br>
  * These blocks are now allowed - as for example JavaCC 4.2 grammar has a lot of Java code blocks -<br>
  * but as JTB generates return statements to create and return the nodes corresponding to the
@@ -135,9 +136,10 @@ import EDU.purdue.jtb.syntaxtree.WhileStatement;
  * <p>
  * To be Done: check that the JTB generated return variables do not collide with user variables.
  * 
- * @author Marc Mazas, mmazas@sopragroup.com
+ * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  * @version 1.4.1 : 02/2010 : MMa : fixed unprocessed n.f0.which == 0 case in visit(ExpansionUnit)
+ * @version 1.4.7 : 07/2012 : MMa : followed changes in jtbgram.jtb (LocalVariableDeclaration())
  */
 public class SemanticChecker extends DepthFirstVoidVisitor {
 
@@ -150,20 +152,20 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * f0 -> JavaCCOptions()<br>
    * f1 -> "PARSER_BEGIN"<br>
    * f2 -> "("<br>
-   * f3 -> Identifier()<br>
+   * f3 -> IdentifierAsString()<br>
    * f4 -> ")"<br>
    * f5 -> CompilationUnit()<br>
    * f6 -> "PARSER_END"<br>
    * f7 -> "("<br>
-   * f8 -> Identifier()<br>
+   * f8 -> IdentifierAsString()<br>
    * f9 -> ")"<br>
    * f10 -> ( Production() )+<br>
    * 
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(final JavaCCInput n) {
-    // only visit production subtree
+    // visit only f10 -> ( Production() )+
     n.f10.accept(this);
   }
 
@@ -171,9 +173,10 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * Visits a {@link JavaCCOptions} node, whose children are the following :
    * <p>
    * f0 -> [ #0 "options" #1 "{"<br>
-   * .. .. . #2 ( OptionBinding() )* #3 "}" ]<br>
+   * .. .. . #2 ( OptionBinding() )*<br>
+   * .. .. . #3 "}" ]<br>
    * 
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(@SuppressWarnings("unused") final JavaCCOptions n) {
@@ -193,7 +196,7 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * .. .. | %2 StringLiteral() )<br>
    * f3 -> ";"<br>
    * 
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(@SuppressWarnings("unused") final OptionBinding n) {
@@ -208,11 +211,11 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * .. .. | %2 TokenManagerDecls()<br>
    * .. .. | %3 BNFProduction()<br>
    * 
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(final Production n) {
-    // visit only JavaCodeProduction() and BNFProduction
+    // visit only %0 JavaCodeProduction() and %3 BNFProduction()
     if (n.f0.which == 0 || n.f0.which == 3)
       n.f0.choice.accept(this);
   }
@@ -223,57 +226,62 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * f0 -> "JAVACODE"<br>
    * f1 -> AccessModifier()<br>
    * f2 -> ResultType()<br>
-   * f3 -> Identifier()<br>
+   * f3 -> IdentifierAsString()<br>
    * f4 -> FormalParameters()<br>
    * f5 -> [ #0 "throws" #1 Name()<br>
    * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
    * f6 -> Block()<br>
    * 
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(final JavaCodeProduction n) {
-    // f3 -> Identifier()
+    // f3 -> IdentifierAsString()
     final String ident = n.f3.f0.tokenImage;
     final String resType = getResultType(n.f2);
     if (!"void".equals(resType)) {
       Messages.info("Non \"void\" JavaCodeProduction. Result type '" + resType +
-                    "' will be changed into '" + ident + "', and a parser class variable 'jtbrt_" +
-                    resType + "' of type '" + resType + "'will be added to hold the return value.",
+                        "' will be changed into '" + ident +
+                        "', and a parser class variable 'jtbrt_" + resType + "' of type '" +
+                        resType + "'will be added to hold the return value.",
                     n.f0.beginLine);
     }
   }
 
   /**
    * Gets the ResultType. Walks down the tree to find the first token.
-   *<p>
+   * <p>
    * {@link ResultType}<br>
-   * f0 -> ( "void" | Type() )<br>
-   *<p>
+   * f0 -> ( %0 "void"<br>
+   * .. .. | %1 Type() )<br>
+   * <p>
    * {@link Type}<br>
-   * f0 -> ReferenceType()<br>
-   * | PrimitiveType()<br>
-   *<p>
+   * f0 -> . %0 ReferenceType()<br>
+   * .. .. | %1 PrimitiveType()<br>
+   * <p>
    * {@link ReferenceType}<br>
-   * f0 -> PrimitiveType() ( "[" "]" )+<br>
-   * | ClassOrInterfaceType() ( "[" "]" )*<br>
-   *<p>
+   * f0 -> . %0 #0 PrimitiveType()<br>
+   * .. .. . .. #1 ( $0 "[" $1 "]" )+<br>
+   * .. .. | %1 #0 ClassOrInterfaceType()<br>
+   * .. .. . .. #1 ( $0 "[" $1 "]" )*<br>
+   * <p>
    * {@link PrimitiveType}<br>
-   * f0 -> "boolean"<br>
-   * | "char"<br>
-   * | "byte"<br>
-   * | "short"<br>
-   * | "int"<br>
-   * | "long"<br>
-   * | "float"<br>
-   * | "double"<br>
-   *<p>
+   * f0 -> . %0 "boolean"<br>
+   * .. .. | %1 "char"<br>
+   * .. .. | %2 "byte"<br>
+   * .. .. | %3 "short"<br>
+   * .. .. | %4 "int"<br>
+   * .. .. | %5 "long"<br>
+   * .. .. | %6 "float"<br>
+   * .. .. | %7 "double"<br>
+   * <p>
    * {@link ClassOrInterfaceType}<br>
    * f0 -> < IDENTIFIER ><br>
    * f1 -> [ TypeArguments() ]<br>
-   * f2 -> ( "." < IDENTIFIER > [ TypeArguments() ] )*<br>
+   * f2 -> ( #0 "." #1 < IDENTIFIER ><br>
+   * .. .. . #2 [ TypeArguments() ] )*<br>
    * 
-   * @param rt the node to process
+   * @param rt - the node to process
    * @return the result type token image
    */
   String getResultType(final ResultType rt) {
@@ -308,7 +316,8 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> [ %0 #0 "<" #1 "*" #2 ">"<br>
    * .. .. | %1 #0 "<" #1 < IDENTIFIER ><br>
-   * .. .. . .. #2 ( $0 "," $1 < IDENTIFIER > )* #3 ">" ]<br>
+   * .. .. . .. #2 ( $0 "," $1 < IDENTIFIER > )*<br>
+   * .. .. . .. #3 ">" ]<br>
    * f1 -> RegExprKind()<br>
    * f2 -> [ #0 "[" #1 "IGNORE_CASE" #2 "]" ]<br>
    * f3 -> ":"<br>
@@ -317,7 +326,7 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * f6 -> ( #0 "|" #1 RegExprSpec() )*<br>
    * f7 -> "}"<br>
    *
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(@SuppressWarnings("unused") final RegularExprProduction n) {
@@ -331,7 +340,7 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * f1 -> ":"<br>
    * f2 -> ClassOrInterfaceBody()<br>
    * 
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(@SuppressWarnings("unused") final TokenManagerDecls n) {
@@ -343,7 +352,7 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> AccessModifier()<br>
    * f1 -> ResultType()<br>
-   * f2 -> Identifier()<br>
+   * f2 -> IdentifierAsString()<br>
    * f3 -> FormalParameters()<br>
    * f4 -> [ #0 "throws" #1 Name()<br>
    * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
@@ -353,11 +362,12 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * f8 -> ExpansionChoices()<br>
    * f9 -> "}"<br>
    * 
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(final BNFProduction n) {
-    // f1 -> ResultType(p.getReturnTypeTokens())
+    prod = n.f2.f0.tokenImage;
+    // f1 -> ResultType()
     final ResultType rt = n.f1;
     NodeToken tk;
     final INode in = rt.f0.choice;
@@ -384,25 +394,23 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
       final String ident = n.f2.f0.tokenImage;
       Messages.info("Non \"void\" BNFProduction. Result type '" + resType +
                     "' will be changed into '" + ident + "', and a parser class variable '" +
-                    Globals.JTBRT_PREFIX + ident + "' of type '" + resType +
+                    jtbRtPrefix + ident + "' of type '" + resType +
                     "' will be added to hold the return values.", tk.beginLine);
 
-      prod = n.f2.f0.tokenImage;
-      if (prod.equals(Globals.iNodeName) || prod.equals(Globals.iNodeListName) ||
-          prod.equals(Globals.nodeListName) || prod.equals(Globals.nodeListOptName) ||
-          prod.equals(Globals.nodeOptName) || prod.equals(Globals.nodeSeqName) ||
-          prod.equals(Globals.nodeTokenName) || prod.equals(Globals.nodeChoiceName))
+      if (prod.equals(iNode) || prod.equals(iNodeList) || prod.equals(nodeList) ||
+          prod.equals(nodeListOpt) || prod.equals(nodeOpt) || prod.equals(nodeSeq) ||
+          prod.equals(nodeToken) || prod.equals(nodeChoice))
         Messages.softErr("Production \"" + prod + "\" has the same name as a JTB generated class.",
                          n.f2.f0.beginLine);
     }
-    // f6 -> Block(p.getDeclarationTokens())
+    // f6 -> Block()
     if (n.f6.f1.present()) {
       // visit block declarations only if non empty
       for (final Iterator<INode> e = n.f6.f1.elements(); e.hasNext();)
         // BlockStatement(), not Block() !
         e.next().accept(this);
     }
-    // f8 -> ExpansionChoices(c)
+    // f8 -> ExpansionChoices()
     n.f8.accept(this);
   }
 
@@ -413,7 +421,7 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * f1 -> ( BlockStatement() )*<br>
    * f2 -> "}"<br>
    * 
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(final Block n) {
@@ -431,33 +439,33 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * .. .. | %1 Statement()<br>
    * .. .. | %2 ClassOrInterfaceDeclaration()<br>
    * 
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(final BlockStatement n) {
     if (n.f0.which <= 1)
-      // LocalVariableDeclaration() ";" or Statement()
+      // %0 #0 LocalVariableDeclaration() #1 ";"
       n.f0.choice.accept(this);
   }
 
   /**
    * Visits a {@link LocalVariableDeclaration} node, whose children are the following :
    * <p>
-   * f0 -> Modifiers()<br>
+   * f0 -> VariableModifiers()<br>
    * f1 -> Type()<br>
    * f2 -> VariableDeclarator()<br>
    * f3 -> ( #0 "," #1 VariableDeclarator() )*<br>
    * 
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(final LocalVariableDeclaration n) {
     // f2 -> VariableDeclarator()
     n.f2.accept(this);
-    // f3 -> ( "," VariableDeclarator() )*
+    // f3 -> ( #0 "," #1 VariableDeclarator() )*
     if (n.f3.present()) {
       for (final Iterator<INode> e = n.f3.elements(); e.hasNext();) {
-        // VariableDeclarator()
+        // #1 VariableDeclarator()
         ((NodeSequence) e.next()).elementAt(1).accept(this);
       }
     }
@@ -469,16 +477,16 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * f0 -> VariableDeclaratorId()<br>
    * f1 -> [ #0 "=" #1 VariableInitializer() ]<br>
    * 
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(final VariableDeclarator n) {
-    // f1 -> [ "=" VariableInitializer() ]
+    // f1 -> [ #0 "=" #1 VariableInitializer() ]
     if (!n.f1.present()) {
       final String var = n.f0.f0.tokenImage;
       Messages.warning("Non initialized user variable '" + var +
-                       "'. May lead to compiler error(s)" +
-                       " (specially for 'Token' variables). Check in generated parser.",
+                           "'. May lead to compiler error(s)" +
+                           " (specially for 'Token' variables). Check in generated parser.",
                        n.f0.f0.beginLine);
     }
   }
@@ -503,22 +511,22 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * .. .. | %14 SynchronizedStatement()<br>
    * .. .. | %15 TryStatement()<br>
    * 
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(final Statement n) {
     switch (n.f0.which) {
       case 0:
-        // LabeledStatement() : f2 -> Statement()
+        // %00 LabeledStatement() : f2 -> Statement()
         ((NodeSequence) n.f0.choice).elementAt(2).accept(this);
         break;
       case 2:
-        // Block(null) : f1 -> ( BlockStatement() )*
+        // %02 Block() : f1 -> ( BlockStatement() )*
         if (((Block) n.f0.choice).f1.present())
           ((Block) n.f0.choice).f1.accept(this);
         break;
       case 5:
-        // SwitchStatement() : f5 -> ( SwitchLabel() ( BlockStatement() )* )*<br>
+        // %05 SwitchStatement() : f5 -> ( SwitchLabel() ( BlockStatement() )* )*<br>
         final NodeListOptional nlo5 = ((SwitchStatement) n.f0.choice).f5;
         if (nlo5.present()) {
           for (final Iterator<INode> e = nlo5.elements(); e.hasNext();) {
@@ -529,7 +537,7 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
         }
         break;
       case 6:
-        // IfStatement() : f4 -> Statement() and f5 -> [ "else" Statement() ]
+        // %06 IfStatement() : f4 -> Statement() and f5 -> [ "else" Statement() ]
         ((IfStatement) n.f0.choice).f4.accept(this);
         final NodeOptional opt6 = ((IfStatement) n.f0.choice).f5;
         if (opt6.present()) {
@@ -537,39 +545,39 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
         }
         break;
       case 7:
-        // WhileStatement()
+        // %07 WhileStatement()
         ((WhileStatement) n.f0.choice).f4.accept(this);
         break;
       case 8:
-        // DoStatement()
+        // %08 DoStatement()
         ((DoStatement) n.f0.choice).f1.accept(this);
         break;
       case 9:
-        // ForStatement()
+        // %09 ForStatement()
         ((ForStatement) n.f0.choice).f4.accept(this);
         break;
       case 12:
-        // ReturnStatement()
+        // %12 ReturnStatement()
         Messages.info("Return statement in a Java block in production '" + prod + "()'. It will " +
                       "be transformed in an assign statement to the corresponding new parser " +
                       "class variable.", ((ReturnStatement) n.f0.choice).f0.beginLine);
         break;
       case 14:
-        // SynchronizedStatement()
+        // %14 SynchronizedStatement()
         ((SynchronizedStatement) n.f0.choice).f4.accept(this);
         break;
       case 15:
-        // TryStatement()
-        // f1 -> Block(null)
+        // %15 TryStatement()
+        // f1 -> Block()
         ((TryStatement) n.f0.choice).f1.accept(this);
-        // f2 -> ( "catch" "(" FormalParameter() ")" Block(null) )*
+        // f2 -> ( "catch" "(" FormalParameter() ")" Block() )*
         final NodeListOptional nlo15 = ((TryStatement) n.f0.choice).f2;
         if (nlo15.present()) {
           for (final Iterator<INode> e = nlo15.elements(); e.hasNext();) {
             ((NodeSequence) e.next()).elementAt(4).accept(this);
           }
         }
-        // f3 -> [ "finally" Block(null) ]
+        // f3 -> [ "finally" Block() ]
         final NodeOptional opt15 = ((TryStatement) n.f0.choice).f3;
         if (opt15.present()) {
           ((NodeSequence) opt15.node).elementAt(1).accept(this);
@@ -586,13 +594,13 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * f0 -> Expansion()<br>
    * f1 -> ( #0 "|" #1 Expansion() )*<br>
    * 
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(final ExpansionChoices n) {
-    // f0 -> Expansion(c1)
+    // f0 -> Expansion()
     n.f0.accept(this);
-    // f1 -> ( "|" Expansion(c2) )*
+    // f1 -> ( #0 "|" #1 Expansion() )*
     final NodeListOptional nlo = n.f1;
     if (nlo.present()) {
       for (final Iterator<INode> e = nlo.elements(); e.hasNext();) {
@@ -607,11 +615,11 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * f0 -> ( #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" )?<br>
    * f1 -> ( ExpansionUnit() )+<br>
    * 
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(final Expansion n) {
-    // visit only ExpansionUnit
+    // visit only f1 -> ( ExpansionUnit() )+
     n.f1.accept(this);
   }
 
@@ -621,17 +629,17 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * f0 -> . %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"<br>
    * .. .. | %1 Block()<br>
    * .. .. | %2 #0 "[" #1 ExpansionChoices() #2 "]"<br>
-   * .. .. | %3 ExpansionUnitInTCF()<br>
+   * .. .. | %3 ExpansionUnitTCF()<br>
    * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ]<br>
-   * .. .. . .. #1 ( &0 $0 Identifier() $1 Arguments()<br>
+   * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
    * .. .. . .. .. | &1 $0 RegularExpression()<br>
-   * .. .. . .. .. . .. $1 [ £0 "." £1 < IDENTIFIER > ] )<br>
+   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )<br>
    * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
    * .. .. . .. #3 ( &0 "+"<br>
    * .. .. . .. .. | &1 "*"<br>
    * .. .. . .. .. | &2 "?" )?<br>
    * 
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(final ExpansionUnit n) {
@@ -652,15 +660,15 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
         return;
 
       case 3:
-        // ExpansionUnitInTCF()
+        // %3 ExpansionUnitTCF()
         n.f0.choice.accept(this);
         return;
 
       case 4:
         // %4 #0 [ $0 PrimaryExpression() $1 "=" ]
-        // .. #1 ( &0 $0 Identifier() $1 Arguments()
+        // .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()
         // .. .. | &1 $0 RegularExpression()
-        // .. .. . .. $1 [ £0 "." £1 < IDENTIFIER > ] )
+        // .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )
         return;
 
       case 5:
@@ -670,7 +678,7 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
         final ExpansionChoices choice = (ExpansionChoices) seq.elementAt(1);
         final NodeOptional mod = (NodeOptional) seq.elementAt(3);
         if (!mod.present() && !choice.f1.present())
-          Messages.warning("Extra parentheses in " + prod + "().",
+          Messages.warning("Unnecessary parentheses in " + prod + "().",
                            ((NodeToken) ((NodeSequence) n.f0.choice).elementAt(0)).beginLine);
         return;
 
@@ -681,7 +689,7 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
   }
 
   /**
-   * Visits a {@link ExpansionUnitInTCF} node, whose children are the following :
+   * Visits a {@link ExpansionUnitTCF} node, whose children are the following :
    * <p>
    * f0 -> "try"<br>
    * f1 -> "{"<br>
@@ -690,10 +698,10 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * f4 -> ( #0 "catch" #1 "(" #2 Name() #3 < IDENTIFIER > #4 ")" #5 Block() )*<br>
    * f5 -> [ #0 "finally" #1 Block() ]<br>
    * 
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
-  public void visit(final ExpansionUnitInTCF n) {
+  public void visit(final ExpansionUnitTCF n) {
     // f2 -> ExpansionChoices()
     n.f2.accept(this);
     // f4 -> ( #0 "catch" #1 "(" #2 Name() #3 < IDENTIFIER > #4 ")" #5 Block() )*
@@ -710,31 +718,33 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
     }
   }
 
-/**
-   * Visits a {@link RegularExpression} node, whose children are the following :
+  /**
+   * Visits a {@link LocalLookahead} node, whose children are the following :
    * <p>
-   * f0 -> . %0 StringLiteral()<br>
-   * .. .. | %1 #0 < LANGLE : "<" ><br>
-   * .. .. . .. #1 [ $0 [ "#" ] $1 Identifier() $2 ":" ] #2 ComplexRegularExpressionChoices() #3 < RANGLE : ">" ><br>
-   * .. .. | %2 #0 "<" #1 Identifier() #2 ">"<br>
-   * .. .. | %3 #0 "<" #1 "EOF" #2 ">"<br>
-   *
-   * @param n the node to visit
+   * f0 -> [ IntegerLiteral() ]<br>
+   * f1 -> [ "," ]<br>
+   * f2 -> [ ExpansionChoices() ]<br>
+   * f3 -> [ "," ]<br>
+   * f4 -> [ #0 "{" #1 Expression() #2 "}" ]<br>
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(@SuppressWarnings("unused") final LocalLookahead n) {
     // should not be called !
   }
 
-  /**
+/**
    * Visits the {@link RegularExpression node}<br>
-   * f0 -> StringLiteral()<br>
-   * | < LANGLE: "<" > [ [ "#" ] Identifier() ":" ] ComplexRegularExpressionChoices(c) < RANGLE: ">"
-   * ><br>
-   * | "<" Identifier() ">"<br>
-   * | "<" "EOF" ">"<br>
+   * f0 -> . %0 StringLiteral()<br>
+   * .. .. | %1 #0 "<"<br>
+   * .. .. . .. #1 [ $0 [ "#" ]<br>
+   * .. .. . .. .. . $1 IdentifierAsString() $2 ":" ]<br>
+   * .. .. . .. #2 ComplexRegularExpressionChoices() #3 ">"<br>
+   * .. .. | %2 #0 "<" #1 IdentifierAsString() #2 ">"<br>
+   * .. .. | %3 #0 "<" #1 "EOF" #2 ">"<br>
    * 
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(@SuppressWarnings("unused") final RegularExpression n) {

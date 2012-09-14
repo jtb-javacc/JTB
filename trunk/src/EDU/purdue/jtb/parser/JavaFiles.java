@@ -40,7 +40,7 @@ import EDU.purdue.jtb.utils.JavaFileGenerator;
 /**
  * Generate CharStream, TokenManager and Exceptions.
  *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
@@ -73,7 +73,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
    * Replaces all backslahes with double backslashes.
    */
   static String replaceBackslash(final String str) {
-    StringBuffer b;
+    StringBuilder b;
     int i = 0;
     final int len = str.length();
     while (i < len && str.charAt(i++) != '\\')
@@ -81,7 +81,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
     if (i == len) // No backslash found.
       return str;
     char c;
-    b = new StringBuffer();
+    b = new StringBuilder();
     for (i = 0; i < len; i++)
       if ((c = str.charAt(i)) == '\\')
         b.append("\\\\");
@@ -94,7 +94,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
    * This method does not try to recover from invalid comment syntax, but
    * rather returns version 0.0 (which will always be taken to mean the file
    * is out of date).
-   * @param fileName eg Token.java
+   * @param fileName - eg Token.java
    * @return The version as a double, eg 4.1
    * @since 4.1
    */

@@ -54,14 +54,15 @@
 
 package EDU.purdue.jtb.misc;
 
+import static EDU.purdue.jtb.misc.Globals.INDENT_AMT;
 import EDU.purdue.jtb.syntaxtree.INode;
 import EDU.purdue.jtb.visitor.JavaPrinter;
 
 /**
  * Class JavaBranchPrinter visits a java code branch of the tree and returns a pretty printed string
  * representation of the subtree.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  */
 public class JavaBranchPrinter {
@@ -75,14 +76,14 @@ public class JavaBranchPrinter {
 
   /**
    * Constructs a new instance with a default allocated buffer and a given indentation object.
-   *
-   * @param aSPC an indentation
+   * 
+   * @param aSPC - an indentation
    */
   public JavaBranchPrinter(final Spacing aSPC) {
     sb = new StringBuilder(512);
     spc = aSPC;
     if (spc == null)
-      spc = new Spacing(Globals.INDENT_AMT);
+      spc = new Spacing(INDENT_AMT);
     jp = new JavaPrinter(sb, spc);
   }
 
@@ -91,8 +92,8 @@ public class JavaBranchPrinter {
    * representation of the subtree.<br>
    * Implementation note : it reuses a class allocated StringBuilder buffer, which is therefore
    * overwritten on a next call.
-   *
-   * @param javaNode the node to walk down and pretty print
+   * 
+   * @param javaNode - the node to walk down and pretty print
    * @return the pretty print in a reused StringBuilder buffer
    */
   public StringBuilder genJavaBranch(final INode javaNode) {
@@ -101,4 +102,24 @@ public class JavaBranchPrinter {
     javaNode.accept(jp);
     return sb;
   }
+
+  /**
+   * Visits a given (java code) node branch of the tree and returns a pretty printed string
+   * representation of the subtree.<br>
+   * Implementation note : it reuses a class allocated StringBuilder buffer, which is therefore
+   * overwritten on a next call.
+   * 
+   * @param javaNode - the node to walk down and pretty print
+   * @param noDebugComments - true to suppress debug comments, false otherwise
+   * @return the pretty print in a reused StringBuilder buffer
+   */
+  public StringBuilder genJavaBranch(final INode javaNode, final boolean noDebugComments) {
+    sb.setLength(0);
+    jp.reset(sb, spc);
+    jp.noDebugComments = noDebugComments;
+    javaNode.accept(jp);
+    jp.noDebugComments = false;
+    return sb;
+  }
+
 }

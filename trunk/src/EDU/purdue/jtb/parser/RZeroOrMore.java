@@ -28,14 +28,12 @@
 
 package EDU.purdue.jtb.parser;
 
-
 /**
  * Describes zero-or-more regular expressions (<foo*>).
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
-
 public class RZeroOrMore extends RegularExpression_ {
 
   /**
@@ -43,6 +41,7 @@ public class RZeroOrMore extends RegularExpression_ {
    */
   public RegularExpression_ regexpr;
 
+  /** {@inheritDoc} */
   @Override
   public Nfa GenerateNfa(final boolean ignoreCase) {
     final Nfa retVal = new Nfa();
@@ -60,12 +59,10 @@ public class RZeroOrMore extends RegularExpression_ {
   }
 
   public RZeroOrMore() {
-    // ModMMa : added to get rid of 'instanceof' in ExpansionTreeWalker
     expType = EXP_TYPE.R_ZERO_OR_MORE;
   }
 
   public RZeroOrMore(final Token t, final RegularExpression_ r) {
-    // ModMMa : added to get rid of 'instanceof' in ExpansionTreeWalker
     this();
     this.setLine(t.beginLine);
     this.setColumn(t.beginColumn);

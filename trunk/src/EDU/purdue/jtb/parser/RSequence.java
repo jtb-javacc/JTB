@@ -31,20 +31,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Describes regular expressions which are sequences of
- * other regular expressions.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * Describes regular expressions which are sequences of other regular expressions.
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public class RSequence extends RegularExpression_ {
 
   /**
-   * The list of units in this regular expression sequence.  Each
-   * list component will narrow to RegularExpression_.
+   * The list of units in this regular expression sequence. Each list component will narrow to
+   * RegularExpression_.
    */
   public List<RegularExpression_> units = new ArrayList<RegularExpression_>();
 
+  /** {@inheritDoc} */
   @Override
   public Nfa GenerateNfa(final boolean ignoreCase) {
     if (units.size() == 1)
@@ -68,15 +68,11 @@ public class RSequence extends RegularExpression_ {
     return retVal;
   }
 
-  // ModMMa : added public
   public RSequence() {
-    // ModMMa : added to get rid of 'instanceof' in ExpansionTreeWalker
     expType = EXP_TYPE.R_SEQUENCE;
   }
 
-  // ModMMa : added public
   public RSequence(final List<RegularExpression_> seq) {
-    // ModMMa : added to get rid of 'instanceof' in ExpansionTreeWalker
     this();
     ordinal = Integer.MAX_VALUE;
     units = seq;

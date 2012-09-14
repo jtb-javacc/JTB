@@ -33,27 +33,23 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Describes expansions where one of many choices
- * is taken (c1|c2|...).
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * Describes expansions where one of many choices is taken (c1|c2|...).
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public class Choice extends Expansion_ {
 
   /**
-   * The list of choices of this expansion unit.  Each
-   * List component will narrow to ExpansionUnit.
+   * The list of choices of this expansion unit. Each List component will narrow to ExpansionUnit.
    */
   private List<Expansion_> choices = new ArrayList<Expansion_>();
 
   public Choice() {
-    // ModMMa : added to get rid of 'instanceof' in ExpansionTreeWalker
     expType = EXP_TYPE.CHOICE;
   }
 
   public Choice(final Token token) {
-    // ModMMa : added to get rid of 'instanceof' in ExpansionTreeWalker
     this();
     this.setLine(token.beginLine);
     this.setColumn(token.beginColumn);
@@ -61,7 +57,6 @@ public class Choice extends Expansion_ {
   }
 
   public Choice(final Expansion_ expansion) {
-    // ModMMa : added to get rid of 'instanceof' in ExpansionTreeWalker
     this();
     this.setLine(expansion.getLine());
     this.setColumn(expansion.getColumn());
@@ -70,7 +65,7 @@ public class Choice extends Expansion_ {
   }
 
   /**
-   * @param choices the choices to set
+   * @param choices - the choices to set
    */
   public final void setChoices(final List<Expansion_> ch) {
     choices = ch;
@@ -83,9 +78,10 @@ public class Choice extends Expansion_ {
     return choices;
   }
 
+  /** {@inheritDoc} */
   @Override
-  public StringBuffer dump(final int indent, final Set<Object> alreadyDumped) {
-    final StringBuffer sb = super.dump(indent, alreadyDumped);
+  public StringBuilder dump(final int indent, final Set<Object> alreadyDumped) {
+    final StringBuilder sb = super.dump(indent, alreadyDumped);
     if (alreadyDumped.contains(this))
       return sb;
     alreadyDumped.add(this);

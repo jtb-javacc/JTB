@@ -1,7 +1,14 @@
 ---------------
-Version 1.4.5.1
+Version 1.4.7
 ---------------
--> xx/xx/2010
+-> xx/xx/2012
+
+---------------
+Version 1.4.6
+---------------
+-> 25/01/2011
+- added -va and -npfx and -nsfx options (Francis Andre Kampbell)
+- added java code formatter & clean up preference files
 
 ---------------
 Version 1.4.5

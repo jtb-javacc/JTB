@@ -33,15 +33,15 @@ import java.util.Set;
 
 /**
  * Describes non terminals.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public class NonTerminal extends Expansion_ {
+
   /**
-   * The LHS to which the return value of the non-terminal
-   * is assigned.  In case there is no LHS, then the vector
-   * remains empty.
+   * The LHS to which the return value of the non-terminal is assigned. In case there is no LHS,
+   * then the vector remains empty.
    */
   private List<Token>      lhsTokens       = new ArrayList<Token>();
   /**
@@ -57,14 +57,15 @@ public class NonTerminal extends Expansion_ {
    */
   private NormalProduction prod;
 
+  /** {@inheritDoc} */
   @Override
-  public StringBuffer dump(final int indent, final Set<Object> alreadyDumped) {
-    final StringBuffer value = super.dump(indent, alreadyDumped).append(' ').append(name);
+  public StringBuilder dump(final int indent, final Set<Object> alreadyDumped) {
+    final StringBuilder value = super.dump(indent, alreadyDumped).append(' ').append(name);
     return value;
   }
 
   /**
-   * @param lhsTokens the lhsTokens to set
+   * @param lhsTokens - the lhsTokens to set
    */
   public final void setLhsTokens(final List<Token> lt) {
     lhsTokens = lt;
@@ -78,7 +79,7 @@ public class NonTerminal extends Expansion_ {
   }
 
   /**
-   * @param ref the name to set
+   * @param ref - the name to set
    */
   public final void setName(final String nm) {
     name = nm;
@@ -92,7 +93,7 @@ public class NonTerminal extends Expansion_ {
   }
 
   /**
-   * @param argument_tokens the argument_tokens to set
+   * @param argument_tokens - the argument_tokens to set
    */
   public final void setArgumentTokens(final List<Token> tk) {
     argument_tokens = tk;
@@ -106,7 +107,7 @@ public class NonTerminal extends Expansion_ {
   }
 
   /**
-   * @param prod the prod to set
+   * @param prod - the prod to set
    */
   public final NormalProduction setProd(final NormalProduction pr) {
     return prod = pr;

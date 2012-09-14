@@ -28,14 +28,12 @@
 
 package EDU.purdue.jtb.parser;
 
-
 /**
  * Describes one-or-more regular expressions (<foo+>).
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
-
 public class ROneOrMore extends RegularExpression_ {
 
   /**
@@ -43,6 +41,7 @@ public class ROneOrMore extends RegularExpression_ {
    */
   public RegularExpression_ regexpr;
 
+  /** {@inheritDoc} */
   @Override
   public Nfa GenerateNfa(final boolean ignoreCase) {
     final Nfa retVal = new Nfa();
@@ -59,12 +58,10 @@ public class ROneOrMore extends RegularExpression_ {
   }
 
   public ROneOrMore() {
-    // ModMMa : added to get rid of 'instanceof' in ExpansionTreeWalker
     expType = EXP_TYPE.R_ONE_OR_MORE;
   }
 
   public ROneOrMore(final Token t, final RegularExpression_ re) {
-    // ModMMa : added to get rid of 'instanceof' in ExpansionTreeWalker
     this();
     this.setLine(t.beginLine);
     this.setColumn(t.beginColumn);

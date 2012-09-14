@@ -36,17 +36,17 @@ import java.util.Map;
  * Generates boiler-plate files from templates.<br>
  * Only very basic template processing is supplied - if we need something more sophisticated I
  * suggest we use a third-party library.
- *
- * @author paulcager
+ * 
+ * @author Paul Cager
  * @since 4.2
- * @author Marc Mazas, mmazas@sopragroup.com
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  */
 public class JavaFileGenerator {
 
   /**
-   * @param tn the name of the template. E.g. "/templates/Token.template".
-   * @param opt the processing options in force, such as "STATIC=yes"
+   * @param tn - the name of the template. E.g. "/templates/Token.template".
+   * @param opt - the processing options in force, such as "STATIC=yes"
    */
   public JavaFileGenerator(final String tn, final Map<String, Object> opt) {
     templateName = tn;
@@ -62,9 +62,9 @@ public class JavaFileGenerator {
 
   /**
    * Generate the output file.
-   *
-   * @param out the PrintWriter to output into
-   * @throws IOException if the template file name is invalid
+   * 
+   * @param out - the PrintWriter to output into
+   * @throws IOException - if the template file name is invalid
    */
   public void generate(final PrintWriter out) throws IOException {
     final InputStream is = getClass().getResourceAsStream(templateName);
@@ -77,10 +77,10 @@ public class JavaFileGenerator {
   /**
    * Returns the internal current line if not null, otherwise reads a new line, assigns it to the
    * internal current line, and returns it.
-   *
-   * @param in the BufferedReader to read from
+   * 
+   * @param in - the BufferedReader to read from
    * @return the current line
-   * @throws IOException if any IO exception occurs
+   * @throws IOException - if any IO exception occurs
    */
   private String peekLine(final BufferedReader in) throws IOException {
     if (currentLine == null)
@@ -91,10 +91,10 @@ public class JavaFileGenerator {
   /**
    * Reads a new line if the internal current line is not null, sets the internal current line to
    * null, and returns the internal current line if not null or the new line read if null.
-   *
-   * @param in the BufferedReader to read from
+   * 
+   * @param in - the BufferedReader to read from
    * @return the current line
-   * @throws IOException if any IO exception occurs
+   * @throws IOException - if any IO exception occurs
    */
   private String getLine(final BufferedReader in) throws IOException {
     final String line = currentLine;
@@ -106,8 +106,8 @@ public class JavaFileGenerator {
 
   /**
    * Evaluates whether a given condition maps to true or false.
-   *
-   * @param condition the condition (as a String)
+   * 
+   * @param condition - the condition (as a String)
    * @return true or false
    */
   private boolean evaluate(final String condition) {
@@ -128,10 +128,10 @@ public class JavaFileGenerator {
 
   /**
    * Substitutes a template string with the corresponding text.
-   *
-   * @param text the template string
+   * 
+   * @param text - the template string
    * @return the substituted text
-   * @throws IOException if any exception occurs
+   * @throws IOException - if any exception occurs
    */
   private String substitute(final String text) throws IOException {
     int startPos;
@@ -186,15 +186,15 @@ public class JavaFileGenerator {
   }
 
   /**
-   * Substitutes a template string with the corresponding conditional text :<br>
+   * Substitutes a template string with the corresponding conditional text:<br>
    * if the template evaluates to true, it will substituted with the values substring up to the ':',<br>
    * if the template evaluates to false, it will substituted with the values substring after the
    * ':'.<br>
-   *
-   * @param variableName the text to be substituted
-   * @param values a pair of substituting strings separated by a ':'
+   * 
+   * @param variableName - the text to be substituted
+   * @param values - a pair of substituting strings separated by a ':'
    * @return the substituted text
-   * @throws IOException if any exception occurs
+   * @throws IOException - if any exception occurs
    */
   private String substituteWithConditional(final String variableName, final String values)
                                                                                           throws IOException {
@@ -211,11 +211,11 @@ public class JavaFileGenerator {
   /**
    * Substitutes a given text with the corresponding option, or with a given default value if the
    * option is not present or empty.
-   *
-   * @param variableName the text to be substituted
-   * @param defaultValue the default value
+   * 
+   * @param variableName - the text to be substituted
+   * @param defaultValue - the default value
    * @return the substituted text
-   * @throws IOException if any exception occurs
+   * @throws IOException - if any exception occurs
    */
   private String substituteWithDefault(final String variableName, final String defaultValue)
                                                                                             throws IOException {
@@ -227,10 +227,10 @@ public class JavaFileGenerator {
 
   /**
    * Writes a text, substituting templates parts if necessary.
-   *
-   * @param out the PrintWriter to write to
-   * @param text the text to write
-   * @throws IOException if any exception occurs
+   * 
+   * @param out - the PrintWriter to write to
+   * @param text - the text to write
+   * @throws IOException - if any exception occurs
    */
   private void write(final PrintWriter out, final String text) throws IOException {
     String txt = text;
@@ -241,10 +241,10 @@ public class JavaFileGenerator {
   }
 
   /**
-   * @param in the BufferedReader to read from
-   * @param out the PrintWriter to write to
-   * @param ignoring true if line must not be outputted, false otherwise
-   * @throws IOException if any exception occurs
+   * @param in - the BufferedReader to read from
+   * @param out - the PrintWriter to write to
+   * @param ignoring - true if line must not be output, false otherwise
+   * @throws IOException - if any exception occurs
    */
   private void process(final BufferedReader in, final PrintWriter out, final boolean ignoring)
                                                                                               throws IOException {
@@ -281,9 +281,9 @@ public class JavaFileGenerator {
 
   /**
    * Test main method.
-   *
-   * @param args command line arguments
-   * @throws Exception if any exception occur
+   * 
+   * @param args - command line arguments
+   * @throws Exception - if any exception occur
    */
   public static void main(final String[] args) throws Exception {
     final Map<String, Object> map = new HashMap<String, Object>();

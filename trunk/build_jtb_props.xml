@@ -20,11 +20,11 @@
   <property name="jtb_tool" value="EDU.purdue.jtb.JTB" />
 
 	  <!-- JTB versions -->
-	  <property name="jtb_last_version" value="1.4.4" />
-	  <property name="jtb_curr_version" value="1.4.5" />
+	  <property name="jtb_last_version" value="1.4.6" />
+	  <property name="jtb_curr_version" value="1.4.7" />
 
 	  <!-- JDK version -->
-	  <property name="jdk_version" value="1.5" />
+	  <property name="jdk_version" value="1.6" />
 
   <!-- which JTB jar to use -->
   <!-- bootstrap JTB jar -->

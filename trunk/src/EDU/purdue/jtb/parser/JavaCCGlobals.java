@@ -36,11 +36,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This package contains data created as a result of parsing and semanticizing
- * a JavaCC input file.  This data is what is used by the back-ends of JavaCC as
- * well as any other back-end of JavaCC related tools such as JJTree.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * This package contains data created as a result of parsing and semanticizing a JavaCC input file.
+ * This data is what is used by the back-ends of JavaCC as well as any other back-end of JavaCC
+ * related tools such as JJTree.
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public class JavaCCGlobals {
@@ -56,8 +56,8 @@ public class JavaCCGlobals {
   static public String          fileName;
 
   /**
-   * The name of the original file (before processing by JJTree).
-   * Currently this is the same as fileName.
+   * The name of the original file (before processing by JJTree). Currently this is the same as
+   * fileName.
    */
   static public String          origFileName;
 
@@ -67,14 +67,13 @@ public class JavaCCGlobals {
   static public boolean         jjtreeGenerated;
 
   /**
-   * The list of tools that have participated in generating the
-   * input grammar file.
+   * The list of tools that have participated in generating the input grammar file.
    */
   static public List<String>    toolNames;
 
   /**
-   * This prints the banner line when the various tools are invoked.  This
-   * takes as argument the tool's full name and its version.
+   * This prints the banner line when the various tools are invoked. This takes as argument the
+   * tool's full name and its version.
    */
   static public void bannerLine(final String fullName, final String ver) {
     System.out.print("Java Compiler Compiler Version " + Version.version + " (" + fullName);
@@ -87,127 +86,119 @@ public class JavaCCGlobals {
   /**
    * The name of the parser class (what appears in PARSER_BEGIN and PARSER_END).
    */
-  static public String                                                                     cu_name;
+  static public String                                                                      cu_name;
 
   /**
-   * This is a list of tokens that appear after "PARSER_BEGIN(name)" all the
-   * way until (but not including) the opening brace "{" of the class "name".
+   * This is a list of tokens that appear after "PARSER_BEGIN(name)" all the way until (but not
+   * including) the opening brace "{" of the class "name".
    */
-  static public List<Token>                                                                cu_to_insertion_point_1   = new ArrayList<Token>();
+  static public List<Token>                                                                 cu_to_insertion_point_1   = new ArrayList<Token>();
 
   /**
-   * This is the list of all tokens that appear after the tokens in
-   * "cu_to_insertion_point_1" and until (but not including) the closing brace "}"
-   * of the class "name".
+   * This is the list of all tokens that appear after the tokens in "cu_to_insertion_point_1" and
+   * until (but not including) the closing brace "}" of the class "name".
    */
-  static public List<Token>                                                                cu_to_insertion_point_2   = new ArrayList<Token>();
+  static public List<Token>                                                                 cu_to_insertion_point_2   = new ArrayList<Token>();
 
   /**
-   * This is the list of all tokens that appear after the tokens in
-   * "cu_to_insertion_point_2" and until "PARSER_END(name)".
+   * This is the list of all tokens that appear after the tokens in "cu_to_insertion_point_2" and
+   * until "PARSER_END(name)".
    */
-  static public List<Token>                                                                cu_from_insertion_point_2 = new ArrayList<Token>();
+  static public List<Token>                                                                 cu_from_insertion_point_2 = new ArrayList<Token>();
 
   /**
-   * A list of all grammar productions - normal and JAVACODE - in the order
-   * they appear in the input file.  Each entry here will be a subclass of
-   * "NormalProduction".
+   * A list of all grammar productions - normal and JAVACODE - in the order they appear in the input
+   * file. Each entry here will be a subclass of "NormalProduction".
    */
-  static public List<NormalProduction>                                                     bnfproductions            = new ArrayList<NormalProduction>();
+  static public List<NormalProduction>                                                      bnfproductions            = new ArrayList<NormalProduction>();
 
   /**
-   * A symbol table of all grammar productions - normal and JAVACODE.  The
-   * symbol table is indexed by the name of the left hand side non-terminal.
-   * Its contents are of type "NormalProduction".
+   * A symbol table of all grammar productions - normal and JAVACODE. The symbol table is indexed by
+   * the name of the left hand side non-terminal. Its contents are of type "NormalProduction".
    */
-  static public Map<String, NormalProduction>                                              production_table          = new HashMap<String, NormalProduction>();
+  static public Map<String, NormalProduction>                                               production_table          = new HashMap<String, NormalProduction>();
 
   /**
-   * A mapping of lexical state strings to their integer internal representation.
-   * Integers are stored as java.lang.Integer's.
+   * A mapping of lexical state strings to their integer internal representation. Integers are
+   * stored as java.lang.Integer's.
    */
-  static public Hashtable<String, Integer>                                                 lexstate_S2I              = new Hashtable<String, Integer>();
+  static public Hashtable<String, Integer>                                                  lexstate_S2I              = new Hashtable<String, Integer>();
 
   /**
-   * A mapping of the internal integer representations of lexical states to
-   * their strings.  Integers are stored as java.lang.Integer's.
+   * A mapping of the internal integer representations of lexical states to their strings. Integers
+   * are stored as java.lang.Integer's.
    */
-  static public Hashtable<Integer, String>                                                 lexstate_I2S              = new Hashtable<Integer, String>();
+  static public Hashtable<Integer, String>                                                  lexstate_I2S              = new Hashtable<Integer, String>();
 
   /**
    * The declarations to be inserted into the TokenManager class.
    */
-  static public List<Token>                                                                token_mgr_decls;
+  static public List<Token>                                                                 token_mgr_decls;
 
   /**
-   * The list of all TokenProductions from the input file.  This list includes
-   * implicit TokenProductions that are created for uses of regular expressions
-   * within BNF productions.
+   * The list of all TokenProductions from the input file. This list includes implicit
+   * TokenProductions that are created for uses of regular expressions within BNF productions.
    */
-  static public List<TokenProduction>                                                      rexprlist                 = new ArrayList<TokenProduction>();
+  static public List<TokenProduction>                                                       rexprlist                 = new ArrayList<TokenProduction>();
 
   /**
-   * The total number of distinct tokens.  This is therefore one more than the
-   * largest assigned token ordinal.
+   * The total number of distinct tokens. This is therefore one more than the largest assigned token
+   * ordinal.
    */
-  static public int                                                                        tokenCount;
+  static public int                                                                         tokenCount;
 
   /**
-   * This is a symbol table that contains all named tokens (those that are
-   * defined with a label).  The index to the table is the image of the label
-   * and the contents of the table are of type "RegularExpression_".
+   * This is a symbol table that contains all named tokens (those that are defined with a label).
+   * The index to the table is the image of the label and the contents of the table are of type
+   * "RegularExpression_".
    */
   static public Map<String, RegularExpression_>                                             named_tokens_table        = new HashMap<String, RegularExpression_>();
 
   /**
-   * Contains the same entries as "named_tokens_table", but this is an ordered
-   * list which is ordered by the order of appearance in the input file.
+   * Contains the same entries as "named_tokens_table", but this is an ordered list which is ordered
+   * by the order of appearance in the input file.
    */
   static public List<RegularExpression_>                                                    ordered_named_tokens      = new ArrayList<RegularExpression_>();
 
   /**
-   * A mapping of ordinal values (represented as objects of type "Integer") to
-   * the corresponding labels (of type "String").  An entry exists for an ordinal
-   * value only if there is a labeled token corresponding to this entry.
-   * If there are multiple labels representing the same ordinal value, then
-   * only one label is stored.
+   * A mapping of ordinal values (represented as objects of type "Integer") to the corresponding
+   * labels (of type "String"). An entry exists for an ordinal value only if there is a labeled
+   * token corresponding to this entry. If there are multiple labels representing the same ordinal
+   * value, then only one label is stored.
    */
-  static public Map<Integer, String>                                                       names_of_tokens           = new HashMap<Integer, String>();
+  static public Map<Integer, String>                                                        names_of_tokens           = new HashMap<Integer, String>();
 
   /**
-   * A mapping of ordinal values (represented as objects of type "Integer") to
-   * the corresponding RegularExpression_'s.
+   * A mapping of ordinal values (represented as objects of type "Integer") to the corresponding
+   * RegularExpression_'s.
    */
   static public Map<Integer, RegularExpression_>                                            rexps_of_tokens           = new HashMap<Integer, RegularExpression_>();
 
   /**
-   * This is a three-level symbol table that contains all simple tokens (those
-   * that are defined using a single string (with or without a label).  The index
-   * to the first level table is a lexical state which maps to a second level
-   * hashtable.  The index to the second level hashtable is the string of the
-   * simple token converted to upper case, and this maps to a third level hashtable.
-   * This third level hashtable contains the actual string of the simple token
-   * and maps it to its RegularExpression_.
+   * This is a three-level symbol table that contains all simple tokens (those that are defined
+   * using a single string (with or without a label). The index to the first level table is a
+   * lexical state which maps to a second level hashtable. The index to the second level hashtable
+   * is the string of the simple token converted to upper case, and this maps to a third level
+   * hashtable. This third level hashtable contains the actual string of the simple token and maps
+   * it to its RegularExpression_.
    */
   static public Hashtable<String, Hashtable<String, Hashtable<String, RegularExpression_>>> simple_tokens_table       = new Hashtable<String, Hashtable<String, Hashtable<String, RegularExpression_>>>();
 
   /**
-   * maskindex, jj2index, maskVals are variables that are shared between
-   * ParseEngine and ParseGen.
+   * maskindex, jj2index, maskVals are variables that are shared between ParseEngine and ParseGen.
    */
-  static protected int                                                                     maskindex                 = 0;
-  static protected int                                                                     jj2index                  = 0;
-  public static boolean                                                                    lookaheadNeeded;
-  static protected List<int[]>                                                             maskVals                  = new ArrayList<int[]>();
+  static protected int                                                                      maskindex                 = 0;
+  static protected int                                                                      jj2index                  = 0;
+  public static boolean                                                                     lookaheadNeeded;
+  static protected List<int[]>                                                              maskVals                  = new ArrayList<int[]>();
 
-  static Action                                                                            actForEof;
-  static String                                                                            nextStateForEof;
+  static Action                                                                             actForEof;
+  static String                                                                             nextStateForEof;
 
   // Some general purpose utilities follow.
 
   /**
-   * Returns the identifying string for the file name, given a toolname
-   * used to generate it.
+   * Returns the identifying string for the file name, given a toolname used to generate it.
    */
   public static String getIdString(final String tn, final String fn) {
     final List<String> tns = new ArrayList<String>();
@@ -216,8 +207,8 @@ public class JavaCCGlobals {
   }
 
   /**
-   * Returns the identifying string for the file name, given a set of tool
-   * names that are used to generate it.
+   * Returns the identifying string for the file name, given a set of tool names that are used to
+   * generate it.
    */
   public static String getIdString(final List<String> tns, final String fn) {
     int i;
@@ -236,8 +227,7 @@ public class JavaCCGlobals {
   }
 
   /**
-   * Returns true if tool name passed is one of the tool names returned
-   * by getToolNames(fileName).
+   * Returns true if tool name passed is one of the tool names returned by getToolNames(fileName).
    */
   public static boolean isGeneratedBy(final String tn, final String fn) {
     final List<String> v = getToolNames(fn);
@@ -263,8 +253,7 @@ public class JavaCCGlobals {
     String tmp;
     if (limit == 1000) {
       tmp = str;
-    }
-    else {
+    } else {
       tmp = str.substring(0, limit);
     }
 
@@ -292,8 +281,7 @@ public class JavaCCGlobals {
   }
 
   /**
-   * Returns a List of names of the tools that have been used to generate
-   * the given file.
+   * Returns a List of names of the tools that have been used to generate the given file.
    */
   public static List<String> getToolNames(final String fn) {
     final char[] buf = new char[256];
@@ -307,8 +295,8 @@ public class JavaCCGlobals {
         if ((read = stream.read(buf, total, buf.length - total)) != -1) {
           if ((total += read) == buf.length)
             break;
-        }
-        else break;
+        } else
+          break;
 
       return makeToolNameList(new String(buf, 0, total));
     }
@@ -356,8 +344,7 @@ public class JavaCCGlobals {
   static public String staticOpt() {
     if (Options.getStatic()) {
       return "static ";
-    }
-    else {
+    } else {
       return "";
     }
   }
@@ -369,33 +356,24 @@ public class JavaCCGlobals {
       ch = str.charAt(i);
       if (ch == '\b') {
         retval += "\\b";
-      }
-      else if (ch == '\t') {
+      } else if (ch == '\t') {
         retval += "\\t";
-      }
-      else if (ch == '\n') {
+      } else if (ch == '\n') {
         retval += "\\n";
-      }
-      else if (ch == '\f') {
+      } else if (ch == '\f') {
         retval += "\\f";
-      }
-      else if (ch == '\r') {
+      } else if (ch == '\r') {
         retval += "\\r";
-      }
-      else if (ch == '\"') {
+      } else if (ch == '\"') {
         retval += "\\\"";
-      }
-      else if (ch == '\'') {
+      } else if (ch == '\'') {
         retval += "\\\'";
-      }
-      else if (ch == '\\') {
+      } else if (ch == '\\') {
         retval += "\\\\";
-      }
-      else if (ch < 0x20 || ch > 0x7e) {
+      } else if (ch < 0x20 || ch > 0x7e) {
         final String s = "0000" + Integer.toString(ch, 16);
         retval += "\\u" + s.substring(s.length() - 4, s.length());
-      }
-      else {
+      } else {
         retval += ch;
       }
     }
@@ -403,19 +381,6 @@ public class JavaCCGlobals {
   }
 
   static public String addUnicodeEscapes(final String str) {
-    // ModMMa : performance improvements (String concatenation)
-    //    String retval = "";
-    //    char ch;
-    //    for (int i = 0; i < str.length(); i++) {
-    //      ch = str.charAt(i);
-    //      if (ch < 0x20 || ch > 0x7e || ch == '\\') {
-    //        String s = "0000" + Integer.toString(ch, 16);
-    //        retval += "\\u" + s.substring(s.length() - 4, s.length());
-//      } else {
-    //        retval += ch;
-    //      }
-    //    }
-    //    return retval;
     final int strlen = str.length();
     final StringBuilder retval = new StringBuilder(2 * strlen);
     char ch;
@@ -424,8 +389,7 @@ public class JavaCCGlobals {
       if (ch < 0x20 || ch > 0x7e || ch == '\\') {
         final String s = "0000" + Integer.toString(ch, 16);
         retval.append("\\u").append(s.substring(s.length() - 4, s.length()));
-      }
-      else {
+      } else {
         retval.append(ch);
       }
     }
@@ -453,7 +417,8 @@ public class JavaCCGlobals {
     if (t.kind == JavaCCParserConstants.STRING_LITERAL ||
         t.kind == JavaCCParserConstants.CHARACTER_LITERAL)
       ostr.print(addUnicodeEscapes(t.image));
-    else ostr.print(t.image);
+    else
+      ostr.print(t.image);
     cline = t.endLine;
     ccol = t.endColumn + 1;
     final char last = t.image.charAt(t.image.length() - 1);
@@ -523,7 +488,8 @@ public class JavaCCGlobals {
     if (t.kind == JavaCCParserConstants.STRING_LITERAL ||
         t.kind == JavaCCParserConstants.CHARACTER_LITERAL)
       retval += addUnicodeEscapes(t.image);
-    else retval += t.image;
+    else
+      retval += t.image;
     cline = t.endLine;
     ccol = t.endColumn + 1;
     final char last = t.image.charAt(t.image.length() - 1);

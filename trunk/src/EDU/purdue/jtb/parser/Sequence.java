@@ -33,40 +33,37 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Describes expansions that are sequences of expansion
- * units.  (c1 c2 ...)
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * Describes expansions that are sequences of expansion units. (c1 c2 ...)
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public class Sequence extends Expansion_ {
 
   /**
-   * The list of units in this expansion sequence.  Each
-   * List component will narrow to Expansion_.
+   * The list of units in this expansion sequence. Each List component will narrow to Expansion_.
    */
   public List<Expansion_> units = new ArrayList<Expansion_>();
 
   public Sequence() {
-    // ModMMa : added to get rid of 'instanceof' in ExpansionTreeWalker
     expType = EXP_TYPE.SEQUENCE;
   }
 
   public Sequence(final Token token, final Lookahead lookahead) {
-    // ModMMa : added to get rid of 'instanceof' in ExpansionTreeWalker
     this();
     this.setLine(token.beginLine);
     this.setColumn(token.beginColumn);
     this.units.add(lookahead);
   }
 
+  /** {@inheritDoc} */
   @Override
-  public StringBuffer dump(final int indent, final Set<Object> alreadyDumped) {
+  public StringBuilder dump(final int indent, final Set<Object> alreadyDumped) {
     if (alreadyDumped.contains(this)) {
       return super.dump(0, alreadyDumped).insert(0, '[').append(']').insert(0, dumpPrefix(indent));
     }
     alreadyDumped.add(this);
-    final StringBuffer sb = super.dump(indent, alreadyDumped);
+    final StringBuilder sb = super.dump(indent, alreadyDumped);
     for (final Iterator<Expansion_> it = units.iterator(); it.hasNext();) {
       final Expansion_ next = it.next();
       sb.append(eol).append(next.dump(indent + 1, alreadyDumped));

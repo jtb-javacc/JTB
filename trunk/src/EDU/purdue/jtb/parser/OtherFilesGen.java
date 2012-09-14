@@ -37,8 +37,8 @@ import java.util.List;
 
 /**
  * Generates the Constants file.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public class OtherFilesGen extends JavaCCGlobals implements JavaCCParserConstants {
@@ -46,8 +46,8 @@ public class OtherFilesGen extends JavaCCGlobals implements JavaCCParserConstant
   public static boolean keepLineCol;
 
   // ModMMa : modified for Token.template with GTToken
-//static public void start() throws MetaParseException {
-static public void start(final String pn) throws MetaParseException {
+  //static public void start() throws MetaParseException {
+  static public void start(final String pn) throws MetaParseException {
     Token t = null;
     keepLineCol = Options.getKeepLineColumn();
     if (JavaCCErrors.get_error_count() != 0)
@@ -55,19 +55,16 @@ static public void start(final String pn) throws MetaParseException {
     JavaFiles.gen_TokenMgrError();
     JavaFiles.gen_ParseException();
     // ModMMa : modified for Token.template with GTToken
-//  JavaFiles.gen_Token();
-  JavaFiles.gen_Token(pn);
+    //  JavaFiles.gen_Token();
+    JavaFiles.gen_Token(pn);
     if (Options.getUserTokenManager()) {
       JavaFiles.gen_TokenManager();
-    }
-    else if (Options.getUserCharStream()) {
+    } else if (Options.getUserCharStream()) {
       JavaFiles.gen_CharStream();
-    }
-    else {
+    } else {
       if (Options.getJavaUnicodeEscape()) {
         JavaFiles.gen_JavaCharStream();
-      }
-      else {
+      } else {
         JavaFiles.gen_SimpleCharStream();
       }
     }
@@ -76,11 +73,8 @@ static public void start(final String pn) throws MetaParseException {
                              new BufferedWriter(
                                                 new FileWriter(
                                                                new File(
-                                                                        Options
-                                                                               .getOutputDirectory(),
+                                                                        Options.getOutputDirectory(),
                                                                         cu_name + "Constants.java")),
-                                                // ModMMa : performance improvements (use big BufferedWriter)
-                                                // 8192
                                                 4 * 8192));
     }
     catch (final java.io.IOException e) {
@@ -143,14 +137,11 @@ static public void start(final String pn) throws MetaParseException {
         if (re instanceof RStringLiteral) {
           ostr.println("    \"\\\"" + add_escapes(add_escapes(((RStringLiteral) re).image)) +
                        "\\\"\",");
-        }
-        else if (!re.label.equals("")) {
+        } else if (!re.label.equals("")) {
           ostr.println("    \"<" + re.label + ">\",");
-        }
-        else {
+        } else {
           if (re.tpContext.kind == TokenProduction.TOKEN) {
-            JavaCCErrors
-                        .warning(re,
+            JavaCCErrors.warning(re,
                                  "Consider giving this non-string token a label for better error reporting.");
           }
           ostr.println("    \"<token of kind " + re.ordinal + ">\",");
