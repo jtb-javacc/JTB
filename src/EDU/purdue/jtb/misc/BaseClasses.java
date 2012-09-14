@@ -54,6 +54,7 @@
 
 package EDU.purdue.jtb.misc;
 
+import static EDU.purdue.jtb.misc.Globals.*;
 import EDU.purdue.jtb.syntaxtree.INode;
 import EDU.purdue.jtb.syntaxtree.INodeList;
 import EDU.purdue.jtb.syntaxtree.NodeChoice;
@@ -61,43 +62,46 @@ import EDU.purdue.jtb.syntaxtree.NodeList;
 import EDU.purdue.jtb.syntaxtree.NodeListOptional;
 import EDU.purdue.jtb.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.syntaxtree.NodeSequence;
+import EDU.purdue.jtb.syntaxtree.NodeTCF;
 import EDU.purdue.jtb.syntaxtree.NodeToken;
 
 /**
- * Class BaseClasses contains static methods to generated string representations of the base classes (nodes
- * and visitors).<br>
+ * Class BaseClasses contains static methods to generated string representations of the base classes
+ * (nodes and visitors).<br>
  * 
- * @author Marc Mazas, mmazas@sopragroup.com
+ * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
+ * @version 1.4.6 : 01/2011 : FA : added -va and -npfx and -nsfx options
+ * @version 1.4.7 : 12/2011 : MMa : fixed extendsClause() in genNodeTCFClass<br>
+ *          1.4.7 : 09/2012 : MMa : extracted constants, added missing visit methods (NodeChoice and
+ *          NodeTCF)
  */
 class BaseClasses {
 
   /** Return and Argument parameter types */
-  final static String        parRetArgu  = genClassParamType(true, true);
+  final static String parRetArgu  = genClassParamType(true, true);
   /** Beginning of argument list for Return and Argument parameter types */
-  final static String        begRetArgu  = begArgList(true);
+  final static String begRetArgu  = begArgList(true);
   /** End of argument list for Return and Argument parameter types */
-  final static String        endRetArgu  = endArgList(true);
+  final static String endRetArgu  = endArgList(true);
   /** Return and no Argument parameter type */
-  final static String        parRet      = genClassParamType(true, false);
+  final static String parRet      = genClassParamType(true, false);
   /** Beginning of argument list for Return and no Argument parameter types */
-  final static String        begRet      = begArgList(true);
+  final static String begRet      = begArgList(true);
   /** End of argument list for Return and no Argument parameter types */
-  final static String        endRet      = endArgList(false);
+  final static String endRet      = endArgList(false);
   /** No Return and Argument parameter types */
-  final static String        parVoidArgu = genClassParamType(false, true);
+  final static String parVoidArgu = genClassParamType(false, true);
   /** Beginning of argument list for no Return and Argument parameter types */
-  final static String        begVoidArgu = begArgList(false);
+  final static String begVoidArgu = begArgList(false);
   /** End of argument list for no Return and Argument parameter types */
-  final static String        endVoidArgu = endArgList(true);
+  final static String endVoidArgu = endArgList(true);
   /** No Return and no Argument parameter types */
-  final static String        parVoid     = genClassParamType(false, false);
+  final static String parVoid     = genClassParamType(false, false);
   /** Beginning of argument list for no Return and no Argument parameter types */
-  final static String        begVoid     = begArgList(false);
+  final static String begVoid     = begArgList(false);
   /** End of argument list for no Return and no Argument parameter types */
-  final static String        endVoid     = endArgList(false);
-  /** The OS line separator */
-  public static final String LS          = System.getProperty("line.separator");
+  final static String endVoid     = endArgList(false);
 
   /*
    * Node interfaces methods
@@ -106,11 +110,11 @@ class BaseClasses {
   /**
    * Generates the {@link INode} interface.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated interface
    */
-  static StringBuilder genINodeInterface(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
+  static StringBuilder genINodeInterface(final StringBuilder aSb) {
+    StringBuilder sb = aSb;
     if (sb == null) {
       sb = new StringBuilder(1900);
     }
@@ -118,38 +122,42 @@ class BaseClasses {
     packageAndImports(sb);
     sb.append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("/**").append(LS);
       sb.append(" * The interface which all syntax tree classes must implement.").append(LS);
       sb.append(" */").append(LS);
     }
-    sb.append("public interface ").append(Globals.iNodeName).append(" extends java.io.Serializable {")
+    sb.append("public interface ").append(iNode).append(" extends java.io.Serializable {")
+      .append(LS).append(LS);
+
+    sb.append("  /** The OS line separator */").append(LS);
+    sb.append("  public static final String LS = System.getProperty(\"line.separator\");")
       .append(LS).append(LS);
 
     interfacesAcceptMethods(sb);
 
-    if (Globals.parentPointer) {
-      if (Globals.javaDocComments) {
+    if (parentPointer) {
+      if (javaDocComments) {
         sb.append("  /**").append(LS);
         sb.append("   * Gets the parent node.").append(LS);
         sb.append("   *").append(LS);
         sb.append("   * @return the parent node").append(LS);
         sb.append("   */").append(LS);
       }
-      sb.append("  public ").append(Globals.iNodeName).append(" getParent();").append(LS).append(LS);
-      if (Globals.javaDocComments) {
+      sb.append("  public ").append(iNode).append(" getParent();").append(LS).append(LS);
+      if (javaDocComments) {
         sb.append("  /**").append(LS);
         sb.append("   * Sets the parent node. (It is the responsibility of each implementing class")
           .append(LS);
         sb.append("   * to call setParent() on each of its child nodes.)").append(LS);
         sb.append("   *").append(LS);
-        sb.append("   * @param n the parent node").append(LS);
+        sb.append("   * @param n - the parent node").append(LS);
         sb.append("   */").append(LS);
       }
-      sb.append("  public void setParent(final ").append(Globals.iNodeName).append(" n);").append(LS);
+      sb.append("  public void setParent(final ").append(iNode).append(" n);").append(LS);
     }
 
-    sb.append("}").append(LS);
+    sb.append('}').append(LS);
 
     return sb;
   }
@@ -157,11 +165,11 @@ class BaseClasses {
   /**
    * Generates the {@link INodeList} interface.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated interface
    */
-  static StringBuilder genINodeListInterface(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
+  static StringBuilder genINodeListInterface(final StringBuilder aSb) {
+    StringBuilder sb = aSb;
     if (sb == null) {
       sb = new StringBuilder(1850);
     }
@@ -169,42 +177,42 @@ class BaseClasses {
     packageAndImports(sb);
     sb.append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("/**").append(LS);
-      sb.append(" * The interface which {@link ").append(Globals.nodeListName).append("}, {@link ")
-        .append(Globals.nodeListOptName).append("} and {@link ").append(Globals.nodeSeqName)
-        .append("} must implement.").append(LS);
+      sb.append(" * The interface which {@link ").append(nodeList).append("}, {@link ")
+        .append(nodeListOpt).append("} and {@link ").append(nodeSeq).append("} must implement.")
+        .append(LS);
       sb.append(" */").append(LS);
     }
-    sb.append("public interface ").append(Globals.iNodeListName).append(" extends ")
-      .append(Globals.iNodeName).append(" {").append(LS).append(LS);
+    sb.append("public interface ").append(iNodeList).append(" extends ").append(iNode).append(" {")
+      .append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Adds a node to the list.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param n the node to add").append(LS);
+      sb.append("   * @param n - the node to add").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public void addNode(final ").append(Globals.iNodeName).append(" n);").append(LS).append(LS);
+    sb.append("  public void addNode(final ").append(iNode).append(" n);").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
-      sb.append("   * @param i the element index").append(LS);
+      sb.append("   * @param i - the element index").append(LS);
       sb.append("   * @return the element at the given index").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.iNodeName).append(" elementAt(int i);").append(LS).append(LS);
+    sb.append("  public ").append(iNode).append(" elementAt(int i);").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * @return the iterator on the node list").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public java.util.Iterator<").append(Globals.iNodeName).append("> elements();").append(LS)
+    sb.append("  public java.util.Iterator<").append(iNode).append("> elements();").append(LS)
       .append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * @return the list size").append(LS);
       sb.append("   */").append(LS);
@@ -213,7 +221,7 @@ class BaseClasses {
 
     interfacesAcceptMethods(sb);
 
-    sb.append("}").append(LS);
+    sb.append('}').append(LS);
     return sb;
   }
 
@@ -224,11 +232,11 @@ class BaseClasses {
   /**
    * Generates the {@link NodeChoice} class.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated class
    */
-  static StringBuilder genNodeChoiceClass(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
+  static StringBuilder genNodeChoiceClass(final StringBuilder aSb) {
+    StringBuilder sb = aSb;
     if (sb == null) {
       sb = new StringBuilder(2700);
     }
@@ -236,26 +244,27 @@ class BaseClasses {
     packageAndImports(sb);
     sb.append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("/**").append(LS);
       sb.append(" * Represents a grammar choice (|), e.g. ' ( A | B ) '.<br>").append(LS);
-      sb.append(" * The class stores the node and the \"which\" choice indicator (0, 1, ...).").append(LS);
+      sb.append(" * The class stores the node and the \"which\" choice indicator (0, 1, ...).")
+        .append(LS);
       sb.append(" */").append(LS);
     }
-    sb.append("public class ").append(Globals.nodeChoiceName).append(extendsClause()).append(" implements ")
-      .append(Globals.iNodeName).append(" {").append(LS).append(LS);
+    sb.append("public class ").append(nodeChoice).append(extendsClause()).append(" implements ")
+      .append(iNode).append(" {").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /** The real node */").append(LS);
     }
-    sb.append("  public ").append(Globals.iNodeName).append(" choice;").append(LS).append(LS);
+    sb.append("  public ").append(iNode).append(" choice;").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /** The \"which\" choice indicator */").append(LS);
     }
     sb.append("  public int which;").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /** The total number of choices */").append(LS);
     }
     sb.append("  public int total;").append(LS).append(LS);
@@ -264,84 +273,84 @@ class BaseClasses {
 
     serialUIDDeclaration(sb);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Constructs the {@link NodeChoice} with a given node and non standard (-1) ")
         .append("which choice and total number of choices.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param node the node").append(LS);
+      sb.append("   * @param node - the node").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.nodeChoiceName).append("(final ").append(Globals.iNodeName)
-      .append(" node) {").append(LS);
+    sb.append("  public ").append(nodeChoice).append("(final ").append(iNode).append(" node) {")
+      .append(LS);
     sb.append("   this(node, -1, -1);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Constructs the {@link NodeChoice} with a given node, a which choice and ")
         .append("a total (not controlled).").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param node the node").append(LS);
-      sb.append("   * @param whichChoice the which choice").append(LS);
-      sb.append("   * @param totalChoices the total number of choices").append(LS);
+      sb.append("   * @param node - the node").append(LS);
+      sb.append("   * @param whichChoice - the which choice").append(LS);
+      sb.append("   * @param totalChoices - the total number of choices").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.nodeChoiceName).append("(final ").append(Globals.iNodeName)
+    sb.append("  public ").append(nodeChoice).append("(final ").append(iNode)
       .append(" node, final int whichChoice, final int totalChoices) {").append(LS);
     sb.append("    choice = node;").append(LS);
     sb.append("    which = whichChoice;").append(LS);
     sb.append("    total = totalChoices;").append(LS);
-    sb.append((Globals.parentPointer ? "    choice.setParent(this);" : ""));
-    sb.append((Globals.parentPointer ? LS : ""));
+    if (parentPointer)
+      sb.append("    choice.setParent(this);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       genAcceptRetArguComment(sb);
     }
-    sb.append("  public ").append(parRetArgu).append(" ").append(begRetArgu)
-      .append(Globals.iRetArguVisitorName).append(parRetArgu).append(endRetArgu).append(" {").append(LS);
+    sb.append("  public ").append(parRetArgu).append(' ').append(begRetArgu)
+      .append(iRetArguVisitor).append(parRetArgu).append(endRetArgu).append(" {").append(LS);
     sb.append("    return choice.accept(vis, argu);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       genAcceptRetComment(sb);
     }
-    sb.append("  public ").append(parRet).append(" ").append(begRet).append(Globals.iRetVisitorName)
+    sb.append("  public ").append(parRet).append(' ').append(begRet).append(iRetVisitor)
       .append(parRet).append(endRet).append(" {").append(LS);
     sb.append("    return choice.accept(vis);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       genAcceptVoidArguComment(sb);
     }
-    sb.append("  public ").append(parVoidArgu).append(" ").append(begVoidArgu)
-      .append(Globals.iVoidArguVisitorName).append(parVoidArgu).append(endVoidArgu).append(" {").append(LS);
+    sb.append("  public ").append(parVoidArgu).append(' ').append(begVoidArgu)
+      .append(iVoidArguVisitor).append(parVoidArgu).append(endVoidArgu).append(" {").append(LS);
     sb.append("    choice.accept(vis, argu);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       genAcceptVoidComment(sb);
     }
-    sb.append("  public ").append(parVoid).append(begVoid).append(Globals.iVoidVisitorName).append(parVoid)
+    sb.append("  public ").append(parVoid).append(begVoid).append(iVoidVisitor).append(parVoid)
       .append(endVoid).append(" {").append(LS);
     sb.append("    choice.accept(vis);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
     parentPointerGetterSetter(sb);
 
-    sb.append("}").append(LS);
+    sb.append('}').append(LS);
     return sb;
   }
 
   /**
    * Generates the {@link NodeList} class.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated class
    */
-  static StringBuilder genNodeListClass(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
+  static StringBuilder genNodeListClass(final StringBuilder aSb) {
+    StringBuilder sb = aSb;
     if (sb == null) {
       sb = new StringBuilder(4050);
     }
@@ -349,26 +358,27 @@ class BaseClasses {
     packageAndImports(sb);
     sb.append("import java.util.*;").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("/**").append(LS);
       sb.append(" * Represents a grammar list (+), e.g. ' ( A )+ '.<br>").append(LS);
       sb.append(" * The class stores the nodes list in an ArrayList.").append(LS);
       sb.append(" */").append(LS);
     }
-    sb.append("public class ").append(Globals.nodeListName).append(extendsClause()).append(" implements ")
-      .append(Globals.iNodeListName).append(" {").append(LS).append(LS);
+    sb.append("public class ").append(nodeList).append(extendsClause()).append(" implements ")
+      .append(iNodeList).append(" {").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /** The list of nodes */").append(LS);
     }
-    sb.append("  public ArrayList<").append(Globals.iNodeName).append("> nodes;").append(LS).append(LS);
+    sb.append("  public ArrayList<").append(iNode).append("> nodes;").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /** The allocation sizes table */").append(LS);
     }
-    sb.append("  private static final int allocTb[] = {1, 2, 3, 4, 5, 10, 20, 50};").append(LS).append(LS);
+    sb.append("  private static final int allocTb[] = {1, 2, 3, 4, 5, 10, 20, 50};").append(LS)
+      .append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /** The allocation number */").append(LS);
     }
     sb.append("  private int allocNb = 0;").append(LS).append(LS);
@@ -377,66 +387,65 @@ class BaseClasses {
 
     serialUIDDeclaration(sb);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
-      sb.append("   * Initializes an empty list of nodes with a default first allocation.").append(LS);
+      sb.append("   * Initializes an empty list of nodes with a default first allocation.")
+        .append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.nodeListName).append("() {").append(LS);
-    sb.append("    nodes = new ArrayList<").append(Globals.iNodeName).append(">(allocTb[allocNb]);")
-      .append(LS);
+    sb.append("  public ").append(nodeList).append("() {").append(LS);
+    sb.append("    nodes = new ArrayList<").append(iNode).append(">(allocTb[allocNb]);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Initializes an empty list of nodes with a given allocation.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param sz the list size").append(LS);
+      sb.append("   * @param sz - the list size").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.nodeListName).append("(final int sz) {").append(LS);
-    sb.append("    nodes = new ArrayList<").append(Globals.iNodeName).append(">(sz);").append(LS);
+    sb.append("  public ").append(nodeList).append("(final int sz) {").append(LS);
+    sb.append("    nodes = new ArrayList<").append(iNode).append(">(sz);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Initializes an empty list of nodes with a default first allocation ")
         .append("and adds a first node.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param firstNode the node to add").append(LS);
+      sb.append("   * @param firstNode - the node to add").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.nodeListName).append("(final ").append(Globals.iNodeName)
-      .append(" firstNode) {").append(LS);
-    sb.append("    nodes = new ArrayList<").append(Globals.iNodeName).append(">(allocTb[allocNb]);")
+    sb.append("  public ").append(nodeList).append("(final ").append(iNode).append(" firstNode) {")
       .append(LS);
+    sb.append("    nodes = new ArrayList<").append(iNode).append(">(allocTb[allocNb]);").append(LS);
     sb.append("    addNode(firstNode);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Initializes an empty list of nodes with a given allocation and ")
         .append("adds a first node.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param sz the list size").append(LS);
-      sb.append("   * @param firstNode the node to add").append(LS);
+      sb.append("   * @param sz - the list size").append(LS);
+      sb.append("   * @param firstNode - the node to add").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.nodeListName).append("(final int sz, final ")
-      .append(Globals.iNodeName).append(" firstNode) {").append(LS);
-    sb.append("    nodes = new ArrayList<").append(Globals.iNodeName).append(">(sz);").append(LS);
+    sb.append("  public ").append(nodeList).append("(final int sz, final ").append(iNode)
+      .append(" firstNode) {").append(LS);
+    sb.append("    nodes = new ArrayList<").append(iNode).append(">(sz);").append(LS);
     sb.append("    addNode(firstNode);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Adds a node to the list of nodes, managing progressive ")
         .append("allocation increments.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param n the node to add").append(LS);
+      sb.append("   * @param n - the node to add").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public void addNode(final ").append(Globals.iNodeName).append(" n) {").append(LS);
+    sb.append("  public void addNode(final ").append(iNode).append(" n) {").append(LS);
     sb.append("    if (++allocNb < allocTb.length)").append(LS);
     sb.append("      nodes.ensureCapacity(allocTb[allocNb]);").append(LS);
     sb.append("    else").append(LS);
@@ -452,18 +461,18 @@ class BaseClasses {
 
     parentPointerGetterSetter(sb);
 
-    sb.append("}").append(LS);
+    sb.append('}').append(LS);
     return sb;
   }
 
   /**
    * Generates the {@link NodeListOptional} class.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated class
    */
-  static StringBuilder genNodeListOptClass(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
+  static StringBuilder genNodeListOptClass(final StringBuilder aSb) {
+    StringBuilder sb = aSb;
     if (sb == null) {
       sb = new StringBuilder(4250);
     }
@@ -471,26 +480,27 @@ class BaseClasses {
     packageAndImports(sb);
     sb.append("import java.util.*;").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("/**").append(LS);
       sb.append(" * Represents an optional grammar list (*), e.g. ' ( A )* '.<br>").append(LS);
       sb.append(" * The class stores the nodes list in an ArrayList.").append(LS);
       sb.append(" */").append(LS);
     }
-    sb.append("public class ").append(Globals.nodeListOptName).append(extendsClause()).append(" implements ")
-      .append(Globals.iNodeListName).append(" {").append(LS).append(LS);
+    sb.append("public class ").append(nodeListOpt).append(extendsClause()).append(" implements ")
+      .append(iNodeList).append(" {").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /** The list of nodes */").append(LS);
     }
-    sb.append("  public ArrayList<").append(Globals.iNodeName).append("> nodes;").append(LS).append(LS);
+    sb.append("  public ArrayList<").append(iNode).append("> nodes;").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /** The allocation sizes table */").append(LS);
     }
-    sb.append("  private static final int allocTb[] = {0, 1, 2, 3, 4, 5, 10, 20, 50};").append(LS).append(LS);
+    sb.append("  private static final int allocTb[] = {0, 1, 2, 3, 4, 5, 10, 20, 50};").append(LS)
+      .append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /** The allocation number */").append(LS);
     }
     sb.append("  private int allocNb = 0;").append(LS).append(LS);
@@ -499,66 +509,65 @@ class BaseClasses {
 
     serialUIDDeclaration(sb);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
-      sb.append("   * Initializes an empty list of nodes with a default first allocation.").append(LS);
+      sb.append("   * Initializes an empty list of nodes with a default first allocation.")
+        .append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.nodeListOptName).append("() {").append(LS);
-    sb.append("    nodes = new ArrayList<").append(Globals.iNodeName).append(">(allocTb[allocNb]);")
-      .append(LS);
+    sb.append("  public ").append(nodeListOpt).append("() {").append(LS);
+    sb.append("    nodes = new ArrayList<").append(iNode).append(">(allocTb[allocNb]);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Initializes an empty list of nodes with a given allocation.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param sz the list size").append(LS);
+      sb.append("   * @param sz - the list size").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.nodeListOptName).append("(final int sz) {").append(LS);
-    sb.append("    nodes = new ArrayList<").append(Globals.iNodeName).append(">(sz);").append(LS);
+    sb.append("  public ").append(nodeListOpt).append("(final int sz) {").append(LS);
+    sb.append("    nodes = new ArrayList<").append(iNode).append(">(sz);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Initializes an empty list of nodes with a default first allocation and ")
         .append("adds a first node.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param firstNode the node to add").append(LS);
+      sb.append("   * @param firstNode - the node to add").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.nodeListOptName).append("(final ").append(Globals.iNodeName)
+    sb.append("  public ").append(nodeListOpt).append("(final ").append(iNode)
       .append(" firstNode) {").append(LS);
-    sb.append("    nodes = new ArrayList<").append(Globals.iNodeName).append(">(allocTb[allocNb]);")
-      .append(LS);
+    sb.append("    nodes = new ArrayList<").append(iNode).append(">(allocTb[allocNb]);").append(LS);
     sb.append("    addNode(firstNode);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Initializes an empty list of nodes with a given allocation and ")
         .append("adds a first node.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param sz the list size").append(LS);
-      sb.append("   * @param firstNode the node to add").append(LS);
+      sb.append("   * @param sz - the list size").append(LS);
+      sb.append("   * @param firstNode - the node to add").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.nodeListOptName).append("(final int sz, final ")
-      .append(Globals.iNodeName).append(" firstNode) {").append(LS);
-    sb.append("    nodes = new ArrayList<").append(Globals.iNodeName).append(">(sz);").append(LS);
+    sb.append("  public ").append(nodeListOpt).append("(final int sz, final ").append(iNode)
+      .append(" firstNode) {").append(LS);
+    sb.append("    nodes = new ArrayList<").append(iNode).append(">(sz);").append(LS);
     sb.append("    addNode(firstNode);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Adds a node to the list of nodes, managing progressive ")
         .append("allocation increments.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param n the node to add").append(LS);
+      sb.append("   * @param n - the node to add").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public void addNode(final ").append(Globals.iNodeName).append(" n) {").append(LS);
+    sb.append("  public void addNode(final ").append(iNode).append(" n) {").append(LS);
     sb.append("    if (++allocNb < allocTb.length)").append(LS);
     sb.append("      nodes.ensureCapacity(allocTb[allocNb]);").append(LS);
     sb.append("    else").append(LS);
@@ -570,7 +579,7 @@ class BaseClasses {
 
     listMethods(sb);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * @return true if there is at least one node, false otherwise").append(LS);
       sb.append("   */").append(LS);
@@ -582,18 +591,18 @@ class BaseClasses {
 
     parentPointerGetterSetter(sb);
 
-    sb.append("}").append(LS);
+    sb.append('}').append(LS);
     return sb;
   }
 
   /**
    * Generates the {@link NodeOptional} class.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated class
    */
-  static StringBuilder genNodeOptClass(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
+  static StringBuilder genNodeOptClass(final StringBuilder aSb) {
+    StringBuilder sb = aSb;
     if (sb == null) {
       sb = new StringBuilder(2700);
     }
@@ -601,61 +610,61 @@ class BaseClasses {
     packageAndImports(sb);
     sb.append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("/**").append(LS);
       sb.append(" * Represents a grammar optional node (? or []), e.g. ' ( A )? ' or ' [ A ] '.<br>")
         .append(LS);
       sb.append(" * The class stores the node.").append(LS);
       sb.append(" */").append(LS);
     }
-    sb.append("public class ").append(Globals.nodeOptName).append(extendsClause()).append(" implements ")
-      .append(Globals.iNodeName).append(" {").append(LS).append(LS);
+    sb.append("public class ").append(nodeOpt).append(extendsClause()).append(" implements ")
+      .append(iNode).append(" {").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /** The node (if null there is no node) */").append(LS);
     }
-    sb.append("  public ").append(Globals.iNodeName).append(" node;").append(LS).append(LS);
+    sb.append("  public ").append(iNode).append(" node;").append(LS).append(LS);
 
     parentPointerDeclaration(sb);
 
     serialUIDDeclaration(sb);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Initializes an empty {@link NodeOptional}.").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.nodeOptName).append("() {").append(LS);
+    sb.append("  public ").append(nodeOpt).append("() {").append(LS);
     sb.append("    node = null;").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Initializes a {@link NodeOptional} with a node.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param n the node").append(LS);
+      sb.append("   * @param n - the node").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.nodeOptName).append("(final ").append(Globals.iNodeName)
-      .append(" n) {").append(LS);
+    sb.append("  public ").append(nodeOpt).append("(final ").append(iNode).append(" n) {")
+      .append(LS);
     sb.append("    addNode(n);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Adds a node to the {@link NodeOptional}.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param n the node to add").append(LS);
+      sb.append("   * @param n - the node to add").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public void addNode(final ").append(Globals.iNodeName).append(" n) {").append(LS);
+    sb.append("  public void addNode(final ").append(iNode).append(" n) {").append(LS);
     sb.append("    if (node != null)").append(LS)
       .append("      throw new Error(\"Attempt to set optional node twice\");").append(LS);
     sb.append("    node = n;").append(LS);
     parentPointerSetCall(sb);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * @return true if the node exists, false otherwise").append(LS);
       sb.append("   */").append(LS);
@@ -667,18 +676,18 @@ class BaseClasses {
 
     parentPointerGetterSetter(sb);
 
-    sb.append("}").append(LS);
+    sb.append('}').append(LS);
     return sb;
   }
 
   /**
    * Generates the {@link NodeSequence} class.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated class
    */
-  static StringBuilder genNodeSeqClass(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
+  static StringBuilder genNodeSeqClass(final StringBuilder aSb) {
+    StringBuilder sb = aSb;
     if (sb == null) {
       sb = new StringBuilder(3800);
     }
@@ -687,7 +696,7 @@ class BaseClasses {
     sb.append(LS);
 
     sb.append("import java.util.*;").append(LS).append(LS);
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("/**").append(LS);
       sb.append(" * Represents a sequence of nodes (x y z ...) nested ")
         .append("within a choice (|), list (+),").append(LS)
@@ -696,75 +705,77 @@ class BaseClasses {
       sb.append(" * The class stores the nodes list in an ArrayList.").append(LS);
       sb.append(" */").append(LS);
     }
-    sb.append("public class ").append(Globals.nodeSeqName).append(extendsClause()).append(" implements ")
-      .append(Globals.iNodeListName).append(" {").append(LS).append(LS);
+    sb.append("public class ").append(nodeSeq).append(extendsClause()).append(" implements ")
+      .append(iNodeList).append(" {").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /** The list of nodes */").append(LS);
     }
-    sb.append("  public ArrayList<").append(Globals.iNodeName).append("> nodes;").append(LS).append(LS);
+    sb.append("  public ArrayList<").append(iNode).append("> nodes;").append(LS).append(LS);
 
     parentPointerDeclaration(sb);
 
     serialUIDDeclaration(sb);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
-      sb.append("   * Initializes an empty {@link NodeSequence} with a default allocation.").append(LS);
+      sb.append("   * Initializes an empty {@link NodeSequence} with a default allocation.")
+        .append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.nodeSeqName).append("() {").append(LS);
-    sb.append("    nodes = new ArrayList<").append(Globals.iNodeName).append(">();").append(LS);
+    sb.append("  public ").append(nodeSeq).append("() {").append(LS);
+    sb.append("    nodes = new ArrayList<").append(iNode).append(">();").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
-      sb.append("   * Initializes an empty {@link NodeSequence} with a given allocation.").append(LS);
+      sb.append("   * Initializes an empty {@link NodeSequence} with a given allocation.")
+        .append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param sz the list size").append(LS);
+      sb.append("   * @param sz - the list size").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.nodeSeqName).append("(final int sz) {").append(LS);
-    sb.append("    nodes = new ArrayList<").append(Globals.iNodeName).append(">(sz);").append(LS);
+    sb.append("  public ").append(nodeSeq).append("(final int sz) {").append(LS);
+    sb.append("    nodes = new ArrayList<").append(iNode).append(">(sz);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Initializes an empty {@link NodeSequence} with a default allocation ")
         .append("and adds a first node.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param firstNode the node to add").append(LS);
+      sb.append("   * @param firstNode - the node to add").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.nodeSeqName).append("(final ").append(Globals.iNodeName)
-      .append(" firstNode) {").append(LS);
-    sb.append("    nodes = new ArrayList<").append(Globals.iNodeName).append(">();").append(LS);
+    sb.append("  public ").append(nodeSeq).append("(final ").append(iNode).append(" firstNode) {")
+      .append(LS);
+    sb.append("    nodes = new ArrayList<").append(iNode).append(">();").append(LS);
     sb.append("    addNode(firstNode);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Initializes an empty {@link NodeSequence} with a given allocation ")
         .append("and adds a first node.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param sz the list size").append(LS);
-      sb.append("   * @param firstNode the node to add").append(LS);
+      sb.append("   * @param sz - the list size").append(LS);
+      sb.append("   * @param firstNode - the node to add").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.nodeSeqName).append("(final int sz, final ")
-      .append(Globals.iNodeName).append(" firstNode) {").append(LS);
-    sb.append("    nodes = new ArrayList<").append(Globals.iNodeName).append(">(sz);").append(LS);
+    sb.append("  public ").append(nodeSeq).append("(final int sz, final ").append(iNode)
+      .append(" firstNode) {").append(LS);
+    sb.append("    nodes = new ArrayList<").append(iNode).append(">(sz);").append(LS);
     sb.append("    addNode(firstNode);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Adds a node to the {@link NodeSequence}.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param n the node to add").append(LS);
+      sb.append("   * @param n - the node to add").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public void addNode(final ").append(Globals.iNodeName).append(" n) {").append(LS);
+    sb.append("  public void addNode(final ").append(iNode).append(" n) {").append(LS);
     sb.append("    nodes.add(n);").append(LS);
     parentPointerSetCall(sb);
     sb.append("  }").append(LS).append(LS);
@@ -775,27 +786,26 @@ class BaseClasses {
 
     parentPointerGetterSetter(sb);
 
-    sb.append("}").append(LS);
+    sb.append('}').append(LS);
     return sb;
   }
 
   /**
    * Generates the {@link NodeToken} class.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated class
    */
-  static StringBuilder genNodeTokenClass(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
+  static StringBuilder genNodeTokenClass(final StringBuilder aSb) {
+    StringBuilder sb = aSb;
     if (sb == null) {
       sb = new StringBuilder(5970);
     }
 
     packageAndImports(sb);
-    sb.append(LS);
+    sb.append("import java.util.*;").append(LS).append(LS);
 
-    sb.append("import java.util.*;").append(LS);
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("/**").append(LS);
       sb.append(" * Represents a single token in the grammar.<br>").append(LS);
       sb.append(" * If the \"-tk\" option is used, also contains a ArrayList of preceding ")
@@ -804,38 +814,38 @@ class BaseClasses {
         .append("and the special tokens list.<br>").append(LS);
       sb.append(" */").append(LS);
     }
-    sb.append("public class ").append(Globals.nodeTokenName).append(extendsClause() + " implements ")
-      .append(Globals.iNodeName).append(" {").append(LS).append(LS);
+    sb.append("public class ").append(nodeToken).append(extendsClause()).append(" implements ")
+      .append(iNode).append(" {").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /** The token image */").append(LS);
     }
     sb.append("  public String tokenImage;").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /** The list of special tokens */").append(LS);
     }
-    sb.append("  public ArrayList<").append(Globals.nodeTokenName).append("> specialTokens;").append(LS)
+    sb.append("  public ArrayList<").append(nodeToken).append("> specialTokens;").append(LS)
       .append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /** The token first line (-1 means not available) */").append(LS);
     }
     sb.append("  public int beginLine;").append(LS).append(LS);
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /** The token first column (-1 means not available) */").append(LS);
     }
     sb.append("  public int beginColumn;").append(LS).append(LS);
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /** The token last line (-1 means not available) */").append(LS);
     }
     sb.append("  public int endLine;").append(LS).append(LS);
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /** The token last column (-1 means not available) */").append(LS);
     }
     sb.append("  public int endColumn;").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /** The JavaCC token \"kind\" integer (-1 means not available) */").append(LS);
     }
     sb.append("  public int kind;").append(LS).append(LS);
@@ -846,32 +856,32 @@ class BaseClasses {
 
     lineSeparatorDeclaration(sb);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Initializes a {@link NodeToken} with a given string and ")
         .append("no position information.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param s the token string").append(LS);
+      sb.append("   * @param s - the token string").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.nodeTokenName).append("(String s) {").append(LS);
+    sb.append("  public ").append(nodeToken).append("(String s) {").append(LS);
     sb.append("    this(s, -1, -1, -1, -1, -1);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Initializes a {@link NodeToken} with a given string and ")
         .append("position information.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param s the token string").append(LS);
-      sb.append("   * @param kn the token kind").append(LS);
-      sb.append("   * @param bl the first line").append(LS);
-      sb.append("   * @param bc the first column").append(LS);
-      sb.append("   * @param el the last line").append(LS);
-      sb.append("   * @param ec the last column").append(LS);
+      sb.append("   * @param s - the token string").append(LS);
+      sb.append("   * @param kn - the token kind").append(LS);
+      sb.append("   * @param bl - the first line").append(LS);
+      sb.append("   * @param bc - the first column").append(LS);
+      sb.append("   * @param el - the last line").append(LS);
+      sb.append("   * @param ec - the last column").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.nodeTokenName)
+    sb.append("  public ").append(nodeToken)
       .append("(String s, final int kn, final int bl, final int bc, ")
       .append("final int el, final int ec) {").append(LS);
     sb.append("    tokenImage = s;").append(LS);
@@ -883,45 +893,47 @@ class BaseClasses {
     sb.append("    endColumn = ec;").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
-      sb.append("   * Gets the special token in the special tokens list at a given position.").append(LS);
+      sb.append("   * Gets the special token in the special tokens list at a given position.")
+        .append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param i the special token's position").append(LS);
+      sb.append("   * @param i - the special token's position").append(LS);
       sb.append("   * @return the special token").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.nodeTokenName).append(" getSpecialAt(final int i) {").append(LS);
+    sb.append("  public ").append(nodeToken).append(" getSpecialAt(final int i) {").append(LS);
     sb.append("    if (specialTokens == null)").append(LS);
     sb.append("      throw new NoSuchElementException(\"No specialTokens in token\");").append(LS);
     sb.append("    return specialTokens.get(i);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * @return the number of special tokens").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public int numSpecials() {").append(LS).append("    if (specialTokens == null)").append(LS);
+    sb.append("  public int numSpecials() {").append(LS).append("    if (specialTokens == null)")
+      .append(LS);
     sb.append("      return 0;").append(LS).append("    return specialTokens.size();").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Adds a special token to the special tokens list.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param s the special token to add").append(LS);
+      sb.append("   * @param s - the special token to add").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public void addSpecial(final ").append(Globals.nodeTokenName).append(" s) {").append(LS);
+    sb.append("  public void addSpecial(final ").append(nodeToken).append(" s) {").append(LS);
     sb.append("    if (specialTokens == null)").append(LS);
-    sb.append("      specialTokens = new ArrayList<").append(Globals.nodeTokenName).append(">();").append(LS);
+    sb.append("      specialTokens = new ArrayList<").append(nodeToken).append(">();").append(LS);
     sb.append("    specialTokens.add(s);").append(LS);
-    sb.append((Globals.parentPointer ? "    s.setParent(this);" : ""));
-    sb.append((Globals.parentPointer ? LS : ""));
+    if (parentPointer)
+      sb.append("    s.setParent(this);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Trims the special tokens list.").append(LS);
       sb.append("   */").append(LS);
@@ -932,7 +944,7 @@ class BaseClasses {
     sb.append("    specialTokens.trimToSize();").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * @return the token image").append(LS);
       sb.append("   */").append(LS);
@@ -942,13 +954,13 @@ class BaseClasses {
     sb.append("    return tokenImage;").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Returns the list of special tokens of the current {@link NodeToken} ")
         .append("as a string,<br>").append(LS);
       sb.append("   * taking in account a given indentation.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param spc the indentation").append(LS);
+      sb.append("   * @param spc - the indentation").append(LS);
       sb.append("   * @return the string representing the special tokens list").append(LS);
       sb.append("   */").append(LS);
     }
@@ -956,13 +968,13 @@ class BaseClasses {
     sb.append("    if (specialTokens == null)").append(LS);
     sb.append("      return \"\";").append(LS);
     sb.append("    StringBuilder buf = new StringBuilder(64);").append(LS);
-    sb.append("    for (final Iterator<").append(Globals.nodeTokenName)
+    sb.append("    for (final Iterator<").append(nodeToken)
       .append("> e = specialTokens.iterator(); e.hasNext();) {").append(LS);
     sb.append("      final String s = e.next().tokenImage;").append(LS);
     sb.append("      final int p = s.length() - 1;").append(LS);
     sb.append("      final char c = s.charAt(p);").append(LS);
     sb.append("      buf.append(s);").append(LS);
-    sb.append("      // TODO modifier specials pour inclure fins de ligne").append(LS);
+    sb.append("      // TODO modify specials to include end of lines").append(LS);
     sb.append("      if (c == '\\n' || c == '\\r')").append(LS);
     sb.append("        buf.append(spc);").append(LS);
     sb.append("      else").append(LS);
@@ -971,14 +983,16 @@ class BaseClasses {
     sb.append("    return buf.toString();").append(LS);
     sb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * Returns the list of special tokens of the current {@link NodeToken} ")
         .append("and the current<br>").append(LS);
-      sb.append("   * {@link NodeToken} as a string, taking in account a given indentation.").append(LS);
+      sb.append("   * {@link NodeToken} as a string, taking in account a given indentation.")
+        .append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param spc the indentation").append(LS);
-      sb.append("   * @return the string representing the special tokens list and the token").append(LS);
+      sb.append("   * @param spc - the indentation").append(LS);
+      sb.append("   * @return the string representing the special tokens list and the token")
+        .append(LS);
       sb.append("   */").append(LS);
     }
     sb.append("  public String withSpecials(final String spc) {").append(LS);
@@ -995,7 +1009,69 @@ class BaseClasses {
 
     parentPointerGetterSetter(sb);
 
-    sb.append("}").append(LS);
+    sb.append('}').append(LS);
+
+    return sb;
+  }
+
+  /**
+   * Generates the {@link NodeToken} class.
+   * 
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @return the generated class
+   */
+  static StringBuilder genNodeTCFClass(final StringBuilder aSb) {
+    StringBuilder sb = aSb;
+    if (sb == null) {
+      sb = new StringBuilder(1000);
+    }
+
+    sb.append("package ").append(nodesPackageName).append(';').append(LS).append(LS);
+    if (javaDocComments) {
+      sb.append("/**").append(LS);
+      sb.append(" * Represents a token in an ExpansionUnit type 3 in the grammar.<br>").append(LS);
+      sb.append(" * If the \"-tk\" option is used, also contains a ArrayList of preceding ")
+        .append("special tokens.<br>").append(LS);
+      sb.append(" */").append(LS);
+    }
+    sb.append("public class ").append(nodeTCF).append(" extends ").append(nodeToken).append(" {")
+      .append(LS).append(LS);
+
+    serialUIDDeclaration(sb);
+
+    if (javaDocComments) {
+      sb.append("  /**").append(LS);
+      sb.append("   * Initializes a {@link ").append(nodeTCF).append("} with a given string and ")
+        .append("no position information.").append(LS);
+      sb.append("   *").append(LS);
+      sb.append("   * @param s - the token string").append(LS);
+      sb.append("   */").append(LS);
+    }
+    sb.append("  public ").append(nodeTCF).append("(String s) {").append(LS);
+    sb.append("    super(s, -1, -1, -1, -1, -1);").append(LS);
+    sb.append("  }").append(LS).append(LS);
+
+    if (javaDocComments) {
+      sb.append("  /**").append(LS);
+      sb.append("   * Initializes a {@link ").append(nodeTCF).append("} with a given string and ")
+        .append("position information.").append(LS);
+      sb.append("   *").append(LS);
+      sb.append("   * @param s - the token string").append(LS);
+      sb.append("   * @param kn - the token kind").append(LS);
+      sb.append("   * @param bl - the first line").append(LS);
+      sb.append("   * @param bc - the first column").append(LS);
+      sb.append("   * @param el - the last line").append(LS);
+      sb.append("   * @param ec - the last column").append(LS);
+      sb.append("   */").append(LS);
+    }
+    sb.append("  public ").append(nodeTCF)
+      .append("(String s, final int kn, final int bl, final int bc, ")
+      .append("final int el, final int ec) {").append(LS);
+    sb.append("    super(s, kn, bl, bc, el, ec);").append(LS);
+    sb.append("  }").append(LS).append(LS);
+
+    sb.append('}').append(LS);
+
     return sb;
   }
 
@@ -1004,138 +1080,111 @@ class BaseClasses {
    */
 
   /**
-   * Generates the visit method declaration on a {@link NodeList} for a visitor with user Return and Argument
-   * data.
-   * 
-   * @param aSB a buffer to print into (will be allocated if null)
-   * @return the generated visit method
-   */
-  static StringBuilder genRetArguVisitNodeList(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
-    if (sb == null) {
-      sb = new StringBuilder(280);
-    }
-    if (Globals.javaDocComments) {
-      sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeList} node, passing it an argument.").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
-      sb.append("   * @param argu the user argument").append(LS);
-      sb.append("   * @return the user return information").append(LS);
-      sb.append("   */").append(LS);
-    }
-    sb.append("  public ").append(Globals.genRetType).append(" visit(final ").append(Globals.nodeListName)
-      .append(" n, final ").append(Globals.varargs ? Globals.genArgusType : Globals.genArguType)
-      .append(" argu);").append(LS);
-    return sb;
-  }
-
-  /**
-   * Generates the visit method declaration on a {@link NodeListOptional} for a visitor with user Return and
+   * Generates the visit method declaration on a given node type for a visitor with user Return and
    * Argument data.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @param aBufSize - the initial buffer size
+   * @param aNodeType - the node type
    * @return the generated visit method
    */
-  static StringBuilder genRetArguVisitNodeListOpt(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
+  private static StringBuilder genRetArguVisitAnyNode(final StringBuilder aSb, final int aBufSize,
+                                                      final String aNodeType) {
+    StringBuilder sb = aSb;
     if (sb == null) {
-      sb = new StringBuilder(280);
+      sb = new StringBuilder(aBufSize);
     }
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeListOptional} node, passing it an argument.").append(LS);
+      sb.append("   * Visits a {@link ").append(aNodeType)
+        .append("} node, passing it an argument.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
-      sb.append("   * @param argu the user argument").append(LS);
+      sb.append("   * @param n - the node to visit").append(LS);
+      sb.append("   * @param argu - the user argument").append(LS);
       sb.append("   * @return the user return information").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.genRetType).append(" visit(final ").append(Globals.nodeListOptName)
-      .append(" n, final ").append(Globals.varargs ? Globals.genArgusType : Globals.genArguType)
-      .append(" argu);").append(LS);
+    sb.append("  public ").append(genRetType).append(" visit(final ").append(aNodeType)
+      .append(" n, final ").append(varargs ? genArgusType : genArguType).append(" argu);")
+      .append(LS);
     return sb;
   }
 
   /**
-   * Generates the visit method declaration on a {@link NodeOptional} for a visitor with user Return and
+   * Generates the visit method declaration on a {@link NodeChoice} for a visitor with user Return
+   * and Argument data.
+   * 
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @return the generated visit method
+   */
+  static StringBuilder genRetArguVisitNodeChoice(final StringBuilder aSb) {
+    return genRetArguVisitAnyNode(aSb, 280, nodeChoice);
+  }
+
+  /**
+   * Generates the visit method declaration on a {@link NodeList} for a visitor with user Return and
    * Argument data.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated visit method
    */
-  static StringBuilder genRetArguVisitNodeOpt(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
-    if (sb == null) {
-      sb = new StringBuilder(280);
-    }
-    if (Globals.javaDocComments) {
-      sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeOptional} node, passing it an argument.").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
-      sb.append("   * @param argu the user argument").append(LS);
-      sb.append("   * @return the user return information").append(LS);
-      sb.append("   */").append(LS);
-    }
-    sb.append("  public ").append(Globals.genRetType).append(" visit(final ").append(Globals.nodeOptName)
-      .append(" n, final ").append(Globals.varargs ? Globals.genArgusType : Globals.genArguType)
-      .append(" argu);").append(LS);
-    return sb;
+  static StringBuilder genRetArguVisitNodeList(final StringBuilder aSb) {
+    return genRetArguVisitAnyNode(aSb, 280, nodeList);
   }
 
   /**
-   * Generates the visit method declaration on a {@link NodeSequence} for a visitor with user Return and
+   * Generates the visit method declaration on a {@link NodeListOptional} for a visitor with user
+   * Return and Argument data.
+   * 
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @return the generated visit method
+   */
+  static StringBuilder genRetArguVisitNodeListOpt(final StringBuilder aSb) {
+    return genRetArguVisitAnyNode(aSb, 280, nodeListOpt);
+  }
+
+  /**
+   * Generates the visit method declaration on a {@link NodeOptional} for a visitor with user Return
+   * and Argument data.
+   * 
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @return the generated visit method
+   */
+  static StringBuilder genRetArguVisitNodeOpt(final StringBuilder aSb) {
+    return genRetArguVisitAnyNode(aSb, 280, nodeOpt);
+  }
+
+  /**
+   * Generates the visit method declaration on a {@link NodeSequence} for a visitor with user Return
+   * and Argument data.
+   * 
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @return the generated visit method
+   */
+  static StringBuilder genRetArguVisitNodeSeq(final StringBuilder aSb) {
+    return genRetArguVisitAnyNode(aSb, 280, nodeSeq);
+  }
+
+  /**
+   * Generates the visit method declaration on a {@link NodeTCF} for a visitor with user Return and
    * Argument data.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated visit method
    */
-  static StringBuilder genRetArguVisitNodeSeq(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
-    if (sb == null) {
-      sb = new StringBuilder(280);
-    }
-    if (Globals.javaDocComments) {
-      sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeSequence} node, passing it an argument.").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
-      sb.append("   * @param argu the user argument").append(LS);
-      sb.append("   * @return the user return information").append(LS);
-      sb.append("   */").append(LS);
-    }
-    sb.append("  public ").append(Globals.genRetType).append(" visit(final ").append(Globals.nodeSeqName)
-      .append(" n, final ").append(Globals.varargs ? Globals.genArgusType : Globals.genArguType)
-      .append(" argu);").append(LS);
-    return sb;
+  static StringBuilder genRetArguVisitNodeTCF(final StringBuilder aSb) {
+    return genRetArguVisitAnyNode(aSb, 280, nodeTCF);
   }
 
   /**
-   * Generates the visit method declaration on a {@link NodeToken} for a visitor with user Return and Argument
-   * data.
+   * Generates the visit method declaration on a {@link NodeToken} for a visitor with user Return
+   * and Argument data.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated visit method
    */
-  static StringBuilder genRetArguVisitNodeToken(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
-    if (sb == null) {
-      sb = new StringBuilder(280);
-    }
-    if (Globals.javaDocComments) {
-      sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeToken} node, passing it an argument.").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
-      sb.append("   * @param argu the user argument").append(LS);
-      sb.append("   * @return the user return information").append(LS);
-      sb.append("   */").append(LS);
-    }
-    sb.append("  public ").append(Globals.genRetType).append(" visit(final ").append(Globals.nodeTokenName)
-      .append(" n, final ").append(Globals.varargs ? Globals.genArgusType : Globals.genArguType)
-      .append(" argu);").append(LS);
-    return sb;
+  static StringBuilder genRetArguVisitNodeToken(final StringBuilder aSb) {
+    return genRetArguVisitAnyNode(aSb, 280, nodeToken);
   }
 
   /*
@@ -1143,128 +1192,108 @@ class BaseClasses {
    */
 
   /**
-   * Generates the visit method declaration on a {@link NodeList} for a visitor with user Return and no
-   * Argument data.
-   * 
-   * @param aSB a buffer to print into (will be allocated if null)
-   * @return the generated visit method
-   */
-  static StringBuilder genRetVisitNodeList(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
-    if (sb == null) {
-      sb = new StringBuilder(250);
-    }
-    if (Globals.javaDocComments) {
-      sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeList} node.").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
-      sb.append("   * @return the user return information").append(LS);
-      sb.append("   */").append(LS);
-    }
-    sb.append("  public ").append(Globals.genRetType).append(" visit(final ").append(Globals.nodeListName)
-      .append(" n);").append(LS);
-    return sb;
-  }
-
-  /**
-   * Generates the visit method declaration on a {@link NodeListOptional} for a visitor with user Return and
+   * Generates the visit method declaration on a given node type for a visitor with user Return and
    * no Argument data.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @param aBufSize - the initial buffer size
+   * @param aNodeType - the node type
    * @return the generated visit method
    */
-  static StringBuilder genRetVisitNodeListOpt(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
+  private static StringBuilder genRetVisitAnyNode(final StringBuilder aSb, final int aBufSize,
+                                                  final String aNodeType) {
+    StringBuilder sb = aSb;
     if (sb == null) {
-      sb = new StringBuilder(250);
+      sb = new StringBuilder(aBufSize);
     }
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeListOptional} node.").append(LS);
+      sb.append("   * Visits a {@link ").append(aNodeType).append("} node.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
+      sb.append("   * @param n - the node to visit").append(LS);
       sb.append("   * @return the user return information").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(Globals.genRetType).append(" visit(final ").append(Globals.nodeListOptName)
+    sb.append("  public ").append(genRetType).append(" visit(final ").append(aNodeType)
       .append(" n);").append(LS);
     return sb;
   }
 
   /**
-   * Generates the visit method declaration on a {@link NodeOptional} for a visitor with user Return and no
-   * Argument data.
+   * Generates the visit method declaration on a {@link NodeChoice} for a visitor with user Return
+   * and no Argument data.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated visit method
    */
-  static StringBuilder genRetVisitNodeOpt(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
-    if (sb == null) {
-      sb = new StringBuilder(250);
-    }
-    if (Globals.javaDocComments) {
-      sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeOptional} node.").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
-      sb.append("   * @return the user return information").append(LS);
-      sb.append("   */").append(LS);
-    }
-    sb.append("  public ").append(Globals.genRetType).append(" visit(final ").append(Globals.nodeOptName)
-      .append(" n);").append(LS);
-    return sb;
+  static StringBuilder genRetVisitNodeChoice(final StringBuilder aSb) {
+    return genRetVisitAnyNode(aSb, 250, nodeChoice);
   }
 
   /**
-   * Generates the visit method declaration on a {@link NodeSequence} for a visitor with user Return and no
-   * Argument data.
+   * Generates the visit method declaration on a {@link NodeList} for a visitor with user Return and
+   * no Argument data.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated visit method
    */
-  static StringBuilder genRetVisitNodeSeq(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
-    if (sb == null) {
-      sb = new StringBuilder(250);
-    }
-    if (Globals.javaDocComments) {
-      sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeSequence} node.").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
-      sb.append("   * @return the user return information").append(LS);
-      sb.append("   */").append(LS);
-    }
-    sb.append("  public ").append(Globals.genRetType).append(" visit(final ").append(Globals.nodeSeqName)
-      .append(" n);").append(LS);
-    return sb;
+  static StringBuilder genRetVisitNodeList(final StringBuilder aSb) {
+    return genRetVisitAnyNode(aSb, 250, nodeList);
   }
 
   /**
-   * Generates the visit method declaration on a {@link NodeToken} for a visitor with user Return and no
-   * Argument data.
+   * Generates the visit method declaration on a {@link NodeListOptional} for a visitor with user
+   * Return and no Argument data.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated visit method
    */
-  static StringBuilder genRetVisitNodeToken(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
-    if (sb == null) {
-      sb = new StringBuilder(250);
-    }
-    if (Globals.javaDocComments) {
-      sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeToken} node.").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
-      sb.append("   * @return the user return information").append(LS);
-      sb.append("   */").append(LS);
-    }
-    sb.append("  public ").append(Globals.genRetType).append(" visit(final ").append(Globals.nodeTokenName)
-      .append(" n);").append(LS);
-    return sb;
+  static StringBuilder genRetVisitNodeListOpt(final StringBuilder aSb) {
+    return genRetVisitAnyNode(aSb, 250, nodeListOpt);
+  }
+
+  /**
+   * Generates the visit method declaration on a {@link NodeOptional} for a visitor with user Return
+   * and no Argument data.
+   * 
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @return the generated visit method
+   */
+  static StringBuilder genRetVisitNodeOpt(final StringBuilder aSb) {
+    return genRetVisitAnyNode(aSb, 250, nodeOpt);
+  }
+
+  /**
+   * Generates the visit method declaration on a {@link NodeSequence} for a visitor with user Return
+   * and no Argument data.
+   * 
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @return the generated visit method
+   */
+  static StringBuilder genRetVisitNodeSeq(final StringBuilder aSb) {
+    return genRetVisitAnyNode(aSb, 250, nodeSeq);
+  }
+
+  /**
+   * Generates the visit method declaration on a {@link NodeTCF} for a visitor with user Return and
+   * no Argument data.
+   * 
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @return the generated visit method
+   */
+  static StringBuilder genRetVisitNodeTCF(final StringBuilder aSb) {
+    return genRetVisitAnyNode(aSb, 250, nodeTCF);
+  }
+
+  /**
+   * Generates the visit method declaration on a {@link NodeToken} for a visitor with user Return
+   * and no Argument data.
+   * 
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @return the generated visit method
+   */
+  static StringBuilder genRetVisitNodeToken(final StringBuilder aSb) {
+    return genRetVisitAnyNode(aSb, 250, nodeToken);
   }
 
   /*
@@ -1272,128 +1301,109 @@ class BaseClasses {
    */
 
   /**
-   * Generates the visit method declaration on a {@link NodeList} for a visitor with user no Return and
-   * Argument data.
-   * 
-   * @param aSB a buffer to print into (will be allocated if null)
-   * @return the generated visit method
-   */
-  static StringBuilder genVoidArguVisitNodeList(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
-    if (sb == null) {
-      sb = new StringBuilder(260);
-    }
-    if (Globals.javaDocComments) {
-      sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeList} node, passing it an argument.").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
-      sb.append("   * @param argu the user argument").append(LS);
-      sb.append("   */").append(LS);
-    }
-    sb.append("  public void visit(final ").append(Globals.nodeListName).append(" n, final ")
-      .append(Globals.varargs ? Globals.genArgusType : Globals.genArguType).append(" argu);").append(LS);
-    return sb;
-  }
-
-  /**
-   * Generates the visit method declaration on a {@link NodeListOptional} for a visitor with user no Return
+   * Generates the visit method declaration on a given node type for a visitor with user no Return
    * and Argument data.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @param aBufSize - the initial buffer size
+   * @param aNodeType - the node type
    * @return the generated visit method
    */
-  static StringBuilder genVoidArguVisitNodeListOpt(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
+  private static StringBuilder genVoidArguVisitAnyNode(final StringBuilder aSb, final int aBufSize,
+                                                       final String aNodeType) {
+    StringBuilder sb = aSb;
     if (sb == null) {
-      sb = new StringBuilder(260);
+      sb = new StringBuilder(aBufSize);
     }
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeListOptional} node, passing it an argument.").append(LS);
+      sb.append("   * Visits a {@link ").append(aNodeType)
+        .append("} node, passing it an argument.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
-      sb.append("   * @param argu the user argument").append(LS);
+      sb.append("   * @param n - the node to visit").append(LS);
+      sb.append("   * @param argu - the user argument").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public void visit(final ").append(Globals.nodeListOptName).append(" n, final ")
-      .append(Globals.varargs ? Globals.genArgusType : Globals.genArguType).append(" argu);").append(LS);
+    sb.append("  public void visit(final ").append(aNodeType).append(" n, final ")
+      .append(varargs ? genArgusType : genArguType).append(" argu);").append(LS);
     return sb;
   }
 
   /**
-   * Generates the visit method declaration on a {@link NodeOptional} for a visitor with user no Return and
-   * Argument data.
+   * Generates the visit method declaration on a {@link NodeChoice} for a visitor with user no
+   * Return and Argument data.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated visit method
    */
-  static StringBuilder genVoidArguVisitNodeOpt(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
-    if (sb == null) {
-      sb = new StringBuilder(260);
-    }
-    if (Globals.javaDocComments) {
-      sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeOptional} node, passing it an argument.").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
-      sb.append("   * @param argu the user argument").append(LS);
-      sb.append("   */").append(LS);
-    }
-    sb.append("  public void visit(final ").append(Globals.nodeOptName).append(" n, final ")
-      .append(Globals.varargs ? Globals.genArgusType : Globals.genArguType).append(" argu);").append(LS);
-    return sb;
+  static StringBuilder genVoidArguVisitNodeChoice(final StringBuilder aSb) {
+    return genVoidArguVisitAnyNode(aSb, 260, nodeChoice);
   }
 
   /**
-   * Generates the visit method declaration on a {@link NodeSequence} for a visitor with user no Return and
-   * Argument data.
+   * Generates the visit method declaration on a {@link NodeList} for a visitor with user no Return
+   * and Argument data.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated visit method
    */
-  static StringBuilder genVoidArguVisitNodeSeq(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
-    if (sb == null) {
-      sb = new StringBuilder(100);
-    }
-    if (Globals.javaDocComments) {
-      sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeSequence} node, passing it an argument.").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
-      sb.append("   * @param argu the user argument").append(LS);
-      sb.append("   */").append(LS);
-    }
-    sb.append("  public void visit(final ").append(Globals.nodeSeqName).append(" n, final ")
-      .append(Globals.varargs ? Globals.genArgusType : Globals.genArguType).append(" argu);").append(LS);
-    return sb;
+  static StringBuilder genVoidArguVisitNodeList(final StringBuilder aSb) {
+    return genVoidArguVisitAnyNode(aSb, 260, nodeList);
   }
 
   /**
-   * Generates the visit method declaration on a {@link NodeToken} for a visitor with user no Return and
-   * Argument data.
+   * Generates the visit method declaration on a {@link NodeListOptional} for a visitor with user no
+   * Return and Argument data.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated visit method
    */
-  static StringBuilder genVoidArguVisitNodeToken(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
-    if (sb == null) {
-      sb = new StringBuilder(260);
-    }
-    if (Globals.javaDocComments) {
-      sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeToken} node, passing it an argument.").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
-      sb.append("   * @param argu the user argument").append(LS);
-      sb.append("   */").append(LS);
-    }
-    sb.append("  public void visit(final ").append(Globals.nodeTokenName).append(" n, final ")
-      .append(Globals.varargs ? Globals.genArgusType : Globals.genArguType).append(" argu);").append(LS);
-    return sb;
+  static StringBuilder genVoidArguVisitNodeListOpt(final StringBuilder aSb) {
+    return genVoidArguVisitAnyNode(aSb, 260, nodeListOpt);
+  }
+
+  /**
+   * Generates the visit method declaration on a {@link NodeOptional} for a visitor with user no
+   * Return and Argument data.
+   * 
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @return the generated visit method
+   */
+  static StringBuilder genVoidArguVisitNodeOpt(final StringBuilder aSb) {
+    return genVoidArguVisitAnyNode(aSb, 260, nodeOpt);
+  }
+
+  /**
+   * Generates the visit method declaration on a {@link NodeSequence} for a visitor with user no
+   * Return and Argument data.
+   * 
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @return the generated visit method
+   */
+  static StringBuilder genVoidArguVisitNodeSeq(final StringBuilder aSb) {
+    return genVoidArguVisitAnyNode(aSb, 260, nodeSeq);
+  }
+
+  /**
+   * Generates the visit method declaration on a {@link NodeTCF} for a visitor with user no Return
+   * and Argument data.
+   * 
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @return the generated visit method
+   */
+  static StringBuilder genVoidArguVisitNodeTCF(final StringBuilder aSb) {
+    return genVoidArguVisitAnyNode(aSb, 260, nodeTCF);
+  }
+
+  /**
+   * Generates the visit method declaration on a {@link NodeToken} for a visitor with user no Return
+   * and Argument data.
+   * 
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @return the generated visit method
+   */
+  static StringBuilder genVoidArguVisitNodeToken(final StringBuilder aSb) {
+    return genVoidArguVisitAnyNode(aSb, 260, nodeToken);
   }
 
   /*
@@ -1401,177 +1411,168 @@ class BaseClasses {
    */
 
   /**
-   * Generates the visit method declaration on a {@link NodeList} for a visitor with user no Return and no
-   * Argument data.
-   * 
-   * @param aSB a buffer to print into (will be allocated if null)
-   * @return the generated visit method
-   */
-  static StringBuilder genVoidVisitNodeList(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
-    if (sb == null) {
-      sb = new StringBuilder(230);
-    }
-    if (Globals.javaDocComments) {
-      sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeList} node.").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
-      sb.append("   */").append(LS);
-    }
-    sb.append("  public void visit(final ").append(Globals.nodeListName).append(" n);").append(LS);
-    return sb;
-  }
-
-  /**
-   * Generates the visit method declaration on a {@link NodeListOptional} for a visitor with user no Return
+   * Generates the visit method declaration on a given node type for a visitor with user no Return
    * and no Argument data.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @param aBufSize - the initial buffer size
+   * @param aNodeType - the node type
    * @return the generated visit method
    */
-  static StringBuilder genVoidVisitNodeListOpt(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
+  private static StringBuilder genVoidVisitAnyNode(final StringBuilder aSb, final int aBufSize,
+                                                   final String aNodeType) {
+    StringBuilder sb = aSb;
     if (sb == null) {
-      sb = new StringBuilder(230);
+      sb = new StringBuilder(aBufSize);
     }
-    if (Globals.javaDocComments) {
+    if (javaDocComments) {
       sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeListOptional} node.").append(LS);
+      sb.append("   * Visits a {@link ").append(aNodeType).append("} node.").append(LS);
       sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
+      sb.append("   * @param n - the node to visit").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public void visit(final ").append(Globals.nodeListOptName).append(" n);").append(LS);
+    sb.append("  public void visit(final ").append(aNodeType).append(" n);").append(LS);
     return sb;
   }
 
   /**
-   * Generates the visit method declaration on a {@link NodeOptional} for a visitor with user no Return and no
-   * Argument data.
+   * Generates the visit method declaration on a {@link NodeChoice} for a visitor with user no
+   * Return and no Argument data.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated visit method
    */
-  static StringBuilder genVoidVisitNodeOpt(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
-    if (sb == null) {
-      sb = new StringBuilder(230);
-    }
-    if (Globals.javaDocComments) {
-      sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeOptional} node.").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
-      sb.append("   */").append(LS);
-    }
-    sb.append("  public void visit(final ").append(Globals.nodeOptName).append(" n);").append(LS);
-    return sb;
+  static StringBuilder genVoidVisitNodeChoice(final StringBuilder aSb) {
+    return genVoidVisitAnyNode(aSb, 230, nodeChoice);
   }
 
   /**
-   * Generates the visit method declaration on a {@link NodeSequence} for a visitor with user no Return and no
-   * Argument data.
+   * Generates the visit method declaration on a {@link NodeList} for a visitor with user no Return
+   * and no Argument data.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated visit method
    */
-  static StringBuilder genVoidVisitNodeSeq(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
-    if (sb == null) {
-      sb = new StringBuilder(230);
-    }
-    if (Globals.javaDocComments) {
-      sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeSequence} node.").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
-      sb.append("   */").append(LS);
-    }
-    sb.append("  public void visit(final ").append(Globals.nodeSeqName).append(" n);").append(LS);
-    return sb;
+  static StringBuilder genVoidVisitNodeList(final StringBuilder aSb) {
+    return genVoidVisitAnyNode(aSb, 230, nodeList);
   }
 
   /**
-   * Generates the visit method declaration on a {@link NodeToken} for a visitor with user no Return and no
-   * Argument data.
+   * Generates the visit method declaration on a {@link NodeListOptional} for a visitor with user no
+   * Return and no Argument data.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated visit method
    */
-  static StringBuilder genVoidVisitNodeToken(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
-    if (sb == null) {
-      sb = new StringBuilder(230);
-    }
-    if (Globals.javaDocComments) {
-      sb.append("  /**").append(LS);
-      sb.append("   * Visits a {@link NodeToken} node.").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @param n the node to visit").append(LS);
-      sb.append("   */").append(LS);
-    }
-    sb.append("  public void visit(final ").append(Globals.nodeTokenName).append(" n);").append(LS);
-    return sb;
+  static StringBuilder genVoidVisitNodeListOpt(final StringBuilder aSb) {
+    return genVoidVisitAnyNode(aSb, 230, nodeListOpt);
+  }
+
+  /**
+   * Generates the visit method declaration on a {@link NodeOptional} for a visitor with user no
+   * Return and no Argument data.
+   * 
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @return the generated visit method
+   */
+  static StringBuilder genVoidVisitNodeOpt(final StringBuilder aSb) {
+    return genVoidVisitAnyNode(aSb, 230, nodeOpt);
+  }
+
+  /**
+   * Generates the visit method declaration on a {@link NodeSequence} for a visitor with user no
+   * Return and no Argument data.
+   * 
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @return the generated visit method
+   */
+  static StringBuilder genVoidVisitNodeSeq(final StringBuilder aSb) {
+    return genVoidVisitAnyNode(aSb, 230, nodeSeq);
+  }
+
+  /**
+   * Generates the visit method declaration on a {@link NodeTCF} for a visitor with user no Return
+   * and no Argument data.
+   * 
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @return the generated visit method
+   */
+  static StringBuilder genVoidVisitNodeTCF(final StringBuilder aSb) {
+    return genVoidVisitAnyNode(aSb, 230, nodeTCF);
+  }
+
+  /**
+   * Generates the visit method declaration on a {@link NodeToken} for a visitor with user no Return
+   * and no Argument data.
+   * 
+   * @param aSb - a buffer to print into (will be allocated if null)
+   * @return the generated visit method
+   */
+  static StringBuilder genVoidVisitNodeToken(final StringBuilder aSb) {
+    return genVoidVisitAnyNode(aSb, 230, nodeToken);
   }
 
   /**
    * Generates package and visitor classes imports.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    */
-  static void packageAndImports(final StringBuilder aSB) {
-    aSB.append("package ").append(Globals.nodesPackageName).append(";").append(LS).append(LS);
-    aSB.append("import ").append(Globals.visitorsPackageName).append(".IRetArguVisitor;").append(LS);
-    aSB.append("import ").append(Globals.visitorsPackageName).append(".IRetVisitor;").append(LS);
-    aSB.append("import ").append(Globals.visitorsPackageName).append(".IVoidArguVisitor;").append(LS);
-    aSB.append("import ").append(Globals.visitorsPackageName).append(".IVoidVisitor;").append(LS);
+  static void packageAndImports(final StringBuilder aSb) {
+    aSb.append("package ").append(nodesPackageName).append(';').append(LS).append(LS);
+    aSb.append("import ").append(visitorsPackageName).append('.').append(iRetArguVisitor)
+       .append(';').append(LS);
+    aSb.append("import ").append(visitorsPackageName).append('.').append(iRetVisitor).append(';')
+       .append(LS);
+    aSb.append("import ").append(visitorsPackageName).append('.').append(iVoidArguVisitor)
+       .append(';').append(LS);
+    aSb.append("import ").append(visitorsPackageName).append('.').append(iVoidVisitor).append(';')
+       .append(LS);
   }
 
   /**
-   * Generates the serial uid member.
+   * Generates the serial version UID member.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    */
-  static void serialUIDDeclaration(final StringBuilder aSB) {
-    if (Globals.javaDocComments) {
-      aSB.append("  /** The serial version uid */").append(LS);
+  static void serialUIDDeclaration(final StringBuilder aSb) {
+    if (javaDocComments) {
+      aSb.append("  /** The serial version UID */").append(LS);
     }
-    aSB.append("  private static final long serialVersionUID = " + Globals.SERIAL_UID + "L;").append(LS)
-       .append(LS);
+    aSb.append("  private static final long serialVersionUID = ").append(SERIAL_UID).append("L;")
+       .append(LS).append(LS);
   }
 
   /**
    * Generates the line separator member.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    */
-  static void lineSeparatorDeclaration(final StringBuilder aSB) {
-    if (Globals.javaDocComments) {
-      aSB.append("  /** The OS line separator */").append(LS);
+  static void lineSeparatorDeclaration(final StringBuilder aSb) {
+    if (javaDocComments) {
+      aSb.append("  /** The OS line separator */").append(LS);
     }
-    aSB.append("  public static final String LS = System.getProperty(\"line.separator\");").append(LS)
-       .append(LS);
+    aSb.append("  public static final String LS = System.getProperty(\"line.separator\");")
+       .append(LS).append(LS);
   }
 
   /**
    * Generates parent pointer field.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated declaration
    */
-  static StringBuilder parentPointerDeclaration(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
-    if (Globals.parentPointer) {
+  static StringBuilder parentPointerDeclaration(final StringBuilder aSb) {
+    StringBuilder sb = aSb;
+    if (parentPointer) {
       if (sb == null) {
         sb = new StringBuilder(50);
       }
-      if (Globals.javaDocComments) {
-        aSB.append("  /** The parent node */").append(LS);
+      if (javaDocComments) {
+        aSb.append("  /** The parent node */").append(LS);
       }
-      sb.append("  private ").append(Globals.iNodeName).append(" parent;").append(LS).append(LS);
-    }
-    else if (sb == null) {
+      sb.append("  private ").append(iNode).append(" parent;").append(LS).append(LS);
+    } else if (sb == null) {
       sb = new StringBuilder(0);
     }
     return sb;
@@ -1580,37 +1581,36 @@ class BaseClasses {
   /**
    * Generates parent pointer getter and setter methods.
    * 
-   * @param aSB a buffer to print into (will be allocated if null)
+   * @param aSb - a buffer to print into (will be allocated if null)
    * @return the generated methods
    */
-  static StringBuilder parentPointerGetterSetter(final StringBuilder aSB) {
-    StringBuilder sb = aSB;
-    if (Globals.parentPointer) {
+  static StringBuilder parentPointerGetterSetter(final StringBuilder aSb) {
+    StringBuilder sb = aSb;
+    if (parentPointer) {
       if (sb == null) {
         sb = new StringBuilder(200);
       }
-      if (Globals.javaDocComments) {
+      if (javaDocComments) {
         sb.append("  /**").append(LS);
         sb.append("   * Sets the parent node.").append(LS);
         sb.append("   *").append(LS);
-        sb.append("   * @param n the parent node").append(LS);
+        sb.append("   * @param n - the parent node").append(LS);
         sb.append("   */").append(LS);
       }
-      sb.append("  public void setParent(final ").append(Globals.iNodeName).append(" n) {").append(LS);
+      sb.append("  public void setParent(final ").append(iNode).append(" n) {").append(LS);
       sb.append("    parent = n;").append(LS);
       sb.append("  }").append(LS).append(LS);
-      if (Globals.javaDocComments) {
+      if (javaDocComments) {
         sb.append("  /**").append(LS);
         sb.append("   * Gets the parent node.").append(LS);
         sb.append("   *").append(LS);
         sb.append("   * @return the parent node").append(LS);
         sb.append("   */").append(LS);
       }
-      sb.append("  public ").append(Globals.iNodeName).append(" getParent() {").append(LS);
+      sb.append("  public ").append(iNode).append(" getParent() {").append(LS);
       sb.append("    return parent;").append(LS);
       sb.append("  }").append(LS);
-    }
-    else if (sb == null) {
+    } else if (sb == null) {
       sb = new StringBuilder(0);
     }
     return sb;
@@ -1619,239 +1619,241 @@ class BaseClasses {
   /**
    * Generates parent pointer set call.
    * 
-   * @param aSB a buffer to print into (must be non null)
+   * @param aSb - a buffer to print into (must be non null)
    */
-  static void parentPointerSetCall(final StringBuilder aSB) {
-    aSB.append((Globals.parentPointer ? "    n.setParent(this);\n" : ""));
-    aSB.append((Globals.parentPointer ? LS : ""));
+  static void parentPointerSetCall(final StringBuilder aSb) {
+    if (parentPointer)
+      aSb.append("    n.setParent(this);\n").append(LS);
   }
 
   /**
    * Generates the node list methods (for list nodes).
    * 
-   * @param aSB a buffer to print into (must be non null)
+   * @param aSb - a buffer to print into (must be non null)
    */
-  static void listMethods(final StringBuilder aSB) {
-    if (Globals.javaDocComments) {
-      aSB.append("  /**").append(LS);
-      aSB.append("   * Gets the node in the list at a given position.").append(LS);
-      aSB.append("   *").append(LS);
-      aSB.append("   * @param i the node's position").append(LS);
-      aSB.append("   * @return the node").append(LS);
-      aSB.append("   */").append(LS);
+  static void listMethods(final StringBuilder aSb) {
+    if (javaDocComments) {
+      aSb.append("  /**").append(LS);
+      aSb.append("   * Gets the node in the list at a given position.").append(LS);
+      aSb.append("   *").append(LS);
+      aSb.append("   * @param i - the node's position").append(LS);
+      aSb.append("   * @return the node").append(LS);
+      aSb.append("   */").append(LS);
     }
-    aSB.append("  public ").append(Globals.iNodeName).append(" elementAt(final int i) {").append(LS);
-    aSB.append("    return nodes.get(i); }").append(LS).append(LS);
+    aSb.append("  public ").append(iNode).append(" elementAt(final int i) {").append(LS);
+    aSb.append("    return nodes.get(i); }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
-      aSB.append("  /**").append(LS);
-      aSB.append("   * Returns an iterator on the nodes list.").append(LS);
-      aSB.append("   *").append(LS);
-      aSB.append("   * @return the iterator").append(LS);
-      aSB.append("   */").append(LS);
+    if (javaDocComments) {
+      aSb.append("  /**").append(LS);
+      aSb.append("   * Returns an iterator on the nodes list.").append(LS);
+      aSb.append("   *").append(LS);
+      aSb.append("   * @return the iterator").append(LS);
+      aSb.append("   */").append(LS);
     }
-    aSB.append("  public Iterator<").append(Globals.iNodeName).append("> elements() {").append(LS);
-    aSB.append("    return nodes.iterator(); }").append(LS).append(LS);
+    aSb.append("  public Iterator<").append(iNode).append("> elements() {").append(LS);
+    aSb.append("    return nodes.iterator(); }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
-      aSB.append("  /**").append(LS);
-      aSB.append("   * Returns the number of nodes in the list.").append(LS);
-      aSB.append("   *").append(LS);
-      aSB.append("   * @return the list size").append(LS);
-      aSB.append("   */").append(LS);
+    if (javaDocComments) {
+      aSb.append("  /**").append(LS);
+      aSb.append("   * Returns the number of nodes in the list.").append(LS);
+      aSb.append("   *").append(LS);
+      aSb.append("   * @return the list size").append(LS);
+      aSb.append("   */").append(LS);
     }
-    aSB.append("  public int size() {").append(LS);
-    aSB.append("    return nodes.size(); }").append(LS).append(LS);
+    aSb.append("  public int size() {").append(LS);
+    aSb.append("    return nodes.size(); }").append(LS).append(LS);
   }
 
   /**
    * Generates the node interfaces accept methods.
    * 
-   * @param aSB a buffer to print into (must be non null)
+   * @param aSb - a buffer to print into (must be non null)
    */
-  static void interfacesAcceptMethods(final StringBuilder aSB) {
-    if (Globals.javaDocComments) {
-      genAcceptRetArguComment(aSB);
+  static void interfacesAcceptMethods(final StringBuilder aSb) {
+    if (javaDocComments) {
+      genAcceptRetArguComment(aSb);
     }
-    aSB.append("  public ").append(parRetArgu).append(" ").append(begRetArgu)
-       .append(Globals.iRetArguVisitorName).append(parRetArgu).append(endRetArgu).append(";").append(LS)
+    aSb.append("  public ").append(parRetArgu).append(' ').append(begRetArgu)
+       .append(iRetArguVisitor).append(parRetArgu).append(endRetArgu).append(';').append(LS)
        .append(LS);
 
-    if (Globals.javaDocComments) {
-      genAcceptRetComment(aSB);
+    if (javaDocComments) {
+      genAcceptRetComment(aSb);
     }
-    aSB.append("  public ").append(parRet).append(" ").append(begRet).append(Globals.iRetVisitorName)
-       .append(parRet).append(endRet).append(";").append(LS).append(LS);
+    aSb.append("  public ").append(parRet).append(' ').append(begRet).append(iRetVisitor)
+       .append(parRet).append(endRet).append(';').append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
-      genAcceptVoidArguComment(aSB);
+    if (javaDocComments) {
+      genAcceptVoidArguComment(aSb);
     }
-    aSB.append("  public ").append(parVoidArgu).append(" ").append(begVoidArgu)
-       .append(Globals.iVoidArguVisitorName).append(parVoidArgu).append(endVoidArgu).append(";").append(LS)
+    aSb.append("  public ").append(parVoidArgu).append(' ').append(begVoidArgu)
+       .append(iVoidArguVisitor).append(parVoidArgu).append(endVoidArgu).append(';').append(LS)
        .append(LS);
 
-    if (Globals.javaDocComments) {
-      genAcceptVoidComment(aSB);
+    if (javaDocComments) {
+      genAcceptVoidComment(aSb);
     }
-    aSB.append("  public ").append(parVoid).append(begVoid).append(Globals.iVoidVisitorName).append(parVoid)
-       .append(endVoid).append(";").append(LS).append(LS);
+    aSb.append("  public ").append(parVoid).append(begVoid).append(iVoidVisitor).append(parVoid)
+       .append(endVoid).append(';').append(LS).append(LS);
   }
 
   /**
    * Generates the javadoc comment for a method with user Return and Argument data.
    * 
-   * @param aSB a buffer to print into (must be non null)
+   * @param aSb - a buffer to print into (must be non null)
    */
-  static void genAcceptRetArguComment(final StringBuilder aSB) {
-    aSB.append("  /**").append(LS);
-    aSB.append("   * Accepts a {@link IRetArguVisitor} visitor with user Return and Argument data.")
-       .append(LS);
-    aSB.append("   *").append(LS);
-    aSB.append("   * @param <R> the user Return type").append(LS);
-    aSB.append("   * @param <A> the user Argument type").append(LS);
-    aSB.append("   * @param vis the visitor").append(LS);
-    aSB.append("   * @param argu the user Argument data").append(LS);
-    aSB.append("   * @return the user Return data").append(LS);
-    aSB.append("   */").append(LS);
+  static void genAcceptRetArguComment(final StringBuilder aSb) {
+    aSb.append("  /**").append(LS);
+    aSb.append("   * Accepts a {@link ").append(iRetArguVisitor)
+       .append("} visitor with user Return and Argument data.").append(LS);
+    aSb.append("   *").append(LS);
+    aSb.append("   * @param <R> - the user Return type").append(LS);
+    aSb.append("   * @param <A> - the user Argument type").append(LS);
+    aSb.append("   * @param vis - the visitor").append(LS);
+    aSb.append("   * @param argu - the user Argument data").append(LS);
+    aSb.append("   * @return the user Return data").append(LS);
+    aSb.append("   */").append(LS);
   }
 
   /**
    * Generates the javadoc comment for a method with Return data.
    * 
-   * @param aSB a buffer to print into (must be non null)
+   * @param aSb - a buffer to print into (must be non null)
    */
-  static void genAcceptRetComment(final StringBuilder aSB) {
-    aSB.append("  /**").append(LS);
-    aSB.append("   * Accepts a {@link IRetVisitor} visitor with user Return data.").append(LS);
-    aSB.append("   *").append(LS);
-    aSB.append("   * @param <R> the user Return type").append(LS);
-    aSB.append("   * @param vis the visitor").append(LS);
-    aSB.append("   * @return the user Return data").append(LS);
-    aSB.append("   */").append(LS);
+  static void genAcceptRetComment(final StringBuilder aSb) {
+    aSb.append("  /**").append(LS);
+    aSb.append("   * Accepts a {@link ").append(iRetVisitor)
+       .append("} visitor with user Return data.").append(LS);
+    aSb.append("   *").append(LS);
+    aSb.append("   * @param <R> - the user Return type").append(LS);
+    aSb.append("   * @param vis - the visitor").append(LS);
+    aSb.append("   * @return the user Return data").append(LS);
+    aSb.append("   */").append(LS);
   }
 
   /**
    * Generates the javadoc comment for a method with user Argument data.
    * 
-   * @param aSB a buffer to print into (must be non null)
+   * @param aSb - a buffer to print into (must be non null)
    */
-  static void genAcceptVoidArguComment(final StringBuilder aSB) {
-    aSB.append("  /**").append(LS);
-    aSB.append("   * Accepts a {@link IVoidArguVisitor} visitor with user Argument data.").append(LS);
-    aSB.append("   *").append(LS);
-    aSB.append("   * @param <A> the user Argument type").append(LS);
-    aSB.append("   * @param vis the visitor").append(LS);
-    aSB.append("   * @param argu the user Argument data").append(LS);
-    aSB.append("   */").append(LS);
+  static void genAcceptVoidArguComment(final StringBuilder aSb) {
+    aSb.append("  /**").append(LS);
+    aSb.append("   * Accepts a {@link ").append(iVoidArguVisitor)
+       .append("} visitor with user Argument data.").append(LS);
+    aSb.append("   *").append(LS);
+    aSb.append("   * @param <A> - the user Argument type").append(LS);
+    aSb.append("   * @param vis - the visitor").append(LS);
+    aSb.append("   * @param argu - the user Argument data").append(LS);
+    aSb.append("   */").append(LS);
   }
 
   /**
    * Generates the javadoc comment for a method with no user Return nor Argument data.
    * 
-   * @param aSB a buffer to print into (must be non null)
+   * @param aSb - a buffer to print into (must be non null)
    */
-  static void genAcceptVoidComment(final StringBuilder aSB) {
-    aSB.append("  /**").append(LS);
-    aSB.append("   * Accepts a {@link IVoidVisitor} visitor with no user Return nor Argument data.")
-       .append(LS);
-    aSB.append("   *").append(LS);
-    aSB.append("   * @param vis the visitor").append(LS);
-    aSB.append("   */").append(LS);
+  static void genAcceptVoidComment(final StringBuilder aSb) {
+    aSb.append("  /**").append(LS);
+    aSb.append("   * Accepts a {@link ").append(iVoidVisitor)
+       .append("} visitor with no user Return nor Argument data.").append(LS);
+    aSb.append("   *").append(LS);
+    aSb.append("   * @param vis - the visitor").append(LS);
+    aSb.append("   */").append(LS);
   }
 
   /**
    * Generates the node classes accept methods.
    * 
-   * @param aSB a buffer to print into (must be non null)
+   * @param aSb - a buffer to print into (must be non null)
    */
-  static void classesAcceptMethods(final StringBuilder aSB) {
-    if (Globals.javaDocComments) {
-      genAcceptRetArguComment(aSB);
+  static void classesAcceptMethods(final StringBuilder aSb) {
+    if (javaDocComments) {
+      genAcceptRetArguComment(aSb);
     }
-    aSB.append("  public ").append(parRetArgu).append(" ").append(begRetArgu)
-       .append(Globals.iRetArguVisitorName).append(parRetArgu).append(endRetArgu).append(" {").append(LS);
-    aSB.append("    return vis.visit(this, argu);").append(LS);
-    aSB.append("  }").append(LS).append(LS);
+    aSb.append("  public ").append(parRetArgu).append(' ').append(begRetArgu)
+       .append(iRetArguVisitor).append(parRetArgu).append(endRetArgu).append(" {").append(LS);
+    aSb.append("    return vis.visit(this, argu);").append(LS);
+    aSb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
-      genAcceptRetComment(aSB);
+    if (javaDocComments) {
+      genAcceptRetComment(aSb);
     }
-    aSB.append("  public ").append(parRet).append(" ").append(begRet).append(Globals.iRetVisitorName)
+    aSb.append("  public ").append(parRet).append(' ').append(begRet).append(iRetVisitor)
        .append(parRet).append(endRet).append(" {").append(LS);
-    aSB.append("    return vis.visit(this);").append(LS);
-    aSB.append("  }").append(LS).append(LS);
+    aSb.append("    return vis.visit(this);").append(LS);
+    aSb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
-      genAcceptVoidArguComment(aSB);
+    if (javaDocComments) {
+      genAcceptVoidArguComment(aSb);
     }
-    aSB.append("  public ").append(parVoidArgu).append(" ").append(begVoidArgu)
-       .append(Globals.iVoidArguVisitorName).append(parVoidArgu).append(endVoidArgu).append(" {").append(LS);
-    aSB.append("    vis.visit(this, argu);").append(LS);
-    aSB.append("  }").append(LS).append(LS);
+    aSb.append("  public ").append(parVoidArgu).append(' ').append(begVoidArgu)
+       .append(iVoidArguVisitor).append(parVoidArgu).append(endVoidArgu).append(" {").append(LS);
+    aSb.append("    vis.visit(this, argu);").append(LS);
+    aSb.append("  }").append(LS).append(LS);
 
-    if (Globals.javaDocComments) {
-      genAcceptVoidComment(aSB);
+    if (javaDocComments) {
+      genAcceptVoidComment(aSb);
     }
-    aSB.append("  public ").append(parVoid).append(begVoid).append(Globals.iVoidVisitorName).append(parVoid)
+    aSb.append("  public ").append(parVoid).append(begVoid).append(iVoidVisitor).append(parVoid)
        .append(endVoid).append(" {").append(LS);
-    aSB.append("    vis.visit(this);").append(LS);
-    aSB.append("  }").append(LS).append(LS);
+    aSb.append("    vis.visit(this);").append(LS);
+    aSb.append("  }").append(LS).append(LS);
   }
 
   /**
    * Generates the javadoc comment for a method with user Return and Argument data.
    * 
-   * @param aSB a buffer to print into (must be non null)
+   * @param aSb - a buffer to print into (must be non null)
    */
-  static void genVisitRetArguComment(final StringBuilder aSB) {
-    aSB.append("  /**").append(LS);
-    aSB.append("   * Visits a node with user Return and Argument data.").append(LS);
-    aSB.append("   *").append(LS);
-    aSB.append("   * @param n the node to visit").append(LS);
-    aSB.append("   * @param argu the user Argument data").append(LS);
-    aSB.append("   * @return the user Return data").append(LS);
-    aSB.append("   */").append(LS);
+  static void genVisitRetArguComment(final StringBuilder aSb) {
+    aSb.append("  /**").append(LS);
+    aSb.append("   * Visits a node with user Return and Argument data.").append(LS);
+    aSb.append("   *").append(LS);
+    aSb.append("   * @param n - the node to visit").append(LS);
+    aSb.append("   * @param argu - the user Argument data").append(LS);
+    aSb.append("   * @return the user Return data").append(LS);
+    aSb.append("   */").append(LS);
   }
 
   /**
    * Generates the javadoc comment for a method with user Return data.
    * 
-   * @param aSB a buffer to print into (must be non null)
+   * @param aSb - a buffer to print into (must be non null)
    */
-  static void genVisitRetComment(final StringBuilder aSB) {
-    aSB.append("  /**").append(LS);
-    aSB.append("   * Visits a node with user Return data.").append(LS);
-    aSB.append("   *").append(LS);
-    aSB.append("   * @param n the node to visit").append(LS);
-    aSB.append("   * @return the user Return data").append(LS);
-    aSB.append("   */").append(LS);
+  static void genVisitRetComment(final StringBuilder aSb) {
+    aSb.append("  /**").append(LS);
+    aSb.append("   * Visits a node with user Return data.").append(LS);
+    aSb.append("   *").append(LS);
+    aSb.append("   * @param n - the node to visit").append(LS);
+    aSb.append("   * @return the user Return data").append(LS);
+    aSb.append("   */").append(LS);
   }
 
   /**
    * Generates the javadoc comment for a method with user Argument data.
    * 
-   * @param aSB a buffer to print into (must be non null)
+   * @param aSb - a buffer to print into (must be non null)
    */
-  static void genVisitVoidArguComment(final StringBuilder aSB) {
-    aSB.append("  /**").append(LS);
-    aSB.append("   * Visits a node with user Argument data.").append(LS);
-    aSB.append("   *").append(LS);
-    aSB.append("   * @param n the node to visit").append(LS);
-    aSB.append("   * @param argu the user Argument data").append(LS);
-    aSB.append("   */").append(LS);
+  static void genVisitVoidArguComment(final StringBuilder aSb) {
+    aSb.append("  /**").append(LS);
+    aSb.append("   * Visits a node with user Argument data.").append(LS);
+    aSb.append("   *").append(LS);
+    aSb.append("   * @param n - the node to visit").append(LS);
+    aSb.append("   * @param argu - the user Argument data").append(LS);
+    aSb.append("   */").append(LS);
   }
 
   /**
    * Generates the javadoc comment for a method with no user Return nor Argument data.
    * 
-   * @param aSB a buffer to print into (must be non null)
+   * @param aSb - a buffer to print into (must be non null)
    */
-  static void genVisitVoidComment(final StringBuilder aSB) {
-    aSB.append("  /**").append(LS);
-    aSB.append("   * Visits a node with a user no user Return nor Argument data.").append(LS);
-    aSB.append("   *").append(LS);
-    aSB.append("   * @param n the node to visit").append(LS);
-    aSB.append("   */").append(LS);
+  static void genVisitVoidComment(final StringBuilder aSb) {
+    aSb.append("  /**").append(LS);
+    aSb.append("   * Visits a node with a user no user Return nor Argument data.").append(LS);
+    aSb.append("   *").append(LS);
+    aSb.append("   * @param n - the node to visit").append(LS);
+    aSb.append("   */").append(LS);
   }
 
   /*
@@ -1862,57 +1864,52 @@ class BaseClasses {
    * @return the extends clause.
    */
   static String extendsClause() {
-    return (Globals.nodesSuperclass != null ? " extends " + Globals.nodesSuperclass : "");
+    return (nodesSuperclass != null ? " extends " + nodesSuperclass : "");
   }
 
   /**
    * Generates the class parameter type(s).
    * 
-   * @param ret true if with a Return type, false if void
-   * @param arg true if with a user Argument, false otherwise
+   * @param ret - true if with a Return type, false if void
+   * @param arg - true if with a user Argument, false otherwise
    * @return the class parameter(s) string
    */
   static String genClassParamType(final boolean ret, final boolean arg) {
     if (ret) {
       if (arg) {
-        return "<" + Globals.genRetType + ", " + Globals.genArguType + ">";
+        return "<".concat(genRetType).concat(", ").concat(genArguType).concat(">");
+      } else {
+        return "<".concat(genRetType).concat(">");
       }
-      else {
-        return "<" + Globals.genRetType + ">";
-      }
-    }
-    else {
+    } else {
       if (arg) {
-        return "<" + Globals.genArguType + ">";
-      }
-      else {
+        return "<".concat(genArguType).concat(">");
+      } else {
         return "";
       }
     }
   }
 
   /**
-   * @param ret true if with a Return type, false if void
+   * @param ret - true if with a Return type, false if void
    * @return the beginning of the argument(s) list
    */
   static String begArgList(final boolean ret) {
     if (ret) {
-      return Globals.genRetType + " accept(final ";
-    }
-    else {
+      return genRetType + " accept(final ";
+    } else {
       return "void accept(final ";
     }
   }
 
   /**
-   * @param arg true if with a user Argument, false otherwise
+   * @param arg - true if with a user Argument, false otherwise
    * @return the end of the argument(s) list
    */
   static String endArgList(final boolean arg) {
     if (arg) {
-      return " vis, final " + (Globals.varargs ? Globals.genArgusType : Globals.genArguType) + " argu)";
-    }
-    else {
+      return " vis, final ".concat(varargs ? genArgusType : genArguType).concat(" argu)");
+    } else {
       return " vis)";
     }
   }

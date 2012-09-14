@@ -52,6 +52,8 @@
  */
 package EDU.purdue.jtb.misc;
 
+import static EDU.purdue.jtb.misc.Globals.*;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -72,8 +74,8 @@ import java.util.Iterator;
  * useful, JTB will not overwrite this file automatically.<br>
  * JTB will take this precaution for the other files only if the "-ow" command-line parameter is
  * used.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  * @version 1.4.3 : 03/2010 : MMa : fixed output of constructor
  */
@@ -89,19 +91,17 @@ public class TreeFormatterGenerator {
   private final ArrayList<ClassInfo> classList;
   /** The buffer to print into */
   protected StringBuilder            sb;
-  /** The OS line separator */
-  public static final String         LS          = System.getProperty("line.separator");
 
   /**
    * Constructor with a given list of classes. Will create the visitors directory if it does not
    * exist.
-   *
-   * @param classes the list of classes
+   * 
+   * @param classes - the list of classes
    */
   public TreeFormatterGenerator(final ArrayList<ClassInfo> classes) {
     classList = classes;
     sb = new StringBuilder(500 * classes.size());
-    visitorDir = new File(Globals.visitorsDirName);
+    visitorDir = new File(visitorsDirName);
 
     if (!visitorDir.exists())
       visitorDir.mkdir();
@@ -111,8 +111,8 @@ public class TreeFormatterGenerator {
    * Saves the current buffer in the output file (global variable).<br>
    * Since the user is expected to edit and customize this file, this method will never overwrite
    * the file if it exists, regardless of the global no overwrite flag.
-   *
-   * @throws FileExistsException if the file exists
+   * 
+   * @throws FileExistsException - if the file exists
    */
   public void saveToFile() throws FileExistsException {
     try {
@@ -130,20 +130,20 @@ public class TreeFormatterGenerator {
     }
   }
 
-  // TODO passer les méthodes suivantes en spc.spc
+  // TODO change the following methods with spc.spc
 
   /**
    * Generates the tree formatter visitor source in its file.<br>
-   *
-   * @throws FileExistsException if the file exists
+   * 
+   * @throws FileExistsException - if the file exists
    */
   public void generateTreeFormatter() throws FileExistsException {
 
-    sb.append(Globals.genFileHeaderComment()).append(LS);
-    sb.append("package " + Globals.visitorsPackageName + ";").append(LS).append(LS);
+    sb.append(genFileHeaderComment()).append(LS);
+    sb.append("package " + visitorsPackageName + ";").append(LS).append(LS);
     sb.append("import java.util.ArrayList;").append(LS);
     sb.append("import java.util.Iterator;").append(LS).append(LS);
-    sb.append("import " + Globals.nodesPackageName + ".*;").append(LS).append(LS);
+    sb.append("import " + nodesPackageName + ".*;").append(LS).append(LS);
     sb.append("/**").append(LS);
     sb.append(" * A skeleton output formatter for your language grammar.<br>").append(LS);
     sb.append(" * Using the add() method along with force(), indent(), and outdent(),<br>")
@@ -156,12 +156,10 @@ public class TreeFormatterGenerator {
       .append(LS);
     sb.append(" * in order to \"pretty print\" your tree.").append(LS);
     sb.append(" */").append(LS);
-    sb.append("public class TreeFormatter extends " + Globals.dFVoidVisitorName + " {").append(LS)
-      .append(LS);
+    sb.append("public class TreeFormatter extends " + dFVoidVisitor + " {").append(LS).append(LS);
 
     sb.append("  /** The list of formatting commands */").append(LS);
-    sb
-      .append("  private final ArrayList<FormatCommand> cmdQueue = new ArrayList<FormatCommand>();")
+    sb.append("  private final ArrayList<FormatCommand> cmdQueue = new ArrayList<FormatCommand>();")
       .append(LS);
     sb.append("  /** True if line to be wrapped, false otherwise */").append(LS);
     sb.append("  private boolean lineWrap;").append(LS);
@@ -179,25 +177,22 @@ public class TreeFormatterGenerator {
     sb.append("  private static int INDENT_AMT = 2;").append(LS).append(LS);
 
     sb.append("  /**").append(LS);
-    sb
-      .append(
-              "   * Constructor with a default indentation amount of {@link #INDENT_AMT} and no line-wrap.")
+    sb.append("   * Constructor with a default indentation amount of {@link #INDENT_AMT} and no line-wrap.")
       .append(LS);
     sb.append("   */").append(LS);
     sb.append("  public TreeFormatter() { this(INDENT_AMT, 0); }").append(LS).append(LS);
 
     sb.append("  /**").append(LS);
-    sb
-      .append(
-              "   * Constructor using an indent amount and a line width used to wrap long lines.<br>")
+    sb.append("   * Constructor using an indent amount and a line width used to wrap long lines.<br>")
       .append(LS);
     sb.append("   * If a token's beginColumn value is greater than the specified wrapWidth,<br>")
       .append(LS);
     sb.append("   * it will be moved to the next line andindented one extra level.<br>").append(LS);
     sb.append("   * To turn off line-wrapping, specify a wrapWidth of 0.").append(LS);
     sb.append("   *").append(LS);
-    sb.append("   * @param aIndentAmt Amount of spaces per indentation level").append(LS);
-    sb.append("   * @param aWrapWidth Wrap lines longer than wrapWidth. 0 for no wrap").append(LS);
+    sb.append("   * @param aIndentAmt - Amount of spaces per indentation level").append(LS);
+    sb.append("   * @param aWrapWidth - Wrap lines longer than wrapWidth. 0 for no wrap")
+      .append(LS);
     sb.append("   */").append(LS);
     sb.append("  public TreeFormatter(final int aIndentAmt, final int aWrapWidth) {").append(LS);
     sb.append("    this.indentAmt = aIndentAmt;").append(LS);
@@ -209,29 +204,26 @@ public class TreeFormatterGenerator {
     sb.append("  }").append(LS).append(LS);
 
     sb.append("  /**").append(LS);
-    sb.append("   * Accepts a " + Globals.iNodeListName + " object.").append(LS);
+    sb.append("   * Accepts a " + iNodeList + " object.").append(LS);
     sb.append("   *").append(LS);
-    sb.append("   * @param n the node list to process").append(LS);
+    sb.append("   * @param n - the node list to process").append(LS);
     sb.append("   */").append(LS);
-    sb.append("  protected void processList(final " + Globals.iNodeListName + " n) {").append(LS);
+    sb.append("  protected void processList(final " + iNodeList + " n) {").append(LS);
     sb.append("    processList(n, null);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
     sb.append("  /**").append(LS);
-    sb.append(
-              "   * Accepts a " + Globals.iNodeListName +
+    sb.append("   * Accepts a " + iNodeList +
                   " object and performs a format command (if non null)<br>").append(LS);
     sb.append("   * between each node in the list (but not after the last node).").append(LS);
     sb.append("   *").append(LS);
-    sb.append("   * @param n the node list to process").append(LS);
-    sb.append("   * @param cmd the format command").append(LS);
+    sb.append("   * @param n - the node list to process").append(LS);
+    sb.append("   * @param cmd - the format command").append(LS);
     sb.append("   */").append(LS);
-    sb.append(
-              "  protected void processList(final " + Globals.iNodeListName +
-                  " n, final FormatCommand cmd) {").append(LS);
-    sb.append(
-              "    for (final Iterator<" + Globals.iNodeName +
-                  "> e = n.elements(); e.hasNext();) {").append(LS);
+    sb.append("  protected void processList(final " + iNodeList + " n, final FormatCommand cmd) {")
+      .append(LS);
+    sb.append("    for (final Iterator<" + iNode + "> e = n.elements(); e.hasNext();) {")
+      .append(LS);
     sb.append("       e.next().accept(this);").append(LS);
     sb.append("       if (cmd != null && e.hasNext())").append(LS);
     sb.append("        cmdQueue.add(cmd);").append(LS);
@@ -239,9 +231,7 @@ public class TreeFormatterGenerator {
     sb.append("  }").append(LS).append(LS);
 
     sb.append("  /**").append(LS);
-    sb
-      .append(
-              "   * Inserts one line break and indents the next line to the current indentation level.<br>")
+    sb.append("   * Inserts one line break and indents the next line to the current indentation level.<br>")
       .append(LS);
     sb.append("   * Use \"add(force());\".").append(LS);
     sb.append("   *").append(LS);
@@ -250,13 +240,11 @@ public class TreeFormatterGenerator {
     sb.append("  protected FormatCommand force() { return force(1); }").append(LS).append(LS);
 
     sb.append("  /**").append(LS);
-    sb
-      .append(
-              "   * Inserts a given number of line breaks and indents the next line to the current indentation level.<br>")
+    sb.append("   * Inserts a given number of line breaks and indents the next line to the current indentation level.<br>")
       .append(LS);
     sb.append("   * Use \"add(force(i));\".").append(LS);
     sb.append("   *").append(LS);
-    sb.append("   * @param i the number of line breaks").append(LS);
+    sb.append("   * @param i - the number of line breaks").append(LS);
     sb.append("   * @return the corresponding FormatCommand").append(LS);
     sb.append("   */").append(LS);
     sb.append("  protected FormatCommand force(final int i) {").append(LS);
@@ -275,7 +263,7 @@ public class TreeFormatterGenerator {
     sb.append("   * Increases the indentation level by a given number.<br>").append(LS);
     sb.append("   * Use \"add(indent(i));\".").append(LS);
     sb.append("   *").append(LS);
-    sb.append("   * @param i the number of indentation levels to add").append(LS);
+    sb.append("   * @param i - the number of indentation levels to add").append(LS);
     sb.append("   * @return the corresponding FormatCommand").append(LS);
     sb.append("   */").append(LS);
     sb.append("  protected FormatCommand indent(final int i) {").append(LS);
@@ -294,7 +282,7 @@ public class TreeFormatterGenerator {
     sb.append("   * Reduces the indentation level by a given number.<br>").append(LS);
     sb.append("   * Use \"add(outdent(i));\".").append(LS);
     sb.append("   *").append(LS);
-    sb.append("   * @param i the number of indentation levels to substract").append(LS);
+    sb.append("   * @param i - the number of indentation levels to substract").append(LS);
     sb.append("   * @return the corresponding FormatCommand").append(LS);
     sb.append("   */").append(LS);
     sb.append("  protected FormatCommand outdent(final int i) {").append(LS);
@@ -313,7 +301,7 @@ public class TreeFormatterGenerator {
     sb.append("   * Adds a given number of spaces between tokens.<br>").append(LS);
     sb.append("   * Use \"add(space(i));\".").append(LS);
     sb.append("   *").append(LS);
-    sb.append("   * @param i the number of spaces to add").append(LS);
+    sb.append("   * @param i - the number of spaces to add").append(LS);
     sb.append("   * @return the corresponding FormatCommand").append(LS);
     sb.append("   */").append(LS);
     sb.append("  protected FormatCommand space(final int i) {").append(LS);
@@ -325,7 +313,7 @@ public class TreeFormatterGenerator {
       .append(LS);
     sb.append("   * when the next token in the tree is visited.").append(LS);
     sb.append("   *").append(LS);
-    sb.append("   * @param cmd the FormatCommand to be added").append(LS);
+    sb.append("   * @param cmd - the FormatCommand to be added").append(LS);
     sb.append("   */").append(LS);
     sb.append("  protected void add(final FormatCommand cmd) {").append(LS);
     sb.append("    cmdQueue.add(cmd);").append(LS);
@@ -344,7 +332,7 @@ public class TreeFormatterGenerator {
     sb.append("   * feel free to modify this method.").append(LS);
     sb.append("   */").append(LS);
     sb.append("  @Override").append(LS);
-    sb.append("  public void visit(final " + Globals.nodeTokenName + " n) {").append(LS);
+    sb.append("  public void visit(final " + nodeToken + " n) {").append(LS);
     sb.append("    for (Iterator<FormatCommand> e = cmdQueue.iterator(); e.hasNext();) {")
       .append(LS);
     sb.append("      final FormatCommand cmd = e.next();").append(LS);
@@ -373,8 +361,7 @@ public class TreeFormatterGenerator {
     sb.append("    // Handle all special tokens preceding this NodeToken").append(LS);
     sb.append("    //").append(LS);
     sb.append("    if (n.numSpecials() > 0)").append(LS);
-    sb.append(
-              "      for (final Iterator<" + Globals.nodeTokenName +
+    sb.append("      for (final Iterator<" + nodeToken +
                   "> e = n.specialTokens.iterator(); e.hasNext();) {").append(LS);
     sb.append("       NodeToken special = e.next();").append(LS).append(LS);
     sb.append("       //").append(LS);
@@ -397,12 +384,11 @@ public class TreeFormatterGenerator {
     sb.append("   * Takes into account line-wrap. Does not update curLine and curColumn.")
       .append(LS);
     sb.append("   *").append(LS);
-    sb.append("   * @param n the NodeToken to insert").append(LS);
-    sb.append("   * @param aLine the insertion line number").append(LS);
-    sb.append("   * @param aColumn the insertion column number").append(LS);
+    sb.append("   * @param n - the NodeToken to insert").append(LS);
+    sb.append("   * @param aLine - the insertion line number").append(LS);
+    sb.append("   * @param aColumn - the insertion column number").append(LS);
     sb.append("   */").append(LS);
-    sb.append(
-              "  private void placeToken(final " + Globals.nodeTokenName +
+    sb.append("  private void placeToken(final " + nodeToken +
                   " n, final int aLine, final int aColumn) {").append(LS);
     sb.append("    final int length = n.tokenImage.length();").append(LS);
     sb.append("    int line = aLine;").append(LS);
@@ -437,16 +423,17 @@ public class TreeFormatterGenerator {
     sb.append("  //").append(LS);
     sb.append("  // User-generated visitor methods below").append(LS);
     sb.append("  //").append(LS).append(LS);
-    final Spacing spc = new Spacing(Globals.INDENT_AMT);
+    final Spacing spc = new Spacing(INDENT_AMT);
     spc.updateSpc(+1);
 
     for (final Iterator<ClassInfo> e = classList.iterator(); e.hasNext();) {
       final ClassInfo cur = e.next();
-      final String className = cur.getQualifiedName();
+      final String className = cur.className;
 
-      if (Globals.javaDocComments) {
+      if (javaDocComments) {
         sb.append(spc.spc).append("/**").append(LS);
-        sb.append(cur.genAllFieldsComment(spc));
+        // generate the javadoc for the class fields, with indentation of 1
+        cur.fmtFieldsJavadocCmts(sb, spc);
         sb.append(spc.spc).append(" */").append(LS);
         sb.append(spc.spc).append("@Override").append(LS);
       }
@@ -455,30 +442,31 @@ public class TreeFormatterGenerator {
 
       spc.updateSpc(+1);
 
-      final Iterator<String> names = cur.getFieldNames().iterator();
-      final Iterator<String> types = cur.getFieldTypes().iterator();
+      final Iterator<String> names = cur.fieldNames.iterator();
+      final Iterator<String> types = cur.fieldTypes.iterator();
 
       while (names.hasNext() && types.hasNext()) {
         final String name = names.next();
         final String type = types.next();
 
-        if (type.equals(Globals.nodeListName))
-          sb.append(spc.spc).append("processList(n.").append(name).append(");").append(LS);
-        else if (type.equals(Globals.nodeListOptName)) {
-          sb.append(spc.spc).append("if (n.").append(name).append(".present()) {").append(LS);
-          spc.updateSpc(+1);
-          sb.append(spc.spc).append("processList(n.").append(name).append(");").append(LS);
-          spc.updateSpc(-1);
-          sb.append(spc.spc).append("}").append(LS);
-        } else if (type.equals(Globals.nodeOptName)) {
-          sb.append(spc.spc).append("if (n.").append(name).append(".present()) {").append(LS);
-          spc.updateSpc(+1);
-          sb.append(spc.spc).append("n.").append(name).append(".accept(this);").append(LS);
+        if (name != null)
+          if (type.equals(nodeList))
+            sb.append(spc.spc).append("processList(n.").append(name).append(");").append(LS);
+          else if (type.equals(nodeListOpt)) {
+            sb.append(spc.spc).append("if (n.").append(name).append(".present()) {").append(LS);
+            spc.updateSpc(+1);
+            sb.append(spc.spc).append("processList(n.").append(name).append(");").append(LS);
+            spc.updateSpc(-1);
+            sb.append(spc.spc).append("}").append(LS);
+          } else if (type.equals(nodeOpt)) {
+            sb.append(spc.spc).append("if (n.").append(name).append(".present()) {").append(LS);
+            spc.updateSpc(+1);
+            sb.append(spc.spc).append("n.").append(name).append(".accept(this);").append(LS);
 
-          spc.updateSpc(-1);
-          sb.append(spc.spc).append("}").append(LS);
-        } else
-          sb.append(spc.spc).append("n.").append(name).append(".accept(this);").append(LS);
+            spc.updateSpc(-1);
+            sb.append(spc.spc).append("}").append(LS);
+          } else
+            sb.append(spc.spc).append("n.").append(name).append(".accept(this);").append(LS);
       }
 
       spc.updateSpc(-1);
@@ -513,8 +501,8 @@ public class TreeFormatterGenerator {
     sb.append("  /**").append(LS);
     sb.append("   * Constructor with class members.").append(LS);
     sb.append("   *").append(LS);
-    sb.append("   * @param aCmd the command code").append(LS);
-    sb.append("   * @param aNumCmd the command repetition number").append(LS);
+    sb.append("   * @param aCmd - the command code").append(LS);
+    sb.append("   * @param aNumCmd - the command repetition number").append(LS);
     sb.append("   */").append(LS);
     sb.append("  FormatCommand(final int aCmd, final int aNumCmd) {").append(LS);
     sb.append("    this.command = aCmd;").append(LS);
@@ -534,14 +522,14 @@ public class TreeFormatterGenerator {
     sb.append("  /**").append(LS);
     sb.append("   * Sets the command code.").append(LS);
     sb.append("   *").append(LS);
-    sb.append("   * @param i the command code").append(LS);
+    sb.append("   * @param i - the command code").append(LS);
     sb.append("   */").append(LS);
     sb.append("  public void setCommand(final int i)  { command = i; }").append(LS).append(LS);
 
     sb.append("  /**").append(LS);
     sb.append("   * Sets the command repetition number.").append(LS);
     sb.append("   *").append(LS);
-    sb.append("   * @param i the command repetition number").append(LS);
+    sb.append("   * @param i - the command repetition number").append(LS);
     sb.append("   */").append(LS);
     sb.append("  public void setNumCommands(final int i)  { numCommands = i; }").append(LS)
       .append(LS);
@@ -556,7 +544,7 @@ public class TreeFormatterGenerator {
     sb.append(" */").append(LS);
     sb.append("class TreeFormatterException extends RuntimeException {").append(LS).append(LS);
 
-    sb.append("  /** The serial version uid */").append(LS);
+    sb.append("  /** The serial version UID */").append(LS);
     sb.append("  private static final long serialVersionUID = 1L;").append(LS).append(LS);
 
     sb.append("  /**").append(LS);
@@ -567,7 +555,7 @@ public class TreeFormatterGenerator {
     sb.append("  /**").append(LS);
     sb.append("   * Constructor with a given message.").append(LS);
     sb.append("   *").append(LS);
-    sb.append("   * @param s the exception message").append(LS);
+    sb.append("   * @param s - the exception message").append(LS);
     sb.append("   */").append(LS);
     sb.append("  TreeFormatterException(final String s)  { super(s); }").append(LS).append(LS);
     sb.append("}").append(LS);

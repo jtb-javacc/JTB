@@ -27,20 +27,21 @@
  */
 package EDU.purdue.jtb.parser;
 
+import static EDU.purdue.jtb.misc.Globals.*;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import EDU.purdue.jtb.misc.Globals;
-
 /**
  * A class with static state that stores all option information.
  * 
- * @author Marc Mazas, mmazas@sopragroup.com
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar<br>
  *          1.4.0 : 11/2009 : MMa : added JTB options
+ * @version 1.4.6 : 01/2011 : FA/MMa : added JTB_VA and JTB_NPFX and JTB_NSFX options
  */
 public class Options {
 
@@ -58,12 +59,12 @@ public class Options {
    * MMa : modified (allocated here) for JTB
    */
   //  protected static Map<String, Object> optionValues = null; ;
-  protected static Map<String, Object> optionValues = new HashMap<String, Object>(64); ;
+  protected static Map<String, Object> optionValues = new HashMap<String, Object>(70); ;
 
   /**
    * Convenience method to retrieve integer options.
    * 
-   * @param option the option string key
+   * @param option - the option string key
    * @return the option integer value
    */
   protected static int intValue(final String option) {
@@ -73,7 +74,7 @@ public class Options {
   /**
    * Convenience method to retrieve boolean options.
    * 
-   * @param option the option string key
+   * @param option - the option string key
    * @return the option boolean value
    */
   protected static boolean booleanValue(final String option) {
@@ -83,7 +84,7 @@ public class Options {
   /**
    * Convenience method to retrieve string options.
    * 
-   * @param option the option string key
+   * @param option - the option string key
    * @return the option string value
    */
   protected static String stringValue(final String option) {
@@ -132,11 +133,14 @@ public class Options {
     optionValues.put("GENERATE_CHAINED_EXCEPTION", Boolean.FALSE);
     optionValues.put("GENERATE_GENERICS", Boolean.FALSE);
     optionValues.put("GENERATE_STRING_BUILDER", Boolean.FALSE);
+    optionValues.put("GENERATE_VARARG_ARGUMENT", Boolean.FALSE);
     optionValues.put("IGNORE_CASE", Boolean.FALSE);
     optionValues.put("JAVA_UNICODE_ESCAPE", Boolean.FALSE);
     optionValues.put("JDK_VERSION", "1.5");
     optionValues.put("KEEP_LINE_COLUMN", Boolean.TRUE);
     optionValues.put("LOOKAHEAD", new Integer(1));
+    optionValues.put("NODE_PREFIX", "");
+    optionValues.put("NODE_SUFFIX", "");
     optionValues.put("OTHER_AMBIGUITY_CHECK", new Integer(1));
     optionValues.put("OUTPUT_DIRECTORY", ".");
     optionValues.put("SANITY_CHECK", Boolean.TRUE);
@@ -151,49 +155,49 @@ public class Options {
     // JTB Options (with default values or command line arguments)
     // -h & -si are not managed in an input file
     if (optionValues.get("JTB_CL") == null)
-      optionValues.put("JTB_CL", new Boolean(Globals.printClassList));
+      optionValues.put("JTB_CL", new Boolean(printClassList));
     if (optionValues.get("JTB_D") == null)
       optionValues.put("JTB_D", "");
     if (optionValues.get("JTB_DL") == null)
-      optionValues.put("JTB_DL", new Boolean(Globals.depthLevel));
+      optionValues.put("JTB_DL", new Boolean(depthLevel));
     if (optionValues.get("JTB_E") == null)
-      optionValues.put("JTB_E", new Boolean(Globals.noSemanticCheck));
+      optionValues.put("JTB_E", new Boolean(noSemanticCheck));
     if (optionValues.get("JTB_F") == null)
-      optionValues.put("JTB_F", new Boolean(Globals.descriptiveFieldNames));
+      optionValues.put("JTB_F", new Boolean(descriptiveFieldNames));
     if (optionValues.get("JTB_IA") == null)
-      optionValues.put("JTB_IA", new Boolean(Globals.inlineAcceptMethods));
+      optionValues.put("JTB_IA", new Boolean(inlineAcceptMethods));
     if (optionValues.get("JTB_JD") == null)
-      optionValues.put("JTB_JD", new Boolean(Globals.javaDocComments));
+      optionValues.put("JTB_JD", new Boolean(javaDocComments));
     if (optionValues.get("JTB_ND") == null)
-      optionValues.put("JTB_ND", Globals.nodesDirName);
+      optionValues.put("JTB_ND", nodesDirName);
     if (optionValues.get("JTB_NP") == null)
-      optionValues.put("JTB_NP", Globals.nodesPackageName);
+      optionValues.put("JTB_NP", nodesPackageName);
     if (optionValues.get("JTB_NPFX") == null)
-      optionValues.put("JTB_NPFX", Globals.nodePrefix);
+      optionValues.put("JTB_NPFX", nodePrefix);
     if (optionValues.get("JTB_NSFX") == null)
-      optionValues.put("JTB_NSFX", Globals.nodeSuffix);
+      optionValues.put("JTB_NSFX", nodeSuffix);
     if (optionValues.get("JTB_NS") == null)
       optionValues.put("JTB_NS", "");
     if (optionValues.get("JTB_O") == null)
-      optionValues.put("JTB_O", Globals.DEF_OUT_FILE_NAME);
+      optionValues.put("JTB_O", DEF_OUT_FILE_NAME);
     if (optionValues.get("JTB_P") == null)
       optionValues.put("JTB_P", "");
     if (optionValues.get("JTB_PP") == null)
-      optionValues.put("JTB_PP", new Boolean(Globals.parentPointer));
+      optionValues.put("JTB_PP", new Boolean(parentPointer));
     if (optionValues.get("JTB_PRINTER") == null)
-      optionValues.put("JTB_PRINTER", new Boolean(Globals.printerToolkit));
+      optionValues.put("JTB_PRINTER", new Boolean(printerToolkit));
     if (optionValues.get("JTB_SCHEME") == null)
-      optionValues.put("JTB_SCHEME", new Boolean(Globals.schemeToolkit));
+      optionValues.put("JTB_SCHEME", new Boolean(schemeToolkit));
     if (optionValues.get("JTB_TK") == null)
-      optionValues.put("JTB_TK", new Boolean(Globals.keepSpecialTokens));
+      optionValues.put("JTB_TK", new Boolean(keepSpecialTokens));
     if (optionValues.get("JTB_VA") == null)
       optionValues.put("JTB_VA", Boolean.FALSE);
     if (optionValues.get("JTB_VD") == null)
-      optionValues.put("JTB_VD", Globals.visitorsDirName);
+      optionValues.put("JTB_VD", visitorsDirName);
     if (optionValues.get("JTB_VP") == null)
-      optionValues.put("JTB_VP", Globals.visitorsPackageName);
+      optionValues.put("JTB_VP", visitorsPackageName);
     if (optionValues.get("JTB_W") == null)
-      optionValues.put("JTB_W", new Boolean(Globals.noOverwrite));
+      optionValues.put("JTB_W", new Boolean(noOverwrite));
   }
 
   /**
@@ -201,13 +205,11 @@ public class Options {
    * generating Token.java to record the JavaCC options that were used to generate the file. All of
    * the options must be boolean values.
    * 
-   * @param interestingOptions the options of interest, eg {"STATIC", "CACHE_TOKENS"}
+   * @param interestingOptions - the options of interest, eg {"STATIC", "CACHE_TOKENS"}
    * @return the string representation of the options, eg "STATIC=true,CACHE_TOKENS=false"
    */
   public static String getOptionsString(final String[] interestingOptions) {
-    // MMa : performance improvements (StringBuffer allocation)
-    // StringBuffer sb = new StringBuffer();
-    final StringBuffer sb = new StringBuffer(128);
+    final StringBuilder sb = new StringBuilder(128);
     for (int i = 0; i < interestingOptions.length; i++) {
       final String key = interestingOptions[i];
       sb.append(key);
@@ -224,7 +226,7 @@ public class Options {
    * Determine if a given command line argument might be an option flag. Command line options start
    * with a dash&nbsp;(-).
    * 
-   * @param opt The command line argument to examine.
+   * @param opt - The command line argument to examine.
    * @return True when the argument looks like an option flag.
    */
   public static boolean isOption(final String opt) {
@@ -235,8 +237,8 @@ public class Options {
    * Help function to handle cases where the meaning of an option has changed over time. If the user
    * has supplied an option in the old format, it will be converted to the new format.
    * 
-   * @param name The name of the option being checked.
-   * @param value The option's value.
+   * @param name - The name of the option being checked.
+   * @param value - The option's value.
    * @return The upgraded value.
    */
   public static Object upgradeValue(final String name, final Object value) {
@@ -254,10 +256,10 @@ public class Options {
   /**
    * Sets an option for the input file.
    * 
-   * @param nameloc the option name location
-   * @param valueloc the option value location
-   * @param name the option name
-   * @param value the option value
+   * @param nameloc - the option name location
+   * @param valueloc - the option value location
+   * @param name - the option name
+   * @param value - the option value
    */
   public static void setInputFileOption(final Object nameloc, final Object valueloc,
                                         final String name, final Object value) {
@@ -298,7 +300,7 @@ public class Options {
    * Process a single command line option. The option is parsed and stored in the optionValues map.
    * (Not used).
    * 
-   * @param arg the command line option
+   * @param arg - the command line option
    */
   public static void setCmdLineOption(final String arg) {
     final String s;
@@ -515,7 +517,7 @@ public class Options {
   }
 
   /**
-   * Should the generated code use StringBuilder rather than StringBuffer?
+   * Should the generated code use StringBuilder rather than StringBuilder?
    * 
    * @return The generate StringBuilder exception value
    */
@@ -670,7 +672,7 @@ public class Options {
   /**
    * Determine if the output language is at least the specified version.
    * 
-   * @param version the version to check against. E.g. <code>1.5</code>
+   * @param version - the version to check against. E.g. <code>1.5</code>
    * @return true if the output version is at least the specified version.
    */
   public static boolean jdkVersionAtLeast(final double version) {
@@ -680,13 +682,13 @@ public class Options {
   }
 
   /**
-   * @return the "StringBuilder" or "StringBuffer" string
+   * @return the "StringBuilder" or "StringBuilder" string
    */
   public static String stringBufOrBuild() {
     if (getGenerateStringBuilder()) {
       return "StringBuilder";
     } else {
-      return "StringBuffer";
+      return "StringBuilder";
     }
   }
 }

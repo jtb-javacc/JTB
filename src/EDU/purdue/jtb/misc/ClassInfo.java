@@ -32,6 +32,8 @@
  */
 package EDU.purdue.jtb.misc;
 
+import static EDU.purdue.jtb.misc.Globals.*;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -43,164 +45,199 @@ import EDU.purdue.jtb.visitor.CommentsPrinter;
 /**
  * Class ClassInfo is used by the visitors to store and ask for information about a class including
  * its name, the list of field types, names and initializers.
- *<p>
+ * <p>
  * Uses class {@link CommentsPrinter} to find field javadoc comments and format them.<br>
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
+ * @version 1.4.6 : 01/2011 : FA/MMa : added -va and -npfx and -nsfx options
  */
 public class ClassInfo {
 
   /** The node */
-  final INode                astNode;
-  /** The class name */
-  private final String               className;
+  public final INode             astNode;
+  /** The class name (including optional prefix and suffix) */
+  public final String            className;
   /** The list of the types of the class fields representing the node's children */
-  final ArrayList<String>    fieldTypes;
+  public final ArrayList<String> fieldTypes;
   /** The list of the names of the class fields representing the node's children */
-  final ArrayList<String>    fieldNames;
+  public final ArrayList<String> fieldNames;
   /** The list of the initializers of the class fields representing the node's children */
-  final ArrayList<String>    fieldInitializers;
+  final ArrayList<String>        fieldInitializers;
   /** True if the class allows specific initializing constructor(s) (without {@link NodeToken} nodes */
-  boolean                    needInitializingConstructor = false;
+  boolean                        needInitializingConstructor = false;
+  /** The list of the java code elements in an EUTCF */
+  final ArrayList<String>        fieldEUTCFCodes;
+  /** The list of the field comments data */
+  public ArrayList<CommentData>  fieldCmts                   = null;
   /**
-   * The list of the javadoc comments of the class fields representing the node's children<br>
-   * Start with " * " but without indentation, and may be on multiple lines
+   * The list of the sub comments data (without field comments data).<br>
+   * Built and used only when the "inline accept methods" option is on.
    */
-  ArrayList<String>          fieldComments               = null;
+  public ArrayList<CommentData>  subCmts                     = null;
+  /**
+   * The javadoc formatted field comments used by the visit methods (more than once, so that's why
+   * they are stored as an optimization)
+   */
+  public StringBuilder           visitFieldCmts              = null;
   /** The comments printer visitor */
-  static CommentsPrinter     cpv                         = new CommentsPrinter();
-  /** The OS line separator */
-  public static final String LS                          = System.getProperty("line.separator");
+  static CommentsPrinter         cpv                         = new CommentsPrinter();
 
   /**
-   * Constructs an instance giving an ExpansionChoices node and a name
-   *
-   * @param ec the ExpansionChoices node
-   * @param cn the class name
+   * Constructs an instance giving an ExpansionChoices node and a name.
+   * 
+   * @param aEC - the ExpansionChoices node
+   * @param aCN - the class name
    */
-  public ClassInfo(final ExpansionChoices ec, final String cn) {
-    astNode = ec;
-    className = cn;
-    final int nb = (ec.f1.present() ? ec.f1.size() + 1 : 1);
+  public ClassInfo(final ExpansionChoices aEC, final String aCN) {
+    astNode = aEC;
+    className = getFixedName(aCN);
+    final int nb = (aEC.f1.present() ? aEC.f1.size() + 1 : 1);
     fieldTypes = new ArrayList<String>(nb);
     fieldNames = new ArrayList<String>(nb);
     fieldInitializers = new ArrayList<String>(nb);
-  }
-
-  /**
-   * Getter for the node.
-   *
-   * @return the node
-   */
-  public INode getAstNode() {
-    return astNode;
-  }
-
-  /**
-   * Getter for the class name.
-   *
-   * @return the class name
-   */
-  public String getQualifiedName() {
-    return Globals.getQualifiedName(className);
-  }
-
-  /**
-   * Getter for the class name.
-   *
-   * @return the class name
-   */
-  public String getClassName() {
-    return Globals.getClassName(className);
-  }
-
-  /**
-   * Getter for the fields types.
-   *
-   * @return the fields types
-   */
-  public ArrayList<String> getFieldTypes() {
-    return fieldTypes;
-  }
-
-  /**
-   * Getter for the fields names.
-   *
-   * @return the fields names
-   */
-  public ArrayList<String> getFieldNames() {
-    return fieldNames;
-  }
-
-  /**
-   * Getter for the fields comments (which may be null).
-   *
-   * @return the fields comments
-   */
-  public ArrayList<String> getFieldComments() {
-    return fieldComments;
-  }
-
-  /**
-   * Setter for the fields comments.
-   *
-   * @param fc the fields comments
-   */
-  public void setFieldComments(final ArrayList<String> fc) {
-    fieldComments = fc;
+    fieldEUTCFCodes = new ArrayList<String>(nb);
   }
 
   /**
    * Adds a field type, name (with no initializer) to the internal lists.
-   *
-   * @param fieldType the field type
-   * @param fieldName the field name
+   * 
+   * @param aFT - the field type
+   * @param aFN - the field name
    */
-  public void addField(final String fieldType, final String fieldName) {
-    addField(fieldType, fieldName, null);
+  public void addField(final String aFT, final String aFN) {
+    addField(aFT, aFN, null, null);
   }
 
   /**
-   * Adds a field type, name and initializer to the internal lists.
-   *
-   * @param fieldType the field type
-   * @param fieldName the field name
-   * @param fieldInitializer the field initializer
+   * Adds a field type, name, initializer, code and node to the internal lists.
+   * 
+   * @param aFT - the field type
+   * @param aFN - the field name
+   * @param aFI - the field initializer
+   * @param aFEC - the field EUTCF code
    */
-  public void addField(final String fieldType, final String fieldName, final String fieldInitializer) {
-    fieldTypes.add(fieldType);
-    fieldNames.add(fieldName);
+  public void addField(final String aFT, final String aFN, final String aFI, final String aFEC) {
+    fieldTypes.add(aFT);
+    fieldNames.add(aFN);
 
-    if (fieldInitializer == null || fieldInitializer.equals(""))
+    if (aFI == null || aFI.equals(""))
       fieldInitializers.add(null);
     else {
-      fieldInitializers.add(fieldInitializer);
+      fieldInitializers.add(aFI);
       needInitializingConstructor = true;
+    }
+
+    if (aFEC == null || aFEC.equals(""))
+      fieldEUTCFCodes.add(null);
+    else
+      fieldEUTCFCodes.add(aFEC);
+  }
+
+  /**
+   * Append to a given buffer a set of javadoc comments showing a BNF description of the current
+   * class. They include de debug comments (after the break) if they have been produced.
+   * 
+   * @param aSb - the buffer to append the BNF description to
+   * @param aSpc - the indentation
+   */
+  public void fmtFieldsJavadocCmts(final StringBuilder aSb, final Spacing aSpc) {
+    genCommentsData();
+    if (aSpc.indentLevel == 1) {
+      // for visit methods that have an indentation of 1, store the result
+      if (visitFieldCmts == null) {
+        int len = 0;
+        for (final CommentData fieldCmt : fieldCmts) {
+          for (final CommentLineData line : fieldCmt.lines) {
+            // 3 is length of " * "
+            len += aSpc.spc.length() + 3 + line.bare.length() + BRLEN;
+            if (line.debug != null)
+              len += line.debug.length();
+            len += BRLSLEN;
+          }
+        }
+        visitFieldCmts = new StringBuilder(len);
+        for (final CommentData fieldCmt : fieldCmts) {
+          for (final CommentLineData line : fieldCmt.lines) {
+            visitFieldCmts.append(aSpc.spc).append(" * ").append(line.bare);
+            if (line.debug != null)
+              visitFieldCmts.append(line.debug);
+            visitFieldCmts.append(BRLS);
+          }
+        }
+      }
+      aSb.append(visitFieldCmts);
+    } else
+      // other cases
+      for (final CommentData fieldCmt : fieldCmts) {
+        for (final CommentLineData line : fieldCmt.lines) {
+          aSb.append(aSpc.spc).append(" * ").append(line.bare);
+          if (line.debug != null)
+            aSb.append(line.debug);
+          aSb.append(BRLS);
+        }
+      }
+    return;
+  }
+
+  /**
+   * Append to a given buffer a java code comment showing a BNF description of the current field.
+   * They do not include de debug comments even if they have been produced.
+   * 
+   * @param aSb - the buffer to append the BNF description to
+   * @param aSpc - the indentation
+   * @param i - the field index
+   */
+  public void fmt1JavacodeFieldCmt(final StringBuilder aSb, final Spacing aSpc, final int i) {
+    genCommentsData();
+    final CommentData fieldCmt = fieldCmts.get(i);
+    for (final CommentLineData line : fieldCmt.lines) {
+      aSb.append(aSpc.spc).append("// ").append(line.bare);
+      aSb.append(LS);
+    }
+    return;
+  }
+
+  /**
+   * Append to a given buffer a java code comment showing a BNF description of the current part.
+   * They do not include de debug comments even if they have been produced.
+   * 
+   * @param aSb - the buffer to append the BNF description to
+   * @param aSpc - the indentation
+   * @param i - the sub comment index
+   */
+  public void fmt1JavacodeSubCmt(final StringBuilder aSb, final Spacing aSpc, final int i) {
+    genCommentsData();
+    if (i >= subCmts.size()) {
+      aSb.append(aSpc.spc).append("// invalid sub comment index (").append(i).append("), size = ")
+         .append(subCmts.size()).append(LS);
+    } else {
+      final CommentData subCmt = subCmts.get(i);
+      for (final CommentLineData line : subCmt.lines) {
+        aSb.append(aSpc.spc).append("// ").append(line.bare);
+        aSb.append(LS);
+      }
+    }
+    return;
+  }
+
+  /**
+   * Generates if not already done the comments trees by calling the {@link CommentsPrinter} visitor
+   * on itself.
+   */
+  void genCommentsData() {
+    if (fieldCmts == null) {
+      cpv.genCommentsData(this);
     }
   }
 
   /**
-   * Generates the BNF description of the current class as a bunch of comments showing which field
-   * names belong to which parts of the production.<br>
-   * Does not add the javadoc opening and closing delimiters.
-   *
-   * @param spc the indentation
-   * @return the BNF description
-   */
-  public String genAllFieldsComment(final Spacing spc) {
-    if (fieldComments == null)
-      fieldComments = new ArrayList<String>(fieldNames.size());
-    return cpv.formatAllFieldsComment(spc, this);
-  }
-
-  /**
    * Generates the node class code into a newly allocated buffer.
-   *
-   * @param spc the current indentation
+   * 
+   * @param aSpc - the current indentation
    * @return the buffer with the node class code
    */
-  public StringBuilder genClassString(final Spacing spc) {
+  public StringBuilder genClassString(final Spacing aSpc) {
     Iterator<String> types = fieldTypes.iterator();
     Iterator<String> names = fieldNames.iterator();
     Iterator<String> inits;
@@ -210,53 +247,52 @@ public class ClassInfo {
      * class declaration
      */
 
-    sb.append(spc.spc).append("public class " + getClassName());
+    sb.append(aSpc.spc).append("public class " + className);
 
-    if (Globals.nodesSuperclass != null)
-      sb.append(" extends ").append(Globals.nodesSuperclass);
-    sb.append(" implements ").append(Globals.iNodeName).append(" {").append(LS).append(LS);
-    spc.updateSpc(+1);
+    if (nodesSuperclass != null)
+      sb.append(" extends ").append(nodesSuperclass);
+    sb.append(" implements ").append(iNode).append(" {").append(LS).append(LS);
+    aSpc.updateSpc(+1);
 
     /*
      * data fields declarations
      */
 
-    for (; types.hasNext();) {
-      if (Globals.javaDocComments)
-        sb.append(spc.spc).append("/** A child node */").append(LS);
-      sb.append(spc.spc).append("public ").append(types.next()).append(" ").append(names.next())
+    for (int i = 1; types.hasNext(); i++) {
+      if (javaDocComments)
+        sb.append(aSpc.spc).append("/** Child node " + i + " */").append(LS);
+      sb.append(aSpc.spc).append("public ").append(types.next()).append(" ").append(names.next())
         .append(";").append(LS).append(LS);
     }
 
-    if (Globals.parentPointer) {
-      if (Globals.javaDocComments)
-        sb.append(spc.spc).append("/** The parent pointer */").append(LS);
-      sb.append(spc.spc).append("private ").append(Globals.iNodeName).append(" parent;").append(LS)
-        .append(LS);
+    if (parentPointer) {
+      if (javaDocComments)
+        sb.append(aSpc.spc).append("/** The parent pointer */").append(LS);
+      sb.append(aSpc.spc).append("private ").append(iNode).append(" parent;").append(LS).append(LS);
     }
 
-    if (Globals.javaDocComments)
-      sb.append(spc.spc).append("/** The serial version uid */").append(LS);
-    sb.append(spc.spc).append("private static final long serialVersionUID = ")
-      .append(Globals.SERIAL_UID + "L;").append(LS).append(LS);
+    if (javaDocComments)
+      sb.append(aSpc.spc).append("/** The serial version UID */").append(LS);
+    sb.append(aSpc.spc).append("private static final long serialVersionUID = ")
+      .append(SERIAL_UID + "L;").append(LS).append(LS);
 
     /*
      * standard constructor header
      */
 
-    if (Globals.javaDocComments) {
-      sb.append(spc.spc).append("/**").append(LS);
-      sb.append(spc.spc).append(" * Constructs the node with ");
+    if (javaDocComments) {
+      sb.append(aSpc.spc).append("/**").append(LS);
+      sb.append(aSpc.spc).append(" * Constructs the node with ");
       sb.append(fieldTypes.size() > 1 ? "all its children nodes." : "its child node.").append(LS);
-      sb.append(spc.spc).append(" *").append(LS);
+      sb.append(aSpc.spc).append(" *").append(LS);
       types = fieldTypes.iterator();
-      sb.append(spc.spc).append(" * @param n0 ").append(fieldTypes.size() > 1 ? "first" : "the")
+      sb.append(aSpc.spc).append(" * @param n0 - ").append(fieldTypes.size() > 1 ? "first" : "the")
         .append(" child node").append(LS);
       for (int i = 1; i < fieldTypes.size(); i++)
-        sb.append(spc.spc).append(" * @param n").append(i).append(" next child node").append(LS);
-      sb.append(spc.spc).append(" */").append(LS);
+        sb.append(aSpc.spc).append(" * @param n").append(i).append(" - next child node").append(LS);
+      sb.append(aSpc.spc).append(" */").append(LS);
     }
-    sb.append(spc.spc).append("public ").append(getClassName()).append("(");
+    sb.append(aSpc.spc).append("public ").append(className).append("(");
     types = fieldTypes.iterator();
     if (types.hasNext())
       sb.append("final ").append(types.next()).append(" n0");
@@ -269,20 +305,20 @@ public class ClassInfo {
      */
 
     names = fieldNames.iterator();
-    spc.updateSpc(+1);
+    aSpc.updateSpc(+1);
     for (int count = 0; names.hasNext(); ++count) {
       final String nm = names.next();
-      sb.append(spc.spc).append(nm).append(" = n").append(count).append(";").append(LS);
-      if (Globals.parentPointer) {
-        sb.append(spc.spc).append("if (").append(nm).append(" != null)").append(LS);
-        spc.updateSpc(+1);
-        sb.append(spc.spc).append(nm).append(".setParent(this);").append(LS);
-        spc.updateSpc(-1);
+      sb.append(aSpc.spc).append(nm).append(" = n").append(count).append(";").append(LS);
+      if (parentPointer) {
+        sb.append(aSpc.spc).append("if (").append(nm).append(" != null)").append(LS);
+        aSpc.updateSpc(+1);
+        sb.append(aSpc.spc).append(nm).append(".setParent(this);").append(LS);
+        aSpc.updateSpc(-1);
       }
     }
 
-    spc.updateSpc(-1);
-    sb.append(spc.spc).append("}").append(LS);
+    aSpc.updateSpc(-1);
+    sb.append(aSpc.spc).append("}").append(LS);
 
     /*
      * specific initializing constructor header if necessary
@@ -292,30 +328,29 @@ public class ClassInfo {
       int count = 0;
       boolean firstTime = true;
       sb.append(LS);
-      if (Globals.javaDocComments) {
-        sb.append(spc.spc).append("/**").append(LS);
-        sb.append(spc.spc).append(" * Constructs the node with only its non ")
-          .append(Globals.nodeTokenName);
+      if (javaDocComments) {
+        sb.append(aSpc.spc).append("/**").append(LS);
+        sb.append(aSpc.spc).append(" * Constructs the node with only its non ").append(nodeToken);
         sb.append(" child node").append(fieldTypes.size() > 1 ? "(s)." : ".").append(LS);
-        sb.append(spc.spc).append(" *").append(LS);
+        sb.append(aSpc.spc).append(" *").append(LS);
         types = fieldTypes.iterator();
         inits = fieldInitializers.iterator();
         while (types.hasNext()) {
           types.next();
           if (inits.next() == null) {
             if (!firstTime)
-              sb.append(spc.spc).append(" * @param n").append(count).append(" next child node")
+              sb.append(aSpc.spc).append(" * @param n").append(count).append(" - next child node")
                 .append(LS);
             else
-              sb.append(spc.spc).append(" * @param n").append(count).append(" first child node")
+              sb.append(aSpc.spc).append(" * @param n").append(count).append(" - first child node")
                 .append(LS);
             ++count;
             firstTime = false;
           }
         }
-        sb.append(spc.spc).append(" */").append(LS);
+        sb.append(aSpc.spc).append(" */").append(LS);
       }
-      sb.append(spc.spc).append("public ").append(getClassName()).append("(");
+      sb.append(aSpc.spc).append("public ").append(className).append("(");
       count = 0;
       firstTime = true;
       types = fieldTypes.iterator();
@@ -344,25 +379,25 @@ public class ClassInfo {
       int count = 0;
       names = fieldNames.iterator();
       inits = fieldInitializers.iterator();
-      spc.updateSpc(+1);
+      aSpc.updateSpc(+1);
       while (names.hasNext()) {
         final String nm = names.next();
         final String init = inits.next();
         if (init != null)
-          sb.append(spc.spc).append(nm).append(" = ").append(init).append(";").append(LS);
+          sb.append(aSpc.spc).append(nm).append(" = ").append(init).append(";").append(LS);
         else {
-          sb.append(spc.spc).append(nm).append(" = n").append(count).append(";").append(LS);
+          sb.append(aSpc.spc).append(nm).append(" = n").append(count).append(";").append(LS);
           ++count;
         }
-        if (Globals.parentPointer) {
-          sb.append(spc.spc).append("if (").append(nm).append(" != null)").append(LS);
-          spc.updateSpc(+1);
-          sb.append(spc.spc).append("  ").append(nm).append(".setParent(this);").append(LS);
-          spc.updateSpc(-1);
+        if (parentPointer) {
+          sb.append(aSpc.spc).append("if (").append(nm).append(" != null)").append(LS);
+          aSpc.updateSpc(+1);
+          sb.append(aSpc.spc).append("  ").append(nm).append(".setParent(this);").append(LS);
+          aSpc.updateSpc(-1);
         }
       }
-      spc.updateSpc(-1);
-      sb.append(spc.spc).append("}").append(LS);
+      aSpc.updateSpc(-1);
+      sb.append(aSpc.spc).append("}").append(LS);
     }
 
     /*
@@ -370,131 +405,151 @@ public class ClassInfo {
      */
 
     sb.append(LS);
-    if (Globals.javaDocComments) {
-      sb.append(spc.spc).append("/**").append(LS);
-      sb.append(spc.spc).append(" * Accepts the ").append(Globals.iRetArguVisitorName)
-        .append(" visitor.").append(LS);
-      sb.append(spc.spc).append(" *").append(LS);
-      sb.append(spc.spc).append(" * @param <").append(Globals.genRetType)
-        .append("> the user return type").append(LS);
-      sb.append(spc.spc).append(" * @param <").append(Globals.genArguType)
+    if (javaDocComments) {
+      sb.append(aSpc.spc).append("/**").append(LS);
+      sb.append(aSpc.spc).append(" * Accepts the ").append(iRetArguVisitor).append(" visitor.")
+        .append(LS);
+      sb.append(aSpc.spc).append(" *").append(LS);
+      sb.append(aSpc.spc).append(" * @param <").append(genRetType).append("> the user return type")
+        .append(LS);
+      sb.append(aSpc.spc).append(" * @param <").append(genArguType)
         .append("> the user argument type").append(LS);
-      sb.append(spc.spc).append(" * @param vis the visitor").append(LS);
-      sb.append(spc.spc).append(" * @param argu a user chosen argument").append(LS);
-      sb.append(spc.spc).append(" * @return a user chosen return information").append(LS);
-      sb.append(spc.spc).append(" */").append(LS);
+      sb.append(aSpc.spc).append(" * @param vis - the visitor").append(LS);
+      sb.append(aSpc.spc).append(" * @param argu - a user chosen argument").append(LS);
+      sb.append(aSpc.spc).append(" * @return a user chosen return information").append(LS);
+      sb.append(aSpc.spc).append(" */").append(LS);
     }
-    sb.append(spc.spc).append("public <").append(Globals.genRetType).append(", ")
-      .append(Globals.genArguType).append("> " + Globals.genRetType).append(" accept(final ")
-      .append(Globals.iRetArguVisitorName).append("<" + Globals.genRetType).append(", ")
-      .append(Globals.genArguType).append("> vis, final " + (Globals.varargs ? Globals.genArgusType : Globals.genArguType)).append(" argu) {")
+    sb.append(aSpc.spc).append("public <").append(genRetType).append(", ").append(genArguType)
+      .append("> " + genRetType).append(" accept(final ").append(iRetArguVisitor)
+      .append("<" + genRetType).append(", ").append(genArguType)
+      .append("> vis, final " + (varargs ? genArgusType : genArguType)).append(" argu) {")
       .append(LS);
-    spc.updateSpc(+1);
-    sb.append(spc.spc).append("return vis.visit(this, argu);").append(LS);
-    spc.updateSpc(-1);
-    sb.append(spc.spc).append("}").append(LS);
+    aSpc.updateSpc(+1);
+    sb.append(aSpc.spc).append("return vis.visit(this, argu);").append(LS);
+    aSpc.updateSpc(-1);
+    sb.append(aSpc.spc).append("}").append(LS);
 
     sb.append(LS);
-    if (Globals.javaDocComments) {
-      sb.append(spc.spc).append("/**").append(LS);
-      sb.append(spc.spc).append(" * Accepts the ").append(Globals.iRetVisitorName)
-        .append(" visitor.").append(LS);
-      sb.append(spc.spc).append(" *").append(LS);
-      sb.append(spc.spc).append(" * @param <").append(Globals.genRetType)
-        .append("> the user return type").append(LS);
-      sb.append(spc.spc).append(" * @param vis the visitor").append(LS);
-      sb.append(spc.spc).append(" * @return a user chosen return information").append(LS);
-      sb.append(spc.spc).append(" */").append(LS);
+    if (javaDocComments) {
+      sb.append(aSpc.spc).append("/**").append(LS);
+      sb.append(aSpc.spc).append(" * Accepts the ").append(iRetVisitor).append(" visitor.")
+        .append(LS);
+      sb.append(aSpc.spc).append(" *").append(LS);
+      sb.append(aSpc.spc).append(" * @param <").append(genRetType).append("> the user return type")
+        .append(LS);
+      sb.append(aSpc.spc).append(" * @param vis - the visitor").append(LS);
+      sb.append(aSpc.spc).append(" * @return a user chosen return information").append(LS);
+      sb.append(aSpc.spc).append(" */").append(LS);
     }
-    sb.append(spc.spc).append("public <").append(Globals.genRetType).append("> ")
-      .append(Globals.genRetType + " accept(final ").append(Globals.iRetVisitorName).append("<")
-      .append(Globals.genRetType).append("> vis) {").append(LS);
-    spc.updateSpc(+1);
-    sb.append(spc.spc).append("return vis.visit(this);").append(LS);
-    spc.updateSpc(-1);
-    sb.append(spc.spc).append("}").append(LS);
+    sb.append(aSpc.spc).append("public <").append(genRetType).append("> ")
+      .append(genRetType + " accept(final ").append(iRetVisitor).append("<").append(genRetType)
+      .append("> vis) {").append(LS);
+    aSpc.updateSpc(+1);
+    sb.append(aSpc.spc).append("return vis.visit(this);").append(LS);
+    aSpc.updateSpc(-1);
+    sb.append(aSpc.spc).append("}").append(LS);
 
     sb.append(LS);
-    if (Globals.javaDocComments) {
-      sb.append(spc.spc).append("/**").append(LS);
-      sb.append(spc.spc).append(" * Accepts the ").append(Globals.iVoidArguVisitorName)
-        .append(" visitor.").append(LS);
-      sb.append(spc.spc).append(" *").append(LS);
-      sb.append(spc.spc).append(" * @param <").append(Globals.genArguType)
+    if (javaDocComments) {
+      sb.append(aSpc.spc).append("/**").append(LS);
+      sb.append(aSpc.spc).append(" * Accepts the ").append(iVoidArguVisitor).append(" visitor.")
+        .append(LS);
+      sb.append(aSpc.spc).append(" *").append(LS);
+      sb.append(aSpc.spc).append(" * @param <").append(genArguType)
         .append("> the user argument type").append(LS);
-      sb.append(spc.spc).append(" * @param vis the visitor").append(LS);
-      sb.append(spc.spc).append(" * @param argu a user chosen argument").append(LS);
-      sb.append(spc.spc).append(" */").append(LS);
+      sb.append(aSpc.spc).append(" * @param vis - the visitor").append(LS);
+      sb.append(aSpc.spc).append(" * @param argu - a user chosen argument").append(LS);
+      sb.append(aSpc.spc).append(" */").append(LS);
     }
-    sb.append(spc.spc).append("public <").append(Globals.genArguType)
-      .append("> void accept(final " + Globals.iVoidArguVisitorName).append("<")
-      .append(Globals.genArguType).append("> vis, final " + (Globals.varargs ? Globals.genArgusType : Globals.genArguType)).append(" argu) {")
+    sb.append(aSpc.spc).append("public <").append(genArguType)
+      .append("> void accept(final " + iVoidArguVisitor).append("<").append(genArguType)
+      .append("> vis, final " + (varargs ? genArgusType : genArguType)).append(" argu) {")
       .append(LS);
-    spc.updateSpc(+1);
-    sb.append(spc.spc).append("vis.visit(this, argu);").append(LS);
-    spc.updateSpc(-1);
-    sb.append(spc.spc).append("}").append(LS);
+    aSpc.updateSpc(+1);
+    sb.append(aSpc.spc).append("vis.visit(this, argu);").append(LS);
+    aSpc.updateSpc(-1);
+    sb.append(aSpc.spc).append("}").append(LS);
 
     sb.append(LS);
-    if (Globals.javaDocComments) {
-      sb.append(spc.spc).append("/**").append(LS);
-      sb.append(spc.spc).append(" * Accepts the ").append(Globals.iVoidVisitorName)
-        .append(" visitor.").append(LS);
-      sb.append(spc.spc).append(" *").append(LS);
-      sb.append(spc.spc).append(" * @param vis the visitor").append(LS);
-      sb.append(spc.spc).append(" */").append(LS);
+    if (javaDocComments) {
+      sb.append(aSpc.spc).append("/**").append(LS);
+      sb.append(aSpc.spc).append(" * Accepts the ").append(iVoidVisitor).append(" visitor.")
+        .append(LS);
+      sb.append(aSpc.spc).append(" *").append(LS);
+      sb.append(aSpc.spc).append(" * @param vis - the visitor").append(LS);
+      sb.append(aSpc.spc).append(" */").append(LS);
     }
-    sb.append(spc.spc).append("public void accept(final ").append(Globals.iVoidVisitorName)
-      .append(" vis) {").append(LS);
-    spc.updateSpc(+1);
-    sb.append(spc.spc).append("vis.visit(this);").append(LS);
-    spc.updateSpc(-1);
-    sb.append(spc.spc).append("}").append(LS);
+    sb.append(aSpc.spc).append("public void accept(final ").append(iVoidVisitor).append(" vis) {")
+      .append(LS);
+    aSpc.updateSpc(+1);
+    sb.append(aSpc.spc).append("vis.visit(this);").append(LS);
+    aSpc.updateSpc(-1);
+    sb.append(aSpc.spc).append("}").append(LS);
 
     /*
      * parent getter & setter methods
      */
 
-    if (Globals.parentPointer) {
+    if (parentPointer) {
       sb.append(LS);
-      if (Globals.javaDocComments) {
-        sb.append(spc.spc).append("/**").append(LS);
-        sb.append(spc.spc).append(" * Setter for the parent node.").append(LS);
-        sb.append(spc.spc).append(" *").append(LS);
-        sb.append(spc.spc).append(" * @param n the parent node").append(LS);
-        sb.append(spc.spc).append(" */").append(LS);
+      if (javaDocComments) {
+        sb.append(aSpc.spc).append("/**").append(LS);
+        sb.append(aSpc.spc).append(" * Setter for the parent node.").append(LS);
+        sb.append(aSpc.spc).append(" *").append(LS);
+        sb.append(aSpc.spc).append(" * @param n - the parent node").append(LS);
+        sb.append(aSpc.spc).append(" */").append(LS);
       }
-      sb.append(spc.spc).append("public void setParent(final ").append(Globals.iNodeName)
-        .append(" n) {").append(LS);
-      spc.updateSpc(+1);
-      sb.append(spc.spc).append("parent = n;").append(LS);
-      spc.updateSpc(-1);
-      sb.append(spc.spc).append("}").append(LS);
-      sb.append(LS);
-      if (Globals.javaDocComments) {
-        sb.append(spc.spc).append("/**").append(LS);
-        sb.append(spc.spc).append(" * Getter for the parent node.").append(LS);
-        sb.append(spc.spc).append(" *").append(LS);
-        sb.append(spc.spc).append(" * @return the parent node").append(LS);
-        sb.append(spc.spc).append(" */").append(LS);
-      }
-      sb.append(spc.spc).append("public ").append(Globals.iNodeName).append(" getParent() {")
+      sb.append(aSpc.spc).append("public void setParent(final ").append(iNode).append(" n) {")
         .append(LS);
-      spc.updateSpc(+1);
-      sb.append(spc.spc).append("return parent;").append(LS);
-      spc.updateSpc(-1);
-      sb.append(spc.spc).append("}").append(LS);
+      aSpc.updateSpc(+1);
+      sb.append(aSpc.spc).append("parent = n;").append(LS);
+      aSpc.updateSpc(-1);
+      sb.append(aSpc.spc).append("}").append(LS);
+      sb.append(LS);
+      if (javaDocComments) {
+        sb.append(aSpc.spc).append("/**").append(LS);
+        sb.append(aSpc.spc).append(" * Getter for the parent node.").append(LS);
+        sb.append(aSpc.spc).append(" *").append(LS);
+        sb.append(aSpc.spc).append(" * @return the parent node").append(LS);
+        sb.append(aSpc.spc).append(" */").append(LS);
+      }
+      sb.append(aSpc.spc).append("public ").append(iNode).append(" getParent() {").append(LS);
+      aSpc.updateSpc(+1);
+      sb.append(aSpc.spc).append("return parent;").append(LS);
+      aSpc.updateSpc(-1);
+      sb.append(aSpc.spc).append("}").append(LS);
     }
 
     /*
      * end
      */
 
-    spc.updateSpc(-1);
-    sb.append(spc.spc).append(LS);
-    sb.append(spc.spc).append("}").append(LS);
+    aSpc.updateSpc(-1);
+    sb.append(aSpc.spc).append(LS);
+    sb.append(aSpc.spc).append("}").append(LS);
 
     return sb;
+  }
+
+  /**
+   * Holds the data of the lines of a comment or sub comment.
+   */
+  public class CommentData {
+
+    /** The list of the lines */
+    public ArrayList<CommentLineData> lines = null;
+
+  }
+
+  /**
+   * Holds the data of a line of a comment or sub comment.
+   */
+  public class CommentLineData {
+
+    /** The node's bare comment (should be never null after processing) */
+    public String bare  = null;
+    /** The node's debug comment (null if none, or starts with " //") */
+    public String debug = null;
   }
 
 }

@@ -31,21 +31,23 @@
  */
 package EDU.purdue.jtb.visitor;
 
+import static EDU.purdue.jtb.misc.Globals.*;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 
 import EDU.purdue.jtb.misc.ClassInfo;
 import EDU.purdue.jtb.misc.FieldNameGenerator;
-import EDU.purdue.jtb.misc.Globals;
+import EDU.purdue.jtb.misc.JavaBranchPrinter;
 import EDU.purdue.jtb.misc.Messages;
 import EDU.purdue.jtb.syntaxtree.BNFProduction;
 import EDU.purdue.jtb.syntaxtree.Expansion;
 import EDU.purdue.jtb.syntaxtree.ExpansionChoices;
 import EDU.purdue.jtb.syntaxtree.ExpansionUnit;
-import EDU.purdue.jtb.syntaxtree.ExpansionUnitInTCF;
+import EDU.purdue.jtb.syntaxtree.ExpansionUnitTCF;
 import EDU.purdue.jtb.syntaxtree.INode;
-import EDU.purdue.jtb.syntaxtree.Identifier;
+import EDU.purdue.jtb.syntaxtree.IdentifierAsString;
 import EDU.purdue.jtb.syntaxtree.JavaCCInput;
 import EDU.purdue.jtb.syntaxtree.JavaCodeProduction;
 import EDU.purdue.jtb.syntaxtree.LocalLookahead;
@@ -60,42 +62,59 @@ import EDU.purdue.jtb.syntaxtree.StringLiteral;
 import EDU.purdue.jtb.syntaxtree.TokenManagerDecls;
 
 /**
- * The ClassGenerator visitor creates a list of ClassInfo objects describing every class to be
- * generated.<br> {@link Annotator} and ClassGenerator depend on each other to create and use classes.<br>
+ * The {@link ClassGenerator} visitor creates a list of {@link ClassInfo} objects describing every
+ * class to be generated.
+ * <p>
+ * {@link Annotator}, {@link CommentsPrinter} and {@link ClassGenerator} depend on each other to
+ * create and use classes.
+ * <p>
  * Programming note: we do not continue down the tree once a new field has been added to curClass,
  * as we only worry about top-level expansions.<br>
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
+ * @version 1.4.6 : 01/2011 : FA : add -va and -npfx and -nsfx options
+ * @version 1.4.7 : 12/2011-05/2012 : MMa : fixed problem in fmtJavaNodeCode<br>
+ *          added bareJavaNodeCode and fixed problems in visiting ExpansionUnitTCF<br>
+ *          1.4.7 : 07/2012 : MMa : followed changes in jtbgram.jtb (IndentifierAsString())<br>
+ *          1.4.7 : 09/2012 : MMa : changed some comments and removed one JavaBranchPrinter visitor
  */
 public class ClassGenerator extends DepthFirstVoidVisitor {
 
+  /** Visitor to print a java node and its subtree with default indentation */
+  final JavaBranchPrinter             jbpv       = new JavaBranchPrinter(null);
   /** Visitor for finding return variables declarations */
-  final GlobalDataFinder             gdfv       = new GlobalDataFinder();
+  final VoidJavaCodeProductionsFinder vjcpfv     = new VoidJavaCodeProductionsFinder();
   /** Flag to print the token or not */
-  private boolean                    printToken = false;
+  private boolean                     printToken = false;
   /** The table used to generate default constructors if a token has a constant regexpr */
-  private Hashtable<String, String>  tokenTable;
+  private Hashtable<String, String>   tokenTable;
   /** The current generated class */
-  private ClassInfo                  curClass;
+  private ClassInfo                   ci;
   /** The list of generated classes */
-  private final ArrayList<ClassInfo> classList  = new ArrayList<ClassInfo>();
+  private final ArrayList<ClassInfo>  ciList     = new ArrayList<ClassInfo>();
   /** The field names generator (descriptive or not, depending on -f option) */
-  private final FieldNameGenerator   nameGen    = new FieldNameGenerator();
+  private final FieldNameGenerator    gen        = new FieldNameGenerator();
   /** Global variable to pass RegularExpression info between methods (as they are recursive) */
-  String                             regExpr    = "";
-  /** Global variable to pass Identifier info between methods (as they are recursive) */
-  String                             ident      = "";
+  String                              regExpr    = "";
+  /** Global variable to pass IdentifierAsString info between methods (as they are recursive) */
+  String                              ident      = "";
   /** The JavaCodeProductions table */
-  Hashtable<String, String>          jcpHT      = new Hashtable<String, String>();
+  Hashtable<String, String>           jcpHT      = new Hashtable<String, String>();
+  /** The OS line separator as a string */
+  public static final String          LS         = System.getProperty("line.separator");
+  /** The OS line separator string length */
+  public static final int             LS_LEN     = LS.length();
+  /** The OS line separator first character */
+  public static final char            LS0        = LS.charAt(0);
 
   /**
    * Getter for the class list.
-   *
+   * 
    * @return the class list
    */
   public ArrayList<ClassInfo> getClassList() {
-    return classList;
+    return ciList;
   }
 
   /*
@@ -108,21 +127,21 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
    * f0 -> JavaCCOptions()<br>
    * f1 -> "PARSER_BEGIN"<br>
    * f2 -> "("<br>
-   * f3 -> Identifier()<br>
+   * f3 -> IdentifierAsString()<br>
    * f4 -> ")"<br>
    * f5 -> CompilationUnit()<br>
    * f6 -> "PARSER_END"<br>
    * f7 -> "("<br>
-   * f8 -> Identifier()<br>
+   * f8 -> IdentifierAsString()<br>
    * f9 -> ")"<br>
    * f10 -> ( Production() )+<br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(final JavaCCInput n) {
     // find first global data
-    n.accept(gdfv);
+    n.accept(vjcpfv);
     // build the token table and visit only Production
     final TokenTableBuilder builder = new TokenTableBuilder();
     n.accept(builder);
@@ -136,13 +155,13 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
    * f0 -> "JAVACODE"<br>
    * f1 -> AccessModifier()<br>
    * f2 -> ResultType()<br>
-   * f3 -> Identifier()<br>
+   * f3 -> IdentifierAsString()<br>
    * f4 -> FormalParameters()<br>
    * f5 -> [ #0 "throws" #1 Name()<br>
    * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
    * f6 -> Block()<br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(@SuppressWarnings("unused") final JavaCodeProduction n) {
@@ -154,7 +173,7 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> AccessModifier()<br>
    * f1 -> ResultType()<br>
-   * f2 -> Identifier()<br>
+   * f2 -> IdentifierAsString()<br>
    * f3 -> FormalParameters()<br>
    * f4 -> [ #0 "throws" #1 Name()<br>
    * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
@@ -163,15 +182,15 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
    * f7 -> "{"<br>
    * f8 -> ExpansionChoices()<br>
    * f9 -> "}"<br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(final BNFProduction n) {
-    nameGen.reset();
+    gen.reset();
     printToken = true;
-    curClass = new ClassInfo(n.f8, n.f2.f0.tokenImage);
-    classList.add(curClass);
+    ci = new ClassInfo(n.f8, n.f2.f0.tokenImage);
+    ciList.add(ci);
     n.f8.accept(this);
     printToken = false;
   }
@@ -190,12 +209,12 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
    * f6 -> ( #0 "|" #1 RegExprSpec() )*<br>
    * f7 -> "}"<br>
    *
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(@SuppressWarnings("unused") final RegularExprProduction n) {
     // Don't visit : don't want to generate NodeTokens inside RegularExpression
-    // if it's visited from a RegularExpressionProduction
+    //  if it's visited from a RegularExprProduction
   }
 
   /**
@@ -204,8 +223,8 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
    * f0 -> "TOKEN_MGR_DECLS"<br>
    * f1 -> ":"<br>
    * f2 -> ClassOrInterfaceBody()<br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(@SuppressWarnings("unused") final TokenManagerDecls n) {
@@ -217,16 +236,17 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> Expansion()<br>
    * f1 -> ( #0 "|" #1 Expansion() )*<br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(final ExpansionChoices n) {
     if (!n.f1.present())
+      // f0 -> Expansion()
       n.f0.accept(this);
-    else
-      curClass
-              .addField(Globals.nodeChoiceName, nameGen.genCommentFieldName(Globals.nodeChoiceName));
+    else {
+      ci.addField(nodeChoice, gen.genFieldName(nodeChoice));
+    }
   }
 
   /**
@@ -234,12 +254,13 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> ( #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" )?<br>
    * f1 -> ( ExpansionUnit() )+<br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(final Expansion n) {
-    // don't visit LocalLookahead
+    // Don't visit LocalLookahead
+    // f1 -> ( ExpansionUnit() )+
     n.f1.accept(this);
   }
 
@@ -251,12 +272,12 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
    * f2 -> [ ExpansionChoices() ]<br>
    * f3 -> [ "," ]<br>
    * f4 -> [ #0 "{" #1 Expression() #2 "}" ]<br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(@SuppressWarnings("unused") final LocalLookahead n) {
-    // Don't visit...ignore lookaheads
+    // Don't visit
   }
 
   /**
@@ -265,17 +286,17 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
    * f0 -> . %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"<br>
    * .. .. | %1 Block()<br>
    * .. .. | %2 #0 "[" #1 ExpansionChoices() #2 "]"<br>
-   * .. .. | %3 ExpansionUnitInTCF()<br>
+   * .. .. | %3 ExpansionUnitTCF()<br>
    * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ]<br>
-   * .. .. . .. #1 ( &0 $0 Identifier() $1 Arguments()<br>
+   * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
    * .. .. . .. .. | &1 $0 RegularExpression()<br>
-   * .. .. . .. .. . .. $1 [ £0 "." £1 < IDENTIFIER > ] )<br>
+   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )<br>
    * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
    * .. .. . .. #3 ( &0 "+"<br>
    * .. .. . .. .. | &1 "*"<br>
    * .. .. . .. .. | &2 "?" )?<br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(final ExpansionUnit n) {
@@ -292,32 +313,32 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
 
       case 2:
         // %2 #0 "[" #1 ExpansionChoices() #2 "]"
-        curClass.addField(Globals.nodeOptName, nameGen.genCommentFieldName(Globals.nodeOptName));
+        ci.addField(nodeOpt, gen.genFieldName(nodeOpt));
         return;
 
       case 3:
-        // %3 ExpansionUnitInTCF()
+        // %3 ExpansionUnitTCF()
         n.f0.choice.accept(this);
         return;
 
       case 4:
         // %4 #0 [ $0 PrimaryExpression() $1 "=" ]
-        // .. #1 ( &0 $0 Identifier() $1 Arguments()
+        // .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()
         // .. .. | &1 $0 RegularExpression()
-        // .. .. . .. $1 [ £0 "." £1 < IDENTIFIER > ] )
+        // .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )
         seq = (NodeSequence) n.f0.choice;
         ch = (NodeChoice) seq.elementAt(1);
         final NodeSequence seq1 = (NodeSequence) ch.choice;
         if (ch.which == 0) {
-          // &0 $0 Identifier() $1 Arguments()
+          // &0 $0 IdentifierAsString() $1 Arguments()
           // ident will be set further down the tree
           seq1.elementAt(0).accept(this);
           // add the field if not a JavaCodeProduction
           if (!jcpHT.containsKey(ident)) {
-            curClass.addField(Globals.getQualifiedName(ident), nameGen.genCommentFieldName(ident));
+            ci.addField(getFixedName(ident), gen.genFieldName(ident));
           }
         } else {
-          // &1 $0 RegularExpression() $1 [ £0 "." £1 < IDENTIFIER > ] )
+          // &1 $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ] )
           seq1.elementAt(0).accept(this);
         }
         return;
@@ -329,17 +350,16 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
         final NodeOptional opt = (NodeOptional) seq.elementAt(3);
         if (opt.present()) {
           ch = (NodeChoice) opt.node;
-          final String name = getNodeNameForMod(ch.which);
-          curClass.addField(name, nameGen.genCommentFieldName(name));
+          final String type = getNodeNameForMod(ch.which);
+          ci.addField(type, gen.genFieldName(type));
         } else {
-          if (((ExpansionChoices) seq.elementAt(1)).f1.present())
-            // f1 -> ( "|" Expansion(c2) )*
-            curClass.addField(Globals.nodeChoiceName,
-                              nameGen.genCommentFieldName(Globals.nodeChoiceName));
-          else
-            // f0 -> Expansion(c1)
-            curClass
-                    .addField(Globals.nodeSeqName, nameGen.genCommentFieldName(Globals.nodeSeqName));
+          if (((ExpansionChoices) seq.elementAt(1)).f1.present()) {
+            // f1 -> ( "|" Expansion() )*
+            ci.addField(nodeChoice, gen.genFieldName(nodeChoice));
+          } else {
+            // f0 -> Expansion()
+            ci.addField(nodeSeq, gen.genFieldName(nodeSeq));
+          }
         }
         return;
 
@@ -350,7 +370,7 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
   }
 
   /**
-   * Visits a {@link ExpansionUnitInTCF} node, whose children are the following :
+   * Visits a {@link ExpansionUnitTCF} node, whose children are the following :
    * <p>
    * f0 -> "try"<br>
    * f1 -> "{"<br>
@@ -358,28 +378,71 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
    * f3 -> "}"<br>
    * f4 -> ( #0 "catch" #1 "(" #2 Name() #3 < IDENTIFIER > #4 ")" #5 Block() )*<br>
    * f5 -> [ #0 "finally" #1 Block() ]<br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
-  public void visit(final ExpansionUnitInTCF n) {
+  public void visit(final ExpansionUnitTCF n) {
+    String fmtStr;
+    INode inode;
+    final String newNodeTCF = "new " + nodeTCF;
+    // f0 -> "try"
+    ci.addField(nodeTCF, gen.genFieldName(nodeTCF), newNodeTCF + "(\"try\")", null);
+    // f1 -> "{"
+    ci.addField(nodeTCF, gen.genFieldName(nodeTCF), newNodeTCF + "(\"{\")", null);
     // f2 -> ExpansionChoices()
     n.f2.accept(this);
+    // f3 -> "}"
+    ci.addField(nodeTCF, gen.genFieldName(nodeTCF), newNodeTCF + "(\"}\")", null);
+
+    // f4 -> ( #0 "catch" #1 "(" #2 Name() #3 < IDENTIFIER > #4 ")" #5 Block() )*
+    if (n.f4.present()) {
+      for (int i = 0; i < n.f4.size(); i++) {
+        // #0 "catch"
+        ci.addField(nodeTCF, gen.genFieldName(nodeTCF), newNodeTCF + "(\"catch\")", null);
+        // #1 "("
+        ci.addField(nodeTCF, gen.genFieldName(nodeTCF), newNodeTCF + "(\"(\")", null);
+        // #2 Name()
+        inode = ((NodeSequence) n.f4.elementAt(i)).elementAt(2);
+        fmtStr = newNodeTCF + "(\"" + fmtJavaNodeCode(inode) + "\")";
+        ci.addField(nodeTCF, gen.genFieldName(nodeTCF), fmtStr, bareJavaNodeCode(inode));
+        // #3 < IDENTIFIER >
+        inode = ((NodeSequence) n.f4.elementAt(i)).elementAt(3);
+        fmtStr = newNodeTCF + "(\"" + fmtJavaNodeCode(inode) + "\")";
+        ci.addField(nodeTCF, gen.genFieldName(nodeTCF), fmtStr, bareJavaNodeCode(inode));
+        // #4 ")"
+        ci.addField(nodeTCF, gen.genFieldName(nodeTCF), newNodeTCF + "(\")\")", null);
+        // #5 Block()
+        inode = ((NodeSequence) n.f4.elementAt(i)).elementAt(5);
+        fmtStr = newNodeTCF + "(\"" + fmtJavaNodeCode(inode) + "\")";
+        ci.addField(nodeTCF, gen.genFieldName(nodeTCF), fmtStr, bareJavaNodeCode(inode));
+      }
+    }
+
+    // f5 -> [ #0 "finally" #1 Block() ]
+    if (n.f5.present()) {
+      // #0 "finally"
+      ci.addField(nodeTCF, gen.genFieldName(nodeTCF), newNodeTCF + "(\"finally\")", null);
+      // #1 Block()
+      inode = ((NodeSequence) n.f5.node).elementAt(1);
+      fmtStr = newNodeTCF + "(\"" + fmtJavaNodeCode(inode) + "\")";
+      ci.addField(nodeTCF, gen.genFieldName(nodeTCF), fmtStr, bareJavaNodeCode(inode));
+    }
   }
 
   /**
    * Returns the base node name for a given modifier.
-   *
-   * @param mod the modifier
+   * 
+   * @param mod - the modifier
    * @return the corresponding base node name
    */
   private String getNodeNameForMod(final int mod) {
     if (mod == 0)
-      return Globals.nodeListName;
+      return nodeList;
     else if (mod == 1)
-      return Globals.nodeListOptName;
+      return nodeListOpt;
     else if (mod == 2)
-      return Globals.nodeOptName;
+      return nodeOpt;
     else {
       Messages.hardErr("Illegal EBNF modifier in " + "ExpansionUnit: mod = " + mod);
       return "";
@@ -390,63 +453,55 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
    * Visits a {@link RegularExpression} node, whose children are the following :
    * <p>
    * f0 -> . %0 StringLiteral()<br>
-   * .. .. | %1 #0 < LANGLE : "<" ><br>
-   * .. .. . .. #1 [ $0 [ "#" ] $1 Identifier() $2 ":" ] #2 ComplexRegularExpressionChoices() #3 < RANGLE : ">" ><br>
-   * .. .. | %2 #0 "<" #1 Identifier() #2 ">"<br>
+   * .. .. | %1 #0 "<"<br>
+   * .. .. . .. #1 [ $0 [ "#" ] $1 IdentifierAsString() $2 ":" ] #2 ComplexRegularExpressionChoices() #3 ">"<br>
+   * .. .. | %2 #0 "<" #1 IdentifierAsString() #2 ">"<br>
    * .. .. | %3 #0 "<" #1 "EOF" #2 ">"<br>
    *
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(final RegularExpression n) {
     regExpr = "";
-    String initialValue = null;
-    boolean isEOF = false;
     if (!printToken)
       return;
     switch (n.f0.which) {
-      case 0: // StringLiteral()
+      case 0: // %0 StringLiteral()
         n.f0.choice.accept(this);
         break;
-      case 1: // <LANGLE: "<"> [ [ "#" ] Identifier() ":" ] ComplexRegularExpressionChoices(c) <RANGLE: ">">
+      case 1: // %1 #0 "<" #1 [ $0 [ "#" ] $1 IdentifierAsString() $2 ":" ] #2 ComplexRegularExpressionChoices() #3 ">"
         regExpr = "";
         break;
-      case 2: // "<" Identifier() ">"
+      case 2: // %2 #0 "<" #1 IdentifierAsString() #2 ">"
         final NodeSequence seq = (NodeSequence) n.f0.choice;
         // ident will be set further down the tree
         seq.elementAt(1).accept(this);
         regExpr = tokenTable.get(ident);
         if (regExpr == null) {
-          final NodeToken ident_nt = ((Identifier) seq.elementAt(1)).f0;
+          final NodeToken ident_nt = ((IdentifierAsString) seq.elementAt(1)).f0;
           Messages.softErr("Undefined token \"" + ident_nt + "\".", ident_nt.beginLine);
           regExpr = "";
           ident = "";
         }
         break;
-      case 3: // "<" "EOF" ">"
+      case 3: // %3 #0 "<" #1 "EOF" #2 ">"
         regExpr = "";
-        isEOF = true;
         break;
       default:
         Messages.hardErr("Unreachable code executed!");
     }
-    if (isEOF)
-      initialValue = "new " + Globals.nodeTokenName + "(\"\")";
-    else if (regExpr.length() != 0)
-      initialValue = "new " + Globals.nodeTokenName + "(" + regExpr + ")";
-    curClass.addField(Globals.nodeTokenName, nameGen.genCommentFieldName(Globals.nodeTokenName),
-                      initialValue);
+    ci.addField(nodeToken, gen.genFieldName(nodeToken));
   }
 
   /**
-   * Visits a {@link Identifier} node, whose children are the following :
+   * Visits a {@link IdentifierAsString} node, whose children are the following :
    * <p>
    * f0 -> < IDENTIFIER ><br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
-  public void visit(final Identifier n) {
+  public void visit(final IdentifierAsString n) {
     ident = n.f0.tokenImage;
   }
 
@@ -454,8 +509,8 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
    * Visits a {@link StringLiteral} node, whose children are the following :
    * <p>
    * f0 -> < STRING_LITERAL ><br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(final StringLiteral n) {
@@ -463,16 +518,86 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
   }
 
   /**
-   * The GlobalDataFinder visitor finds:<br>
-   * all "void" JavaCodeProductions and adds them to a Hashtable (which will be used to avoid
-   * creating later invalid child nodes).
+   * Visits a given (java code) node branch of the tree and returns a formatted string
+   * representation of the subtree, escaping double quotes and replacing end of lines by the OS line
+   * separator, and with an indentation of 1.
+   * 
+   * @param javaNode - the node to walk down and format as a string
+   * @return the formatted string
    */
-  class GlobalDataFinder extends DepthFirstVoidVisitor {
+  String fmtJavaNodeCode(final INode javaNode) {
+    final StringBuilder sb = jbpv.genJavaBranch(javaNode, true);
+    final StringBuilder res = new StringBuilder(2 * sb.length());
+    final int len = sb.length();
+    for (int i = 0; i < len; i++) {
+      final char c = sb.charAt(i);
+      if (c == '"') {
+        res.append("\\\"");
+      } else if (c == LS0) {
+        if (LS_LEN > 1) {
+          if (i < len) {
+            i++;
+            if (LS.charAt(1) != sb.charAt(i))
+              i--;
+          }
+        }
+        res.append(eosPlusEolSpacesEos);
+      } else {
+        res.append(c);
+      }
+    }
+    return res.toString();
+  }
+
+  /**
+   * Visits a given (java code) node branch of the tree and returns a bare string representation of
+   * the subtree with an indentation level of 0.
+   * 
+   * @param javaNode - the node to walk down and return as a string
+   * @return the bare string
+   */
+  String bareJavaNodeCode(final INode javaNode) {
+    return jbpv.genJavaBranch(javaNode, true).toString();
+  }
+
+  /** NewLine, EndOfString (escaped double quotes), Plus */
+  public static String eolEosPlus;
+  static {
+    eolEosPlus = "\\n\" +";
+  }
+
+  /** NewLine, EndOfString (escaped double quotes), Plus, EndOfLine */
+  public static String eolEosPlusEol;
+  static {
+    eolEosPlusEol = eolEosPlus + LS;
+  }
+
+  /** Indentation spaces, EndOfString (escaped double quotes) */
+  public static String spacesEos;
+  static {
+    final StringBuilder res = new StringBuilder(nodeTCF.length() + 21);
+    for (int j = 0; j < nodeTCF.length(); j++)
+      res.append(" ");
+    res.append("                    \"");
+    spacesEos = res.toString();
+  }
+
+  /** A string */
+  public static String eosPlusEolSpacesEos;
+  static {
+    eosPlusEolSpacesEos = eolEosPlusEol + spacesEos;
+  }
+
+  /**
+   * The VoidJavaCodeProductionsFinder visitor finds all "void" JavaCodeProductions and adds them to
+   * a Hashtable (which will be used to avoid creating later invalid child nodes).
+   */
+  class VoidJavaCodeProductionsFinder extends DepthFirstVoidVisitor {
 
     /**
      * Constructor, with a given buffer and a default indentation.
      */
-    GlobalDataFinder() {
+    VoidJavaCodeProductionsFinder() {
       super();
     }
 
@@ -482,16 +607,16 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
      * f0 -> JavaCCOptions()<br>
      * f1 -> "PARSER_BEGIN"<br>
      * f2 -> "("<br>
-     * f3 -> Identifier()<br>
+     * f3 -> IdentifierAsString()<br>
      * f4 -> ")"<br>
      * f5 -> CompilationUnit()<br>
      * f6 -> "PARSER_END"<br>
      * f7 -> "("<br>
-     * f8 -> Identifier()<br>
+     * f8 -> IdentifierAsString()<br>
      * f9 -> ")"<br>
      * f10 -> ( Production() )+<br>
-     *
-     * @param n the node to visit
+     * 
+     * @param n - the node to visit
      */
     @Override
     public void visit(final JavaCCInput n) {
@@ -509,8 +634,8 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
      * .. .. | %1 RegularExprProduction()<br>
      * .. .. | %2 TokenManagerDecls()<br>
      * .. .. | %3 BNFProduction()<br>
-     *
-     * @param n the node to visit
+     * 
+     * @param n - the node to visit
      */
     @Override
     public void visit(final Production n) {
@@ -525,18 +650,18 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
      * f0 -> "JAVACODE"<br>
      * f1 -> AccessModifier()<br>
      * f2 -> ResultType()<br>
-     * f3 -> Identifier()<br>
+     * f3 -> IdentifierAsString()<br>
      * f4 -> FormalParameters()<br>
      * f5 -> [ #0 "throws" #1 Name()<br>
      * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
      * f6 -> Block()<br>
-     *
-     * @param n the node to visit
+     * 
+     * @param n - the node to visit
      */
     @Override
     public void visit(final JavaCodeProduction n) {
       // store it in the hashtable
-      // f3 -> Identifier()
+      // f3 -> IdentifierAsString()
       final String id = n.f3.f0.tokenImage;
       jcpHT.put(id, id);
     }

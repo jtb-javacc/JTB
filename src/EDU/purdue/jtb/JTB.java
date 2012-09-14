@@ -52,6 +52,8 @@
  */
 package EDU.purdue.jtb;
 
+import static EDU.purdue.jtb.misc.Globals.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -64,7 +66,6 @@ import EDU.purdue.jtb.misc.ClassInfo;
 import EDU.purdue.jtb.misc.DepthFirstVisitorsGenerator;
 import EDU.purdue.jtb.misc.FileExistsException;
 import EDU.purdue.jtb.misc.FilesGenerator;
-import EDU.purdue.jtb.misc.Globals;
 import EDU.purdue.jtb.misc.Messages;
 import EDU.purdue.jtb.misc.TreeDumperGenerator;
 import EDU.purdue.jtb.misc.TreeFormatterGenerator;
@@ -83,33 +84,33 @@ import EDU.purdue.jtb.visitor.SemanticChecker;
  * 
  * @author Kevin Tao
  * @author Wanjun Wang, wanjun@purdue.edu
- * @author Marc Mazas, mmazas@sopragroup.com
+ * @author Marc Mazas
  * @author Francis Andre, francis.andre.kampbell@orange.fr
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5<br>
  *          1.4.0 : 11/2009 : MMa : added input file options management
  * @version 1.4.0.3 : 02/2010 : MMa : added static flag
  * @version 1.4.5 : 12/2010 : MMa : convert nodes and visitors output directories to absolute paths
- * @version 1.4.6 : 01/2011 : FA  : add -va and -npfx and -nsfx options
+ * @version 1.4.6 : 01/2011 : FA : added -va and -npfx and -nsfx options
  */
 public class JTB {
 
-  /** the input file directory */
+  /** The input file directory */
   private static String              inDir;
-  /** the input file as an InputStream */
+  /** The input file as an InputStream */
   private static InputStream         in;
-  /** the program name (for display purposes) */
-  private static String              progName   = Globals.PROG_NAME;
-  /** the program version (for display purposes) */
-  private static String              version    = Globals.VERSION;
-  /** the script name */
-  private static String              scriptName = Globals.SCRIPT_NAME;
-  /** the input file options */
+  /** The program name (for display purposes) */
+  private static String              progName   = PROG_NAME;
+  /** The program version (for display purposes) */
+  private static String              version    = VERSION;
+  /** The script name */
+  private static String              scriptName = SCRIPT_NAME;
+  /** The input file options */
   private static Map<String, Object> jtbOpt     = null;
 
   /**
    * Standard main method.
    * 
-   * @param args the command line arguments
+   * @param args - the command line arguments
    */
   public static void main(final String args[]) {
 
@@ -121,8 +122,7 @@ public class JTB {
 
       // parse the input file
       System.err.println(progName + " version " + version);
-      System.err
-                .println(progName + ":  Reading jtb input file " + Globals.jtbInputFileName + "...");
+      System.err.println(progName + ":  Reading jtb input file " + jtbInputFileName + "...");
       final JTBParser jtbParser = new JTBParser(in);
       final INode root = jtbParser.JavaCCInput();
       System.err.println(progName + ":  jtb input file parsed successfully.");
@@ -142,7 +142,7 @@ public class JTB {
 
       Messages.resetCounts();
 
-      if (!Globals.noSemanticCheck) {
+      if (!noSemanticCheck) {
         root.accept(new SemanticChecker());
 
         if (Messages.errorCount() > 0) {
@@ -158,7 +158,7 @@ public class JTB {
         return;
       }
 
-      if (Globals.printClassList) {
+      if (printClassList) {
         fg = new FilesGenerator(classes);
         System.out.println("\nThe classes generated and the fields each "
                            + "contains are as follows:\n");
@@ -168,19 +168,18 @@ public class JTB {
       try {
         final Annotator an = new Annotator();
         root.accept(an);
-        an.saveToFile(Globals.jtbOutputFileName);
+        an.saveToFile(jtbOutputFileName);
 
         if (Messages.errorCount() > 0) {
           Messages.printSummary();
           return;
         }
 
-        System.err.println(progName + ":  jj output file \"" + Globals.jtbOutputFileName +
-                           "\" generated.");
+        System.err.println(progName + ":  jj output file \"" + jtbOutputFileName + "\" generated.");
 
       }
       catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + Globals.jtbOutputFileName +
+        System.err.println(progName + ":  \"" + jtbOutputFileName +
                            "\" already exists.  Won't overwrite.");
       }
 
@@ -196,7 +195,7 @@ public class JTB {
       try {
         fg.genBaseNodesFiles();
         System.err.println(progName + ":  base node class files " + "generated into directory \"" +
-                           Globals.nodesDirName + "\".");
+                           nodesDirName + "\".");
       }
       catch (final FileExistsException e) {
         System.err.println(progName + ":  One or more of the base " +
@@ -206,7 +205,7 @@ public class JTB {
       try {
         fg.genNodesFiles();
         System.err.println(progName + ":  " + classes.size() + " syntax tree node class files " +
-                           "generated into directory \"" + Globals.nodesDirName + "\".");
+                           "generated into directory \"" + nodesDirName + "\".");
       }
       catch (final FileExistsException e) {
         System.err.println(progName + ":  One or more of the generated " +
@@ -217,41 +216,41 @@ public class JTB {
 
       try {
         fg.genRetArguIVisitorFile();
-        System.err.println(progName + ":  Visitor interface \"" + Globals.iRetArguVisitorName +
-                           ".java\" generated into directory \"" + Globals.visitorsDirName + "\".");
+        System.err.println(progName + ":  Visitor interface \"" + iRetArguVisitor +
+                           ".java\" generated into directory \"" + visitorsDirName + "\".");
       }
       catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + Globals.iRetArguVisitorName +
+        System.err.println(progName + ":  \"" + iRetArguVisitor +
                            "\" already exists.  Won't overwrite.");
       }
 
       try {
         fg.genVoidIVisitorFile();
-        System.err.println(progName + ":  Visitor interface \"" + Globals.iVoidVisitorName +
-                           ".java\" generated into directory \"" + Globals.visitorsDirName + "\".");
+        System.err.println(progName + ":  Visitor interface \"" + iVoidVisitor +
+                           ".java\" generated into directory \"" + visitorsDirName + "\".");
       }
       catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + Globals.iVoidVisitorName +
+        System.err.println(progName + ":  \"" + iVoidVisitor +
                            "\" already exists.  Won't overwrite.");
       }
 
       try {
         fg.genRetIVisitorFile();
-        System.err.println(progName + ":  Visitor interface \"" + Globals.iRetVisitorName +
-                           ".java\" generated into directory \"" + Globals.visitorsDirName + "\".");
+        System.err.println(progName + ":  Visitor interface \"" + iRetVisitor +
+                           ".java\" generated into directory \"" + visitorsDirName + "\".");
       }
       catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + Globals.iRetVisitorName +
+        System.err.println(progName + ":  \"" + iRetVisitor +
                            "\" already exists.  Won't overwrite.");
       }
 
       try {
         fg.genVoidArguIVisitorFile();
-        System.err.println(progName + ":  Visitor interface \"" + Globals.iVoidArguVisitorName +
-                           ".java\" generated into directory \"" + Globals.visitorsDirName + "\".");
+        System.err.println(progName + ":  Visitor interface \"" + iVoidArguVisitor +
+                           ".java\" generated into directory \"" + visitorsDirName + "\".");
       }
       catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + Globals.iVoidArguVisitorName +
+        System.err.println(progName + ":  \"" + iVoidArguVisitor +
                            "\" already exists.  Won't overwrite.");
       }
 
@@ -259,53 +258,53 @@ public class JTB {
 
       try {
         dfvg.genDepthFirstRetArguVisitorFile();
-        System.err.println(progName + ":  Visitor class \"" + Globals.dFRetArguVisitorName +
-                           ".java\" generated into directory \"" + Globals.visitorsDirName + "\".");
+        System.err.println(progName + ":  Visitor class \"" + dFRetArguVisitor +
+                           ".java\" generated into directory \"" + visitorsDirName + "\".");
       }
       catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + Globals.dFRetArguVisitorName +
+        System.err.println(progName + ":  \"" + dFRetArguVisitor +
                            ".java\" already exists.  Won't overwrite.");
       }
 
       try {
         dfvg.genDepthFirstRetVisitorFile();
-        System.err.println(progName + ":  Visitor class \"" + Globals.dFRetVisitorName +
-                           ".java\" generated into directory \"" + Globals.visitorsDirName + "\".");
+        System.err.println(progName + ":  Visitor class \"" + dFRetVisitor +
+                           ".java\" generated into directory \"" + visitorsDirName + "\".");
       }
       catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + Globals.dFRetVisitorName +
+        System.err.println(progName + ":  \"" + dFRetVisitor +
                            ".java\" already exists.  Won't overwrite.");
       }
 
       try {
         dfvg.genDepthFirstVoidArguVisitorFile();
-        System.err.println(progName + ":  Visitor class \"" + Globals.dFVoidArguVisitorName +
-                           ".java\" generated into directory \"" + Globals.visitorsDirName + "\".");
+        System.err.println(progName + ":  Visitor class \"" + dFVoidArguVisitor +
+                           ".java\" generated into directory \"" + visitorsDirName + "\".");
       }
       catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + Globals.dFVoidArguVisitorName +
+        System.err.println(progName + ":  \"" + dFVoidArguVisitor +
                            ".java\" already exists.  Won't overwrite.");
       }
 
       try {
         dfvg.genDepthFirstVoidVisitorFile();
-        System.err.println(progName + ":  Visitor class \"" + Globals.dFVoidVisitorName +
-                           ".java\" generated into directory \"" + Globals.visitorsDirName + "\".");
+        System.err.println(progName + ":  Visitor class \"" + dFVoidVisitor +
+                           ".java\" generated into directory \"" + visitorsDirName + "\".");
       }
       catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + Globals.dFVoidVisitorName +
+        System.err.println(progName + ":  \"" + dFVoidVisitor +
                            ".java\" already exists.  Won't overwrite.");
       }
 
       System.err.println();
 
-      if (Globals.printerToolkit) {
+      if (printerToolkit) {
         try {
           final TreeDumperGenerator tdg = new TreeDumperGenerator();
           tdg.generateTreeDumper();
           tdg.saveToFile();
           System.err.println(progName + ":  Visitor class \"" + TreeDumperGenerator.outFilename +
-                             "\" generated into directory \"" + Globals.visitorsDirName + "\".");
+                             "\" generated into directory \"" + visitorsDirName + "\".");
         }
         catch (final FileExistsException e) {
           System.err.println(progName + ":  \"" + TreeDumperGenerator.outFilename +
@@ -317,7 +316,7 @@ public class JTB {
           tfg.generateTreeFormatter();
           tfg.saveToFile();
           System.err.println(progName + ":  Visitor class \"" + TreeFormatterGenerator.outFilename +
-                             "\" generated into directory \"" + Globals.visitorsDirName + "\".");
+                             "\" generated into directory \"" + visitorsDirName + "\".");
         }
         catch (final FileExistsException e) {
           System.err.println(progName + ":  \"" + TreeFormatterGenerator.outFilename +
@@ -348,60 +347,60 @@ public class JTB {
   private static void getFileOptionsAndOverwrite() {
     String str = null;
 
-    Globals.varargs = ((Boolean) jtbOpt.get("JTB_VA")).booleanValue();
+    varargs = ((Boolean) jtbOpt.get("JTB_VA")).booleanValue();
 
-    Globals.printClassList = ((Boolean) jtbOpt.get("JTB_CL")).booleanValue();
+    printClassList = ((Boolean) jtbOpt.get("JTB_CL")).booleanValue();
 
-    Globals.depthLevel = ((Boolean) jtbOpt.get("JTB_DL")).booleanValue();
+    depthLevel = ((Boolean) jtbOpt.get("JTB_DL")).booleanValue();
 
-    Globals.noSemanticCheck = ((Boolean) jtbOpt.get("JTB_E")).booleanValue();
+    noSemanticCheck = ((Boolean) jtbOpt.get("JTB_E")).booleanValue();
 
-    Globals.descriptiveFieldNames = ((Boolean) jtbOpt.get("JTB_F")).booleanValue();
+    descriptiveFieldNames = ((Boolean) jtbOpt.get("JTB_F")).booleanValue();
 
-    Globals.inlineAcceptMethods = ((Boolean) jtbOpt.get("JTB_IA")).booleanValue();
+    inlineAcceptMethods = ((Boolean) jtbOpt.get("JTB_IA")).booleanValue();
 
-    Globals.javaDocComments = ((Boolean) jtbOpt.get("JTB_JD")).booleanValue();
+    javaDocComments = ((Boolean) jtbOpt.get("JTB_JD")).booleanValue();
 
-    Globals.nodesDirName = (String) jtbOpt.get("JTB_ND");
+    nodesDirName = (String) jtbOpt.get("JTB_ND");
 
-    Globals.nodesPackageName = (String) jtbOpt.get("JTB_NP");
+    nodesPackageName = (String) jtbOpt.get("JTB_NP");
 
-    Globals.nodePrefix = (String) jtbOpt.get("JTB_NPFX");
+    nodePrefix = (String) jtbOpt.get("JTB_NPFX");
 
-    Globals.nodeSuffix = (String) jtbOpt.get("JTB_NSFX");
+    nodeSuffix = (String) jtbOpt.get("JTB_NSFX");
 
     str = (String) jtbOpt.get("JTB_NS");
-    Globals.nodesSuperclass = "".equals(str) ? null : str;
+    nodesSuperclass = "".equals(str) ? null : str;
 
-    Globals.jtbOutputFileName = (String) jtbOpt.get("JTB_O");
+    jtbOutputFileName = (String) jtbOpt.get("JTB_O");
 
-    Globals.parentPointer = ((Boolean) jtbOpt.get("JTB_PP")).booleanValue();
+    parentPointer = ((Boolean) jtbOpt.get("JTB_PP")).booleanValue();
 
-    Globals.printerToolkit = ((Boolean) jtbOpt.get("JTB_PRINTER")).booleanValue();
+    printerToolkit = ((Boolean) jtbOpt.get("JTB_PRINTER")).booleanValue();
 
-    Globals.schemeToolkit = ((Boolean) jtbOpt.get("JTB_SCHEME")).booleanValue();
+    schemeToolkit = ((Boolean) jtbOpt.get("JTB_SCHEME")).booleanValue();
 
-    Globals.keepSpecialTokens = ((Boolean) jtbOpt.get("JTB_TK")).booleanValue();
+    keepSpecialTokens = ((Boolean) jtbOpt.get("JTB_TK")).booleanValue();
 
-    Globals.visitorsDirName = (String) jtbOpt.get("JTB_VD");
+    visitorsDirName = (String) jtbOpt.get("JTB_VD");
 
-    Globals.visitorsPackageName = (String) jtbOpt.get("JTB_VP");
+    visitorsPackageName = (String) jtbOpt.get("JTB_VP");
 
-    Globals.noOverwrite = ((Boolean) jtbOpt.get("JTB_W")).booleanValue();
+    noOverwrite = ((Boolean) jtbOpt.get("JTB_W")).booleanValue();
 
     str = (String) jtbOpt.get("JTB_D");
     if (!"".equals(str)) {
-      Globals.nodesDirName = str + "/" + Globals.DEF_ND_DIR_NAME;
-      Globals.visitorsDirName = str + "/" + Globals.DEF_VIS_DIR_NAME;
+      nodesDirName = str + "/" + DEF_ND_DIR_NAME;
+      visitorsDirName = str + "/" + DEF_VIS_DIR_NAME;
     }
 
     str = (String) jtbOpt.get("JTB_P");
     if (!"".equals(str)) {
-      Globals.nodesPackageName = str + "." + Globals.DEF_ND_PKG_NAME;
-      Globals.visitorsPackageName = str + "." + Globals.DEF_VIS_PKG_NAME;
+      nodesPackageName = str + "." + DEF_ND_PKG_NAME;
+      visitorsPackageName = str + "." + DEF_VIS_PKG_NAME;
     }
 
-    Globals.staticFlag = ((Boolean) jtbOpt.get("STATIC")).booleanValue();
+    staticFlag = ((Boolean) jtbOpt.get("STATIC")).booleanValue();
 
   }
 
@@ -409,9 +408,9 @@ public class JTB {
    * Processes command line arguments, putting options in the options object (to be overwritten by
    * input file options).
    * 
-   * @param args the command line arguments
+   * @param args - the command line arguments
    * @return true if successful, false otherwise
-   * @throws InvalCmdLineException if any problem with command line arguments
+   * @throws InvalCmdLineException - if any problem with command line arguments
    */
   private static boolean processCommandLine(final String[] args) throws InvalCmdLineException {
     boolean returnVal = false;
@@ -432,7 +431,7 @@ public class JTB {
             return false;
           }
 
-          Globals.jtbInputFileName = args[i];
+          jtbInputFileName = args[i];
           returnVal = true;
         }
       } else {
@@ -445,13 +444,8 @@ public class JTB {
         }
 
         else if (args[i].equals("-cl")) {
-          Globals.printClassList = true;
+          printClassList = true;
           jtbOpt.put("JTB_CL", Boolean.TRUE);
-        }
-
-        else if (args[i].equals("-va")) {
-          Globals.varargs = true;
-          jtbOpt.put("JTB_VA", Boolean.TRUE);
         }
 
         else if (args[i].equals("-d")) {
@@ -459,36 +453,36 @@ public class JTB {
           if (i >= args.length || args[i].charAt(0) == '-')
             throw new InvalCmdLineException("Option \"-d\" must be followed by a directory name.");
           else {
-            Globals.nodesDirName = args[i] + "/" + Globals.DEF_ND_DIR_NAME;
-            Globals.visitorsDirName = args[i] + "/" + Globals.DEF_VIS_DIR_NAME;
+            nodesDirName = args[i] + "/" + DEF_ND_DIR_NAME;
+            visitorsDirName = args[i] + "/" + DEF_VIS_DIR_NAME;
             jtbOpt.put("JTB_D", args[i]);
-            jtbOpt.put("JTB_ND", Globals.nodesDirName);
-            jtbOpt.put("JTB_VD", Globals.visitorsDirName);
+            jtbOpt.put("JTB_ND", nodesDirName);
+            jtbOpt.put("JTB_VD", visitorsDirName);
           }
         }
 
         else if (args[i].equals("-dl")) {
-          Globals.depthLevel = true;
+          depthLevel = true;
           jtbOpt.put("JTB_DL", Boolean.TRUE);
         }
 
         else if (args[i].equals("-e")) {
-          Globals.noSemanticCheck = true;
+          noSemanticCheck = true;
           jtbOpt.put("JTB_E", Boolean.TRUE);
         }
 
         else if (args[i].equals("-f")) {
-          Globals.descriptiveFieldNames = true;
+          descriptiveFieldNames = true;
           jtbOpt.put("JTB_F", Boolean.TRUE);
         }
 
         else if (args[i].equals("-ia")) {
-          Globals.inlineAcceptMethods = true;
+          inlineAcceptMethods = true;
           jtbOpt.put("JTB_IA", Boolean.TRUE);
         }
 
         else if (args[i].equals("-jd")) {
-          Globals.javaDocComments = true;
+          javaDocComments = true;
           jtbOpt.put("JTB_JD", Boolean.TRUE);
         }
 
@@ -497,8 +491,8 @@ public class JTB {
           if (i >= args.length || args[i].charAt(0) == '-')
             throw new InvalCmdLineException("Option \"-nd\" must be followed by a directory name.");
           else {
-            Globals.nodesDirName = args[i];
-            jtbOpt.put("JTB_ND", Globals.nodesDirName);
+            nodesDirName = args[i];
+            jtbOpt.put("JTB_ND", nodesDirName);
           }
         }
 
@@ -507,8 +501,8 @@ public class JTB {
           if (i >= args.length || args[i].charAt(0) == '-')
             throw new InvalCmdLineException("Option \"-np\" must be followed by a package name.");
           else {
-            Globals.nodesPackageName = args[i];
-            jtbOpt.put("JTB_NP", Globals.nodesPackageName);
+            nodesPackageName = args[i];
+            jtbOpt.put("JTB_NP", nodesPackageName);
           }
         }
 
@@ -517,8 +511,8 @@ public class JTB {
           if (i >= args.length || args[i].charAt(0) == '-')
             throw new InvalCmdLineException("Option \"-ns\" must be followed by a class name.");
           else {
-            Globals.nodesSuperclass = args[i];
-            jtbOpt.put("JTB_NS", Globals.nodesSuperclass);
+            nodesSuperclass = args[i];
+            jtbOpt.put("JTB_NS", nodesSuperclass);
           }
         }
 
@@ -526,10 +520,9 @@ public class JTB {
           ++i;
           if (i >= args.length || args[i].charAt(0) == '-') {
             throw new InvalCmdLineException("Option \"-npfx\" must be followed by a prefix.");
-          }
-          else {
-            Globals.nodePrefix = args[i];
-            jtbOpt.put("JTB_NPFX", Globals.nodePrefix);
+          } else {
+            nodePrefix = args[i];
+            jtbOpt.put("JTB_NPFX", nodePrefix);
           }
         }
 
@@ -537,10 +530,9 @@ public class JTB {
           ++i;
           if (i >= args.length || args[i].charAt(0) == '-') {
             throw new InvalCmdLineException("Option \"-nsfx\" must be followed by a suffix.");
-          }
-          else {
-            Globals.nodeSuffix = args[i];
-            jtbOpt.put("JTB_NSFX", Globals.nodeSuffix);
+          } else {
+            nodeSuffix = args[i];
+            jtbOpt.put("JTB_NSFX", nodeSuffix);
           }
         }
 
@@ -549,8 +541,8 @@ public class JTB {
           if (i >= args.length || args[i].charAt(0) == '-')
             throw new InvalCmdLineException("Option \"-o\" must be followed by a filename.");
           else {
-            Globals.jtbOutputFileName = args[i];
-            jtbOpt.put("JTB_O", Globals.jtbOutputFileName);
+            jtbOutputFileName = args[i];
+            jtbOpt.put("JTB_O", jtbOutputFileName);
           }
         }
 
@@ -559,37 +551,42 @@ public class JTB {
           if (i >= args.length || args[i].charAt(0) == '-')
             throw new InvalCmdLineException("Option \"-p\" must be followed by a package name.");
           else {
-            Globals.nodesPackageName = args[i] + "." + Globals.DEF_ND_PKG_NAME;
-            Globals.visitorsPackageName = args[i] + "." + Globals.DEF_VIS_PKG_NAME;
+            nodesPackageName = args[i] + "." + DEF_ND_PKG_NAME;
+            visitorsPackageName = args[i] + "." + DEF_VIS_PKG_NAME;
             jtbOpt.put("JTB_P", args[i]);
-            jtbOpt.put("JTB_NP", Globals.nodesPackageName);
-            jtbOpt.put("JTB_VP", Globals.visitorsPackageName);
+            jtbOpt.put("JTB_NP", nodesPackageName);
+            jtbOpt.put("JTB_VP", visitorsPackageName);
           }
         }
 
         else if (args[i].equals("-pp")) {
-          Globals.parentPointer = true;
+          parentPointer = true;
           jtbOpt.put("JTB_PP", Boolean.TRUE);
         }
 
         else if (args[i].equals("-printer")) {
-          Globals.printerToolkit = true;
+          printerToolkit = true;
           jtbOpt.put("JTB_PRINTER", Boolean.TRUE);
         }
 
         else if (args[i].equals("-scheme")) {
-          Globals.schemeToolkit = true;
+          schemeToolkit = true;
           jtbOpt.put("JTB_SCHEME", Boolean.TRUE);
         }
 
         else if (args[i].equals("-si")) {
           in = System.in;
-          Globals.jtbInputFileName = "standard input";
+          jtbInputFileName = "standard input";
         }
 
         else if (args[i].equals("-tk")) {
-          Globals.keepSpecialTokens = true;
+          keepSpecialTokens = true;
           jtbOpt.put("JTB_TK", Boolean.TRUE);
+        }
+
+        else if (args[i].equals("-va")) {
+          varargs = true;
+          jtbOpt.put("JTB_VA", Boolean.TRUE);
         }
 
         else if (args[i].equals("-vd")) {
@@ -597,8 +594,8 @@ public class JTB {
           if (i >= args.length || args[i].charAt(0) == '-')
             throw new InvalCmdLineException("Option \"-vd\" must be followed by a directory name.");
           else {
-            Globals.visitorsDirName = args[i];
-            jtbOpt.put("JTB_VD", Globals.visitorsDirName);
+            visitorsDirName = args[i];
+            jtbOpt.put("JTB_VD", visitorsDirName);
           }
         }
 
@@ -607,13 +604,13 @@ public class JTB {
           if (i >= args.length || args[i].charAt(0) == '-')
             throw new InvalCmdLineException("Option \"-vp\" must be followed by a package name.");
           else {
-            Globals.visitorsPackageName = args[i];
-            jtbOpt.put("JTB_VP", Globals.visitorsPackageName);
+            visitorsPackageName = args[i];
+            jtbOpt.put("JTB_VP", visitorsPackageName);
           }
         }
 
         else if (args[i].equals("-w")) {
-          Globals.noOverwrite = true;
+          noOverwrite = true;
           jtbOpt.put("JTB_W", Boolean.TRUE);
         }
 
@@ -637,23 +634,22 @@ public class JTB {
    */
   private static void convertPathsToAbsolute() {
     final String dir = inDir + File.separator;
-    final File ndn = new File(Globals.nodesDirName);
+    final File ndn = new File(nodesDirName);
     if (!ndn.isAbsolute())
-      Globals.nodesDirName = dir + Globals.nodesDirName;
-    final File vdn = new File(Globals.visitorsDirName);
+      nodesDirName = dir + nodesDirName;
+    final File vdn = new File(visitorsDirName);
     if (!vdn.isAbsolute())
-      Globals.visitorsDirName = dir + Globals.visitorsDirName;
-    final File jjf = new File(Globals.jtbOutputFileName);
+      visitorsDirName = dir + visitorsDirName;
+    final File jjf = new File(jtbOutputFileName);
     if (!jjf.isAbsolute())
-      Globals.jtbOutputFileName = dir + Globals.jtbOutputFileName;
+      jtbOutputFileName = dir + jtbOutputFileName;
   }
 
   /**
    * Displays program usage.
    */
   private static void printHelp() {
-    System.out
-              .print(progName +
+    System.out.print(progName +
                      " version " +
                      version +
                      "\n" +
@@ -684,7 +680,7 @@ public class JTB {
                      "  -si         Read from standard input rather than a file.\n" +
                      "  -scheme     Generate Scheme records representing the grammar and a Scheme tree building visitor.\n" +
                      "  -tk         Generate special tokens into the tree.\n" +
-                     "  -va         Generate visitor with a variable number of argument.\n" +
+                     "  -va         Generate visitors with an argument of a vararg type.\n" +
                      "  -vd dir     Use dir as the package for the default visitor classes.\n" +
                      "  -vp pkg     Use pkg as the package for the default visitor classes.\n" +
                      "  -w          Do not overwrite existing files.\n" + "\n");
@@ -696,7 +692,7 @@ public class JTB {
  */
 class InvalCmdLineException extends Exception {
 
-  /** default serialVersionUID */
+  /** Default serialVersionUID */
   private static final long serialVersionUID = 1L;
 
   /**
@@ -709,7 +705,7 @@ class InvalCmdLineException extends Exception {
   /**
    * Standard constructor with a message.
    * 
-   * @param s the exception message
+   * @param s - the exception message
    */
   InvalCmdLineException(final String s) {
     super(s);
