@@ -33,27 +33,25 @@ import java.util.Set;
 
 /**
  * Describes regular expressions.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public abstract class RegularExpression_ extends Expansion_ {
+
   /**
-   * The label of the regular expression (if any).  If no label is
-   * present, this is set to "".
+   * The label of the regular expression (if any). If no label is present, this is set to "".
    */
   public String          label        = "";
   /**
-   * The ordinal value assigned to the regular expression.  It is
-   * used for internal processing and passing information between
-   * the parser and the lexical analyzer.
+   * The ordinal value assigned to the regular expression. It is used for internal processing and
+   * passing information between the parser and the lexical analyzer.
    */
   // hides Expansion_.ordinal !!!
   int                    ordinal;
   /**
-   * The LHS to which the token value of the regular expression
-   * is assigned.  In case there is no LHS, then the list
-   * remains empty.
+   * The LHS to which the token value of the regular expression is assigned. In case there is no
+   * LHS, then the list remains empty.
    */
   public List<Token>     lhsTokens    = new ArrayList<Token>();
   /**
@@ -61,15 +59,14 @@ public abstract class RegularExpression_ extends Expansion_ {
    */
   public Token           rhsToken;
   /**
-   * This flag is set if the regular expression has a label prefixed
-   * with the # symbol - this indicates that the purpose of the regular
-   * expression is solely for defining other regular expressions.
+   * This flag is set if the regular expression has a label prefixed with the # symbol - this
+   * indicates that the purpose of the regular expression is solely for defining other regular
+   * expressions.
    */
   public boolean         private_rexp = false;
   /**
-   * If this is a top-level regular expression (nested directly
-   * within a TokenProduction), then this field point to that
-   * TokenProduction object.
+   * If this is a top-level regular expression (nested directly within a TokenProduction), then this
+   * field point to that TokenProduction object.
    */
   public TokenProduction tpContext    = null;
 
@@ -80,18 +77,17 @@ public abstract class RegularExpression_ extends Expansion_ {
   }
 
   /**
-   * The following variable is used to maintain state information for the
-   * loop determination algorithm:  It is initialized to 0, and
-   * set to -1 if this node has been visited in a pre-order walk, and then
-   * it is set to 1 if the pre-order walk of the whole graph from this
-   * node has been traversed.  i.e., -1 indicates partially processed,
-   * and 1 indicates fully processed.
+   * The following variable is used to maintain state information for the loop determination
+   * algorithm: It is initialized to 0, and set to -1 if this node has been visited in a pre-order
+   * walk, and then it is set to 1 if the pre-order walk of the whole graph from this node has been
+   * traversed. i.e., -1 indicates partially processed, and 1 indicates fully processed.
    */
   int walkStatus = 0;
 
+  /** {@inheritDoc} */
   @Override
-  public StringBuffer dump(final int indent, final Set<Object> alreadyDumped) {
-    final StringBuffer sb = super.dump(indent, alreadyDumped);
+  public StringBuilder dump(final int indent, final Set<Object> alreadyDumped) {
+    final StringBuilder sb = super.dump(indent, alreadyDumped);
     alreadyDumped.add(this);
     sb.append(' ').append(label);
     return sb;

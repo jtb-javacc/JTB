@@ -57,8 +57,8 @@ package EDU.purdue.jtb.misc;
 /**
  * Class UnicodeConverter contains some methods to convert unicode chars into their escape sequence
  * form (provided by James Huang from the JavaCC mailing list).
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  */
 public class UnicodeConverter {
@@ -66,8 +66,8 @@ public class UnicodeConverter {
   /**
    * Prints on System.out a string, converting its non ASCII characters in their Unicode
    * representation.
-   *
-   * @param s a String to print
+   * 
+   * @param s - a String to print
    */
   public static void printout(final String s) {
     System.out.print(convertString(s));
@@ -76,8 +76,8 @@ public class UnicodeConverter {
   /**
    * Tells whether a character is an ASCII character or not. <br>
    * ASCII characters are between 0x20 and 0x7e included, or tab, new line, carriage return. *
-   *
-   * @param c a character
+   * 
+   * @param c - a character
    * @return true if ASCII, false otherwise
    */
   public static boolean isASCII(final char c) {
@@ -86,8 +86,8 @@ public class UnicodeConverter {
 
   /**
    * Converts an hexadecimal value into a character.
-   *
-   * @param hex the hexadecimal value
+   * 
+   * @param hex - the hexadecimal value
    * @return the corresponding character
    */
   public static char hexToChar(final int hex) {
@@ -99,8 +99,8 @@ public class UnicodeConverter {
 
   /**
    * Converts a character in its Unicode representation.
-   *
-   * @param c a character
+   * 
+   * @param c - a character
    * @return the converted character array
    */
   public static char[] unicodeToString(final char c) {
@@ -115,13 +115,13 @@ public class UnicodeConverter {
 
   /**
    * Converts a string by replacing non ASCII characters by their Unicode representation.
-   *
-   * @param s the string to convert to Unicode
+   * 
+   * @param s - the string to convert to Unicode
    * @return the converted string
    */
   public static String convertString(final String s) {
     final int len = s.length();
-    final StringBuffer sb = new StringBuffer();
+    final StringBuilder sb = new StringBuilder();
     for (int i = 0; i < len; i++) {
       final char c = s.charAt(i);
       if (isASCII(c))
@@ -137,11 +137,10 @@ public class UnicodeConverter {
    * ASCII characters are between 0x20 and 0x7e included, or tab, new line, carriage return or form
    * feed.<br>
    * Should be the same as {@link #convertString(String)} but comes from JavaCC.
-   *
-   * @param str a string
+   * 
+   * @param str - a string
    * @return the converted string
    */
-  // ModMMa : added
   public static String addUnicodeEscapes(final String str) {
     final int strlen = str.length();
     int found = 0;

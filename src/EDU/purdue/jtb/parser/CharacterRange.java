@@ -29,16 +29,14 @@ package EDU.purdue.jtb.parser;
 
 /**
  * Describes character range descriptors in a character list.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
-
 public class CharacterRange {
 
   /**
-   * The line and column number of the construct that corresponds
-   * most closely to this node.
+   * The line and column number of the construct that corresponds most closely to this node.
    */
   private int  column;
 
@@ -56,8 +54,7 @@ public class CharacterRange {
 
   CharacterRange(final char l, final char r) {
     if (l > r)
-      JavaCCErrors
-                  .semantic_error(this, "Invalid range : \"" + (int) l + "\" - \"" + (int) r +
+      JavaCCErrors.semantic_error(this, "Invalid range : \"" + (int) l + "\" - \"" + (int) r +
                                         "\". First character shoud be less than or equal to the second one in a range.");
 
     setLeft(l);
@@ -65,7 +62,7 @@ public class CharacterRange {
   }
 
   /**
-   * @param line the line to set
+   * @param line - the line to set
    */
   final void setLine(final int ln) {
     line = ln;
@@ -79,7 +76,7 @@ public class CharacterRange {
   }
 
   /**
-   * @param column the column to set
+   * @param column - the column to set
    */
   final void setColumn(final int cl) {
     column = cl;
@@ -93,7 +90,7 @@ public class CharacterRange {
   }
 
   /**
-   * @param left the left to set
+   * @param left - the left to set
    */
   public final void setLeft(final char lf) {
     left = lf;
@@ -107,7 +104,7 @@ public class CharacterRange {
   }
 
   /**
-   * @param right the right to set
+   * @param right - the right to set
    */
   public final void setRight(final char rg) {
     right = rg;

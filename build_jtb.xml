@@ -94,7 +94,7 @@
 			<!-- generates depth level -->
 			<!-- arg value="-dl" / -->
 			<!-- inlines visitors accept methods on base nodes -->
-			<!-- arg value="-ia" / -->
+			<arg value="-ia" />
 			<!-- syntaxtree and visitor directories parent directory name -->
 			<arg value="-d" />
 			<arg value="${jtb_src_dir}" />
@@ -125,7 +125,7 @@
 			<!-- generates depth level -->
 			<!-- arg value="-dl" / -->
 			<!-- inlines visitors accept methods on base nodes -->
-			<!-- arg value="-ia" / -->
+			<arg value="-ia" />
 			<!-- syntaxtree and visitor directories parent directory name -->
 			<arg value="-d" />
 			<arg value="${jtb_src_dir}" />
@@ -134,6 +134,10 @@
 			<arg value="${jtb_pkg_name}" />
 			<!-- input file -->
 			<arg value="${jtb_src_dir}/${jtb_gram}.jtb" />
+			<!-- enable assertions -->
+			<assertions>
+				<enable/>
+			</assertions>
 		</java>
 	</target>
 
@@ -151,8 +155,14 @@
 		<copy file="${jtb_src_dir}/utils/Token.java.save" tofile="${jtb_src_dir}/parser/Token.java" overwrite="true" />
 	</target>
 
+	<!-- Copy saved NodeTCF.java file for 1.4.5 -> 1.4.6 ; to be removed later -->
+	<target name="copy_saved_nodetcf">
+		<copy file="${jtb_src_dir}/utils/NodeTCF.java.save" tofile="${jtb_src_dir}/syntaxtree/NodeTCF.java" overwrite="false" />
+	</target>
+
 	<!-- Compile Java classes -->
 	<target name="compile_java">
+		<antcall target="copy_saved_nodetcf" />
 		<javac srcdir="${jtb_src_dir}" destdir="${jtb_bin_dir}" debug="true" source="${jdk_version}" target="${jdk_version}" classpath="${jtb_bin_dir}">
 			<!-- compilerarg value="-Xlint:unchecked" / -->
 		</javac>

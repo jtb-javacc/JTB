@@ -64,33 +64,33 @@ import EDU.purdue.jtb.syntaxtree.NodeSequence;
 /**
  * The ExpansionUnitTypeCounter visitor counts the different types of the ExpansionUnits found in an
  * ExpansionChoices subtree, without descending further into the tree than the first ExpansionUnit
- * level.<br>
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * level.
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  */
 public class ExpansionUnitTypeCounter extends DepthFirstVoidVisitor {
 
-  /** Number of lookaheads counter */
+  /** Number of lookaheads counter (ExpansionUnit type 0) */
   private int numLookaheads = 0;
-  /** Number of blocks counter */
+  /** Number of blocks counter (ExpansionUnit type 1) */
   private int numBlocks     = 0;
-  /** Number of options counter */
+  /** Number of (bracket) options counter (ExpansionUnit type 2) */
   private int numBrackets   = 0;
-  /** Number of trys counter */
-  private int numTrys       = 0;
-  /** Number of BNF modifiers counter */
-  private int numModifiers  = 0;
-  /** Number of terms counter */
+  /** Number of try-catch-finally counter (ExpansionUnit type 3) */
+  private int numTCFs       = 0;
+  /** Number of "terms" counter (ExpansionUnit type 4) */
   private int numTerms      = 0;
+  /** Number of "BNF modifiers" (parenthesis with/without modifier) counter (ExpansionUnit type 5) */
+  private int numModifiers  = 0;
 
   /**
    * Visits a {@link ExpansionChoices} node, whose children are the following :
    * <p>
    * f0 -> Expansion()<br>
    * f1 -> ( #0 "|" #1 Expansion() )*<br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(final ExpansionChoices n) {
@@ -112,8 +112,8 @@ public class ExpansionUnitTypeCounter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> ( #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" )?<br>
    * f1 -> ( ExpansionUnit() )+<br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(final Expansion n) {
@@ -130,17 +130,17 @@ public class ExpansionUnitTypeCounter extends DepthFirstVoidVisitor {
    * f0 -> . %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"<br>
    * .. .. | %1 Block()<br>
    * .. .. | %2 #0 "[" #1 ExpansionChoices() #2 "]"<br>
-   * .. .. | %3 ExpansionUnitInTCF()<br>
+   * .. .. | %3 ExpansionUnitTCF()<br>
    * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ]<br>
-   * .. .. . .. #1 ( &0 $0 Identifier() $1 Arguments()<br>
+   * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
    * .. .. . .. .. | &1 $0 RegularExpression()<br>
    * .. .. . .. .. . .. $1 [ £0 "." £1 < IDENTIFIER > ] )<br>
    * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
    * .. .. . .. #3 ( &0 "+"<br>
    * .. .. . .. .. | &1 "*"<br>
    * .. .. . .. .. | &2 "?" )?<br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(final ExpansionUnit n) {
@@ -155,7 +155,7 @@ public class ExpansionUnitTypeCounter extends DepthFirstVoidVisitor {
         ++numBrackets;
         break;
       case 3:
-        ++numTrys;
+        ++numTCFs;
         break;
       case 4:
         ++numTerms;
@@ -172,21 +172,21 @@ public class ExpansionUnitTypeCounter extends DepthFirstVoidVisitor {
    * Resets the counters.
    */
   public void reset() {
-    numLookaheads = numBlocks = numBrackets = numTrys = numTerms = numModifiers = 0;
+    numLookaheads = numBlocks = numBrackets = numTCFs = numTerms = numModifiers = 0;
   }
 
   /**
-   * @return the number of goupings (brackets, trys and modifiers) plus the number of terms
+   * @return the number of groupings (brackets, try-s and modifiers) plus the number of terms
    */
-  public int getNumNormals() {
-    return numBrackets + numTrys + numModifiers + numTerms;
+  public int getNbNormals() {
+    return numBrackets + numTCFs + numModifiers + numTerms;
   }
 
   /**
-   * @return the number of goupings (brackets, trys and modifiers)
+   * @return the number of groupings (brackets, try-s and modifiers)
    */
   public int getNumGroupings() {
-    return numBrackets + numTrys + numModifiers;
+    return numBrackets + numTCFs + numModifiers;
   }
 
   /**
@@ -211,10 +211,10 @@ public class ExpansionUnitTypeCounter extends DepthFirstVoidVisitor {
   }
 
   /**
-   * @return the number of trys
+   * @return the number of try-s
    */
   public int getNumTrys() {
-    return numTrys;
+    return numTCFs;
   }
 
   /**

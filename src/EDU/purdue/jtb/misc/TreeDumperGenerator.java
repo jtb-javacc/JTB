@@ -52,6 +52,8 @@
  */
 package EDU.purdue.jtb.misc;
 
+import static EDU.purdue.jtb.misc.Globals.*;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -62,8 +64,8 @@ import java.io.PrintWriter;
  * Class TreeDumperBuilder generates the TreeDumper visitor which simply prints all the tokens in
  * the tree at the locations given in their beginLine and beginColumn member variables.<br>
  * Similar to {@link FilesGenerator} class.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  */
 public class TreeDumperGenerator {
@@ -76,14 +78,12 @@ public class TreeDumperGenerator {
   private final File         visitorDir;
   /** The buffer to print into */
   protected StringBuilder    sb;
-  /** The OS line separator */
-  public static final String LS          = System.getProperty("line.separator");
 
   /**
    * Constructor. Will create the visitors directory if it does not exist.
    */
   public TreeDumperGenerator() {
-    visitorDir = new File(Globals.visitorsDirName);
+    visitorDir = new File(visitorsDirName);
     sb = new StringBuilder(5 * 1024);
 
     if (!visitorDir.exists())
@@ -92,14 +92,14 @@ public class TreeDumperGenerator {
 
   /**
    * Saves the current buffer in the output file (global variable).
-   *
-   * @throws FileExistsException if the file exists and the noOverwrite flag is set
+   * 
+   * @throws FileExistsException - if the file exists and the noOverwrite flag is set
    */
   public void saveToFile() throws FileExistsException {
     try {
       final File file = new File(visitorDir, outFilename);
 
-      if (Globals.noOverwrite && file.exists())
+      if (noOverwrite && file.exists())
         throw new FileExistsException(outFilename);
 
       final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), sb.length()));
@@ -111,17 +111,17 @@ public class TreeDumperGenerator {
     }
   }
 
-  // TODO passer les méthodes suivantes en spc.spc
+  // TODO change the following methods with spc.spc
 
   /**
    * Generates the tree dumper visitor source in its file.<br>
-   *
-   * @throws FileExistsException if the file exists and the no overwrite flag has been set
+   * 
+   * @throws FileExistsException - if the file exists and the no overwrite flag has been set
    */
   public void generateTreeDumper() throws FileExistsException {
-    sb.append(Globals.genFileHeaderComment() + LS);
-    sb.append("package " + Globals.visitorsPackageName + ";").append(LS).append(LS);
-    sb.append("import " + Globals.nodesPackageName + ".*;").append(LS);
+    sb.append(genFileHeaderComment() + LS);
+    sb.append("package " + visitorsPackageName + ";").append(LS).append(LS);
+    sb.append("import " + nodesPackageName + ".*;").append(LS);
     sb.append("import java.io.OutputStream;").append(LS);
     sb.append("import java.io.PrintWriter;").append(LS);
     sb.append("import java.io.Writer;").append(LS);
@@ -131,8 +131,7 @@ public class TreeDumperGenerator {
     sb.append(" * Dumps the syntax tree using the location information in each NodeToken.")
       .append(LS);
     sb.append(" */").append(LS);
-    sb.append("public class TreeDumper extends " + Globals.dFVoidVisitorName + " {").append(LS)
-      .append(LS);
+    sb.append("public class TreeDumper extends " + dFVoidVisitor + " {").append(LS).append(LS);
 
     sb.append("  /** The PrintWriter to write to */").append(LS);
     sb.append("  protected PrintWriter out;").append(LS);
@@ -155,7 +154,7 @@ public class TreeDumperGenerator {
     sb.append("  /**").append(LS);
     sb.append("   * Constructor using the given Writer as its output location.").append(LS);
     sb.append("   *").append(LS);
-    sb.append("   * @param o the output Writer to write to").append(LS);
+    sb.append("   * @param o - the output Writer to write to").append(LS);
     sb.append("   */").append(LS);
     sb.append("  public TreeDumper(final Writer o)  { out = new PrintWriter(o, true); }")
       .append(LS).append(LS);
@@ -163,7 +162,7 @@ public class TreeDumperGenerator {
     sb.append("  /**").append(LS);
     sb.append("   * Constructor using the given OutputStream as its output location.").append(LS);
     sb.append("   *").append(LS);
-    sb.append("   * @param o the output OutputStream to write to").append(LS);
+    sb.append("   * @param o - the output OutputStream to write to").append(LS);
     sb.append("   */").append(LS);
     sb.append("  public TreeDumper(final OutputStream o)  { out = new PrintWriter(o, true); }")
       .append(LS).append(LS);
@@ -176,7 +175,7 @@ public class TreeDumperGenerator {
     sb.append("  /**").append(LS);
     sb.append("   * Allows you to specify whether or not to print special tokens.").append(LS);
     sb.append("   *").append(LS);
-    sb.append("   * @param b true to print specials, false otherwise").append(LS).append(LS);
+    sb.append("   * @param b - true to print specials, false otherwise").append(LS).append(LS);
     sb.append("   */").append(LS);
     sb.append("  public void printSpecials(final boolean b)  { printSpecials = b; }").append(LS)
       .append(LS);
@@ -207,7 +206,7 @@ public class TreeDumperGenerator {
     sb.append("   *   before the previous token.").append(LS);
     sb.append("   */").append(LS);
     sb.append("  @Override").append(LS);
-    sb.append("  public void visit(final " + Globals.nodeTokenName + " n) {").append(LS);
+    sb.append("  public void visit(final " + nodeToken + " n) {").append(LS);
     sb.append("    if (n.beginLine == -1 || n.beginColumn == -1) {").append(LS);
     sb.append("      printToken(n.tokenImage);").append(LS);
     sb.append("      return;").append(LS);
@@ -216,8 +215,7 @@ public class TreeDumperGenerator {
     sb.append("    // Handle special tokens").append(LS);
     sb.append("    //").append(LS);
     sb.append("    if (printSpecials && n.numSpecials() > 0)").append(LS);
-    sb.append(
-              "      for (final Iterator<" + Globals.nodeTokenName +
+    sb.append("      for (final Iterator<" + nodeToken +
                   "> e = n.specialTokens.iterator(); e.hasNext();)").append(LS);
     sb.append("        visit(e.next());").append(LS).append(LS);
     sb.append("    //").append(LS);
@@ -260,7 +258,7 @@ public class TreeDumperGenerator {
     sb.append("  /**").append(LS);
     sb.append("   * Prints a given String, updating line and column numbers.").append(LS);
     sb.append("   *").append(LS);
-    sb.append("   * @param s the String to print").append(LS);
+    sb.append("   * @param s - the String to print").append(LS);
     sb.append("   */").append(LS);
     sb.append("  private void printToken(final String s) {").append(LS);
     sb.append("    for (int i = 0; i < s.length(); ++i) { ").append(LS);

@@ -57,7 +57,7 @@ package EDU.purdue.jtb.misc;
 /**
  * Class handling file exception.
  * 
- * @author Marc Mazas, mmazas@sopragroup.com
+ * @author Marc Mazas
  */
 public class FileExistsException extends Exception {
 
@@ -74,7 +74,7 @@ public class FileExistsException extends Exception {
   /**
    * Constructor with a specific message.
    * 
-   * @param s a message
+   * @param s - a message
    */
   public FileExistsException(final String s) {
     super(s);

@@ -1,0 +1,50 @@
+- vérifier la bonne prise en compte des modifs jtbgram.jtb
+fait
+//               renamed RSIGNEDSHIFT in RSignedShift and fixed it
+//               renamed RUNSIGNEDSHIFT in RUnsignedShift and fixed it
+//               fixed ForStatement() ; ForInit()
+//               modified RegularExpression (remove LANGLE & RANGLE definitions)
+à faire
+//               TODO found problems in TypeDeclaration(), ExplicitConstructorInvocation(), PrimaryPrefix()
+
+fait
+- reporter les commentaires formatés de la javadoc vers les commentaires dans le code
+- tirets dans les paramètres
+- quelques {@inheritDoc}
+- faire les tests ATestTCFProduction
+- revoir le CommentsPrinter
+- voir l'exception dans les commentaires dans le code en cas de PRINT_CLASS_COMMENT
+- optimisation Spacing
+- bug JTB-1 (soft errors Empty NodeChoices)
+- revoir CommentPrinter et autres pour générer les commentaires javadoc et java en listes distinctes
+
+
+à faire
+- mauvaise génération du code ? dans ASimpleTestTCFProduction sur <EOF>
+- mauvaise génération des commentaires ? dans ATestJTBRTGen2 sur vide
+- syntaxe ! ou JTB_DONT_BUILD pour ne pas générer l'arbre
+- sortir une erreur si n = prod() et void prod()
+- voir les TODOs, ajouter les tests qui vont bien
+- NLS
+- voir modifiers {n, m} pour ExpansionUnit
+- regénérer sans les commentaires de debug
+- vérifier avec et sans inline
+
+- problème coloration syntaxique dans AFancyProductionTCF
+
+- problème de remontée des erreurs JTB qui ne sont pas affichées :
+ex : TCF sans {} pour le try
+>java -jar D:\Devs\Parsers-workspace\JTB-svn_java.net\lib\new_jtb-1.4.7.jar -ia -jd -tk java1_5.jtb 
+JTB version 1.4.7
+JTB:  Reading jtb input file java1_5.jtb...
+
+Encountered " "(" "( "" at line 1122, column 11.
+Was expecting:
+    "{" ...
+    
+
+JTB:  Encountered error(s) during parsing.
+
+A faire pour le plugin
+- libellé Show Caller / Callee Hierarchy non en français
+

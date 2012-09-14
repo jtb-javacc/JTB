@@ -32,8 +32,8 @@ import java.util.Set;
 
 /**
  * Describes expansions of the form "try {...} ...".
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public class TryBlock extends Expansion_ {
@@ -43,34 +43,33 @@ public class TryBlock extends Expansion_ {
    */
   public Expansion_        exp;
   /**
-   * The types of each catch block.  Each list entry is itself a
-   * list which in turn contains tokens as entries.
+   * The types of each catch block. Each list entry is itself a list which in turn contains tokens
+   * as entries.
    */
   public List<List<Token>> types;
   /**
-   * The exception identifiers of each catch block.  Each list entry
-   * is a token.
+   * The exception identifiers of each catch block. Each list entry is a token.
    */
   public List<Token>       ids;
   /**
-   * The block part of each catch block.  Each list entry is itself a
-   * list which in turn contains tokens as entries.
+   * The block part of each catch block. Each list entry is itself a list which in turn contains
+   * tokens as entries.
    */
   public List<List<Token>> catchblks;
   /**
-   * The block part of the finally block.  Each list entry is a token.
-   * If there is no finally block, this is null.
+   * The block part of the finally block. Each list entry is a token. If there is no finally block,
+   * this is null.
    */
   public List<Token>       finallyblk;
 
-  // ModMMa : added to get rid of 'instanceof' in ExpansionTreeWalker
   public TryBlock() {
     expType = EXP_TYPE.TRY_BLOCK;
   }
 
+  /** {@inheritDoc} */
   @Override
-  public StringBuffer dump(final int indent, final Set<Object> alreadyDumped) {
-    final StringBuffer sb = super.dump(indent, alreadyDumped);
+  public StringBuilder dump(final int indent, final Set<Object> alreadyDumped) {
+    final StringBuilder sb = super.dump(indent, alreadyDumped);
     if (alreadyDumped.contains(this))
       return sb;
     alreadyDumped.add(this);

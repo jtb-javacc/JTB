@@ -30,7 +30,7 @@ package EDU.purdue.jtb.parser;
 /**
  * Describes a match, within a given lookahead.
  *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public class MatchInfo {

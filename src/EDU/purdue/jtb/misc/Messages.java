@@ -51,14 +51,16 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR ANY PARTICULAR PURPOSE.
  */
-
 package EDU.purdue.jtb.misc;
 
+import static EDU.purdue.jtb.misc.Globals.SUPPORT;
+import static EDU.purdue.jtb.misc.Globals.jtbInputFileName;
+
 /**
- * Class Messages handles messages (informations, warnings and fatal errors), printing a message to the user
- * and handling it appropriately.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * Class Messages handles messages (informations, warnings and fatal errors), printing a message to
+ * the user and handling it appropriately.
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : enhanced
  */
 public class Messages {
@@ -68,19 +70,20 @@ public class Messages {
   /** The number of warnings */
   private static int numWarnings = 0;
   /** The number of informations */
-  private static int numInfos = 0;
+  private static int numInfos    = 0;
 
   /**
    * Prints on System.err the number of informations, warnings and errors
    */
   public static void printSummary() {
-    System.err.println(numInfos + " informations, " + numWarnings + " warnings, " + numErrors + " errors.");
+    System.err.println(numInfos + " informations, " + numWarnings + " warnings, " + numErrors +
+                       " errors.");
   }
 
   /**
    * Prints on System.out an information text.
-   *
-   * @param s an information text
+   * 
+   * @param s - an information text
    */
   public static void info(final String s) {
     info(s, -1);
@@ -88,24 +91,23 @@ public class Messages {
 
   /**
    * Prints on System.out an information text and its line number.
-   *
-   * @param s an information text
-   * @param lineNum a warning line number
+   * 
+   * @param s - an information text
+   * @param lineNum - a warning line number
    */
   public static void info(final String s, final int lineNum) {
     if (lineNum == -1)
-      System.out.println(Globals.jtbInputFileName + ":  info:  " + s);
+      System.out.println(jtbInputFileName + ":  info:  " + s);
     else
-      System.out.println(Globals.jtbInputFileName + " (" + Integer.toString(lineNum) +
-                         "):  info:  " + s);
+      System.out.println(jtbInputFileName + " (" + Integer.toString(lineNum) + "):  info:  " + s);
 
     ++numInfos;
   }
 
   /**
    * Prints on System.err a warning text.
-   *
-   * @param s a warning text
+   * 
+   * @param s - a warning text
    */
   public static void warning(final String s) {
     warning(s, -1);
@@ -113,24 +115,23 @@ public class Messages {
 
   /**
    * Prints on System.err a warning text and its line number.
-   *
-   * @param s a warning text
-   * @param lineNum a warning line number
+   * 
+   * @param s - a warning text
+   * @param lineNum - a warning line number
    */
   public static void warning(final String s, final int lineNum) {
     if (lineNum == -1)
-      System.err.println(Globals.jtbInputFileName + ":  warning:  " + s);
+      System.err.println(jtbInputFileName + ":  warning:  " + s);
     else
-      System.err.println(Globals.jtbInputFileName + " (" + Integer.toString(lineNum) +
-                         "):  warning:  " + s);
+      System.err.println(jtbInputFileName + " (" + Integer.toString(lineNum) + "):  warning:  " + s);
 
     ++numWarnings;
   }
 
   /**
    * Prints on System.err a soft (non fatal) error text.
-   *
-   * @param s an error text
+   * 
+   * @param s - an error text
    */
   public static void softErr(final String s) {
     softErr(s, -1);
@@ -138,37 +139,37 @@ public class Messages {
 
   /**
    * Prints on System.err a soft (non fatal) error text and its line number.
-   *
-   * @param s an error text
-   * @param lineNum an error line number
+   * 
+   * @param s - an error text
+   * @param lineNum - an error line number
    */
   public static void softErr(final String s, final int lineNum) {
     if (lineNum == -1)
-      System.err.println(Globals.jtbInputFileName + ":  soft error:  " + s);
+      System.err.println(jtbInputFileName + ":  soft error:  " + s);
     else
-      System.err.println(Globals.jtbInputFileName + " (" + Integer.toString(lineNum) + "):  " + s);
+      System.err.println(jtbInputFileName + " (" + Integer.toString(lineNum) + "):  " + s);
 
     ++numErrors;
   }
 
   /**
    * Prints on System.err a message.
-   *
-   * @param s a message
+   * 
+   * @param s - a message
    */
   public static void notice(final String s) {
-    System.err.println(Globals.jtbInputFileName + ":  " + s);
+    System.err.println(jtbInputFileName + ":  " + s);
   }
 
   /**
    * Prints on System.err a fatal error message, its stack trace, and terminates the program.
-   *
-   * @param s a message
+   * 
+   * @param s - a message
    */
   public static void hardErr(final String s) {
-    System.err.println(Globals.jtbInputFileName + ":  unexpected program error:  " + s);
+    System.err.println(jtbInputFileName + ":  unexpected program error:  " + s);
     System.err.println();
-    System.err.println("Please report this to " + Globals.SUPPORT);
+    System.err.println("Please report this to " + SUPPORT);
     System.err.println();
 
     try {
@@ -183,16 +184,15 @@ public class Messages {
 
   /**
    * Prints on System.err a fatal error message, its stack trace, and terminates the program.
-   *
-   * @param t a Throwable
+   * 
+   * @param t - a Throwable
    */
   public static void hardErr(final Throwable t) {
-    System.err
-              .println(Globals.jtbInputFileName + ":  unexpected program error:  " + t.getMessage());
+    System.err.println(jtbInputFileName + ":  unexpected program error:  " + t.getMessage());
     System.err.println();
-    System.err.println("Please report this to " + Globals.SUPPORT);
+    System.err.println("Please report this to " + SUPPORT);
     System.err.println();
-//    t.printStackTrace();
+    //    t.printStackTrace();
     System.exit(-1);
   }
 
@@ -219,8 +219,8 @@ public class Messages {
 
   /**
    * Sets the number of errors.
-   *
-   * @param i the number of errors
+   * 
+   * @param i - the number of errors
    */
   public static void setErrorCount(final int i) {
     numErrors = i;
@@ -228,8 +228,8 @@ public class Messages {
 
   /**
    * Sets the number of warnings.
-   *
-   * @param i the number of warnings
+   * 
+   * @param i - the number of warnings
    */
   public static void setWarningCount(final int i) {
     numWarnings = i;
@@ -237,8 +237,8 @@ public class Messages {
 
   /**
    * Sets the number of informations.
-   *
-   * @param i the number of informations
+   * 
+   * @param i - the number of informations
    */
   public static void setInfoCount(final int i) {
     numInfos = i;

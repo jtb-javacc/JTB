@@ -29,16 +29,14 @@ package EDU.purdue.jtb.parser;
 
 /**
  * Describes single character descriptors in a character list.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
-
 public class SingleCharacter {
 
   /**
-   * The line and column number of the construct that corresponds
-   * most closely to this node.
+   * The line and column number of the construct that corresponds most closely to this node.
    */
   private int column;
 
@@ -49,17 +47,15 @@ public class SingleCharacter {
    */
   public char ch;
 
-  SingleCharacter()
-  {
+  SingleCharacter() {
   }
 
-  SingleCharacter(final char c)
-  {
-     ch = c;
+  SingleCharacter(final char c) {
+    ch = c;
   }
 
   /**
-   * @param line the line to set
+   * @param line - the line to set
    */
   final void setLine(final int ln) {
     line = ln;
@@ -73,7 +69,7 @@ public class SingleCharacter {
   }
 
   /**
-   * @param column the column to set
+   * @param column - the column to set
    */
   final void setColumn(final int cl) {
     column = cl;

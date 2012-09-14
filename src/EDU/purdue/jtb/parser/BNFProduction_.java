@@ -32,8 +32,8 @@ import java.util.List;
 
 /**
  * Describes BNF productions.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public class BNFProduction_ extends NormalProduction {
@@ -41,14 +41,13 @@ public class BNFProduction_ extends NormalProduction {
   /**
    * The declarations of this production.
    */
-  private final List<Token>    declaration_tokens = new ArrayList<Token>();
+  private final List<Token> declaration_tokens = new ArrayList<Token>();
 
   /**
-   * This flag keeps track of whether or not return and throw
-   * statements have been patched within this production's actions to
-   * include a preceding "if (true)".
+   * This flag keeps track of whether or not return and throw statements have been patched within
+   * this production's actions to include a preceding "if (true)".
    */
-  private boolean jumpPatched;
+  private boolean           jumpPatched;
 
   /**
    * @return the declaration_tokens
@@ -58,7 +57,7 @@ public class BNFProduction_ extends NormalProduction {
   }
 
   /**
-   * @param jumpPatched the jumpPatched to set
+   * @param jp - the jumpPatched to set
    */
   public final void setJumpPatched(final boolean jp) {
     jumpPatched = jp;

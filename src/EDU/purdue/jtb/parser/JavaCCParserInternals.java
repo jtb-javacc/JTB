@@ -30,19 +30,20 @@ package EDU.purdue.jtb.parser;
 import java.util.Hashtable;
 import java.util.List;
 
-
 /**
  * Utilities.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public abstract class JavaCCParserInternals extends JavaCCGlobals {
+
   static protected void initialize() {
     final Integer i = new Integer(0);
     lexstate_S2I.put("DEFAULT", i);
     lexstate_I2S.put(i, "DEFAULT");
-    simple_tokens_table.put("DEFAULT", new Hashtable<String, Hashtable<String, RegularExpression_>>());
+    simple_tokens_table.put("DEFAULT",
+                            new Hashtable<String, Hashtable<String, RegularExpression_>>());
   }
 
   static protected void addcuname(final String id) {
@@ -51,8 +52,8 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
 
   static protected void compare(final Token t, final String id1, final String id2) {
     if (!id2.equals(id1)) {
-      JavaCCErrors.parse_error(t, "Name " + id2 + " must be the same as that used at PARSER_BEGIN (" + id1 +
-                                  ")");
+      JavaCCErrors.parse_error(t, "Name " + id2 +
+                                  " must be the same as that used at PARSER_BEGIN (" + id1 + ")");
     }
   }
 
@@ -65,7 +66,8 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     do {
       add_cu_token_here.add(first_cu_token);
       first_cu_token = first_cu_token.next;
-    } while (first_cu_token != t);
+    }
+    while (first_cu_token != t);
     if (no == 1) {
       if (insertionpoint1set) {
         JavaCCErrors.parse_error(t, "Multiple declaration of parser class.");
@@ -86,7 +88,8 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
       first_cu_token = first_cu_token.next;
     }
     if (!insertionpoint1set || !insertionpoint2set) {
-      JavaCCErrors.parse_error(t, "Parser class has not been defined between PARSER_BEGIN and PARSER_END.");
+      JavaCCErrors.parse_error(t,
+                               "Parser class has not been defined between PARSER_BEGIN and PARSER_END.");
     }
   }
 
@@ -128,7 +131,8 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
         ii = new Integer(nextFreeLexState++);
         lexstate_S2I.put(p.lexStates[i], ii);
         lexstate_I2S.put(ii, p.lexStates[i]);
-        simple_tokens_table.put(p.lexStates[i], new Hashtable<String, Hashtable<String, RegularExpression_>>());
+        simple_tokens_table.put(p.lexStates[i],
+                                new Hashtable<String, Hashtable<String, RegularExpression_>>());
       }
     }
   }
@@ -182,94 +186,8 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
   }
 
   static protected String remove_escapes_and_quotes(final Token t, final String str) {
-    // ModMMa : performance improvements (String concatenation)
-    // String retval = "";
-    // int index = 1;
-    // char ch, ch1;
-    // int ordinal;
-    // while (index < str.length()-1) {
-    // if (str.charAt(index) != '\\') {
-    // retval += str.charAt(index); index++;
-    // continue;
-    // }
-    // index++;
-    // ch = str.charAt(index);
-    // if (ch == 'b') {
-    // retval += '\b'; index++;
-    // continue;
-    // }
-    // if (ch == 't') {
-    // retval += '\t'; index++;
-    // continue;
-    // }
-    // if (ch == 'n') {
-    // retval += '\n'; index++;
-    // continue;
-    // }
-    // if (ch == 'f') {
-    // retval += '\f'; index++;
-    // continue;
-    // }
-    // if (ch == 'r') {
-    // retval += '\r'; index++;
-    // continue;
-    // }
-    // if (ch == '"') {
-    // retval += '\"'; index++;
-    // continue;
-    // }
-    // if (ch == '\'') {
-    // retval += '\''; index++;
-    // continue;
-    // }
-    // if (ch == '\\') {
-    // retval += '\\'; index++;
-    // continue;
-    // }
-    // if (ch >= '0' && ch <= '7') {
-    // ordinal = ((int)ch) - ((int)'0'); index++;
-    // ch1 = str.charAt(index);
-    // if (ch1 >= '0' && ch1 <= '7') {
-    // ordinal = ordinal*8 + ((int)ch1) - ((int)'0'); index++;
-    // ch1 = str.charAt(index);
-    // if (ch <= '3' && ch1 >= '0' && ch1 <= '7') {
-    // ordinal = ordinal*8 + ((int)ch1) - ((int)'0'); index++;
-    // }
-    // }
-    // retval += (char)ordinal;
-    // continue;
-    // }
-    // if (ch == 'u') {
-    // index++; ch = str.charAt(index);
-    // if (hexchar(ch)) {
-    // ordinal = hexval(ch);
-    // index++; ch = str.charAt(index);
-    // if (hexchar(ch)) {
-    // ordinal = ordinal*16 + hexval(ch);
-    // index++; ch = str.charAt(index);
-    // if (hexchar(ch)) {
-    // ordinal = ordinal*16 + hexval(ch);
-    // index++; ch = str.charAt(index);
-    // if (hexchar(ch)) {
-    // ordinal = ordinal*16 + hexval(ch);
-    // index++;
-    // continue;
-    // }
-    // }
-    // }
-    // }
-    // JavaCCErrors.parse_error(t, "Encountered non-hex character '" + ch +
-    // "' at position " + index + " of string " +
-    // "- Unicode escape must have 4 hex digits after it.");
-    // return retval;
-    // }
-    // JavaCCErrors.parse_error(t, "Illegal escape sequence '\\" + ch +
-    // "' at position " + index + " of string.");
-    // return retval;
-    // }
-    // return retval;
     final int strlen = str.length();
-    final StringBuffer buff = new StringBuffer(strlen);
+    final StringBuilder buff = new StringBuilder(strlen);
     int index = 1;
     char ch, ch1;
     int ordinal;
@@ -360,8 +278,9 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
             }
           }
         }
-        JavaCCErrors.parse_error(t, "Encountered non-hex character '" + ch + "' at position " + index +
-                                    " of string " + "- Unicode escape must have 4 hex digits after it.");
+        JavaCCErrors.parse_error(t, "Encountered non-hex character '" + ch + "' at position " +
+                                    index + " of string " +
+                                    "- Unicode escape must have 4 hex digits after it.");
         return buff.toString();
       }
       JavaCCErrors.parse_error(t, "Illegal escape sequence '\\" + ch + "' at position " + index +
@@ -385,20 +304,24 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
       JavaCCErrors.parse_error(t, "String in character list may contain only one character.");
       return ' ';
     } else if ((left.charAt(0)) > (s.charAt(0))) {
-      JavaCCErrors.parse_error(t, "Right end of character range \'" + s +
-                                  "\' has a lower ordinal value than the left end of character range \'" +
-                                  left + "\'.");
+      JavaCCErrors.parse_error(t,
+                               "Right end of character range \'" +
+                                   s +
+                                   "\' has a lower ordinal value than the left end of character range \'" +
+                                   left + "\'.");
       return left.charAt(0);
     } else {
       return s.charAt(0);
     }
   }
 
-  static protected void makeTryBlock(final Token tryLoc, final Container result, final Container nestedExp,
-                                     final List<List<Token>> types, final List<Token> ids,
-                                     final List<List<Token>> catchblks, final List<Token> finallyblk) {
+  static protected void makeTryBlock(final Token tryLoc, final Container result,
+                                     final Container nestedExp, final List<List<Token>> types,
+                                     final List<Token> ids, final List<List<Token>> catchblks,
+                                     final List<Token> finallyblk) {
     if (catchblks.size() == 0 && finallyblk == null) {
-      JavaCCErrors.parse_error(tryLoc, "Try block must contain at least one catch or finally block.");
+      JavaCCErrors.parse_error(tryLoc,
+                               "Try block must contain at least one catch or finally block.");
       return;
     }
     final TryBlock tblk = new TryBlock();

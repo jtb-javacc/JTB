@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * Describes the various regular expression productions.
  *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public class TokenProduction {
@@ -91,7 +91,7 @@ public class TokenProduction {
   public Token                 firstToken, lastToken;
 
   /**
-   * @param line the line to set
+   * @param line - the line to set
    */
   public final void setLine(final int ln) {
     line = ln;
@@ -105,7 +105,7 @@ public class TokenProduction {
   }
 
   /**
-   * @param column the column to set
+   * @param column - the column to set
    */
   public final void setColumn(final int cl) {
     column = cl;

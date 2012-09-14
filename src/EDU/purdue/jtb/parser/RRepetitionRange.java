@@ -32,8 +32,8 @@ import java.util.List;
 
 /**
  * Describes one-or-more regular expressions (<foo+>).
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public class RRepetitionRange extends RegularExpression_ {
@@ -46,11 +46,11 @@ public class RRepetitionRange extends RegularExpression_ {
   public int                max = -1;
   public boolean            hasMax;
 
-  // ModMMa : added to get rid of 'instanceof' in ExpansionTreeWalker
   public RRepetitionRange() {
     expType = EXP_TYPE.R_REPETITION_RANGE;
   }
 
+  /** {@inheritDoc} */
   @Override
   public Nfa GenerateNfa(final boolean ignoreCase) {
     final List<RegularExpression_> units = new ArrayList<RegularExpression_>();

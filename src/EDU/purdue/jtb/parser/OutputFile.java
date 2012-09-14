@@ -38,26 +38,20 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * This class handles the creation and maintenance of the boiler-plate classes,
- * such as Token.java, JavaCharStream.java etc.
- *
- * It is responsible for:
- *
+ * This class handles the creation and maintenance of the boiler-plate classes, such as Token.java,
+ * JavaCharStream.java etc. It is responsible for:
  * <ul>
  * <li>Writing the JavaCC header lines to the file.</li>
  * <li>Writing the checksum line.</li>
- * <li>Using the checksum to determine if an existing file has been changed by
- * the user (and so should be left alone).</li>
- * <li>Checking any existing file's version (if the file can not be
- * overwritten).</li>
- * <li>Checking any existing file's creation options (if the file can not be
- * overwritten).</li>
+ * <li>Using the checksum to determine if an existing file has been changed by the user (and so
+ * should be left alone).</li>
+ * <li>Checking any existing file's version (if the file can not be overwritten).</li>
+ * <li>Checking any existing file's creation options (if the file can not be overwritten).</li>
  * <li></li>
  * </ul>
- *
+ * 
  * @author Paul Cager
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public class OutputFile {
@@ -75,14 +69,11 @@ public class OutputFile {
 
   /**
    * Create a new OutputFile.
-   *
-   * @param file
-   *            the file to write to.
-   * @param compatibleVersion
-   *      the minimum compatible JavaCC version.
-   * @param options
-   *      if the file already exists, and cannot be overwritten, this is
-   *      a list of options (such s STATIC=false) to check for changes.
+   * 
+   * @param file the file to write to.
+   * @param compatibleVersion the minimum compatible JavaCC version.
+   * @param options if the file already exists, and cannot be overwritten, this is a list of options
+   *          (such s STATIC=false) to check for changes.
    * @throws IOException
    */
   public OutputFile(final File fl, final String compVers, final String[] opt) throws IOException {
@@ -108,8 +99,7 @@ public class OutputFile {
       while ((line = br.readLine()) != null) {
         if (line.startsWith(MD5_LINE_PART_1)) {
           existingMD5 = line.replaceAll(MD5_LINE_PART_1q, "").replaceAll(MD5_LINE_PART_2q, "");
-        }
-        else {
+        } else {
           lpw.println(line);
         }
       }
@@ -124,15 +114,13 @@ public class OutputFile {
         if (opt != null) {
           checkOptions(fl, opt);
         }
-      }
-      else {
+      } else {
         // The file has not been altered since JavaCC created it.
         // Rebuild it.
         System.out.println("File \"" + fl.getName() + "\" is being rebuilt.");
         needToWrite = true;
       }
-    }
-    else {
+    } else {
       // File does not exist
       System.out.println("File \"" + fl.getName() + "\" does not exist.  Will create one.");
       needToWrite = true;
@@ -147,7 +135,7 @@ public class OutputFile {
 
   /**
    * Output a warning if the file was created with an incompatible version of JavaCC.
-   *
+   * 
    * @param fileName
    * @param versionId
    */
@@ -180,9 +168,9 @@ public class OutputFile {
   }
 
   /**
-   * Read the options line from the file and compare to the options currently in use. Output a warning if they
-   * are different.
-   *
+   * Read the options line from the file and compare to the options currently in use. Output a
+   * warning if they are different.
+   * 
    * @param fileName
    * @param options
    */
@@ -194,8 +182,7 @@ public class OutputFile {
         if (line.startsWith("/* JavaCCOptions:")) {
           final String currentOptions = Options.getOptionsString(opt);
           if (line.indexOf(currentOptions) == -1) {
-            JavaCCErrors
-                        .warning(fl.getName() +
+            JavaCCErrors.warning(fl.getName() +
                                  ": Generated using incompatible options. Please rename or delete this file so" +
                                  " that a new one can be generated for you.");
           }
@@ -214,9 +201,9 @@ public class OutputFile {
   }
 
   /**
-   * Return a PrintWriter object that may be used to write to this file. Any necessary header information is
-   * written by this method.
-   *
+   * Return a PrintWriter object that may be used to write to this file. Any necessary header
+   * information is written by this method.
+   * 
    * @return
    * @throws IOException
    */
@@ -249,16 +236,14 @@ public class OutputFile {
   }
 
   /**
-   * Close the OutputFile, writing any necessary trailer information
-   * (such as a checksum).
+   * Close the OutputFile, writing any necessary trailer information (such as a checksum).
+   * 
    * @throws IOException
    */
   public void close() {
     // Write the trailer (checksum).
     // Possibly rename the .java.tmp to .java??
     if (pw != null) {
-      // Mod MMa : performance improvements (no concatenation)
-      // pw.println(MD5_LINE_PART_1 + getMD5sum() + MD5_LINE_PART_2);
       pw.print(MD5_LINE_PART_1);
       pw.print(getMD5sum());
       pw.println(MD5_LINE_PART_2);
@@ -277,7 +262,7 @@ public class OutputFile {
       '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
   private static final String toHexString(final byte[] bytes) {
-    final StringBuffer sb = new StringBuffer(32);
+    final StringBuilder sb = new StringBuilder(32);
     for (int i = 0; i < bytes.length; i++) {
       final byte b = bytes[i];
       sb.append(HEX_DIGITS[(b & 0xF0) >> 4]).append(HEX_DIGITS[b & 0x0F]);
@@ -287,16 +272,19 @@ public class OutputFile {
 
   static class NullOutputStream extends OutputStream {
 
+    /** {@inheritDoc} */
     @Override
     public void write(@SuppressWarnings("unused") final byte[] arg0,
                       @SuppressWarnings("unused") final int arg1,
                       @SuppressWarnings("unused") final int arg2) {
     }
 
+    /** {@inheritDoc} */
     @Override
     public void write(@SuppressWarnings("unused") final byte[] arg0) {
     }
 
+    /** {@inheritDoc} */
     @Override
     public void write(@SuppressWarnings("unused") final int arg0) {
     }
@@ -312,6 +300,7 @@ public class OutputFile {
       super.close();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void close() {
       OutputFile.this.close();
@@ -326,7 +315,7 @@ public class OutputFile {
   }
 
   /**
-   * @param toolName the toolName to set
+   * @param tn - the toolName to set
    */
   public final void setToolName(final String tn) {
     toolName = tn;

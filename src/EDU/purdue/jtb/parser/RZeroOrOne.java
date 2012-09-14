@@ -27,14 +27,12 @@
  */
 package EDU.purdue.jtb.parser;
 
-
 /**
  * Describes zero-or-one regular expressions (<foo?>).
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
-
 public class RZeroOrOne extends RegularExpression_ {
 
   /**
@@ -42,11 +40,11 @@ public class RZeroOrOne extends RegularExpression_ {
    */
   public RegularExpression_ regexpr;
 
-  // ModMMa : added to get rid of 'instanceof' in ExpansionTreeWalker
   public RZeroOrOne() {
     expType = EXP_TYPE.R_ZERO_OR_ONE;
   }
 
+  /** {@inheritDoc} */
   @Override
   public Nfa GenerateNfa(final boolean ignoreCase) {
     final Nfa retVal = new Nfa();

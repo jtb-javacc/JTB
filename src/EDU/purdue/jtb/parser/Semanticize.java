@@ -35,7 +35,7 @@ import java.util.List;
 
 /**
  *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
 */
 public class Semanticize extends JavaCCGlobals {

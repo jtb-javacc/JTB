@@ -28,35 +28,62 @@
  */
 package EDU.purdue.jtb.misc;
 
+import java.util.ArrayList;
+
 /**
- * Class Spacing is used for of pretty printing to provide necessary indentation.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * Class Spacing manages the indentation information for pretty printing.
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
+ * @version 1.4.7 : 08/2012 : MMa : optimization
  */
 public class Spacing {
 
-  /** the indentation amount */
-  public final int INDENT_AMT;
-  /** the indentation string */
-  public String    spc         = "";
-  /** the indentation level */
-  public int       indentLevel = 0;
+  /** The indentation amount */
+  private final int               INDENT_AMT;
+  /** The indentation string */
+  public String                   spc         = "";
+  /** The indentation level */
+  public int                      indentLevel = 0;
+  /** The internal list of indentation strings for the indentation levels */
+  private final ArrayList<String> str;
 
   /**
    * Constructor.
-   *
-   * @param indentAmt the indentation amount
+   * 
+   * @param indentAmt - the indentation amount
    */
   public Spacing(final int indentAmt) {
     INDENT_AMT = indentAmt;
+    final int nbElem = 10;
+    str = new ArrayList<String>(nbElem);
+    final StringBuilder sb = new StringBuilder(INDENT_AMT * nbElem);
+    for (int i = 0; i < nbElem; i++) {
+      str.add(sb.toString());
+      for (int j = 0; j < INDENT_AMT; j++) {
+        sb.append(" ");
+      }
+    }
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param indentAmt - the indentation amount
+   * @param aIndentLevel - the initial indentation level
+   */
+  public Spacing(final int indentAmt, final int aIndentLevel) {
+    this(indentAmt);
+    if (aIndentLevel > 0) {
+      updateSpc(aIndentLevel);
+    }
   }
 
   /**
    * Resets the instance.
    */
   public void reset() {
-    spc = "";
+    spc = str.get(0);
     indentLevel = 0;
   }
 
@@ -70,18 +97,23 @@ public class Spacing {
 
   /**
    * Updates the indentation.
-   *
-   * @param numIndentLvls the (positive or negative) indentation level delta.
+   * 
+   * @param numIndentLvls - the (positive or negative) indentation level delta.
    */
   public void updateSpc(final int numIndentLvls) {
     indentLevel += numIndentLvls;
-    if (numIndentLvls < 0)
-      spc = spc.substring(-1 * numIndentLvls * INDENT_AMT);
-    else if (numIndentLvls > 0) {
-      final StringBuffer buf = new StringBuffer(spc);
-      for (int i = 0; i < numIndentLvls * INDENT_AMT; ++i)
-        buf.append(" ");
-      spc = buf.toString();
+    if (indentLevel < 0)
+      indentLevel = 0;
+    final int sz = str.size() - 1;
+    if (indentLevel > sz) {
+      final StringBuilder sb = new StringBuilder(str.get(sz));
+      for (int i = sz; i < indentLevel; i++) {
+        for (int j = 0; j < INDENT_AMT; j++) {
+          sb.append(" ");
+        }
+        str.add(sb.toString());
+      }
     }
+    spc = str.get(indentLevel);
   }
 }

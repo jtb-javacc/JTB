@@ -147,119 +147,129 @@ public interface JTBParserConstants {
   /** RegularExpression Id. */
   int INTEGER_LITERAL = 80;
   /** RegularExpression Id. */
-  int DECIMAL_LITERAL = 81;
+  int FLOATING_POINT_LITERAL = 81;
   /** RegularExpression Id. */
-  int HEX_LITERAL = 82;
+  int CHARACTER_LITERAL = 82;
   /** RegularExpression Id. */
-  int OCTAL_LITERAL = 83;
+  int STRING_LITERAL = 83;
   /** RegularExpression Id. */
-  int FLOATING_POINT_LITERAL = 84;
+  int DEC_DIGIT = 84;
   /** RegularExpression Id. */
-  int DECIMAL_FLOATING_POINT_LITERAL = 85;
+  int HEX_DIGIT = 85;
   /** RegularExpression Id. */
-  int DECIMAL_EXPONENT = 86;
+  int OCTAL_DIGIT = 86;
   /** RegularExpression Id. */
-  int HEXADECIMAL_FLOATING_POINT_LITERAL = 87;
+  int OCTAL_FIRST_DIGIT = 87;
   /** RegularExpression Id. */
-  int HEXADECIMAL_EXPONENT = 88;
+  int DECIMAL_LITERAL = 88;
   /** RegularExpression Id. */
-  int CHARACTER_LITERAL = 89;
+  int HEX_LITERAL = 89;
   /** RegularExpression Id. */
-  int STRING_LITERAL = 90;
+  int OCTAL_LITERAL = 90;
   /** RegularExpression Id. */
-  int LPAREN = 91;
+  int DECIMAL_EXPONENT = 91;
   /** RegularExpression Id. */
-  int RPAREN = 92;
+  int HEXADECIMAL_EXPONENT = 92;
   /** RegularExpression Id. */
-  int LBRACE = 93;
+  int FLOATING_POINT_LETTER = 93;
   /** RegularExpression Id. */
-  int RBRACE = 94;
+  int LONG_LETTER = 94;
   /** RegularExpression Id. */
-  int LBRACKET = 95;
+  int DECIMAL_FLOATING_POINT_LITERAL = 95;
   /** RegularExpression Id. */
-  int RBRACKET = 96;
+  int HEXADECIMAL_FLOATING_POINT_LITERAL = 96;
   /** RegularExpression Id. */
-  int SEMICOLON = 97;
+  int ESCAPED_CHARACTER = 97;
   /** RegularExpression Id. */
-  int COMMA = 98;
+  int LPAREN = 98;
   /** RegularExpression Id. */
-  int DOT = 99;
+  int RPAREN = 99;
   /** RegularExpression Id. */
-  int ASSIGN = 100;
+  int LBRACE = 100;
   /** RegularExpression Id. */
-  int LT = 101;
+  int RBRACE = 101;
   /** RegularExpression Id. */
-  int BANG = 102;
+  int LBRACKET = 102;
   /** RegularExpression Id. */
-  int TILDE = 103;
+  int RBRACKET = 103;
   /** RegularExpression Id. */
-  int HOOK = 104;
+  int SEMICOLON = 104;
   /** RegularExpression Id. */
-  int COLON = 105;
+  int COMMA = 105;
   /** RegularExpression Id. */
-  int EQ = 106;
+  int DOT = 106;
   /** RegularExpression Id. */
-  int LE = 107;
+  int ASSIGN = 107;
   /** RegularExpression Id. */
-  int GE = 108;
+  int LT = 108;
   /** RegularExpression Id. */
-  int NE = 109;
+  int BANG = 109;
   /** RegularExpression Id. */
-  int SC_OR = 110;
+  int TILDE = 110;
   /** RegularExpression Id. */
-  int SC_AND = 111;
+  int HOOK = 111;
   /** RegularExpression Id. */
-  int INCR = 112;
+  int COLON = 112;
   /** RegularExpression Id. */
-  int DECR = 113;
+  int EQ = 113;
   /** RegularExpression Id. */
-  int PLUS = 114;
+  int LE = 114;
   /** RegularExpression Id. */
-  int MINUS = 115;
+  int GE = 115;
   /** RegularExpression Id. */
-  int STAR = 116;
+  int NE = 116;
   /** RegularExpression Id. */
-  int SLASH = 117;
+  int SC_OR = 117;
   /** RegularExpression Id. */
-  int BIT_AND = 118;
+  int SC_AND = 118;
   /** RegularExpression Id. */
-  int BIT_OR = 119;
+  int INCR = 119;
   /** RegularExpression Id. */
-  int XOR = 120;
+  int DECR = 120;
   /** RegularExpression Id. */
-  int REM = 121;
+  int PLUS = 121;
   /** RegularExpression Id. */
-  int PLUSASSIGN = 122;
+  int MINUS = 122;
   /** RegularExpression Id. */
-  int MINUSASSIGN = 123;
+  int STAR = 123;
   /** RegularExpression Id. */
-  int STARASSIGN = 124;
+  int SLASH = 124;
   /** RegularExpression Id. */
-  int SLASHASSIGN = 125;
+  int BIT_AND = 125;
   /** RegularExpression Id. */
-  int ANDASSIGN = 126;
+  int BIT_OR = 126;
   /** RegularExpression Id. */
-  int ORASSIGN = 127;
+  int XOR = 127;
   /** RegularExpression Id. */
-  int XORASSIGN = 128;
+  int REM = 128;
   /** RegularExpression Id. */
-  int REMASSIGN = 129;
+  int PLUSASSIGN = 129;
   /** RegularExpression Id. */
-  int RUNSIGNEDSHIFT = 130;
+  int MINUSASSIGN = 130;
   /** RegularExpression Id. */
-  int RSIGNEDSHIFT = 131;
+  int STARASSIGN = 131;
   /** RegularExpression Id. */
-  int GT = 132;
+  int SLASHASSIGN = 132;
   /** RegularExpression Id. */
-  int LANGLE = 101;
+  int ANDASSIGN = 133;
   /** RegularExpression Id. */
-  int RANGLE = 132;
+  int ORASSIGN = 134;
   /** RegularExpression Id. */
-  int IDENTIFIER = 141;
+  int XORASSIGN = 135;
   /** RegularExpression Id. */
-  int LETTER = 142;
+  int REMASSIGN = 136;
   /** RegularExpression Id. */
-  int PART_LETTER = 143;
+  int RUNSIGNEDSHIFT = 137;
+  /** RegularExpression Id. */
+  int RSIGNEDSHIFT = 138;
+  /** RegularExpression Id. */
+  int GT = 139;
+  /** RegularExpression Id. */
+  int IDENTIFIER = 148;
+  /** RegularExpression Id. */
+  int LETTER = 149;
+  /** RegularExpression Id. */
+  int PART_LETTER = 150;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -355,16 +365,23 @@ public interface JTBParserConstants {
     "\"volatile\"",
     "\"while\"",
     "<INTEGER_LITERAL>",
+    "<FLOATING_POINT_LITERAL>",
+    "<CHARACTER_LITERAL>",
+    "<STRING_LITERAL>",
+    "<DEC_DIGIT>",
+    "<HEX_DIGIT>",
+    "<OCTAL_DIGIT>",
+    "<OCTAL_FIRST_DIGIT>",
     "<DECIMAL_LITERAL>",
     "<HEX_LITERAL>",
     "<OCTAL_LITERAL>",
-    "<FLOATING_POINT_LITERAL>",
-    "<DECIMAL_FLOATING_POINT_LITERAL>",
     "<DECIMAL_EXPONENT>",
-    "<HEXADECIMAL_FLOATING_POINT_LITERAL>",
     "<HEXADECIMAL_EXPONENT>",
-    "<CHARACTER_LITERAL>",
-    "<STRING_LITERAL>",
+    "<FLOATING_POINT_LETTER>",
+    "<LONG_LETTER>",
+    "<DECIMAL_FLOATING_POINT_LITERAL>",
+    "<HEXADECIMAL_FLOATING_POINT_LITERAL>",
+    "<ESCAPED_CHARACTER>",
     "\"(\"",
     "\")\"",
     "\"{\"",

@@ -29,13 +29,16 @@ package EDU.purdue.jtb.parser;
 
 /**
  * Describes the EOF regular expression
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public class REndOfFile extends RegularExpression_ {
+
+  /** {@inheritDoc} */
   @Override
   public Nfa GenerateNfa(@SuppressWarnings("unused") final boolean ignoreCase) {
     return null;
   }
+
 }

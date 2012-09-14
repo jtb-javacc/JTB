@@ -32,22 +32,23 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Describes actions that may occur on the right hand side
- * of productions.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * Describes actions that may occur on the right hand side of productions.
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public class Action extends Expansion_ {
+
   /**
-   * Contains the list of tokens that make up the action.  This
-   * list does not include the surrounding braces.
+   * Contains the list of tokens that make up the action. This list does not include the surrounding
+   * braces.
    */
   private final List<Token> action_tokens = new ArrayList<Token>();
 
+  /** {@inheritDoc} */
   @Override
-  public StringBuffer dump(final int indent, final Set<Object> alreadyDumped) {
-    final StringBuffer sb = super.dump(indent, alreadyDumped);
+  public StringBuilder dump(final int indent, final Set<Object> alreadyDumped) {
+    final StringBuilder sb = super.dump(indent, alreadyDumped);
     alreadyDumped.add(this);
     if (getActionTokens().size() > 0) {
       sb.append(' ').append(getActionTokens().get(0));

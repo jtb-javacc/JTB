@@ -29,14 +29,12 @@
 package EDU.purdue.jtb.parser;
 
 /**
- * Describes regular expressions which are referred to just by
- * their name.  This means that a regular expression with this
- * name has been declared earlier.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * Describes regular expressions which are referred to just by their name. This means that a regular
+ * expression with this name has been declared earlier.
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
-
 public class RJustName extends RegularExpression_ {
 
   /**
@@ -44,18 +42,19 @@ public class RJustName extends RegularExpression_ {
    */
   public RegularExpression_ regexpr;
 
+  /** {@inheritDoc} */
   @Override
-  public Nfa GenerateNfa(final boolean ignoreCase)
-  {
-     return regexpr.GenerateNfa(ignoreCase);
+  public Nfa GenerateNfa(final boolean ignoreCase) {
+    return regexpr.GenerateNfa(ignoreCase);
   }
 
-    public RJustName() {}
+  public RJustName() {
+  }
 
-    public RJustName(final Token token, final String image) {
-        this.setLine(token.beginLine);
-        this.setColumn(token.beginColumn);
-        this.label = image;
-    }
+  public RJustName(final Token token, final String image) {
+    this.setLine(token.beginLine);
+    this.setColumn(token.beginColumn);
+    this.label = image;
+  }
 
 }

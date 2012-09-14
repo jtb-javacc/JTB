@@ -57,7 +57,7 @@ import java.util.Hashtable;
 import EDU.purdue.jtb.syntaxtree.ComplexRegularExpression;
 import EDU.purdue.jtb.syntaxtree.ComplexRegularExpressionChoices;
 import EDU.purdue.jtb.syntaxtree.ComplexRegularExpressionUnit;
-import EDU.purdue.jtb.syntaxtree.Identifier;
+import EDU.purdue.jtb.syntaxtree.IdentifierAsString;
 import EDU.purdue.jtb.syntaxtree.JavaCCInput;
 import EDU.purdue.jtb.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.syntaxtree.NodeSequence;
@@ -70,9 +70,10 @@ import EDU.purdue.jtb.syntaxtree.StringLiteral;
 /**
  * Generates a symbol lookup table of tokens which have a constant regular expression, e.g. < PLUS :
  * "+" >, which will be used to generate a default constructor.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
+ * @version 1.4.7 : 07/2012 : MMa : followed changes in jtbgram.jtb (IndentifierAsString())
  */
 public class TokenTableBuilder extends DepthFirstVoidVisitor {
 
@@ -86,7 +87,7 @@ public class TokenTableBuilder extends DepthFirstVoidVisitor {
   /**
    * The returned Hashtable has the names of the tokens as the keys and the constant regular
    * expressions as the values or "" if the regular expression is not constant.
-   *
+   * 
    * @return the Hashtable
    */
   public Hashtable<String, String> getTokenTable() {
@@ -99,20 +100,20 @@ public class TokenTableBuilder extends DepthFirstVoidVisitor {
    * f0 -> JavaCCOptions()<br>
    * f1 -> "PARSER_BEGIN"<br>
    * f2 -> "("<br>
-   * f3 -> Identifier()<br>
+   * f3 -> IdentifierAsString()<br>
    * f4 -> ")"<br>
    * f5 -> CompilationUnit()<br>
    * f6 -> "PARSER_END"<br>
    * f7 -> "("<br>
-   * f8 -> Identifier()<br>
+   * f8 -> IdentifierAsString()<br>
    * f9 -> ")"<br>
    * f10 -> ( Production() )+<br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(final JavaCCInput n) {
-    // visit only Production
+    // visit only f10 -> ( Production() )+
     n.f10.accept(this);
   }
 
@@ -123,12 +124,12 @@ public class TokenTableBuilder extends DepthFirstVoidVisitor {
    * .. .. | %1 RegularExprProduction()<br>
    * .. .. | %2 TokenManagerDecls()<br>
    * .. .. | %3 BNFProduction()<br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(final Production n) {
-    // visit only RegularExprProduction
+    // visit only %1 RegularExprProduction()
     if (n.f0.which == 1)
       n.f0.accept(this);
   }
@@ -138,7 +139,8 @@ public class TokenTableBuilder extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> [ %0 #0 "<" #1 "*" #2 ">"<br>
    * .. .. | %1 #0 "<" #1 < IDENTIFIER ><br>
-   * .. .. . .. #2 ( $0 "," $1 < IDENTIFIER > )* #3 ">" ]<br>
+   * .. .. . .. #2 ( $0 "," $1 < IDENTIFIER > )*<br>
+   * .. .. . .. #3 ">" ]<br>
    * f1 -> RegExprKind()<br>
    * f2 -> [ #0 "[" #1 "IGNORE_CASE" #2 "]" ]<br>
    * f3 -> ":"<br>
@@ -147,11 +149,11 @@ public class TokenTableBuilder extends DepthFirstVoidVisitor {
    * f6 -> ( #0 "|" #1 RegExprSpec() )*<br>
    * f7 -> "}"<br>
    *
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(final RegularExprProduction n) {
-    // visit only RegExprSpec
+    // visit only f5 -> RegExprSpec() AND f6 -> ( #0 "|" #1 RegExprSpec() )*
     n.f5.accept(this);
     n.f6.accept(this);
   }
@@ -162,12 +164,12 @@ public class TokenTableBuilder extends DepthFirstVoidVisitor {
    * f0 -> RegularExpression()<br>
    * f1 -> [ Block() ]<br>
    * f2 -> [ #0 ":" #1 < IDENTIFIER > ]<br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(final RegExprSpec n) {
-    // visit only RegularExpression
+    // visit only f0 -> RegularExpression()
     n.f0.accept(this);
   }
 
@@ -175,22 +177,26 @@ public class TokenTableBuilder extends DepthFirstVoidVisitor {
    * Visits a {@link RegularExpression} node, whose children are the following :
    * <p>
    * f0 -> . %0 StringLiteral()<br>
-   * .. .. | %1 #0 < LANGLE : "<" ><br>
-   * .. .. . .. #1 [ $0 [ "#" ] $1 Identifier() $2 ":" ] #2 ComplexRegularExpressionChoices() #3 < RANGLE : ">" ><br>
-   * .. .. | %2 #0 "<" #1 Identifier() #2 ">"<br>
+   * .. .. | %1 #0 "<"<br>
+   * .. .. . .. #1 [ $0 [ "#" ]<br>
+   * .. .. . .. .. . $1 IdentifierAsString() $2 ":" ]<br>
+   * .. .. . .. #2 ComplexRegularExpressionChoices() #3 ">"<br>
+   * .. .. | %2 #0 "<" #1 IdentifierAsString() #2 ">"<br>
    * .. .. | %3 #0 "<" #1 "EOF" #2 ">"<br>
    *
-   * @param n the node to visit
+   * @param n - the node to visit
    */
   @Override
   public void visit(final RegularExpression n) {
     if (n.f0.which == 1) {
-      // <LANGLE: "<"> [ [ "#" ] Identifier() ":" ] ComplexRegularExpressionChoices(c) <RANGLE: ">">
+      // %1 #0 "<" #1 [ $0 [ "#" ] $1 IdentifierAsString() $2 ":" ] #2 ComplexRegularExpressionChoices() #3 ">"
       final NodeSequence seq = (NodeSequence) n.f0.choice;
       final NodeOptional opt = (NodeOptional) seq.elementAt(1);
       if (opt.present()) {
+        // #1 [ $0 [ "#" ] $1 IdentifierAsString() $2 ":" ]
         // name is set further down the tree
         seq.elementAt(1).accept(this);
+        // #2 ComplexRegularExpressionChoices()
         // regExpr is set further down the tree
         seq.elementAt(2).accept(this);
         table.put(name, regExpr);
@@ -206,15 +212,16 @@ public class TokenTableBuilder extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> ComplexRegularExpression()<br>
    * f1 -> ( #0 "|" #1 ComplexRegularExpression() )*<br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(final ComplexRegularExpressionChoices n) {
     if (n.f1.present())
-      // if f1 is present, this isn't a constant regexpr
+      // if f1 -> ( #0 "|" #1 ComplexRegularExpression() )* is present, this isn't a constant regexpr
       regExpr = "";
     else
+      // f0 -> ComplexRegularExpression()
       n.f0.accept(this);
   }
 
@@ -222,8 +229,8 @@ public class TokenTableBuilder extends DepthFirstVoidVisitor {
    * Visits a {@link ComplexRegularExpression} node, whose children are the following :
    * <p>
    * f0 -> ( ComplexRegularExpressionUnit() )+<br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(final ComplexRegularExpression n) {
@@ -235,22 +242,23 @@ public class TokenTableBuilder extends DepthFirstVoidVisitor {
    * Visits a {@link ComplexRegularExpressionUnit} node, whose children are the following :
    * <p>
    * f0 -> . %0 StringLiteral()<br>
-   * .. .. | %1 #0 "<" #1 Identifier() #2 ">"<br>
+   * .. .. | %1 #0 "<" #1 IdentifierAsString() #2 ">"<br>
    * .. .. | %2 CharacterList()<br>
    * .. .. | %3 #0 "(" #1 ComplexRegularExpressionChoices() #2 ")"<br>
    * .. .. . .. #3 ( &0 "+"<br>
    * .. .. . .. .. | &1 "*"<br>
    * .. .. . .. .. | &2 "?"<br>
    * .. .. . .. .. | &3 $0 "{" $1 IntegerLiteral()<br>
-   * .. .. . .. .. . .. $2 [ £0 ","<br>
-   * .. .. . .. .. . .. .. . £1 [ IntegerLiteral() ] ] $3 "}" )?<br>
-   *
-   * @param n the node to visit
+   * .. .. . .. .. . .. $2 [ ?0 ","<br>
+   * .. .. . .. .. . .. .. . ?1 [ IntegerLiteral() ] ]<br>
+   * .. .. . .. .. . .. $3 "}" )?<br>
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(final ComplexRegularExpressionUnit n) {
     if (n.f0.which == 0)
-      // StringLiteral()
+      // %0 StringLiteral()
       n.f0.accept(this);
     else
       // others
@@ -258,14 +266,14 @@ public class TokenTableBuilder extends DepthFirstVoidVisitor {
   }
 
   /**
-   * Visits a {@link Identifier} node, whose children are the following :
+   * Visits a {@link IdentifierAsString} node, whose children are the following :
    * <p>
    * f0 -> < IDENTIFIER ><br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
-  public void visit(final Identifier n) {
+  public void visit(final IdentifierAsString n) {
     name = n.f0.tokenImage;
   }
 
@@ -273,8 +281,8 @@ public class TokenTableBuilder extends DepthFirstVoidVisitor {
    * Visits a {@link StringLiteral} node, whose children are the following :
    * <p>
    * f0 -> < STRING_LITERAL ><br>
-   *
-   * @param n the node to visit
+   * 
+   * @param n - the node to visit
    */
   @Override
   public void visit(final StringLiteral n) {

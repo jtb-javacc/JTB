@@ -33,8 +33,8 @@ import EDU.purdue.jtb.parser.Expansion_.EXP_TYPE;
 
 /**
  * A set of routines that walk down the Expansion_ tree in various ways.
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public final class ExpansionTreeWalker {
@@ -43,9 +43,8 @@ public final class ExpansionTreeWalker {
   }
 
   /**
-   * Visits the nodes of the tree rooted at "node" in pre-order.
-   * i.e., it executes opObj.action first and then visits the
-   * children.
+   * Visits the nodes of the tree rooted at "node" in pre-order. i.e., it executes opObj.action
+   * first and then visits the children.
    */
   static void preOrderWalk(final Expansion_ node, final TreeWalkerOp opObj) {
     opObj.action(node);
@@ -54,113 +53,46 @@ public final class ExpansionTreeWalker {
         for (final Iterator<Expansion_> it = ((Choice) node).getChoices().iterator(); it.hasNext();) {
           preOrderWalk(it.next(), opObj);
         }
-      }
-      else if (node.expType == EXP_TYPE.SEQUENCE) {
+      } else if (node.expType == EXP_TYPE.SEQUENCE) {
         for (final Iterator<Expansion_> it = ((Sequence) node).units.iterator(); it.hasNext();) {
           preOrderWalk(it.next(), opObj);
         }
-      }
-      else if (node.expType == EXP_TYPE.ONE_OR_MORE) {
+      } else if (node.expType == EXP_TYPE.ONE_OR_MORE) {
         preOrderWalk(((OneOrMore) node).expansion, opObj);
-      }
-      else if (node.expType == EXP_TYPE.ZERO_OR_MORE) {
+      } else if (node.expType == EXP_TYPE.ZERO_OR_MORE) {
         preOrderWalk(((ZeroOrMore) node).expansion, opObj);
-      }
-      else if (node.expType == EXP_TYPE.ZERO_OR_ONE) {
+      } else if (node.expType == EXP_TYPE.ZERO_OR_ONE) {
         preOrderWalk(((ZeroOrOne) node).expansion, opObj);
-      }
-      else if (node.expType == EXP_TYPE.LOOKAHEAD) {
+      } else if (node.expType == EXP_TYPE.LOOKAHEAD) {
         final Expansion_ nested_e = ((Lookahead) node).getLaExpansion();
         if (!(nested_e.expType == EXP_TYPE.SEQUENCE && (((Sequence) nested_e).units.get(0)) == node)) {
           preOrderWalk(nested_e, opObj);
         }
-      }
-      else if (node.expType == EXP_TYPE.TRY_BLOCK) {
+      } else if (node.expType == EXP_TYPE.TRY_BLOCK) {
         preOrderWalk(((TryBlock) node).exp, opObj);
-      }
-      else if (node.expType == EXP_TYPE.R_CHOICE) {
+      } else if (node.expType == EXP_TYPE.R_CHOICE) {
         for (final Iterator<RegularExpression_> it = ((RChoice) node).getChoices().iterator(); it.hasNext();) {
           preOrderWalk(it.next(), opObj);
         }
-      }
-      else if (node.expType == EXP_TYPE.R_SEQUENCE) {
+      } else if (node.expType == EXP_TYPE.R_SEQUENCE) {
         for (final Iterator<RegularExpression_> it = ((RSequence) node).units.iterator(); it.hasNext();) {
           preOrderWalk(it.next(), opObj);
         }
-      }
-      else if (node.expType == EXP_TYPE.R_ONE_OR_MORE) {
+      } else if (node.expType == EXP_TYPE.R_ONE_OR_MORE) {
         preOrderWalk(((ROneOrMore) node).regexpr, opObj);
-      }
-      else if (node.expType == EXP_TYPE.R_ZERO_OR_MORE) {
+      } else if (node.expType == EXP_TYPE.R_ZERO_OR_MORE) {
         preOrderWalk(((RZeroOrMore) node).regexpr, opObj);
-      }
-      else if (node.expType == EXP_TYPE.R_ZERO_OR_ONE) {
+      } else if (node.expType == EXP_TYPE.R_ZERO_OR_ONE) {
         preOrderWalk(((RZeroOrOne) node).regexpr, opObj);
-      }
-      else if (node.expType == EXP_TYPE.R_REPETITION_RANGE) {
+      } else if (node.expType == EXP_TYPE.R_REPETITION_RANGE) {
         preOrderWalk(((RRepetitionRange) node).regexpr, opObj);
       }
     }
-    // ModMMa : modified to get rid of 'instanceof' for performance reasons
-//    opObj.action(node);
-//    if (opObj.goDeeper(node)) {
-//      if (node instanceof Choice) {
-//        for (final Iterator<Expansion_> it = ((Choice) node).getChoices().iterator(); it.hasNext();) {
-//          preOrderWalk(it.next(), opObj);
-//        }
-//      }
-//      else if (node instanceof Sequence) {
-//        for (final Iterator<Expansion_> it = ((Sequence) node).units.iterator(); it.hasNext();) {
-//          preOrderWalk(it.next(), opObj);
-//        }
-//      }
-//      else if (node instanceof OneOrMore) {
-//        preOrderWalk(((OneOrMore) node).expansion, opObj);
-//      }
-//      else if (node instanceof ZeroOrMore) {
-//        preOrderWalk(((ZeroOrMore) node).expansion, opObj);
-//      }
-//      else if (node instanceof ZeroOrOne) {
-//        preOrderWalk(((ZeroOrOne) node).expansion, opObj);
-//      }
-//      else if (node instanceof Lookahead) {
-//        final Expansion_ nested_e = ((Lookahead) node).getLaExpansion();
-//        if (!(nested_e instanceof Sequence && (((Sequence) nested_e).units.get(0)) == node)) {
-//          preOrderWalk(nested_e, opObj);
-//        }
-//      }
-//      else if (node instanceof TryBlock) {
-//        preOrderWalk(((TryBlock) node).exp, opObj);
-//      }
-//      else if (node instanceof RChoice) {
-//        for (final Iterator<RegularExpression_> it = ((RChoice) node).getChoices().iterator(); it.hasNext();) {
-//          preOrderWalk(it.next(), opObj);
-//        }
-//      }
-//      else if (node instanceof RSequence) {
-//        for (final Iterator<RegularExpression_> it = ((RSequence) node).units.iterator(); it.hasNext();) {
-//          preOrderWalk(it.next(), opObj);
-//        }
-//      }
-//      else if (node instanceof ROneOrMore) {
-//        preOrderWalk(((ROneOrMore) node).regexpr, opObj);
-//      }
-//      else if (node instanceof RZeroOrMore) {
-//        preOrderWalk(((RZeroOrMore) node).regexpr, opObj);
-//      }
-//      else if (node instanceof RZeroOrOne) {
-//        preOrderWalk(((RZeroOrOne) node).regexpr, opObj);
-//      }
-//      else if (node instanceof RRepetitionRange) {
-//        preOrderWalk(((RRepetitionRange) node).regexpr, opObj);
-//      }
-//    }
   }
 
   /**
-   * Visits the nodes of the tree rooted at "node" in post-order.
-   * i.e., it visits the children first and then executes
-   * opObj.action.
+   * Visits the nodes of the tree rooted at "node" in post-order. i.e., it visits the children first
+   * and then executes opObj.action.
    */
   static void postOrderWalk(final Expansion_ node, final TreeWalkerOp opObj) {
     if (opObj.goDeeper(node)) {
@@ -168,107 +100,41 @@ public final class ExpansionTreeWalker {
         for (final Iterator<Expansion_> it = ((Choice) node).getChoices().iterator(); it.hasNext();) {
           postOrderWalk(it.next(), opObj);
         }
-      }
-      else if (node.expType == EXP_TYPE.SEQUENCE) {
+      } else if (node.expType == EXP_TYPE.SEQUENCE) {
         for (final Iterator<Expansion_> it = ((Sequence) node).units.iterator(); it.hasNext();) {
           postOrderWalk(it.next(), opObj);
         }
-      }
-      else if (node.expType == EXP_TYPE.ONE_OR_MORE) {
+      } else if (node.expType == EXP_TYPE.ONE_OR_MORE) {
         postOrderWalk(((OneOrMore) node).expansion, opObj);
-      }
-      else if (node.expType == EXP_TYPE.ZERO_OR_MORE) {
+      } else if (node.expType == EXP_TYPE.ZERO_OR_MORE) {
         postOrderWalk(((ZeroOrMore) node).expansion, opObj);
-      }
-      else if (node.expType == EXP_TYPE.ZERO_OR_ONE) {
+      } else if (node.expType == EXP_TYPE.ZERO_OR_ONE) {
         postOrderWalk(((ZeroOrOne) node).expansion, opObj);
-      }
-      else if (node.expType == EXP_TYPE.LOOKAHEAD) {
+      } else if (node.expType == EXP_TYPE.LOOKAHEAD) {
         final Expansion_ nested_e = ((Lookahead) node).getLaExpansion();
         if (!(nested_e.expType == EXP_TYPE.SEQUENCE && (((Sequence) nested_e).units.get(0)) == node)) {
           postOrderWalk(nested_e, opObj);
         }
-      }
-      else if (node.expType == EXP_TYPE.TRY_BLOCK) {
+      } else if (node.expType == EXP_TYPE.TRY_BLOCK) {
         postOrderWalk(((TryBlock) node).exp, opObj);
-      }
-      else if (node.expType == EXP_TYPE.R_CHOICE) {
+      } else if (node.expType == EXP_TYPE.R_CHOICE) {
         for (final Iterator<RegularExpression_> it = ((RChoice) node).getChoices().iterator(); it.hasNext();) {
           postOrderWalk(it.next(), opObj);
         }
-      }
-      else if (node.expType == EXP_TYPE.R_SEQUENCE) {
+      } else if (node.expType == EXP_TYPE.R_SEQUENCE) {
         for (final Iterator<RegularExpression_> it = ((RSequence) node).units.iterator(); it.hasNext();) {
           postOrderWalk(it.next(), opObj);
         }
-      }
-      else if (node.expType == EXP_TYPE.R_ONE_OR_MORE) {
+      } else if (node.expType == EXP_TYPE.R_ONE_OR_MORE) {
         postOrderWalk(((ROneOrMore) node).regexpr, opObj);
-      }
-      else if (node.expType == EXP_TYPE.R_ZERO_OR_MORE) {
+      } else if (node.expType == EXP_TYPE.R_ZERO_OR_MORE) {
         postOrderWalk(((RZeroOrMore) node).regexpr, opObj);
-      }
-      else if (node.expType == EXP_TYPE.R_ZERO_OR_ONE) {
+      } else if (node.expType == EXP_TYPE.R_ZERO_OR_ONE) {
         postOrderWalk(((RZeroOrOne) node).regexpr, opObj);
-      }
-      else if (node.expType == EXP_TYPE.R_REPETITION_RANGE) {
+      } else if (node.expType == EXP_TYPE.R_REPETITION_RANGE) {
         postOrderWalk(((RRepetitionRange) node).regexpr, opObj);
       }
     }
     opObj.action(node);
-    // ModMMa : modified to get rid of 'instanceof' for performance reasons
-//    if (opObj.goDeeper(node)) {
-//      if (node instanceof Choice) {
-//        for (final Iterator<Expansion_> it = ((Choice) node).getChoices().iterator(); it.hasNext();) {
-//          postOrderWalk(it.next(), opObj);
-//        }
-//      }
-//      else if (node instanceof Sequence) {
-//        for (final Iterator<Expansion_> it = ((Sequence) node).units.iterator(); it.hasNext();) {
-//          postOrderWalk(it.next(), opObj);
-//        }
-//      }
-//      else if (node instanceof OneOrMore) {
-//        postOrderWalk(((OneOrMore) node).expansion, opObj);
-//      }
-//      else if (node instanceof ZeroOrMore) {
-//        postOrderWalk(((ZeroOrMore) node).expansion, opObj);
-//      }
-//      else if (node instanceof ZeroOrOne) {
-//        postOrderWalk(((ZeroOrOne) node).expansion, opObj);
-//      }
-//      else if (node instanceof Lookahead) {
-//        final Expansion_ nested_e = ((Lookahead) node).getLaExpansion();
-//        if (!(nested_e instanceof Sequence && (((Sequence) nested_e).units.get(0)) == node)) {
-//          postOrderWalk(nested_e, opObj);
-//        }
-//      }
-//      else if (node instanceof TryBlock) {
-//        postOrderWalk(((TryBlock) node).exp, opObj);
-//      }
-//      else if (node instanceof RChoice) {
-//        for (final Iterator<RegularExpression_> it = ((RChoice) node).getChoices().iterator(); it.hasNext();) {
-//          postOrderWalk(it.next(), opObj);
-//        }
-//      }
-//      else if (node instanceof RSequence) {
-//        for (final Iterator<RegularExpression_> it = ((RSequence) node).units.iterator(); it.hasNext();) {
-//          postOrderWalk(it.next(), opObj);
-//        }
-//      }
-//      else if (node instanceof ROneOrMore) {
-//        postOrderWalk(((ROneOrMore) node).regexpr, opObj);
-//      }
-//      else if (node instanceof RZeroOrMore) {
-//        postOrderWalk(((RZeroOrMore) node).regexpr, opObj);
-//      }
-//      else if (node instanceof RZeroOrOne) {
-//        postOrderWalk(((RZeroOrOne) node).regexpr, opObj);
-//      }
-//      else if (node instanceof RRepetitionRange) {
-//        postOrderWalk(((RRepetitionRange) node).regexpr, opObj);
-//      }
-//    }
-//    opObj.action(node);
   }
 }

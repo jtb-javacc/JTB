@@ -31,8 +31,8 @@ import java.util.Set;
 
 /**
  * Describes zero-or-one expansions (e.g., [foo], foo?).
- *
- * @author Marc Mazas, mmazas@sopragroup.com
+ * 
+ * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  */
 public class ZeroOrOne extends Expansion_ {
@@ -43,12 +43,10 @@ public class ZeroOrOne extends Expansion_ {
   public Expansion_ expansion;
 
   public ZeroOrOne() {
-    // ModMMa : added to get rid of 'instanceof' in ExpansionTreeWalker
     expType = EXP_TYPE.ZERO_OR_ONE;
   }
 
   public ZeroOrOne(final Token t, final Expansion_ e) {
-    // ModMMa : added to get rid of 'instanceof' in ExpansionTreeWalker
     this();
     this.setLine(t.beginLine);
     this.setColumn(t.beginColumn);
@@ -56,9 +54,10 @@ public class ZeroOrOne extends Expansion_ {
     e.parent = this;
   }
 
+  /** {@inheritDoc} */
   @Override
-  public StringBuffer dump(final int indent, final Set<Object> alreadyDumped) {
-    final StringBuffer sb = super.dump(indent, alreadyDumped);
+  public StringBuilder dump(final int indent, final Set<Object> alreadyDumped) {
+    final StringBuilder sb = super.dump(indent, alreadyDumped);
     if (alreadyDumped.contains(this))
       return sb;
     alreadyDumped.add(this);
