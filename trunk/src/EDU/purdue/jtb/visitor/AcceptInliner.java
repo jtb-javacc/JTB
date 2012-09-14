@@ -85,6 +85,8 @@ public class AcceptInliner extends JavaCCPrinter {
   int                      liopIx;
   /** The node optional variables index (0, 1, 2 ... -> P, P1, P2, ...) */
   int                      optIx;
+  /** The case index (-1 for none, or 0, 1, 2 ... */
+  int                      caseIx;
   /** The field name generator */
   final FieldNameGenerator nameGen = new FieldNameGenerator();
   /**
@@ -125,6 +127,7 @@ public class AcceptInliner extends JavaCCPrinter {
     type = "";
     var = ref = genNodeVar;
     loopIx = seqIx = listIx = liopIx = optIx = 0;
+    caseIx = -1;
     nameGen.reset();
     tcfLvl = -1;
     aCI.astNode.accept(this);
@@ -292,6 +295,7 @@ public class AcceptInliner extends JavaCCPrinter {
     String oldRef = ref;
     String oldVar = var;
     String oldType = type;
+    int oldCaseIx;
 
     if (PRINT_CLASS_COMMENT) {
       sb.append(spc.spc).append("// expLvl = ").append(expLvl).append(", lvix = ").append(loopIx)
@@ -306,14 +310,14 @@ public class AcceptInliner extends JavaCCPrinter {
         oneNewLine(n, "a");
       }
 
+      // visit Expansion()
       // no new values for type / var / ref
-
-      // Expansion()
+      oldCaseIx = caseIx = -1;
       n.f0.accept(this);
-
       ref = oldRef;
       var = oldVar;
       type = oldType;
+      caseIx = oldCaseIx;
 
       if (PRINT_CLASS_COMMENT) {
         sb.append(spc.spc).append("// only f0");
@@ -375,20 +379,20 @@ public class AcceptInliner extends JavaCCPrinter {
     sb.append(spc.spc).append("case 0:");
     oneNewLine(n, "case 0");
     spc.updateSpc(+1);
-    outputSubComment("Choice 1");
+    outputSubComment("Choice a");
 
+    // visit Expansion
+    oldCaseIx = caseIx = 0;
     oldRef = ref;
     oldVar = var;
     oldType = type;
-
     ++expLvl;
-    // Expansion()
     n.f0.accept(this);
     --expLvl;
-
     ref = oldRef;
     var = oldVar;
     type = oldType;
+    caseIx = oldCaseIx;
 
     sb.append(spc.spc).append("break;");
     oneNewLine(n, "break 0");
@@ -402,16 +406,17 @@ public class AcceptInliner extends JavaCCPrinter {
       sb.append(spc.spc).append("case ").append(i).append(":");
       oneNewLine(n, "case");
       spc.updateSpc(+1);
-      outputSubComment("Choice 2");
+      outputSubComment("Choice b");
 
+      // visit Expansion
+      oldCaseIx = caseIx = i;
       ++expLvl;
-      // Expansion()
       seq.elementAt(1).accept(this);
       --expLvl;
-
       ref = oldRef;
       var = oldVar;
       type = oldType;
+      caseIx = oldCaseIx;
 
       sb.append(spc.spc).append("break;");
       oneNewLine(n, "break n");
@@ -482,20 +487,27 @@ public class AcceptInliner extends JavaCCPrinter {
     final String oldType = type;
     final int oldNbEu = nbEu;
     int oldSeqIx = seqIx;
-    int ixEu = 0;
 
-    for (int i = 0; i < n.f1.size(); i++) {
+    int numEuOk = 0;
+    final int sz = n.f1.size();
+    for (int i = 0; i < sz; i++) {
       final ExpansionUnit expUnit = (ExpansionUnit) n.f1.elementAt(i);
       // don't process LocalLookahead nor Block in ExpansionUnit
       if (expUnit.f0.which > 1) {
+
         // generate variables except for ExpansionUnitTCF
         if (expUnit.f0.which != 3) {
           if (tcfLvl >= 0 && "".equals(type)) {
-            // case within TCF at first level : do nothing
+            // case within TCF at first level
+            if (expUnit.f0.which == 4) {
+              // just a RegularExpression
+              outputSubComment("Token");
+              var = ref.concat(".").concat(ci.fieldNames.get(fn));
+            }
           } else if (expLvl == 0) {
             // cases not within TCF, or within TCF not at first level : at first Expansion level ; proper type
             ref = ref.concat(".").concat(ci.fieldNames.get(fn));
-            var = var.concat(String.valueOf(fn));
+            var += fn;
             type = ci.fieldTypes.get(fn);
             outputFieldComment("Expansion");
             sb.append(spc.spc).append("final ").append(type).append(' ').append(var).append(" = ")
@@ -507,12 +519,14 @@ public class AcceptInliner extends JavaCCPrinter {
             // cases not within TCF, or within TCF not at first level : at other Expansion levels ; INode type
             if (nbEu > 1) {
               // here we are in a NodeSequence
-              final String numEuOkStr = String.valueOf(ixEu);
+              final String numEuOkStr = String.valueOf(numEuOk);
               if (nodeSeq.equals(type))
                 ref = var.concat(".elementAt(").concat(numEuOkStr).concat(")");
               else
                 ref = "((".concat(nodeSeq).concat(") ").concat(var).concat(").elementAt(")
                           .concat(numEuOkStr).concat(")");
+              if (caseIx >= 0)
+                var += caseIx;
               var = var.concat("A").concat(numEuOkStr);
               outputSubComment("Sequence");
               sb.append(spc.spc).append("final ").append(iNode).append(' ').append(var)
@@ -525,20 +539,19 @@ public class AcceptInliner extends JavaCCPrinter {
           }
         }
 
+        // visitExpansionUnit
         oldSeqIx = seqIx;
-
-        // visit
         ++expLvl;
         expUnit.accept(this);
         --expLvl;
-
         ref = oldRef;
         var = oldVar;
         type = oldType;
         nbEu = oldNbEu;
         seqIx = oldSeqIx;
 
-        ixEu++;
+        numEuOk++;
+
       }
     }
 
@@ -547,18 +560,18 @@ public class AcceptInliner extends JavaCCPrinter {
   /**
    * Visits a {@link ExpansionUnit} node, whose children are the following :
    * <p>
-   * f0 -> . %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"<br>
-   * .. .. | %1 Block()<br>
-   * .. .. | %2 #0 "[" #1 ExpansionChoices() #2 "]"<br>
-   * .. .. | %3 ExpansionUnitTCF()<br>
-   * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ]<br>
-   * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
-   * .. .. . .. .. | &1 $0 RegularExpression()<br>
-   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )<br>
-   * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
-   * .. .. . .. #3 ( &0 "+"<br>
-   * .. .. . .. .. | &1 "*"<br>
-   * .. .. . .. .. | &2 "?" )?<br>
+   * f0 -> . %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" //-- ExpansionChoices element<br>
+   * .. .. | %1 Block() //-- ExpansionChoices element<br>
+   * .. .. | %2 #0 "[" #1 ExpansionChoices() #2 "]" //-- ExpansionChoices element<br>
+   * .. .. | %3 ExpansionUnitTCF() //-- ExpansionChoices element<br>
+   * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ] //-- Expansion b!=0, noCom<br>
+   * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments() //-- ExpansionChoices element<br>
+   * .. .. . .. .. | &1 $0 RegularExpression() //-- Expansion b!=0, noCom<br>
+   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] ) //-- ExpansionChoices element<br>
+   * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")" //-- Expansion b!=0, noCom<br>
+   * .. .. . .. #3 ( &0 "+" //-- ExpansionChoices element<br>
+   * .. .. . .. .. | &1 "*" //-- ExpansionChoices element<br>
+   * .. .. . .. .. | &2 "?" )? //-- ExpansionChoices last<br>
    * 
    * @param n - the node to visit
    */
@@ -616,6 +629,7 @@ public class AcceptInliner extends JavaCCPrinter {
         spc.updateSpc(+1);
         ref = var.concat(".node");
 
+        // visit ExpansionChoices
         ++expLvl;
         seq.elementAt(1).accept(this);
         --expLvl;
@@ -634,7 +648,7 @@ public class AcceptInliner extends JavaCCPrinter {
           sb.append(spc.spc).append("// ExpansionUnit type 3");
           oneNewLine(n, "3_beg");
         }
-
+        // visit ExpansionUnitTCF
         n.f0.choice.accept(this);
         break;
 
@@ -660,42 +674,25 @@ public class AcceptInliner extends JavaCCPrinter {
         // #1 (...)
         ch = (NodeChoice) seq.elementAt(1);
         final NodeSequence seq1 = (NodeSequence) ch.choice;
-        if (ch.which == 0) {
-          // $0 IdentifierAsString() $1 Arguments()
-          if (depthLevel) {
-            sb.append(spc.spc).append("++depthLevel;");
-            oneNewLine(n, "w == 0");
-          }
-          sb.append(spc.spc);
-          if (ret)
-            sb.append(genRetVar).append(" = ");
-          sb.append(var).append(".accept(this");
-          if (argu)
-            sb.append(", ").append(genArguVar);
-          sb.append(");");
-          oneNewLine(n, "4_Identifier");
-          if (depthLevel) {
-            sb.append(spc.spc).append("--depthLevel;");
-            oneNewLine(n, "w == 0 --");
-          }
-        } else {
-          // $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ]
-          if (depthLevel) {
-            sb.append(spc.spc).append("++depthLevel;");
-            oneNewLine(n, "w != 0");
-          }
-          sb.append(spc.spc);
-          if (ret)
-            sb.append(genRetVar).append(" = ");
-          sb.append(var).append(".accept(this");
-          if (argu)
-            sb.append(", ").append(genArguVar);
-          sb.append(");");
-          oneNewLine(n, "4_RegularExpression");
-          if (depthLevel) {
-            sb.append(spc.spc).append("--depthLevel;");
-            oneNewLine(n, "w != 0 --");
-          }
+        // $0 IdentifierAsString() $1 Arguments()
+        // and
+        // $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ]
+        // TODO voir pourquoi là ?
+        if (depthLevel)
+          DepthFirstVisitorsGenerator.increaseDepthLevel(sb, spc);
+        sb.append(spc.spc);
+        if (ret)
+          sb.append(genRetVar).append(" = ");
+        sb.append(var).append(".accept(this");
+        if (argu)
+          sb.append(", ").append(genArguVar);
+        sb.append(");");
+        oneNewLine(n, "4_RegularExpression");
+        // TODO voir pourquoi là ?
+        if (depthLevel)
+          DepthFirstVisitorsGenerator.decreaseDepthLevel(sb, spc);
+        // $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ]
+        if (ch.which == 1) {
           opt = (NodeOptional) seq1.elementAt(1);
           if (opt.present()) {
             // TODO process ???
@@ -761,6 +758,7 @@ public class AcceptInliner extends JavaCCPrinter {
             ref = var;
             type = iNode;
 
+            // visit ExpansionChoices
             ++expLvl;
             seq.elementAt(1).accept(this);
             --expLvl;
@@ -819,6 +817,7 @@ public class AcceptInliner extends JavaCCPrinter {
             oneNewLine(n, "elem *");
             ref = var;
 
+            // visit ExpansionChoices
             ++expLvl;
             seq.elementAt(1).accept(this);
             --expLvl;
@@ -864,6 +863,7 @@ public class AcceptInliner extends JavaCCPrinter {
             spc.updateSpc(+1);
             ref = var.concat(".node");
 
+            // visit ExpansionChoices
             ++expLvl;
             seq.elementAt(1).accept(this);
             --expLvl;
@@ -898,6 +898,7 @@ public class AcceptInliner extends JavaCCPrinter {
             ref = var;
           }
 
+          // visit ExpansionChoices
           ++expLvl;
           seq.elementAt(1).accept(this);
           --expLvl;
@@ -941,6 +942,7 @@ public class AcceptInliner extends JavaCCPrinter {
     // f2 -> ExpansionChoices()
     if (tcfLvl > 0)
       outputTcfComment("ExpansionChoices");
+    // visit ExpansionChoices
     n.f2.accept(this);
 
     // f3 -> "}"

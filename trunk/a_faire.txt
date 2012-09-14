@@ -17,11 +17,15 @@ fait
 - optimisation Spacing
 - bug JTB-1 (soft errors Empty NodeChoices)
 - revoir CommentPrinter et autres pour générer les commentaires javadoc et java en listes distinctes
+- mauvaise génération du code et des commentaires dans ATestEmpty et ASimpleTestTCFProduction sur Identifier
+- NPE sur récupération des commentaires de classe vide ATestEmpty
+- duplicate variables dans les case d'un switch
 
 
 à faire
-- mauvaise génération du code ? dans ASimpleTestTCFProduction sur <EOF>
-- mauvaise génération des commentaires ? dans ATestJTBRTGen2 sur vide
+- voir pb f2 & f3 dans javadoc ASimpleTestTCFProduction et code java
+- voir commentaires dans RegularExprProduction
+- optimiser les types des membres de CommentData
 - syntaxe ! ou JTB_DONT_BUILD pour ne pas générer l'arbre
 - sortir une erreur si n = prod() et void prod()
 - voir les TODOs, ajouter les tests qui vont bien
@@ -29,6 +33,7 @@ fait
 - voir modifiers {n, m} pour ExpansionUnit
 - regénérer sans les commentaires de debug
 - vérifier avec et sans inline
+- vérifier le depthLevel dans AcceptInliner
 
 - problème coloration syntaxique dans AFancyProductionTCF
 

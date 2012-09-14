@@ -196,26 +196,26 @@ public class CommentsPrinter extends JavaCCPrinter {
    */
   int                         expLvl;
   /** The ExpansionUnitTCF level we are in : -1 : none; 0, 1, ... : first, second, ... */
-  int                         tcfLvl = -1;
+  int                         tcfLvl      = -1;
   /** The comment sequence level (0 -> none, 1 -> first, 2 -> second, ...) */
-  int                         seqLvl = 0;
+  int                         seqLvl      = 0;
   /** The choice sequence level (0 -> none, 1 -> first, 2 -> second, ...) */
-  int                         chLvl  = 0;
+  int                         chLvl       = 0;
   /** The comment prefix */
-  StringBuilder               prefix = new StringBuilder(32);
+  StringBuilder               prefix      = new StringBuilder(32);
   /** The which indicator characters */
-  public static final char[]  WHCH   = {
-      '%', '&', '~'                 };
+  public static final char[]  WHCH        = {
+      '%', '&', '~'                      };
   /** The sequence indicator characters */
-  public static final char[]  SEQCH  = {
-      '#', '$', '?'                 };
+  public static final char[]  SEQCH       = {
+      '#', '$', '?'                      };
   /** The (inner) ExpansionUnitTCF indicator characters */
-  public static final char[]  TCFCH  = {
-      '@', '!', '^'                 };
+  public static final char[]  TCFCH       = {
+      '@', '!', '^'                      };
   /** The separator character between sequence elements */
-  public static final char    SEPCH  = ' ';
+  public static final char    SEPCH       = ' ';
   /** The prefix for TCF elements */
-  public static final String  PFXSTR = ". ";
+  public static final String  PFXSTR      = ". ";
   /** The field name index */
   int                         fni;
   /**
@@ -228,11 +228,13 @@ public class CommentsPrinter extends JavaCCPrinter {
   /** The current field index */
   int                         fld;
   /** An auxiliary buffer for the field comments */
-  StringBuilder               fcb    = null;
+  StringBuilder               fcb         = null;
   /** An auxiliary buffer for the sub comments */
-  StringBuilder               scb    = null;
+  StringBuilder               scb         = null;
   /** The ClassInfo the visitor is working on */
   ClassInfo                   classInfo;
+  /** A debug switch, to change prefix and field names strings */
+  public static final boolean DEBUG_CHARS = false;
 
   /**
    * Constructor which just allocates the internal buffer.
@@ -410,9 +412,10 @@ public class CommentsPrinter extends JavaCCPrinter {
       // output generated field name (on the new field comment)
       final String fx = classInfo.fieldNames.get(fni++);
       //  see ReferenceType
-      //      curCtn.addFn(fx, " ?> . ");
-      curCtn.addFn(fx, " -> . ");
-      // set prefix
+      if (DEBUG_CHARS)
+        curCtn.addFn(fx, " ?> . ");
+      else
+        curCtn.addFn(fx, " -> . ");
       reinitPrefix(fx);
       curCtn.addPfx(prefix);
     }
@@ -421,18 +424,16 @@ public class CommentsPrinter extends JavaCCPrinter {
     curCtn.newSubComment();
     // output which indicator
     curCtn.addTag(WHCH[(chLvl % 3)], (bigWh ? "00 " : "0 "));
-    //      curCtn.addPfx(bigWh ? "` ... " : "` .. ");
-    curCtn.addPfx(bigWh ? ". ... " : ". .. ");
+    if (DEBUG_CHARS)
+      curCtn.addPfx(bigWh ? "` ``` " : "` `` ");
+    else
+      curCtn.addPfx(bigWh ? ". ... " : ". .. ");
 
-    // save state info
+    // visit Expansion()
     final int oldChLvl = chLvl++;
-
-    // visit
     ++expLvl;
     n.f0.accept(this);
     --expLvl;
-
-    // restore state info
     chLvl = oldChLvl;
 
     // f1 -> ( #0 "|" #1 Expansion() )*
@@ -453,17 +454,16 @@ public class CommentsPrinter extends JavaCCPrinter {
       // see UnaryExpression
       curCtn.addTag(WHCH[(chLvl % 3)], bigWh && fi < 10 ? "0" : "", fi, ' ');
       chLvl++;
-      //        curCtn.addPfx(bigWh ? "' ... " : "' .. ");
-      curCtn.addPfx(bigWh ? ". ... " : ". .. ");
+      if (DEBUG_CHARS)
+        curCtn.addPfx(bigWh ? "' ''' " : "' '' ");
+      else
+        curCtn.addPfx(bigWh ? ". ... " : ". .. ");
       fi++;
 
-      // visit
+      // visit Expansion()
       ++expLvl;
-      // Expansion()
       seq.elementAt(1).accept(this);
       --expLvl;
-
-      // restore state info
       chLvl = oldChLvl;
 
     } // end for loop on elements
@@ -476,6 +476,7 @@ public class CommentsPrinter extends JavaCCPrinter {
       // see ExplicitConstructorInvocation, ReferenceType
       oneNewLineSwitchFieldCmt(n, "last");
     }
+
   }
 
   /**
@@ -501,13 +502,14 @@ public class CommentsPrinter extends JavaCCPrinter {
     final boolean bigSeq = nbEuOk > 10;
     int numEuOk = 0;
 
-    // save state info
+    // save state info early
     final int oldSeqLvl = seqLvl;
 
     // f1 -> ( ExpansionUnit() )+
     boolean wantedToBeOnNewLine = false;
-    for (final Iterator<INode> e = n.f1.elements(); e.hasNext();) {
-      final ExpansionUnit expUnit = (ExpansionUnit) e.next();
+    final int sz = n.f1.size();
+    for (int i = 0; i < sz; i++) {
+      final ExpansionUnit expUnit = (ExpansionUnit) n.f1.elementAt(i);
       // don't process LocalLookahead or Block ExpansionUnits
       if (expUnit.f0.which > 1) {
 
@@ -521,14 +523,16 @@ public class CommentsPrinter extends JavaCCPrinter {
           }
           // output generated field name (on the new field comment)
           final String fx = classInfo.fieldNames.get(fni++);
-          //          curCtn.addFn(fx, " :> ");
-          curCtn.addFn(fx, " -> ");
-          // set prefix
+          if (DEBUG_CHARS)
+            curCtn.addFn(fx, " :> ");
+          else
+            curCtn.addFn(fx, " -> ");
           reinitPrefix(fx);
           curCtn.addPfx(prefix);
         } else {
           // at non first Expansion levels
           if (expUnit.f0.which == 3) {
+            // ExpansionUnitTCF
             curCtn.addPfx(PFXSTR);
           } else if (numEuOk > 0 && (expUnit.f0.which == 5 || expUnit.f0.which == 2)) {
             // new line if (...), (...)?, (...)+, (...)* or [...] and not first ExpansionUnit
@@ -561,9 +565,10 @@ public class CommentsPrinter extends JavaCCPrinter {
               // and if not first ExpansionUnit,
               // output generated field name (on the new field comment)
               final String fx = classInfo.fieldNames.get(fni++);
-              //              curCtn.addFn(fx, " >> ");
-              curCtn.addFn(fx, " -> ");
-              // set prefix
+              if (DEBUG_CHARS)
+                curCtn.addFn(fx, " >> ");
+              else
+                curCtn.addFn(fx, " -> ");
               reinitPrefix(fx);
               curCtn.addPfx(prefix);
             }
@@ -578,9 +583,10 @@ public class CommentsPrinter extends JavaCCPrinter {
             if (addSpace)
               curCtn.addFn(SEPCH);
             seqLvl++;
-            // store prefix
-            //              curCtn.addPfx(bigSeq ? "-.. " : "-. ");
-            curCtn.addPfx(bigSeq ? "... " : ".. ");
+            if (DEBUG_CHARS)
+              curCtn.addPfx(bigSeq ? "--- " : "-- ");
+            else
+              curCtn.addPfx(bigSeq ? "... " : ".. ");
           }
         }
 
@@ -589,18 +595,17 @@ public class CommentsPrinter extends JavaCCPrinter {
           final NodeSequence seq = (NodeSequence) expUnit.f0.choice;
           final ExpansionChoices ec = (ExpansionChoices) seq.elementAt(1);
           if (!ec.f1.present())
-            //              curCtn.addPfx("= ");
-            curCtn.addPfx(". ");
+            if (DEBUG_CHARS)
+              curCtn.addPfx("= ");
+            else
+              curCtn.addPfx(". ");
         }
 
-        // visit
+        // visit ExpansionUnit
         ++expLvl;
         expUnit.accept(this);
         --expLvl;
-
-        // restore state info
         seqLvl = oldSeqLvl;
-
         wantedToBeOnNewLine = expUnit.f0.which == 5 || expUnit.f0.which == 2;
         numEuOk++;
 
@@ -616,18 +621,18 @@ public class CommentsPrinter extends JavaCCPrinter {
   /**
    * Visits a {@link ExpansionUnit} node, whose children are the following :
    * <p>
-   * f0 -> . %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"<br>
-   * .. .. | %1 Block()<br>
-   * .. .. | %2 #0 "[" #1 ExpansionChoices() #2 "]"<br>
-   * .. .. | %3 ExpansionUnitTCF()<br>
-   * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ]<br>
-   * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
-   * .. .. . .. .. | &1 $0 RegularExpression()<br>
-   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )<br>
-   * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
-   * .. .. . .. #3 ( &0 "+"<br>
-   * .. .. . .. .. | &1 "*"<br>
-   * .. .. . .. .. | &2 "?" )?<br>
+   * f0 -> . %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" //-- ExpansionChoices element<br>
+   * .. .. | %1 Block() //-- ExpansionChoices element<br>
+   * .. .. | %2 #0 "[" #1 ExpansionChoices() #2 "]" //-- ExpansionChoices element<br>
+   * .. .. | %3 ExpansionUnitTCF() //-- ExpansionChoices element<br>
+   * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ] //-- Expansion b!=0, noCom<br>
+   * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments() //-- ExpansionChoices element<br>
+   * .. .. . .. .. | &1 $0 RegularExpression() //-- Expansion b!=0, noCom<br>
+   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] ) //-- ExpansionChoices element<br>
+   * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")" //-- Expansion b!=0, noCom<br>
+   * .. .. . .. #3 ( &0 "+" //-- ExpansionChoices element<br>
+   * .. .. . .. .. | &1 "*" //-- ExpansionChoices element<br>
+   * .. .. . .. .. | &2 "?" )? //-- ExpansionChoices last<br>
    * 
    * @param n - the node to visit
    */
@@ -652,6 +657,7 @@ public class CommentsPrinter extends JavaCCPrinter {
         // %2 #0 "[" #1 ExpansionChoices() #2 "]"
         seq = (NodeSequence) n.f0.choice;
         curCtn.addSeq("[ ");
+        // visit ExpansionChoices
         ++expLvl;
         seq.elementAt(1).accept(this);
         --expLvl;
@@ -661,6 +667,7 @@ public class CommentsPrinter extends JavaCCPrinter {
 
       case 3:
         // %3 ExpansionUnitTCF()
+        // visit
         n.f0.choice.accept(this);
         break;
 
@@ -674,15 +681,18 @@ public class CommentsPrinter extends JavaCCPrinter {
         final NodeSequence seq1 = (NodeSequence) ch.choice;
         if (ch.which == 0) {
           // $0 IdentifierAsString() $1 Arguments()
+          // visit IdentifierAsString
           seq1.elementAt(0).accept(this);
-          // don't print arguments, only parenthesis (for readability)
+          // don't visit / print arguments, only parenthesis (for readability)
           curCtn.addId("()");
         } else {
           // $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ]
+          // visit RegularExpression
           seq1.elementAt(0).accept(this);
           final NodeOptional opt1 = (NodeOptional) seq1.elementAt(1);
           if (opt1.present()) {
             curCtn.addId('.');
+            // visit < IDENTIFIER >
             ((NodeSequence) opt1.node).elementAt(1).accept(this);
           }
         }
@@ -703,8 +713,8 @@ public class CommentsPrinter extends JavaCCPrinter {
         // #3 ( &0 "+" | &1 "*" | &2 "?" )?
         opt = (NodeOptional) seq.elementAt(3);
         if (opt.present()) {
-          //          ((NodeChoice) opt.node).choice.accept(this);
-          // take it directly to add it to the end member, not to the id member
+          // ((NodeChoice) opt.node).choice.accept(this);
+          // don't visit, take it directly to add it to the end member, not to the id member
           curCtn.addEnd(((NodeToken) ((NodeChoice) opt.node).choice).tokenImage);
         }
         //  see Modifiers, TypeDeclaration, EqualityExpression
@@ -773,17 +783,23 @@ public class CommentsPrinter extends JavaCCPrinter {
     // f2 -> ExpansionChoices()
     if (tcfLvl == 0) {
       fx = classInfo.fieldNames.get(fni++);
-      //      curCtn.addFn(fx, " ~> ");
-      curCtn.addFn(fx, " -> ");
+      if (DEBUG_CHARS)
+        curCtn.addFn(fx, " ~> ");
+      else
+        curCtn.addFn(fx, " -> ");
+      reinitPrefix(fx);
       curCtn.addPfx(prefix);
     } else {
       // end sub comment and start a new sub comment
       curCtn.endSubComment();
       curCtn.newSubComment();
       curCtn.addTag(compTcfTag(cs, ++k, bigTcf));
-      //        curCtn.addPfx(bigTcf ? "\".. " : "\". ");
-      curCtn.addPfx(bigTcf ? "... " : ".. ");
+      if (DEBUG_CHARS)
+        curCtn.addPfx(bigTcf ? "\"\"\" " : "\"\" ");
+      else
+        curCtn.addPfx(bigTcf ? "... " : ".. ");
     }
+    // visit ExpansionChoices
     final boolean oldBigTcf = bigTcf;
     n.f2.accept(this);
     bigTcf = oldBigTcf;
@@ -1098,11 +1114,15 @@ public class CommentsPrinter extends JavaCCPrinter {
   void reinitPrefix(final String fx) {
     final int fxl = fx.length();
     prefix.setLength(0);
-    for (int i = 0; i < fxl; i++)
-      //      prefix.append(";");
-      prefix.append(".");
-    //    prefix.append(" ;; ");
-    prefix.append(" .. ");
+    if (DEBUG_CHARS) {
+      for (int i = 0; i < fxl; i++)
+        prefix.append(";");
+      prefix.append(" ;; ");
+    } else {
+      for (int i = 0; i < fxl; i++)
+        prefix.append(".");
+      prefix.append(" .. ");
+    }
   }
 
   /*
@@ -1126,6 +1146,8 @@ public class CommentsPrinter extends JavaCCPrinter {
     for (int i = 0; i < sz; i++)
       roots.add(new CommentsTreeNode(null));
     fld = 0;
+    if (roots.size() == 0)
+      return;
     curCtn = roots.get(0);
     //    assert curCtn != null : "curCtn is null !";
     // work
@@ -1232,20 +1254,20 @@ public class CommentsPrinter extends JavaCCPrinter {
     if (aCtn.children == null)
       fcb.append(aCtn.id);
     else {
-      StringBuilder curPrefix = null;
+      StringBuilder pfx = null;
       final int len = (aPrefix == null ? 0 : aPrefix.length()) +
                       (aCtn.pfx == null ? 0 : aCtn.pfx.length());
       if (len > 0) {
-        curPrefix = new StringBuilder(len);
+        pfx = new StringBuilder(len);
         if (aPrefix != null)
-          curPrefix.append(aPrefix);
+          pfx.append(aPrefix);
         if (aCtn.pfx != null)
-          curPrefix.append(aCtn.pfx);
+          pfx.append(aCtn.pfx);
       }
       boolean apply = false;
       for (final CommentsTreeNode child : aCtn.children) {
         // just fill the "inside" of the field comment
-        processNode(child, aFcd, false, curPrefix, apply);
+        processNode(child, aFcd, false, pfx, apply);
         apply = true;
       }
     }
