@@ -501,8 +501,9 @@ public class AcceptInliner extends JavaCCPrinter {
             // case within TCF at first level
             if (expUnit.f0.which == 4) {
               // just a RegularExpression
-              outputSubComment("Token");
+              outputTcfComment("Token");
               var = ref.concat(".").concat(ci.fieldNames.get(fn));
+              fn++;
             }
           } else if (expLvl == 0) {
             // cases not within TCF, or within TCF not at first level : at first Expansion level ; proper type
@@ -560,18 +561,18 @@ public class AcceptInliner extends JavaCCPrinter {
   /**
    * Visits a {@link ExpansionUnit} node, whose children are the following :
    * <p>
-   * f0 -> . %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" //-- ExpansionChoices element<br>
-   * .. .. | %1 Block() //-- ExpansionChoices element<br>
-   * .. .. | %2 #0 "[" #1 ExpansionChoices() #2 "]" //-- ExpansionChoices element<br>
-   * .. .. | %3 ExpansionUnitTCF() //-- ExpansionChoices element<br>
-   * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ] //-- Expansion b!=0, noCom<br>
-   * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments() //-- ExpansionChoices element<br>
-   * .. .. . .. .. | &1 $0 RegularExpression() //-- Expansion b!=0, noCom<br>
-   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] ) //-- ExpansionChoices element<br>
-   * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")" //-- Expansion b!=0, noCom<br>
-   * .. .. . .. #3 ( &0 "+" //-- ExpansionChoices element<br>
-   * .. .. . .. .. | &1 "*" //-- ExpansionChoices element<br>
-   * .. .. . .. .. | &2 "?" )? //-- ExpansionChoices last<br>
+   * f0 -> . %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"<br>
+   * .. .. | %1 Block()<br>
+   * .. .. | %2 #0 "[" #1 ExpansionChoices() #2 "]"<br>
+   * .. .. | %3 ExpansionUnitTCF()<br>
+   * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ]<br>
+   * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
+   * .. .. . .. .. | &1 $0 RegularExpression()<br>
+   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )<br>
+   * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
+   * .. .. . .. #3 ( &0 "+"<br>
+   * .. .. . .. .. | &1 "*"<br>
+   * .. .. . .. .. | &2 "?" )?<br>
    * 
    * @param n - the node to visit
    */
@@ -662,8 +663,10 @@ public class AcceptInliner extends JavaCCPrinter {
         // #0 [ $0 PrimaryExpression() $1 "=" ]
         opt = (NodeOptional) seq.elementAt(0);
         if (opt.present()) {
-          // TODO do we need to process this ? if yes, we need to generate the first Block()
-          //  of a BnfProduction() (may be we should put a JTB option for this)
+          // we believe that we do not need to process this, as it is used in the generated .jj, but it does
+          // not look it is useful in the visitors
+          // if yes, we would need to generate the first Block() of a BnfProduction() (for the variable declaration),
+          // generate this assignment after the accept method, using a generated return value
           //          sb.append(spc.spc);
           //          ((NodeSequence) opt.node).elementAt(0).accept(this);
           //          sb.append(" = ");
@@ -677,7 +680,6 @@ public class AcceptInliner extends JavaCCPrinter {
         // $0 IdentifierAsString() $1 Arguments()
         // and
         // $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ]
-        // TODO voir pourquoi là ?
         if (depthLevel)
           DepthFirstVisitorsGenerator.increaseDepthLevel(sb, spc);
         sb.append(spc.spc);
@@ -688,15 +690,14 @@ public class AcceptInliner extends JavaCCPrinter {
           sb.append(", ").append(genArguVar);
         sb.append(");");
         oneNewLine(n, "4_RegularExpression");
-        // TODO voir pourquoi là ?
         if (depthLevel)
           DepthFirstVisitorsGenerator.decreaseDepthLevel(sb, spc);
         // $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ]
         if (ch.which == 1) {
           opt = (NodeOptional) seq1.elementAt(1);
           if (opt.present()) {
-            // TODO process ???
-            sb.append("// Please report to support : TO DO $1 [ ?0 \".\" ?1 < IDENTIFIER > ]");
+            sb.append("// Please report to support with a real example of your grammar "
+                      + "if you want the suffix to be generated : $1 [ ?0 \".\" ?1 < IDENTIFIER > ]");
             oneNewLine(n, "4_._<_IDENTIFIER_>");
           }
         }

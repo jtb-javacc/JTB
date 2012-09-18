@@ -1254,7 +1254,10 @@ void RegularExpression(Container c) :
     Token t = getToken(1);
   }
   {
-    image = StringLiteral()    {      c.member = new RStringLiteral(t, image);    }
+    image = StringLiteral()
+    {
+      c.member = new RStringLiteral(t, image);
+    }
   | LOOKAHEAD(3)
     {
       image = "";
@@ -1295,7 +1298,9 @@ void RegularExpression(Container c) :
     }
   | LOOKAHEAD(2)
     "<" image = IdentifierAsString() ">"
-    {      c.member = new RJustName(t, image);    }
+    {
+      c.member = new RJustName(t, image);
+    }
   | "<" "EOF" ">"
     {
       ef = new REndOfFile();

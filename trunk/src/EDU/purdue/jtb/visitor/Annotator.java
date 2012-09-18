@@ -577,15 +577,23 @@ public class Annotator extends JavaCCPrinter {
 /**
    * Visits a {@link RegularExprProduction} node, whose children are the following :
    * <p>
-   * f0 -> [ %0 #0 "<" #1 "*" #2 ">"<br>
-   * .. .. | %1 #0 "<" #1 < IDENTIFIER ><br>
-   * .. .. . .. #2 ( $0 "," $1 < IDENTIFIER > )* #3 ">" ]<br>
+   * f0 -> [ %0 #0 "<"<br>
+   * .. .. . .. #1 "*"<br>
+   * .. .. . .. #2 ">"<br>
+   * .. .. | %1 #0 "<"<br>
+   * .. .. . .. #1 < IDENTIFIER ><br>
+   * .. .. . .. #2 ( $0 ","<br>
+   * .. .. . .. .. . $1 < IDENTIFIER > )*<br>
+   * .. .. . .. #3 ">" ]<br>
    * f1 -> RegExprKind()<br>
-   * f2 -> [ #0 "[" #1 "IGNORE_CASE" #2 "]" ]<br>
+   * f2 -> [ #0 "["<br>
+   * .. .. . #1 "IGNORE_CASE"<br>
+   * .. .. . #2 "]" ]<br>
    * f3 -> ":"<br>
    * f4 -> "{"<br>
    * f5 -> RegExprSpec()<br>
-   * f6 -> ( #0 "|" #1 RegExprSpec() )*<br>
+   * f6 -> ( #0 "|"<br>
+   * .. .. . #1 RegExprSpec() )*<br>
    * f7 -> "}"<br>
    *
    * @param n - the node to visit
@@ -1990,7 +1998,7 @@ public class Annotator extends JavaCCPrinter {
   }
 
   /**
-   * The GlobalDataFinder visitor finds}<br>
+   * The {@link GlobalDataFinder} visitor finds<br>
    * all "void" JavaCodeProductions and adds them to a Hashtable (which will be used to avoid
    * creating later invalid child nodes),<br>
    * all non "void" BNFProductions and constructs a list of return variables declarations (to be
@@ -2201,7 +2209,7 @@ public class Annotator extends JavaCCPrinter {
   }
 
   /**
-   * The CompilationUnitPrinter visitor}<br>
+   * The {@link CompilationUnitPrinter} visitor<br>
    * determines if an import statement for the syntax tree package is needed in the grammar file,<br>
    * prints the compilation unit (with appropriate tool kit methods), inserting the import
    * statements if necessary.

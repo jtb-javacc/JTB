@@ -51,6 +51,7 @@ import EDU.purdue.jtb.visitor.CommentsPrinter;
  * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  * @version 1.4.6 : 01/2011 : FA/MMa : added -va and -npfx and -nsfx options
+ * @version 1.4.7 : 09/2012 : MMa : refactored comment handling to add sub comments and optimization
  */
 public class ClassInfo {
 

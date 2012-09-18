@@ -20,17 +20,18 @@ fait
 - mauvaise génération du code et des commentaires dans ATestEmpty et ASimpleTestTCFProduction sur Identifier
 - NPE sur récupération des commentaires de classe vide ATestEmpty
 - duplicate variables dans les case d'un switch
-
+- voir pb f2 & f3 dans javadoc ASimpleTestTCFProduction et code java
+- voir null dans ASimpleTestEmptyChoiceProduction
+- optimiser les types des membres de CommentData
+- voir commentaires dans RegularExprProduction
+- voir les TODOs pour JTB, ajouter les tests qui vont bien
+- depthLevel dans TCF sans IA
+- sortir une erreur si n = prod() et void prod()
 
 à faire
-- voir pb f2 & f3 dans javadoc ASimpleTestTCFProduction et code java
-- voir commentaires dans RegularExprProduction
-- optimiser les types des membres de CommentData
+- voir les TODOs pour le plugin, ajouter les tests qui vont bien
 - syntaxe ! ou JTB_DONT_BUILD pour ne pas générer l'arbre
-- sortir une erreur si n = prod() et void prod()
-- voir les TODOs, ajouter les tests qui vont bien
 - NLS
-- voir modifiers {n, m} pour ExpansionUnit
 - regénérer sans les commentaires de debug
 - vérifier avec et sans inline
 - vérifier le depthLevel dans AcceptInliner

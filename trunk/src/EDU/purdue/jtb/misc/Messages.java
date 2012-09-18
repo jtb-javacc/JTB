@@ -62,6 +62,7 @@ import static EDU.purdue.jtb.misc.Globals.jtbInputFileName;
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : enhanced
+ * @version 1.4.7 : 09/2012 : MMa : fixed missing "soft error" label
  */
 public class Messages {
 
@@ -147,19 +148,20 @@ public class Messages {
     if (lineNum == -1)
       System.err.println(jtbInputFileName + ":  soft error:  " + s);
     else
-      System.err.println(jtbInputFileName + " (" + Integer.toString(lineNum) + "):  " + s);
+      System.err.println(jtbInputFileName + " (" + Integer.toString(lineNum) + "):  soft error:  " +
+                         s);
 
     ++numErrors;
   }
 
-  /**
-   * Prints on System.err a message.
-   * 
-   * @param s - a message
-   */
-  public static void notice(final String s) {
-    System.err.println(jtbInputFileName + ":  " + s);
-  }
+  //  /**
+  //   * Prints on System.err a message.
+  //   * 
+  //   * @param s - a message
+  //   */
+  //  public static void notice(final String s) {
+  //    System.err.println(jtbInputFileName + ":  " + s);
+  //  }
 
   /**
    * Prints on System.err a fatal error message, its stack trace, and terminates the program.
