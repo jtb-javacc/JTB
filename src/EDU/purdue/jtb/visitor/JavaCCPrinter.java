@@ -667,16 +667,23 @@ public class JavaCCPrinter extends DepthFirstVoidVisitor {
 /**
    * Visits a {@link RegularExprProduction} node, whose children are the following :
    * <p>
-   * f0 -> [ %0 #0 "<" #1 "*" #2 ">"<br>
-   * .. .. | %1 #0 "<" #1 < IDENTIFIER ><br>
-   * .. .. . .. #2 ( $0 "," $1 < IDENTIFIER > )*<br>
+   * f0 -> [ %0 #0 "<"<br>
+   * .. .. . .. #1 "*"<br>
+   * .. .. . .. #2 ">"<br>
+   * .. .. | %1 #0 "<"<br>
+   * .. .. . .. #1 < IDENTIFIER ><br>
+   * .. .. . .. #2 ( $0 ","<br>
+   * .. .. . .. .. . $1 < IDENTIFIER > )*<br>
    * .. .. . .. #3 ">" ]<br>
    * f1 -> RegExprKind()<br>
-   * f2 -> [ #0 "[" #1 "IGNORE_CASE" #2 "]" ]<br>
+   * f2 -> [ #0 "["<br>
+   * .. .. . #1 "IGNORE_CASE"<br>
+   * .. .. . #2 "]" ]<br>
    * f3 -> ":"<br>
    * f4 -> "{"<br>
    * f5 -> RegExprSpec()<br>
-   * f6 -> ( #0 "|" #1 RegExprSpec() )*<br>
+   * f6 -> ( #0 "|"<br>
+   * .. .. . #1 RegExprSpec() )*<br>
    * f7 -> "}"<br>
    *
    * @param n - the node to visit

@@ -54,6 +54,7 @@ package EDU.purdue.jtb.visitor;
 
 import static EDU.purdue.jtb.misc.Globals.*;
 
+import java.util.HashMap;
 import java.util.Iterator;
 
 import EDU.purdue.jtb.misc.Messages;
@@ -68,6 +69,7 @@ import EDU.purdue.jtb.syntaxtree.ExpansionUnit;
 import EDU.purdue.jtb.syntaxtree.ExpansionUnitTCF;
 import EDU.purdue.jtb.syntaxtree.ForStatement;
 import EDU.purdue.jtb.syntaxtree.INode;
+import EDU.purdue.jtb.syntaxtree.IdentifierAsString;
 import EDU.purdue.jtb.syntaxtree.IfStatement;
 import EDU.purdue.jtb.syntaxtree.JavaCCInput;
 import EDU.purdue.jtb.syntaxtree.JavaCCOptions;
@@ -139,12 +141,15 @@ import EDU.purdue.jtb.syntaxtree.WhileStatement;
  * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  * @version 1.4.1 : 02/2010 : MMa : fixed unprocessed n.f0.which == 0 case in visit(ExpansionUnit)
- * @version 1.4.7 : 07/2012 : MMa : followed changes in jtbgram.jtb (LocalVariableDeclaration())
+ * @version 1.4.7 : 07/2012 : MMa : followed changes in jtbgram.jtb (LocalVariableDeclaration())<br>
+ *          1.4.7 : 09/2012 : MMa : added control on void production on the RHS of an assignment
  */
 public class SemanticChecker extends DepthFirstVoidVisitor {
 
   /** The name of the current production */
-  String prod;
+  String                         prod;
+  /** List of all return variables identifiers */
+  public HashMap<String, String> retVarIdent = new HashMap<String, String>();
 
   /**
    * Visits a {@link JavaCCInput} node, whose children are the following :
@@ -165,6 +170,8 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    */
   @Override
   public void visit(final JavaCCInput n) {
+    // find first all non void return types
+    n.f10.accept(new NonVoidBNFProductionsFinder());
     // visit only f10 -> ( Production() )+
     n.f10.accept(this);
   }
@@ -314,16 +321,23 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
 /**
    * Visits a {@link RegularExprProduction} node, whose children are the following :
    * <p>
-   * f0 -> [ %0 #0 "<" #1 "*" #2 ">"<br>
-   * .. .. | %1 #0 "<" #1 < IDENTIFIER ><br>
-   * .. .. . .. #2 ( $0 "," $1 < IDENTIFIER > )*<br>
+   * f0 -> [ %0 #0 "<"<br>
+   * .. .. . .. #1 "*"<br>
+   * .. .. . .. #2 ">"<br>
+   * .. .. | %1 #0 "<"<br>
+   * .. .. . .. #1 < IDENTIFIER ><br>
+   * .. .. . .. #2 ( $0 ","<br>
+   * .. .. . .. .. . $1 < IDENTIFIER > )*<br>
    * .. .. . .. #3 ">" ]<br>
    * f1 -> RegExprKind()<br>
-   * f2 -> [ #0 "[" #1 "IGNORE_CASE" #2 "]" ]<br>
+   * f2 -> [ #0 "["<br>
+   * .. .. . #1 "IGNORE_CASE"<br>
+   * .. .. . #2 "]" ]<br>
    * f3 -> ":"<br>
    * f4 -> "{"<br>
    * f5 -> RegExprSpec()<br>
-   * f6 -> ( #0 "|" #1 RegExprSpec() )*<br>
+   * f6 -> ( #0 "|"<br>
+   * .. .. . #1 RegExprSpec() )*<br>
    * f7 -> "}"<br>
    *
    * @param n - the node to visit
@@ -669,6 +683,24 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
         // .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()
         // .. .. | &1 $0 RegularExpression()
         // .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )
+        seq = (NodeSequence) n.f0.choice;
+        // #0 [ $0 PrimaryExpression() $1 "=" ]
+        final NodeOptional opt = (NodeOptional) seq.elementAt(0);
+        if (opt.present()) {
+          // IdentifierAsString() -> jtbrt_Identifier
+          final NodeChoice ch = (NodeChoice) seq.elementAt(1);
+          final NodeSequence seq1 = (NodeSequence) ch.choice;
+          final NodeToken iasToken = ((IdentifierAsString) seq1.elementAt(0)).f0;
+          final String ident = iasToken.tokenImage;
+          if (retVarIdent.get(ident) == null) {
+            Messages.softErr("Production \"" + ident +
+                                 "\" is of type void but is used in the RHS of an assignment",
+                             iasToken.beginLine);
+          }
+        }
+        // .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()
+        // .. .. | &1 $0 RegularExpression()
+        // .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )
         return;
 
       case 5:
@@ -749,6 +781,175 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
   @Override
   public void visit(@SuppressWarnings("unused") final RegularExpression n) {
     // should not be called !
+  }
+
+  /**
+   * The {@link NonVoidBNFProductionsFinder} visitor finds all non "void" BNFProductions and adds
+   * them to a HashMap. Cloned and simplified from {@link Annotator.GlobalDataFinder}.
+   */
+  class NonVoidBNFProductionsFinder extends DepthFirstVoidVisitor {
+
+    /**
+     * Constructor, with a given buffer and a default indentation.
+     */
+    NonVoidBNFProductionsFinder() {
+      super();
+    }
+
+    /**
+     * Visits a {@link JavaCCInput} node, whose children are the following :
+     * <p>
+     * f0 -> JavaCCOptions()<br>
+     * f1 -> "PARSER_BEGIN"<br>
+     * f2 -> "("<br>
+     * f3 -> IdentifierAsString()<br>
+     * f4 -> ")"<br>
+     * f5 -> CompilationUnit()<br>
+     * f6 -> "PARSER_END"<br>
+     * f7 -> "("<br>
+     * f8 -> IdentifierAsString()<br>
+     * f9 -> ")"<br>
+     * f10 -> ( Production() )+<br>
+     * 
+     * @param n - the node to visit
+     */
+    @Override
+    public void visit(final JavaCCInput n) {
+      // visits only Productions
+      // f10 -> ( Production() )+
+      for (final Iterator<INode> e = n.f10.elements(); e.hasNext();) {
+        e.next().accept(this);
+      }
+    }
+
+    /**
+     * Visits a {@link Production} node, whose children are the following :
+     * <p>
+     * f0 -> . %0 JavaCodeProduction()<br>
+     * .. .. | %1 RegularExprProduction()<br>
+     * .. .. | %2 TokenManagerDecls()<br>
+     * .. .. | %3 BNFProduction()<br>
+     * 
+     * @param n - the node to visit
+     */
+    @Override
+    public void visit(final Production n) {
+      // visits only BNFProduction
+      if (n.f0.which == 3)
+        n.f0.accept(this);
+    }
+
+    /**
+     * Gets the ResultType. Walks down the tree to find the first token.
+     * <p>
+     * {@link ResultType}<br>
+     * f0 -> ( %0 "void"<br>
+     * .. .. | %1 Type() )<br>
+     * <p>
+     * {@link Type}<br>
+     * f0 -> . %0 ReferenceType()<br>
+     * .. .. | %1 PrimitiveType()<br>
+     * <p>
+     * {@link ReferenceType}<br>
+     * f0 -> . %0 #0 PrimitiveType()<br>
+     * .. .. . .. #1 ( $0 "[" $1 "]" )+<br>
+     * .. .. | %1 #0 ClassOrInterfaceType()<br>
+     * .. .. . .. #1 ( $0 "[" $1 "]" )*<br>
+     * <p>
+     * {@link PrimitiveType}<br>
+     * f0 -> . %0 "boolean"<br>
+     * .. .. | %1 "char"<br>
+     * .. .. | %2 "byte"<br>
+     * .. .. | %3 "short"<br>
+     * .. .. | %4 "int"<br>
+     * .. .. | %5 "long"<br>
+     * .. .. | %6 "float"<br>
+     * .. .. | %7 "double"<br>
+     * <p>
+     * {@link ClassOrInterfaceType}<br>
+     * f0 -> < IDENTIFIER ><br>
+     * f1 -> [ TypeArguments() ]<br>
+     * f2 -> ( #0 "." #1 < IDENTIFIER ><br>
+     * .. .. . #2 [ TypeArguments() ] )*<br>
+     * 
+     * @param rt - the node to process
+     * @return the result type token image
+     */
+    String getResultType(final ResultType rt) {
+      NodeToken tk;
+      final INode n = rt.f0.choice;
+      if (rt.f0.which == 0) {
+        // "void"
+        tk = (NodeToken) n;
+      } else {
+        // Type(
+        final NodeChoice ch = ((Type) n).f0;
+        if (ch.which == 0) {
+          // ReferenceType()
+          final NodeChoice ch1 = ((ReferenceType) ch.choice).f0;
+          if (ch1.which == 0) {
+            // PrimitiveType() ( "[" "]" )+
+            tk = (NodeToken) ((PrimitiveType) ch1.choice).f0.choice;
+          } else {
+            // ClassOrInterfaceType() ( "[" "]" )*
+            tk = ((ClassOrInterfaceType) ((NodeSequence) ch1.choice).elementAt(0)).f0;
+          }
+        } else {
+          // PrimitiveType()
+          tk = (NodeToken) ((PrimitiveType) ch.choice).f0.choice;
+        }
+      }
+      return tk.tokenImage;
+    }
+
+    /**
+     * Visits a {@link BNFProduction} node, whose children are the following :
+     * <p>
+     * f0 -> AccessModifier()<br>
+     * f1 -> ResultType()<br>
+     * f2 -> IdentifierAsString()<br>
+     * f3 -> FormalParameters()<br>
+     * f4 -> [ #0 "throws" #1 Name()<br>
+     * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
+     * f5 -> ":"<br>
+     * f6 -> Block()<br>
+     * f7 -> "{"<br>
+     * f8 -> ExpansionChoices()<br>
+     * f9 -> "}"<br>
+     * 
+     * @param n - the node to visit
+     */
+    @Override
+    public void visit(final BNFProduction n) {
+      // f1 -> ResultType()
+      final ResultType rt = n.f1;
+      NodeToken tk;
+      final INode in = rt.f0.choice;
+      if (rt.f0.which == 0) {
+        // "void" : no need for return variable
+        return;
+      } else {
+        // Type()
+        final NodeChoice ch = ((Type) in).f0;
+        if (ch.which == 0) {
+          // ReferenceType()
+          final NodeChoice ch1 = ((ReferenceType) ch.choice).f0;
+          if (ch1.which == 0) {
+            // PrimitiveType() ( "[" "]" )+
+            tk = (NodeToken) ((PrimitiveType) ch1.choice).f0.choice;
+          } else {
+            // ClassOrInterfaceType() ( "[" "]" )*
+            tk = ((ClassOrInterfaceType) ((NodeSequence) ch1.choice).elementAt(0)).f0;
+          }
+        } else {
+          // PrimitiveType()
+          tk = (NodeToken) ((PrimitiveType) ch.choice).f0.choice;
+        }
+      }
+      final String resType = tk.tokenImage;
+      final String ident = n.f2.f0.tokenImage;
+      retVarIdent.put(ident, resType);
+    }
   }
 
 }

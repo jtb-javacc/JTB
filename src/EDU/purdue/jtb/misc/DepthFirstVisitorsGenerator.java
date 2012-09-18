@@ -399,8 +399,6 @@ public class DepthFirstVisitorsGenerator {
         final String fi = fii.next();
         final String fe = fei.next();
 
-        if (depthLevel)
-          sb.append(spc.spc).append("++").append(genDepthLevelVar).append(';').append(LS);
         if (nodeTCF.equals(ft)) {
           // a TCF
           if (fe != null) {
@@ -441,14 +439,16 @@ public class DepthFirstVisitorsGenerator {
         } else {
           // not a TCF
           aClassInfo.fmt1JavacodeFieldCmt(sb, spc, k++);
+          if (depthLevel)
+            increaseDepthLevel(sb, spc);
           sb.append(spc.spc).append(genNodeVar).append(".").append(fn);
           sb.append(".accept(this");
           if (aArgu)
             sb.append(", ").append(genArguVar);
           sb.append(");").append(LS);
+          if (depthLevel)
+            decreaseDepthLevel(sb, spc);
         }
-        if (depthLevel)
-          sb.append(spc.spc).append("--").append(genDepthLevelVar).append(';').append(LS);
       }
     }
     if (aRet)
@@ -848,16 +848,6 @@ public class DepthFirstVisitorsGenerator {
   }
 
   /**
-   * Output code to increase the depth level.
-   * 
-   * @param aSb - the buffer to output into (will be allocated if null)
-   * @param aSpc - the indentation
-   */
-  public static void decreaseDepthLevel(final StringBuilder aSb, final Spacing aSpc) {
-    aSb.append(aSpc.spc).append("--").append(genDepthLevelVar).append(';').append(LS);
-  }
-
-  /**
    * Output code to decrease the depth level.
    * 
    * @param aSb - the buffer to output into (will be allocated if null)
@@ -865,6 +855,16 @@ public class DepthFirstVisitorsGenerator {
    */
   public static void increaseDepthLevel(final StringBuilder aSb, final Spacing aSpc) {
     aSb.append(aSpc.spc).append("++").append(genDepthLevelVar).append(';').append(LS);
+  }
+
+  /**
+   * Output code to increase the depth level.
+   * 
+   * @param aSb - the buffer to output into (will be allocated if null)
+   * @param aSpc - the indentation
+   */
+  public static void decreaseDepthLevel(final StringBuilder aSb, final Spacing aSpc) {
+    aSb.append(aSpc.spc).append("--").append(genDepthLevelVar).append(';').append(LS);
   }
 
   /**

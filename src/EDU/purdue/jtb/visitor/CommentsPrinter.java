@@ -417,13 +417,12 @@ public class CommentsPrinter extends JavaCCPrinter {
       else
         curCtn.addFn(fx, " -> . ");
       reinitPrefix(fx);
-      curCtn.addPfx(prefix);
     }
     // start a new choice sub comment (that will end on ExpansionChoices element)
     // see UnaryExpression, ReferenceType
     curCtn.newSubComment();
     // output which indicator
-    curCtn.addTag(WHCH[(chLvl % 3)], (bigWh ? "00 " : "0 "));
+    curCtn.addTag(String.valueOf(WHCH[(chLvl % 3)]) + (bigWh ? "00 " : "0 "));
     if (DEBUG_CHARS)
       curCtn.addPfx(bigWh ? "` ``` " : "` `` ");
     else
@@ -452,7 +451,7 @@ public class CommentsPrinter extends JavaCCPrinter {
       curCtn.addChoice("| ");
       // output which indicator
       // see UnaryExpression
-      curCtn.addTag(WHCH[(chLvl % 3)], bigWh && fi < 10 ? "0" : "", fi, ' ');
+      curCtn.addTag(String.valueOf(WHCH[(chLvl % 3)]) + (bigWh && fi < 10 ? "0" : "") + fi + " ");
       chLvl++;
       if (DEBUG_CHARS)
         curCtn.addPfx(bigWh ? "' ''' " : "' '' ");
@@ -528,30 +527,38 @@ public class CommentsPrinter extends JavaCCPrinter {
           else
             curCtn.addFn(fx, " -> ");
           reinitPrefix(fx);
-          curCtn.addPfx(prefix);
         } else {
           // at non first Expansion levels
           if (expUnit.f0.which == 3) {
             // ExpansionUnitTCF
             curCtn.addPfx(PFXSTR);
-          } else if (numEuOk > 0 && (expUnit.f0.which == 5 || expUnit.f0.which == 2)) {
+          } else if (numEuOk > 0 && (expUnit.f0.which == 2 || expUnit.f0.which == 5)) {
             // new line if (...), (...)?, (...)+, (...)* or [...] and not first ExpansionUnit
             if (tcfLvl == 0 && expLvl == 1) {
               // if in an ExpansionUnitTCF at first level, end the previous field comment
               // see ATestTCFProduction
-              oneNewLineSwitchFieldCmt(n, "b!=0, Com");
+              oneNewLineSwitchFieldCmt(n, "b!=0, 2&5 Com");
             } else {
               // if not in an ExpansionUnitTCF at first level, end the previous sub comment
               // see TypeDeclaration, EnumBody, ClassOrInterfaceType
-              oneNewLine(n, "b!=0, noCom");
+              oneNewLine(n, "b!=0, 2&5 noCom");
             }
           } else if (wantedToBeOnNewLine) {
             // end the previous sub comment leaving it on its own line
             // see ExplicitConstructorInvocation
             oneNewLine(n, "wantedToBeOnNewLine");
+          } else if (numEuOk > 0 && expUnit.f0.which == 4) {
+            // new line if RegularExpression and not first ExpansionUnit
+            if (tcfLvl == 0 && expLvl == 1) {
+              // if in an ExpansionUnitTCF at first level, end the previous field comment
+              // see ATestTCFProduction
+              oneNewLineSwitchFieldCmt(n, "b!=0, 4 Com");
+            } else {
+              // if not in an ExpansionUnitTCF at first level, otherwise on same line
+              addSpace = true;
+            }
           } else {
             // otherwise on same line (and add a space but don't double space)
-            // end the previous sub comment, keeping the same line
             if (numEuOk > 0)
               addSpace = true;
           }
@@ -570,7 +577,6 @@ public class CommentsPrinter extends JavaCCPrinter {
               else
                 curCtn.addFn(fx, " -> ");
               reinitPrefix(fx);
-              curCtn.addPfx(prefix);
             }
           } else {
             // if not in ExpansionUnitTCF at first level
@@ -579,9 +585,10 @@ public class CommentsPrinter extends JavaCCPrinter {
             if (numEuOk > 0)
               curCtn.endSubComment();
             curCtn.newSubComment();
-            curCtn.addTag(SEQCH[(seqLvl % 3)], bigSeq && numEuOk < 10 ? "0" : "", numEuOk, ' ');
+            curCtn.addTag(String.valueOf(SEQCH[(seqLvl % 3)]) +
+                          (bigSeq && numEuOk < 10 ? "0" : "") + numEuOk + " ");
             if (addSpace)
-              curCtn.addFn(SEPCH);
+              curCtn.addFn(String.valueOf(SEPCH));
             seqLvl++;
             if (DEBUG_CHARS)
               curCtn.addPfx(bigSeq ? "--- " : "-- ");
@@ -621,18 +628,18 @@ public class CommentsPrinter extends JavaCCPrinter {
   /**
    * Visits a {@link ExpansionUnit} node, whose children are the following :
    * <p>
-   * f0 -> . %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" //-- ExpansionChoices element<br>
-   * .. .. | %1 Block() //-- ExpansionChoices element<br>
-   * .. .. | %2 #0 "[" #1 ExpansionChoices() #2 "]" //-- ExpansionChoices element<br>
-   * .. .. | %3 ExpansionUnitTCF() //-- ExpansionChoices element<br>
-   * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ] //-- Expansion b!=0, noCom<br>
-   * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments() //-- ExpansionChoices element<br>
-   * .. .. . .. .. | &1 $0 RegularExpression() //-- Expansion b!=0, noCom<br>
-   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] ) //-- ExpansionChoices element<br>
-   * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")" //-- Expansion b!=0, noCom<br>
-   * .. .. . .. #3 ( &0 "+" //-- ExpansionChoices element<br>
-   * .. .. . .. .. | &1 "*" //-- ExpansionChoices element<br>
-   * .. .. . .. .. | &2 "?" )? //-- ExpansionChoices last<br>
+   * f0 -> . %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"<br>
+   * .. .. | %1 Block()<br>
+   * .. .. | %2 #0 "[" #1 ExpansionChoices() #2 "]"<br>
+   * .. .. | %3 ExpansionUnitTCF()<br>
+   * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ]<br>
+   * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
+   * .. .. . .. .. | &1 $0 RegularExpression()<br>
+   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )<br>
+   * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
+   * .. .. . .. #3 ( &0 "+"<br>
+   * .. .. . .. .. | &1 "*"<br>
+   * .. .. . .. .. | &2 "?" )?<br>
    * 
    * @param n - the node to visit
    */
@@ -788,7 +795,6 @@ public class CommentsPrinter extends JavaCCPrinter {
       else
         curCtn.addFn(fx, " -> ");
       reinitPrefix(fx);
-      curCtn.addPfx(prefix);
     } else {
       // end sub comment and start a new sub comment
       curCtn.endSubComment();
@@ -960,15 +966,23 @@ public class CommentsPrinter extends JavaCCPrinter {
 /**
    * Visits a {@link RegularExprProduction} node, whose children are the following :
    * <p>
-   * f0 -> [ %0 #0 "<" #1 "*" #2 ">"<br>
-   * .. .. | %1 #0 "<" #1 < IDENTIFIER ><br>
-   * .. .. . .. #2 ( $0 "," $1 < IDENTIFIER > )* #3 ">" ]<br>
+   * f0 -> [ %0 #0 "<"<br>
+   * .. .. . .. #1 "*"<br>
+   * .. .. . .. #2 ">"<br>
+   * .. .. | %1 #0 "<"<br>
+   * .. .. . .. #1 < IDENTIFIER ><br>
+   * .. .. . .. #2 ( $0 ","<br>
+   * .. .. . .. .. . $1 < IDENTIFIER > )*<br>
+   * .. .. . .. #3 ">" ]<br>
    * f1 -> RegExprKind()<br>
-   * f2 -> [ #0 "[" #1 "IGNORE_CASE" #2 "]" ]<br>
+   * f2 -> [ #0 "["<br>
+   * .. .. . #1 "IGNORE_CASE"<br>
+   * .. .. . #2 "]" ]<br>
    * f3 -> ":"<br>
    * f4 -> "{"<br>
    * f5 -> RegExprSpec()<br>
-   * f6 -> ( #0 "|" #1 RegExprSpec() )*<br>
+   * f6 -> ( #0 "|"<br>
+   * .. .. . #1 RegExprSpec() )*<br>
    * f7 -> "}"<br>
    *
    * @param n - the node to visit
@@ -1018,29 +1032,33 @@ public class CommentsPrinter extends JavaCCPrinter {
    */
   @Override
   public void visit(final RegularExpression n) {
-    if (n.f0.which == 0)
+    if (n.f0.which == 0) {
       // %0 StringLiteral()
+      // we indeed fall here
+      //      throw new AssertionError("CP RE 0");
       n.f0.choice.accept(this);
-    else if (n.f0.which == 1) {
-      // TODO voir si on est passé dans un exemple de ce cas
+    } else if (n.f0.which == 1) {
       // %1 #0 "<" #1 [ $0 [ "#" ] $1 IdentifierAsString() $2 ":" ] #2 ComplexRegularExpressionChoices() #3 ">"
+      // it looks we never fall here
+      //      throw new AssertionError("CP RE 1");
       final NodeSequence seq = (NodeSequence) n.f0.choice;
       // #0 "<"
       curCtn.addId("< ");
       // #1 [ $0 [ "#" ] $1 IdentifierAsString() $2 ":" ]
-      final NodeOptional opt = (NodeOptional) seq.elementAt(1);
-      if (opt.present()) {
-        // $0 [ "#" ]
-        final NodeSequence seq1 = (NodeSequence) opt.node;
-        if (((NodeOptional) seq1.elementAt(0)).present()) {
-          curCtn.addId('#');
-        }
-        // $1 IdentifierAsString()
-        seq1.elementAt(1).accept(this);
-        curCtn.addId(' ');
-        // $2 ":"
-        curCtn.addId(": ");
-      }
+      // we skip this label definition which seems useless in JTB visitors
+      //      final NodeOptional opt = (NodeOptional) seq.elementAt(1);
+      //      if (opt.present()) {
+      //        // $0 [ "#" ]
+      //        final NodeSequence seq1 = (NodeSequence) opt.node;
+      //        if (((NodeOptional) seq1.elementAt(0)).present()) {
+      //          curCtn.addId('#');
+      //        }
+      //        // $1 IdentifierAsString()
+      //        seq1.elementAt(1).accept(this);
+      //        curCtn.addId(' ');
+      //        // $2 ":"
+      //        curCtn.addId(": ");
+      //      }
       // #2 ComplexRegularExpressionChoices()
       // here we can use super class (JavaCCPrinter) methods which do not add newlines nor indentation
       seq.elementAt(2).accept(this);
@@ -1048,6 +1066,8 @@ public class CommentsPrinter extends JavaCCPrinter {
       curCtn.addId(" >");
     } else if (n.f0.which == 2) {
       // %2 #0 "<" #1 IdentifierAsString() #2 ">"
+      // we indeed fall here
+      //      throw new AssertionError("CP RE 2");
       // #0 "<"
       curCtn.addId("< ");
       // #1 IdentifierAsString()
@@ -1056,6 +1076,8 @@ public class CommentsPrinter extends JavaCCPrinter {
       curCtn.addId(" >");
     } else {
       // %3 #0 "<" #1 "EOF" #2 ">"
+      // we indeed fall here
+      //      throw new AssertionError("CP RE 3");
       // #0 "<"
       curCtn.addId("< ");
       // #1 "EOF"
@@ -1123,6 +1145,7 @@ public class CommentsPrinter extends JavaCCPrinter {
         prefix.append(".");
       prefix.append(" .. ");
     }
+    curCtn.addPfx(prefix);
   }
 
   /*
@@ -1252,7 +1275,7 @@ public class CommentsPrinter extends JavaCCPrinter {
     //                 (aCtn.children == null ? "null" : "not null, size = " + aCtn.children.size()) +
     //                 ") not opposed !";
     if (aCtn.children == null)
-      fcb.append(aCtn.id);
+      fcb.append(aCtn.id == null ? "no node" : aCtn.id);
     else {
       StringBuilder pfx = null;
       final int len = (aPrefix == null ? 0 : aPrefix.length()) +
@@ -1331,7 +1354,7 @@ public class CommentsPrinter extends JavaCCPrinter {
 
     // copy id member or walk down the sub comments
     if (aCtn.children == null)
-      scb.append(aCtn.id);
+      scb.append(aCtn.id == null ? "no node" : aCtn.id);
     else {
       StringBuilder pfx = null;
       final int len = (aPrefix == null ? 0 : aPrefix.length()) +
@@ -1405,24 +1428,24 @@ public class CommentsPrinter extends JavaCCPrinter {
     /** The children, null if none */
     ArrayList<CommentsTreeNode> children = null;
     /** The field name */
-    StringBuilder               fn       = null;
+    String                      fn       = null;
     /** The prefix (for the following nodes at the same level) */
-    StringBuilder               pfx      = null;
+    String                      pfx      = null;
     /** The choice string */
-    StringBuilder               choice   = null;
+    String                      choice   = null;
     /**
      * The tag ({@link CommentsPrinter#WHCH},{@link CommentsPrinter#SEQCH},
      * {@link CommentsPrinter#TCFCH} and an index 0, 1, ...)
      */
-    StringBuilder               tag      = null;
+    String                      tag      = null;
     /** The sequence string */
-    StringBuilder               seq      = null;
+    String                      seq      = null;
     /** The body : identifier or production */
     StringBuilder               id       = null;
     /** The end string */
-    StringBuilder               end      = null;
+    String                      end      = null;
     /** The debug string */
-    StringBuilder               debug    = null;
+    String                      debug    = null;
     /** The flag telling there is a new line or not */
     boolean                     hasNL    = false;
 
@@ -1461,37 +1484,30 @@ public class CommentsPrinter extends JavaCCPrinter {
     }
 
     /**
-     * Adds a {@link CharSequence} to the field name.
+     * Adds a String to the field name.
      * 
-     * @param aChSeq - what to be added
+     * @param aStr - what to be added
      */
-    void addFn(final CharSequence aChSeq) {
+    void addFn(final String aStr) {
       if (fn == null)
-        fn = new StringBuilder(aChSeq.length());
-      fn.append(aChSeq);
+        fn = aStr;
+      else
+        fn += aStr;
     }
 
     /**
-     * Adds two {@link CharSequence} to the field name.
+     * Adds two String to the field name.
      * 
-     * @param aChSeq1 - what to be added
-     * @param aChSeq2 - what to be added
+     * @param aStr1 - what to be added
+     * @param aStr2 - what to be added
      */
-    void addFn(final CharSequence aChSeq1, final CharSequence aChSeq2) {
+    void addFn(final String aStr1, final String aStr2) {
       if (fn == null)
-        fn = new StringBuilder(aChSeq1.length() + aChSeq2.length());
-      fn.append(aChSeq1).append(aChSeq2);
-    }
-
-    /**
-     * Adds a char to the field name.
-     * 
-     * @param aCh - what to be added
-     */
-    void addFn(final char aCh) {
-      if (fn == null)
-        fn = new StringBuilder(1);
-      fn.append(aCh);
+        fn = aStr1 + aStr2;
+      else {
+        fn += aStr1;
+        fn += aStr2;
+      }
     }
 
     /**
@@ -1501,90 +1517,45 @@ public class CommentsPrinter extends JavaCCPrinter {
      */
     void addPfx(final CharSequence aChSeq) {
       if (pfx == null)
-        pfx = new StringBuilder(aChSeq.length());
-      pfx.append(aChSeq);
+        pfx = aChSeq.toString();
+      else
+        pfx += aChSeq.toString();
     }
 
     /**
-     * Adds a {@link CharSequence} to the choice string member.
+     * Adds a String to the choice string member.
      * 
-     * @param aChSeq - what to be added
+     * @param aStr - what to be added
      */
-    void addChoice(final CharSequence aChSeq) {
+    void addChoice(final String aStr) {
       if (choice == null)
-        choice = new StringBuilder(aChSeq.length());
-      choice.append(aChSeq);
+        choice = aStr;
+      else
+        choice += aStr;
     }
 
     /**
-     * Adds a {@link CharSequence} to the sequence string member.
+     * Adds a String to the sequence string member.
      * 
-     * @param aChSeq - what to be added
+     * @param aStr - what to be added
      */
-    void addSeq(final CharSequence aChSeq) {
+    void addSeq(final String aStr) {
       if (seq == null)
-        seq = new StringBuilder(aChSeq.length());
-      seq.append(aChSeq);
+        seq = aStr;
+      else
+        seq += aStr;
     }
 
     /**
-     * Adds a char to the sequence string member.
+     * Adds a String to the tag member.
      * 
-     * @param aCh - what to be added
+     * @param aStr - what to be added
      */
-    void addSeq(final char aCh) {
-      if (seq == null)
-        seq = new StringBuilder(4);
-      seq.append(aCh);
-    }
-
-    /**
-     * Adds a {@link CharSequence} to the tag member.
-     * 
-     * @param aChSeq - what to be added
-     */
-    void addTag(final CharSequence aChSeq) {
+    void addTag(final String aStr) {
       if (tag == null)
-        tag = new StringBuilder(4);
-      tag.append(aChSeq);
-    }
-
-    /**
-     * Adds two {@link CharSequence} to the tag member.
-     * 
-     * @param aChSeq1 - what to be added
-     * @param aChSeq2 - what to be added
-     */
-    void addTag(final CharSequence aChSeq1, final CharSequence aChSeq2) {
-      if (tag == null)
-        tag = new StringBuilder(4);
-      tag.append(aChSeq1).append(aChSeq2);
-    }
-
-    /**
-     * Adds a char and a {@link CharSequence} to the tag member.
-     * 
-     * @param aCh - what to be added
-     * @param aChSeq - what to be added
-     */
-    void addTag(final char aCh, final CharSequence aChSeq) {
-      if (tag == null)
-        tag = new StringBuilder(1 + aChSeq.length());
-      tag.append(aCh).append(aChSeq);
-    }
-
-    /**
-     * Adds a char, a {@link CharSequence}, an int and a char to the tag member.
-     * 
-     * @param aCh1 - what to be added
-     * @param aChSeq - what to be added
-     * @param aInt - what to be added
-     * @param aCh2 - what to be added
-     */
-    void addTag(final char aCh1, final CharSequence aChSeq, final int aInt, final char aCh2) {
-      if (tag == null)
-        tag = new StringBuilder(5);
-      tag.append(aCh1).append(aChSeq).append(aInt).append(aCh2);
+        tag = aStr;
+      else
+        tag += aStr;
     }
 
     /**
@@ -1610,25 +1581,27 @@ public class CommentsPrinter extends JavaCCPrinter {
     }
 
     /**
-     * Adds a {@link CharSequence} to the end string member.
+     * Adds a String to the end string member.
      * 
-     * @param aChSeq - what to be added
+     * @param aStr - what to be added
      */
-    void addEnd(final CharSequence aChSeq) {
+    void addEnd(final String aStr) {
       if (end == null)
-        end = new StringBuilder(aChSeq.length());
-      end.append(aChSeq);
+        end = aStr;
+      else
+        end += aStr;
     }
 
     /**
-     * Adds a {@link CharSequence} to the debug string member.
+     * Adds a String to the debug string member.
      * 
-     * @param aChSeq - what to be added
+     * @param aStr - what to be added
      */
-    void addDebug(final CharSequence aChSeq) {
+    void addDebug(final String aStr) {
       if (debug == null)
-        debug = new StringBuilder(aChSeq.length());
-      debug.append(aChSeq);
+        debug = aStr;
+      else
+        debug += aStr;
     }
 
     /**

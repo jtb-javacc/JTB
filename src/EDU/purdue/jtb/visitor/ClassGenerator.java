@@ -78,35 +78,36 @@ import EDU.purdue.jtb.syntaxtree.TokenManagerDecls;
  *          added bareJavaNodeCode and fixed problems in visiting ExpansionUnitTCF<br>
  *          1.4.7 : 07/2012 : MMa : followed changes in jtbgram.jtb (IndentifierAsString())<br>
  *          1.4.7 : 09/2012 : MMa : changed some comments and removed one JavaBranchPrinter visitor
+ *          ; removed printToken as of no use
  */
 public class ClassGenerator extends DepthFirstVoidVisitor {
 
   /** Visitor to print a java node and its subtree with default indentation */
-  final JavaBranchPrinter             jbpv       = new JavaBranchPrinter(null);
+  final JavaBranchPrinter             jbpv    = new JavaBranchPrinter(null);
   /** Visitor for finding return variables declarations */
-  final VoidJavaCodeProductionsFinder vjcpfv     = new VoidJavaCodeProductionsFinder();
-  /** Flag to print the token or not */
-  private boolean                     printToken = false;
+  final VoidJavaCodeProductionsFinder vjcpfv  = new VoidJavaCodeProductionsFinder();
+  //  /** Flag to print the token or not */
+  //  private boolean                     printToken = false;
   /** The table used to generate default constructors if a token has a constant regexpr */
   private Hashtable<String, String>   tokenTable;
   /** The current generated class */
   private ClassInfo                   ci;
   /** The list of generated classes */
-  private final ArrayList<ClassInfo>  ciList     = new ArrayList<ClassInfo>();
+  private final ArrayList<ClassInfo>  ciList  = new ArrayList<ClassInfo>();
   /** The field names generator (descriptive or not, depending on -f option) */
-  private final FieldNameGenerator    gen        = new FieldNameGenerator();
+  private final FieldNameGenerator    gen     = new FieldNameGenerator();
   /** Global variable to pass RegularExpression info between methods (as they are recursive) */
-  String                              regExpr    = "";
+  String                              regExpr = "";
   /** Global variable to pass IdentifierAsString info between methods (as they are recursive) */
-  String                              ident      = "";
+  String                              ident   = "";
   /** The JavaCodeProductions table */
-  Hashtable<String, String>           jcpHT      = new Hashtable<String, String>();
+  Hashtable<String, String>           jcpHT   = new Hashtable<String, String>();
   /** The OS line separator as a string */
-  public static final String          LS         = System.getProperty("line.separator");
+  public static final String          LS      = System.getProperty("line.separator");
   /** The OS line separator string length */
-  public static final int             LS_LEN     = LS.length();
+  public static final int             LS_LEN  = LS.length();
   /** The OS line separator first character */
-  public static final char            LS0        = LS.charAt(0);
+  public static final char            LS0     = LS.charAt(0);
 
   /**
    * Getter for the class list.
@@ -188,25 +189,32 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
   @Override
   public void visit(final BNFProduction n) {
     gen.reset();
-    printToken = true;
+    //    printToken = true;
     ci = new ClassInfo(n.f8, n.f2.f0.tokenImage);
     ciList.add(ci);
     n.f8.accept(this);
-    printToken = false;
+    //    printToken = false;
   }
 
 /**
    * Visits a {@link RegularExprProduction} node, whose children are the following :
-   * <p>
-   * f0 -> [ %0 #0 "<" #1 "*" #2 ">"<br>
-   * .. .. | %1 #0 "<" #1 < IDENTIFIER ><br>
-   * .. .. . .. #2 ( $0 "," $1 < IDENTIFIER > )* #3 ">" ]<br>
+   * f0 -> [ %0 #0 "<"<br>
+   * .. .. . .. #1 "*"<br>
+   * .. .. . .. #2 ">"<br>
+   * .. .. | %1 #0 "<"<br>
+   * .. .. . .. #1 < IDENTIFIER ><br>
+   * .. .. . .. #2 ( $0 ","<br>
+   * .. .. . .. .. . $1 < IDENTIFIER > )*<br>
+   * .. .. . .. #3 ">" ]<br>
    * f1 -> RegExprKind()<br>
-   * f2 -> [ #0 "[" #1 "IGNORE_CASE" #2 "]" ]<br>
+   * f2 -> [ #0 "["<br>
+   * .. .. . #1 "IGNORE_CASE"<br>
+   * .. .. . #2 "]" ]<br>
    * f3 -> ":"<br>
    * f4 -> "{"<br>
    * f5 -> RegExprSpec()<br>
-   * f6 -> ( #0 "|" #1 RegExprSpec() )*<br>
+   * f6 -> ( #0 "|"<br>
+   * .. .. . #1 RegExprSpec() )*<br>
    * f7 -> "}"<br>
    *
    * @param n - the node to visit
@@ -454,7 +462,9 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> . %0 StringLiteral()<br>
    * .. .. | %1 #0 "<"<br>
-   * .. .. . .. #1 [ $0 [ "#" ] $1 IdentifierAsString() $2 ":" ] #2 ComplexRegularExpressionChoices() #3 ">"<br>
+   * .. .. . .. #1 [ $0 [ "#" ]<br>
+   * .. .. . .. .. . $1 IdentifierAsString() $2 ":" ]<br>
+   * .. .. . .. #2 ComplexRegularExpressionChoices() #3 ">"<br>
    * .. .. | %2 #0 "<" #1 IdentifierAsString() #2 ">"<br>
    * .. .. | %3 #0 "<" #1 "EOF" #2 ">"<br>
    *
@@ -463,16 +473,24 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
   @Override
   public void visit(final RegularExpression n) {
     regExpr = "";
-    if (!printToken)
-      return;
+    // there are no cases where printToken is false, so it is removed
+    //    assert printToken : "printToken is false";
+    //    if (!printToken)
+    //      return;
     switch (n.f0.which) {
       case 0: // %0 StringLiteral()
+        // we indeed fall here while building JTB
+        //        throw new AssertionError("CG RE 0");
         n.f0.choice.accept(this);
         break;
       case 1: // %1 #0 "<" #1 [ $0 [ "#" ] $1 IdentifierAsString() $2 ":" ] #2 ComplexRegularExpressionChoices() #3 ">"
+        // we indeed fall here while building JTB
+        //        throw new AssertionError("CG RE 1");
         regExpr = "";
         break;
       case 2: // %2 #0 "<" #1 IdentifierAsString() #2 ">"
+        // we indeed fall here while building JTB
+        //        throw new AssertionError("CG RE 2");
         final NodeSequence seq = (NodeSequence) n.f0.choice;
         // ident will be set further down the tree
         seq.elementAt(1).accept(this);
@@ -485,6 +503,9 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
         }
         break;
       case 3: // %3 #0 "<" #1 "EOF" #2 ">"
+        // we do not fall here while building JTB but we do when generating from a grammar with EOF
+        //        assert false : "case 3 RegularExpression";
+        //        throw new AssertionError("CG RE 3");
         regExpr = "";
         break;
       default:
