@@ -6,7 +6,7 @@ import EDU.purdue.jtb.visitor.*;
 /**
  * JTB node class for the production OptionBinding:<br>
  * Corresponding grammar:<br>
- * f0 -> ( %0 < IDENTIFIER ><br>
+ * f0 -> ( %0 <IDENTIFIER><br>
  * .. .. | %1 "LOOKAHEAD"<br>
  * .. .. | %2 "IGNORE_CASE"<br>
  * .. .. | %3 "static" )<br>

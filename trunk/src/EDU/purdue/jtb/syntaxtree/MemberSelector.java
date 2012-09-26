@@ -8,7 +8,7 @@ import EDU.purdue.jtb.visitor.*;
  * Corresponding grammar:<br>
  * f0 -> "."<br>
  * f1 -> TypeArguments()<br>
- * f2 -> < IDENTIFIER ><br>
+ * f2 -> <IDENTIFIER><br>
  */
 public class MemberSelector implements INode {
 

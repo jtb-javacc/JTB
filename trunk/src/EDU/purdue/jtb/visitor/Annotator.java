@@ -53,9 +53,9 @@
 package EDU.purdue.jtb.visitor;
 
 import static EDU.purdue.jtb.misc.Globals.*;
+import static EDU.purdue.jtb.visitor.GlobalDataBuilder.DONT_CREATE_NODE_STR;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Iterator;
 
 import EDU.purdue.jtb.misc.Messages;
@@ -78,7 +78,6 @@ import EDU.purdue.jtb.syntaxtree.IdentifierAsString;
 import EDU.purdue.jtb.syntaxtree.IfStatement;
 import EDU.purdue.jtb.syntaxtree.ImportDeclaration;
 import EDU.purdue.jtb.syntaxtree.JavaCCInput;
-import EDU.purdue.jtb.syntaxtree.JavaCodeProduction;
 import EDU.purdue.jtb.syntaxtree.LabeledStatement;
 import EDU.purdue.jtb.syntaxtree.LocalLookahead;
 import EDU.purdue.jtb.syntaxtree.NodeChoice;
@@ -88,7 +87,6 @@ import EDU.purdue.jtb.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.syntaxtree.NodeSequence;
 import EDU.purdue.jtb.syntaxtree.NodeToken;
 import EDU.purdue.jtb.syntaxtree.PrimitiveType;
-import EDU.purdue.jtb.syntaxtree.Production;
 import EDU.purdue.jtb.syntaxtree.ReferenceType;
 import EDU.purdue.jtb.syntaxtree.RegularExprProduction;
 import EDU.purdue.jtb.syntaxtree.RegularExpression;
@@ -106,7 +104,7 @@ import EDU.purdue.jtb.syntaxtree.WhileStatement;
  * The {@link Annotator} visitor generates the (jtb) annotated .jj file containing the tree-building
  * code.
  * <p>
- * {@link Annotator}, {@link CommentsPrinter} and {@link ClassGenerator} depend on each other to
+ * {@link Annotator}, {@link CommentsPrinter} and {@link ClassesFinder} depend on each other to
  * create and use classes.
  * <p>
  * Code is printed in a buffer and {@link #saveToFile} is called to save it in the output file.
@@ -130,54 +128,62 @@ import EDU.purdue.jtb.syntaxtree.WhileStatement;
  *          JTBToolkit class's code<br>
  *          1.4.7 : 07/2012 : MMa : followed changes in jtbgram.jtb (IndentifierAsString(),
  *          ForStatement()), updated grammar comments in the code<br>
- *          1.4.7 : 08/2012 : MMa : fixed soft errors for empty NodeChoice (bug JTB-1) ; fixed error
- *          on return statement for a void production
+ *          1.4.7 : 08-09/2012 : MMa : fixed soft errors for empty NodeChoice (bug JTB-1) ; fixed
+ *          error on return statement for a void production ; added non node creation ; tuned
+ *          messages labels and added the line number finder visitor ; moved the inner
+ *          GlobalDataFinder to {@link GlobalDataBuilder}
  */
 public class Annotator extends JavaCCPrinter {
 
+  /** Reference to the global data builder visitor */
+  final GlobalDataBuilder          gdbv;
   /** Visitor for lower nodes which don't need annotation */
-  final JavaCCPrinter            jccpv;
+  final JavaCCPrinter              jccpv;
   /** Visitor for printing the compilation unit */
-  final CompilationUnitPrinter   cupv;
-  /** Visitor for finding return variables declarations */
-  final GlobalDataFinder         gdfv;
+  final CompilationUnitPrinter     cupv;
   /** Counter for generated variables names */
-  int                            varNum;
+  int                              varNum;
   /** List of all variables to be declared */
-  ArrayList<VarInfo>             varList            = new ArrayList<VarInfo>();
+  ArrayList<VarInfo>               varList            = new ArrayList<VarInfo>();
   /** List of all outer variables for the default constructor */
-  ArrayList<VarInfo>             outerVars          = new ArrayList<VarInfo>();
-  /** List of all return variables pairs of comments and declarations */
-  public ArrayList<String>       retVarDecl         = new ArrayList<String>();
+  ArrayList<VarInfo>               outerVars          = new ArrayList<VarInfo>();
   /** The RegularExpression generated token name */
-  String                         reTokenName        = null;
+  String                           reTokenName        = null;
+  /** Flag to tell lower layers whether to create the RegularExpression node */
+  boolean                          createRENode       = true;
   /** The last variable generated so far */
-  VarInfo                        prevVar;
+  VarInfo                          prevVar;
   /** Flag set to false for Blocks and LocalLookaheads */
-  boolean                        annotateNode;
+  boolean                          annotateNode;
   /** Name of the current production */
-  String                         curProduction;
+  String                           curProduction;
   /** List of additional variables to initialize */
-  ArrayList<VarInfo>             extraVarsList      = null;
+  ArrayList<VarInfo>               extraVarsList      = null;
   /** The BNFProduction result type */
-  String                         resultType         = null;
+  String                           resultType         = null;
   /** The BNFProduction result type specials */
-  String                         resultTypeSpecials = null;
-  /** The JavaCodeProductions table */
-  Hashtable<String, String>      jcpHT              = new Hashtable<String, String>();
-  /** The visitor to count ExpansionUnit types */
-  final ExpansionUnitTypeCounter eutcv              = new ExpansionUnitTypeCounter();
+  String                           resultTypeSpecials = null;
+  /** Visitor to count ExpansionUnit types */
+  final ExpansionUnitTypeCounter   eutcv              = new ExpansionUnitTypeCounter();
   /** True if in ExpansionUnit type 3 (ExpansionUnitTCF), false otherwise */
-  boolean                        inEUT3;
+  boolean                          inEUT3;
+  /** Line number of the first token in an ExpansionChoices */
+  int                              lnft;
+  /** Column number of the first token in an ExpansionChoices */
+  int                              cnft;
+  /** Visitor to count ExpansionUnit types */
+  final ExpansionChoicesLineNumber lnftfv             = new ExpansionChoicesLineNumber();
 
   /**
    * Constructor which will allocate a default buffer and indentation.
+   * 
+   * @param aGdbv - the global data builder visitor
    */
-  public Annotator() {
+  public Annotator(final GlobalDataBuilder aGdbv) {
     jccpv = new JavaCCPrinter(sb, spc);
-    gdfv = new GlobalDataFinder();
     cupv = new CompilationUnitPrinter(sb, spc);
     inEUT3 = false;
+    gdbv = aGdbv;
   }
 
   /*
@@ -302,14 +308,12 @@ public class Annotator extends JavaCCPrinter {
    */
   @Override
   public void visit(final JavaCCInput n) {
-    // find first all global data
-    n.accept(gdfv);
     // generate now output
     sb.append(spc.spc);
     sb.append(genFileHeaderComment());
     threeNewLines(n);
     sb.append(spc.spc);
-    // f0 -> JavaCCOptions()
+    // f0 -> JavaCCOptions() : don't want to annotate under
     n.f0.accept(jccpv);
     twoNewLines(n);
     sb.append(spc.spc);
@@ -357,11 +361,12 @@ public class Annotator extends JavaCCPrinter {
    * f3 -> FormalParameters()<br>
    * f4 -> [ #0 "throws" #1 Name()<br>
    * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
-   * f5 -> ":"<br>
-   * f6 -> Block()<br>
-   * f7 -> "{"<br>
-   * f8 -> ExpansionChoices()<br>
-   * f9 -> "}"<br>
+   * f5 -> [ "!" ]<br>
+   * f6 -> ":"<br>
+   * f7 -> Block()<br>
+   * f8 -> "{"<br>
+   * f9 -> ExpansionChoices()<br>
+   * f10 -> "}"<br>
    * 
    * @param n - the node to visit
    */
@@ -404,53 +409,57 @@ public class Annotator extends JavaCCPrinter {
         }
       }
     }
-    // f5 -> ":"
+    // f5 -> [ "!" ]
+    // print it in a block comment
+    if (n.f5.present())
+      sb.append(" /*!*/ ");
+    // f6 -> ":"
     sb.append(" ");
-    n.f5.accept(this);
-    oneNewLine(n);
+    n.f6.accept(this);
+    oneNewLine(n, "a");
     // generate the RHS into a temporary buffer and collect variables
     final StringBuilder rhsSB = generateRHS(n);
     // print the variables declarations
     sb.append(spc.spc);
     // block left brace
-    n.f6.f0.accept(this);
+    n.f7.f0.accept(this);
     spc.updateSpc(+1);
-    oneNewLine(n);
+    oneNewLine(n, "b");
     sb.append(spc.spc);
     sb.append("// --- JTB generated node declarations ---");
-    oneNewLine(n);
+    oneNewLine(n, "c");
     sb.append(spc.spc);
     for (final Iterator<VarInfo> e = varList.iterator(); e.hasNext();) {
       sb.append(e.next().generateNodeDeclaration());
       if (e.hasNext()) {
-        oneNewLine(n);
+        oneNewLine(n, "d");
         sb.append(spc.spc);
       }
     }
-    // f6 -> Block()
-    if (n.f6.f1.present()) {
+    // f7 -> Block()
+    if (n.f7.f1.present()) {
       // print block declarations only if non empty
       // don't print "{" and "}" otherwise the resulting inner scope will prevent to use declarations
-      oneNewLine(n);
+      oneNewLine(n, "e");
       sb.append(spc.spc);
       sb.append("// --- user BNFProduction java block ---");
-      oneNewLine(n);
+      oneNewLine(n, "f");
       sb.append(spc.spc);
-      for (final Iterator<INode> e = n.f6.f1.elements(); e.hasNext();) {
+      for (final Iterator<INode> e = n.f7.f1.elements(); e.hasNext();) {
         // BlockStatement()
         e.next().accept(this);
         if (e.hasNext()) {
-          oneNewLine(n);
+          oneNewLine(n, "g");
           sb.append(spc.spc);
         }
       }
     }
     spc.updateSpc(-1);
-    oneNewLine(n);
+    oneNewLine(n, "h");
     sb.append(spc.spc);
     // block right brace
-    n.f6.f2.accept(this);
-    oneNewLine(n);
+    n.f7.f2.accept(this);
+    oneNewLine(n, "i");
     sb.append(spc.spc);
     // print the RHS buffer
     sb.append(rhsSB);
@@ -535,11 +544,12 @@ public class Annotator extends JavaCCPrinter {
    * f3 -> FormalParameters()<br>
    * f4 -> [ #0 "throws" #1 Name()<br>
    * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
-   * f5 -> ":"<br>
-   * f6 -> Block()<br>
-   * f7 -> "{"<br>
-   * f8 -> ExpansionChoices()<br>
-   * f9 -> "}"<br>
+   * f5 -> [ "!" ]<br>
+   * f6 -> ":"<br>
+   * f7 -> Block()<br>
+   * f8 -> "{"<br>
+   * f9 -> ExpansionChoices()<br>
+   * f10 -> "}"<br>
    * 
    * @param n - the node to process
    * @return the generated buffer
@@ -548,14 +558,16 @@ public class Annotator extends JavaCCPrinter {
     final StringBuilder mainSB = sb;
     final StringBuilder newSB = new StringBuilder(512);
     sb = jccpv.sb = newSB;
-    // f7 -> "{"
-    n.f7.accept(this);
+    // f5 -> [ "!" ]
+    // do nothing (here we are in the callee)
+    // f8 -> "{"
+    n.f8.accept(this);
     oneNewLine(n, "generateRHS a");
     spc.updateSpc(+1);
     sb.append(spc.spc);
     // outerVars will be set further down the tree in finalActions
-    // f8 -> ExpansionChoices()
-    n.f8.accept(this);
+    // f9 -> ExpansionChoices()
+    n.f9.accept(this);
     // must be prefixed / suffixed
     sb.append("{ return new ").append(getFixedName(n.f2.f0.tokenImage)).append("(");
     final Iterator<VarInfo> e = outerVars.iterator();
@@ -568,8 +580,8 @@ public class Annotator extends JavaCCPrinter {
     oneNewLine(n, "generateRHS b");
     spc.updateSpc(-1);
     sb.append(spc.spc);
-    // f9 -> "}"
-    n.f9.accept(this);
+    // f10 -> "}"
+    n.f10.accept(this);
     sb = jccpv.sb = mainSB;
     return newSB;
   }
@@ -600,6 +612,7 @@ public class Annotator extends JavaCCPrinter {
    */
   @Override
   public void visit(final RegularExprProduction n) {
+    // Don't want to annotate under
     n.accept(jccpv);
   }
 
@@ -650,7 +663,9 @@ public class Annotator extends JavaCCPrinter {
     --bnfLvl;
     final int total = n.f1.size() + 1;
     if (!annotateNode) {
-      Messages.info("Empty NodeChoice in " + curProduction + "()");
+      lnftfv.reset();
+      n.f0.accept(lnftfv);
+      Messages.info("Empty NodeChoice within a choice in '" + curProduction + "()'.", lnft, cnft);
       spc.updateSpc(-1);
       sb.setLength(sb.length() - INDENT_AMT);
     } else {
@@ -674,7 +689,9 @@ public class Annotator extends JavaCCPrinter {
       seq.elementAt(1).accept(this);
       --bnfLvl;
       if (!annotateNode) {
-        Messages.info("Empty NodeChoice in " + curProduction + "()");
+        lnft = ((NodeToken) seq.elementAt(0)).beginLine;
+        cnft = ((NodeToken) seq.elementAt(0)).beginColumn;
+        Messages.info("Empty NodeChoice within a choice in '" + curProduction + "()'.", lnft, cnft);
         spc.updateSpc(-1);
         sb.setLength(sb.length() - INDENT_AMT);
       } else {
@@ -815,7 +832,7 @@ public class Annotator extends JavaCCPrinter {
    */
   @Override
   public void visit(final LocalLookahead n) {
-    // Don't want to annotate these
+    // Don't want to annotate under
     n.accept(jccpv);
   }
 
@@ -828,8 +845,10 @@ public class Annotator extends JavaCCPrinter {
    * .. .. | %3 ExpansionUnitTCF()<br>
    * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ]<br>
    * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
+   * .. .. . .. .. . .. $2 [ "!" ]<br>
    * .. .. . .. .. | &1 $0 RegularExpression()<br>
-   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )<br>
+   * .. .. . .. .. . .. $1 [ ?0 "." ?1 <IDENTIFIER> ]<br>
+   * .. .. . .. .. . .. $2 [ "!" ] )<br>
    * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
    * .. .. . .. #3 ( &0 "+"<br>
    * .. .. . .. .. | &1 "*"<br>
@@ -875,37 +894,37 @@ public class Annotator extends JavaCCPrinter {
       case 4:
         // %4 #0 [ $0 PrimaryExpression() $1 "=" ]
         // .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()
+        // .. .. . $2 [ "!" ]
         // .. .. | &1 $0 RegularExpression()
-        // .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )
+        // .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
+        // .. .. . .. $2 [ "!" ] )
         seq = (NodeSequence) n.f0.choice;
         final NodeOptional opt1 = (NodeOptional) seq.elementAt(0);
         final NodeChoice ch = (NodeChoice) seq.elementAt(1);
         final NodeSequence seq1 = (NodeSequence) ch.choice;
         String name;
         if (ch.which == 0) {
-          // &0 $0 IdentifierAsString() $1 Arguments()
+          // &0 $0 IdentifierAsString() $1 Arguments() $2 [ "!" ]
           final String ident = ((IdentifierAsString) seq1.elementAt(0)).f0.tokenImage;
-          if (jcpHT.containsKey(ident)) {
-            // generate JavaCodeProduction() if a JavaCodeProduction
-            // $0 IdentifierAsString()
-            seq1.elementAt(0).accept(jccpv);
-            // $1 Arguments()
-            sb.append(genJavaBranch(seq1.elementAt(1)));
-          } else {
-            // generate ni = Production() if not a JavaCodeProduction
+          final boolean creLocNode = !gdbv.getNcnHT().containsKey(ident) &&
+                                     !((NodeOptional) seq1.elementAt(2)).present();
+          // generate 'JavaCodeProduction(') or 'BNFProduction()' if node is not to be created
+          // otherwise generate 'ni = Production()'
+          VarInfo varInfo = null;
+          if (creLocNode) {
             name = genNewVarName();
-            final VarInfo varInfo = inEUT3 ? new VarInfo(ident, name, "null") : new VarInfo(ident,
-                                                                                            name);
+            varInfo = inEUT3 ? new VarInfo(ident, name, "null") : new VarInfo(ident, name);
             varList.add(varInfo);
             sb.append(name);
             sb.append(" = ");
-            // $0 IdentifierAsString()
-            // must be prefixed / suffixed
-            sb.append(getFixedName(((IdentifierAsString) seq1.elementAt(0)).f0.tokenImage));
-            // $1 Arguments()
-            sb.append(genJavaBranch(seq1.elementAt(1)));
-            finalActions(varInfo);
           }
+          // $0 IdentifierAsString()
+          // must be prefixed / suffixed
+          sb.append(getFixedName(((IdentifierAsString) seq1.elementAt(0)).f0.tokenImage));
+          // $1 Arguments()
+          sb.append(genJavaBranch(seq1.elementAt(1)));
+          if (creLocNode)
+            finalActions(varInfo);
           oneNewLine(n, "4a");
           sb.append(spc.spc);
           if (opt1.present()) {
@@ -925,16 +944,18 @@ public class Annotator extends JavaCCPrinter {
             sb.append(spc.spc);
           }
         } else {
-          // &1 $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ] )
+          // &1 $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ] $2 [ "!" ]
+          // $2 [ "!" ]
+          createRENode = !((NodeOptional) seq1.elementAt(2)).present();
           // $0 RegularExpression()
           seq1.elementAt(0).accept(this);
-          final NodeOptional opt2 = (NodeOptional) seq1.elementAt(1);
           // $1 [ ?0 "." ?1 < IDENTIFIER > ]
+          final NodeOptional opt2 = (NodeOptional) seq1.elementAt(1);
           if (opt2.present()) {
             sb.append(".");
             ((NodeSequence) opt2.node).elementAt(1).accept(this);
           }
-          if (opt1.present()) {
+          if (createRENode && opt1.present()) {
             // above has generated ni = RegularExpression and generate now { p = ni; }
             oneNewLine(n, "4c");
             sb.append(spc.spc);
@@ -946,12 +967,13 @@ public class Annotator extends JavaCCPrinter {
             // $1 "="
             seq2.elementAt(1).accept(this);
             sb.append(" ");
-            // variable generated for RegularExpression(c)
+            // variable generated for RegularExpression()
             sb.append(reTokenName);
             sb.append("; }");
             oneNewLine(n, "4d");
             sb.append(spc.spc);
           }
+          createRENode = true;
         }
         return;
 
@@ -996,8 +1018,9 @@ public class Annotator extends JavaCCPrinter {
     if (eutcv.getNbNormals() == 0) {
       // technically, we should only generate an error if it's not a choice,
       // but that greatly complicates things and an empty choice is probably useless
-      Messages.softErr("Empty BNF expansion in " + curProduction + "()",
-                       ((NodeToken) seq.elementAt(0)).beginLine);
+      final NodeToken tk = (NodeToken) seq.elementAt(0);
+      Messages.softErr("Empty BNF expansion in production '" + curProduction + "()'.",
+                       tk.beginLine, tk.beginColumn);
     } else {
       final ExpansionUnit firstExpUnit = (ExpansionUnit) list.nodes.get(0);
       if (extraVarsList == null)
@@ -1161,9 +1184,11 @@ public class Annotator extends JavaCCPrinter {
         // count the number of ExpansionUnits of each type (choice)
         eutcv.reset();
         ec.accept(eutcv);
-        if (eutcv.getNbNormals() == 0)
-          Messages.warning("Empty parentheses in " + curProduction + "()",
-                           ((NodeToken) seq.elementAt(0)).beginLine);
+        if (eutcv.getNbNormals() == 0) {
+          final NodeToken tk = (NodeToken) seq.elementAt(0);
+          Messages.warning("Empty parentheses in production '" + curProduction + "()'.",
+                           tk.beginLine, tk.beginColumn);
+        }
         name = genNewVarName();
         final VarInfo varInfo = inEUT3 ? new VarInfo(nodeSeq, name, "null") : new VarInfo(nodeSeq,
                                                                                           name);
@@ -1192,8 +1217,9 @@ public class Annotator extends JavaCCPrinter {
       if (eutcv.getNbNormals() == 0) {
         // technically, we should only generate an error if it's not a choice,
         // but that greatly complicates things and an empty choice is probably useless
-        Messages.softErr("Empty BNF expansion in " + curProduction + "()",
-                         ((NodeToken) seq.elementAt(0)).beginLine);
+        final NodeToken tk = (NodeToken) seq.elementAt(0);
+        Messages.softErr("Empty BNF expansion in production '" + curProduction + "()'.",
+                         tk.beginLine, tk.beginColumn);
       } else {
         final ExpansionUnit firstExpUnit = (ExpansionUnit) list.nodes.get(0);
         if (extraVarsList == null)
@@ -1319,7 +1345,7 @@ public class Annotator extends JavaCCPrinter {
       else if (modifier.which == 2) // "?"
         return new VarInfo(nodeOpt, varName, "new ".concat(nodeOpt).concat("()"));
       else
-        Messages.hardErr("Illegal BNF modifier: " + modifier.choice.toString());
+        Messages.hardErr("Illegal BNF modifier: '" + modifier.choice.toString() + "'.");
     } else {
       if (modifier.which == 0) // "+"
         return new VarInfo(nodeList, varName);
@@ -1328,7 +1354,7 @@ public class Annotator extends JavaCCPrinter {
       else if (modifier.which == 2) // "?"
         return new VarInfo(nodeOpt, varName);
       else
-        Messages.hardErr("Illegal BNF modifier: " + modifier.choice.toString());
+        Messages.hardErr("Illegal BNF modifier: '" + modifier.choice.toString() + "'.");
     }
     return null; // shouldn't happen
   }
@@ -1353,7 +1379,9 @@ public class Annotator extends JavaCCPrinter {
    * <p>
    * f0 -> . %0 StringLiteral()<br>
    * .. .. | %1 #0 "<"<br>
-   * .. .. . .. #1 [ $0 [ "#" ] $1 IdentifierAsString() $2 ":" ] #2 ComplexRegularExpressionChoices() #3 ">"<br>
+   * .. .. . .. #1 [ $0 [ "#" ]<br>
+   * .. .. . .. .. . $1 IdentifierAsString() $2 ":" ]<br>
+   * .. .. . .. #2 ComplexRegularExpressionChoices() #3 ">"<br>
    * .. .. | %2 #0 "<" #1 IdentifierAsString() #2 ">"<br>
    * .. .. | %3 #0 "<" #1 "EOF" #2 ">"<br>
    *
@@ -1361,22 +1389,41 @@ public class Annotator extends JavaCCPrinter {
    */
   @Override
   public void visit(final RegularExpression n) {
-    final String nodeName = genNewVarName();
-    reTokenName = genNewVarName();
-    final VarInfo nodeTokenInfo = new VarInfo(nodeToken, nodeName);
-    final VarInfo tokenNameInfo = new VarInfo(jjToken, reTokenName);
-    varList.add(nodeTokenInfo);
-    varList.add(tokenNameInfo);
-    sb.append(reTokenName);
-    sb.append(" = ");
+    // find if the node must be created
+    boolean creThisNode = createRENode;
+    if (createRENode && n.f0.which == 2) {
+      // %2 #0 "<" #1 IdentifierAsString() #2 ">"
+      final NodeSequence seq1 = (NodeSequence) n.f0.choice;
+      // create the node only if not requested not to do so
+      final String ident = ((IdentifierAsString) seq1.elementAt(1)).f0.tokenImage;
+      final String val = gdbv.getTokenHT().get(ident);
+      if (DONT_CREATE_NODE_STR.equals(val)) {
+        creThisNode = false;
+      }
+    }
+    String nodeName = null;
+    VarInfo nodeTokenInfo = null;
+    // create the variable if the node must be created
+    if (creThisNode) {
+      nodeName = genNewVarName();
+      reTokenName = genNewVarName();
+      nodeTokenInfo = new VarInfo(nodeToken, nodeName);
+      final VarInfo tokenNameInfo = new VarInfo(jjToken, reTokenName);
+      varList.add(nodeTokenInfo);
+      varList.add(tokenNameInfo);
+      sb.append(reTokenName);
+      sb.append(" = ");
+    }
     if (n.f0.which == 0) {
       // %0 StringLiteral()
       n.f0.choice.accept(jccpv);
       oneNewLine(n, "a");
-      sb.append(spc.spc);
-      sb.append("{ ").append(nodeName).append(" = JTBToolkit.makeNodeToken(").append(reTokenName)
-        .append("); }");
-      oneNewLine(n, "b");
+      if (creThisNode) {
+        sb.append(spc.spc);
+        sb.append("{ ").append(nodeName).append(" = JTBToolkit.makeNodeToken(").append(reTokenName)
+          .append("); }");
+        oneNewLine(n, "b");
+      }
     } else if (n.f0.which == 1) {
       // %1 #0 "<" #1 [ $0 [ "#" ] $1 IdentifierAsString() $2 ":" ] #2 ComplexRegularExpressionChoices() #3 ">"
       final NodeSequence seq = (NodeSequence) n.f0.choice;
@@ -1402,13 +1449,16 @@ public class Annotator extends JavaCCPrinter {
       seq.elementAt(3).accept(jccpv);
       sb.append(" ");
       oneNewLine(n, "c");
-      sb.append(spc.spc);
-      sb.append("{ ").append(nodeName).append(" = JTBToolkit.makeNodeToken(").append(reTokenName)
-        .append("); }");
-      oneNewLine(n, "d");
+      if (creThisNode) {
+        sb.append(spc.spc);
+        sb.append("{ ").append(nodeName).append(" = JTBToolkit.makeNodeToken(").append(reTokenName)
+          .append("); }");
+        oneNewLine(n, "d");
+      }
     } else if (n.f0.which == 2) {
       // %2 #0 "<" #1 IdentifierAsString() #2 ">"
       final NodeSequence seq1 = (NodeSequence) n.f0.choice;
+      // print the RegularExpression in all cases
       // #0 "<"
       seq1.elementAt(0).accept(jccpv);
       sb.append(" ");
@@ -1418,10 +1468,12 @@ public class Annotator extends JavaCCPrinter {
       // #2 ">"
       seq1.elementAt(2).accept(jccpv);
       oneNewLine(n, "e");
-      sb.append(spc.spc);
-      sb.append("{ ").append(nodeName).append(" = JTBToolkit.makeNodeToken(").append(reTokenName)
-        .append("); }");
-      oneNewLine(n, "f");
+      if (creThisNode) {
+        sb.append(spc.spc);
+        sb.append("{ ").append(nodeName).append(" = JTBToolkit.makeNodeToken(").append(reTokenName)
+          .append("); }");
+        oneNewLine(n, "f");
+      }
     } else {
       // %3 #0 "<" #1 "EOF" #2 ">"
       sb.append("< EOF >");
@@ -1446,7 +1498,8 @@ public class Annotator extends JavaCCPrinter {
       oneNewLine(n, "k");
     }
     sb.append(spc.spc);
-    finalActions(nodeTokenInfo);
+    if (creThisNode)
+      finalActions(nodeTokenInfo);
   }
 
   /**
@@ -1998,214 +2051,208 @@ public class Annotator extends JavaCCPrinter {
   }
 
   /**
-   * The {@link GlobalDataFinder} visitor finds<br>
-   * all "void" JavaCodeProductions and adds them to a Hashtable (which will be used to avoid
-   * creating later invalid child nodes),<br>
-   * all non "void" BNFProductions and constructs a list of return variables declarations (to be
-   * inserted in the compilation unit by the {@link CompilationUnitPrinter}).
+   * The {@link ExpansionChoicesLineNumber} visitor finds the line number of the first token of a
+   * production under an {@link ExpansionChoices}.
    */
-  class GlobalDataFinder extends DepthFirstVoidVisitor {
+  class ExpansionChoicesLineNumber extends DepthFirstVoidVisitor {
 
     /**
-     * Constructor, with a given buffer and a default indentation.
+     * Resets the global variable.
      */
-    GlobalDataFinder() {
-      super();
+    public void reset() {
+      lnft = 0;
     }
 
     /**
-     * Visits a {@link JavaCCInput} node, whose children are the following :
+     * Visits a {@link ExpansionChoices} node, whose children are the following :
      * <p>
-     * f0 -> JavaCCOptions()<br>
-     * f1 -> "PARSER_BEGIN"<br>
-     * f2 -> "("<br>
-     * f3 -> IdentifierAsString()<br>
-     * f4 -> ")"<br>
-     * f5 -> CompilationUnit()<br>
-     * f6 -> "PARSER_END"<br>
-     * f7 -> "("<br>
-     * f8 -> IdentifierAsString()<br>
-     * f9 -> ")"<br>
-     * f10 -> ( Production() )+<br>
+     * f0 -> Expansion()<br>
+     * f1 -> ( #0 "|" #1 Expansion() )*<br>
      * 
      * @param n - the node to visit
      */
     @Override
-    public void visit(final JavaCCInput n) {
-      // visits only Productions
-      // f10 -> ( Production() )+
-      for (final Iterator<INode> e = n.f10.elements(); e.hasNext();) {
-        e.next().accept(this);
-      }
+    public void visit(final ExpansionChoices n) {
+      // f0 -> Expansion()
+      n.f0.accept(this);
+      // result should be always found after visiting f0
     }
 
     /**
-     * Visits a {@link Production} node, whose children are the following :
+     * Visits a {@link Expansion} node, whose children are the following :
      * <p>
-     * f0 -> . %0 JavaCodeProduction()<br>
-     * .. .. | %1 RegularExprProduction()<br>
-     * .. .. | %2 TokenManagerDecls()<br>
-     * .. .. | %3 BNFProduction()<br>
+     * f0 -> ( #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" )?<br>
+     * f1 -> ( ExpansionUnit() )+<br>
      * 
      * @param n - the node to visit
      */
     @Override
-    public void visit(final Production n) {
-      // visits only %0 JavaCodeProduction and %3 BNFProduction
-      if (n.f0.which == 0 || n.f0.which == 3)
-        n.f0.accept(this);
+    public void visit(final Expansion n) {
+      // f0 -> ( #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" )?
+      if (n.f0.present()) {
+        final NodeSequence seq = (NodeSequence) n.f0.node;
+        lnft = ((NodeToken) seq.elementAt(0)).beginLine;
+        cnft = ((NodeToken) seq.elementAt(0)).beginColumn;
+      } else
+        // f1 -> ( ExpansionUnit() )+
+        n.f1.accept(this);
     }
 
     /**
-     * Visits a {@link JavaCodeProduction} node, whose children are the following :
+     * Visits a {@link ExpansionUnit} node, whose children are the following :
      * <p>
-     * f0 -> "JAVACODE"<br>
-     * f1 -> AccessModifier()<br>
-     * f2 -> ResultType()<br>
-     * f3 -> IdentifierAsString()<br>
-     * f4 -> FormalParameters()<br>
-     * f5 -> [ #0 "throws" #1 Name()<br>
-     * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
-     * f6 -> Block()<br>
+     * f0 -> . %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"<br>
+     * .. .. | %1 Block()<br>
+     * .. .. | %2 #0 "[" #1 ExpansionChoices() #2 "]"<br>
+     * .. .. | %3 ExpansionUnitTCF()<br>
+     * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ]<br>
+     * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
+     * .. .. . .. .. . .. $2 [ "!" ]<br>
+     * .. .. . .. .. | &1 $0 RegularExpression()<br>
+     * .. .. . .. .. . .. $1 [ ?0 "." ?1 <IDENTIFIER> ]<br>
+     * .. .. . .. .. . .. $2 [ "!" ] )<br>
+     * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
+     * .. .. . .. #3 ( &0 "+"<br>
+     * .. .. . .. .. | &1 "*"<br>
+     * .. .. . .. .. | &2 "?" )?<br>
      * 
      * @param n - the node to visit
      */
     @Override
-    public void visit(final JavaCodeProduction n) {
-      // f3 -> IdentifierAsString()
-      // store it in the Hashtable
-      final String ident = n.f3.f0.tokenImage;
-      jcpHT.put(ident, ident);
-      // store it in the list if non "void"
-      final String resType = getResultType(n.f2);
-      if (!"void".equals(resType)) {
-        final String comm = "/** Return variable for {@link #".concat(ident)
-                                                              .concat("} production */");
-        retVarDecl.add(comm);
-        final String decl = (staticFlag ? "static " : "").concat(resType).concat(" ")
-                                                         .concat(jtbRtPrefix).concat(ident)
-                                                         .concat(";");
-        retVarDecl.add(decl);
-      }
-    }
-
-    /**
-     * Gets the ResultType. Walks down the tree to find the first token.
-     * <p>
-     * {@link ResultType}<br>
-     * f0 -> ( %0 "void"<br>
-     * .. .. | %1 Type() )<br>
-     * <p>
-     * {@link Type}<br>
-     * f0 -> . %0 ReferenceType()<br>
-     * .. .. | %1 PrimitiveType()<br>
-     * <p>
-     * {@link ReferenceType}<br>
-     * f0 -> . %0 #0 PrimitiveType()<br>
-     * .. .. . .. #1 ( $0 "[" $1 "]" )+<br>
-     * .. .. | %1 #0 ClassOrInterfaceType()<br>
-     * .. .. . .. #1 ( $0 "[" $1 "]" )*<br>
-     * <p>
-     * {@link PrimitiveType}<br>
-     * f0 -> . %0 "boolean"<br>
-     * .. .. | %1 "char"<br>
-     * .. .. | %2 "byte"<br>
-     * .. .. | %3 "short"<br>
-     * .. .. | %4 "int"<br>
-     * .. .. | %5 "long"<br>
-     * .. .. | %6 "float"<br>
-     * .. .. | %7 "double"<br>
-     * <p>
-     * {@link ClassOrInterfaceType}<br>
-     * f0 -> < IDENTIFIER ><br>
-     * f1 -> [ TypeArguments() ]<br>
-     * f2 -> ( #0 "." #1 < IDENTIFIER ><br>
-     * .. .. . #2 [ TypeArguments() ] )*<br>
-     * 
-     * @param rt - the node to process
-     * @return the result type token image
-     */
-    String getResultType(final ResultType rt) {
+    public void visit(final ExpansionUnit n) {
+      NodeSequence seq;
       NodeToken tk;
-      final INode n = rt.f0.choice;
-      if (rt.f0.which == 0) {
-        // "void"
-        tk = (NodeToken) n;
-      } else {
-        // Type(
-        final NodeChoice ch = ((Type) n).f0;
-        if (ch.which == 0) {
-          // ReferenceType()
-          final NodeChoice ch1 = ((ReferenceType) ch.choice).f0;
-          if (ch1.which == 0) {
-            // PrimitiveType() ( "[" "]" )+
-            tk = (NodeToken) ((PrimitiveType) ch1.choice).f0.choice;
-          } else {
-            // ClassOrInterfaceType() ( "[" "]" )*
-            tk = ((ClassOrInterfaceType) ((NodeSequence) ch1.choice).elementAt(0)).f0;
+      switch (n.f0.which) {
+        case 0:
+          // %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"
+          seq = (NodeSequence) n.f0.choice;
+          tk = (NodeToken) seq.elementAt(0);
+          lnft = tk.beginLine;
+          cnft = tk.beginColumn;
+          return;
+
+        case 1:
+          // %1 Block()
+          n.f0.choice.accept(this);
+          return;
+
+        case 2:
+          // %2 #0 "[" #1 ExpansionChoices() #2 "]"
+          seq = (NodeSequence) n.f0.choice;
+          tk = (NodeToken) seq.elementAt(0);
+          lnft = tk.beginLine;
+          cnft = tk.beginColumn;
+          return;
+
+        case 3:
+          // %3 ExpansionUnitTCF()
+          n.f0.choice.accept(this);
+          return;
+
+        case 4:
+          // %4 #0 [ $0 PrimaryExpression() $1 "=" ]
+          // .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()
+          // .. .. | &1 $0 RegularExpression()
+          // .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
+          // .. .. . .. $2 [ "!" ] )
+          seq = (NodeSequence) n.f0.choice;
+          final NodeOptional opt1 = (NodeOptional) seq.elementAt(0);
+          if (opt1.present()) {
+            // $0 PrimaryExpression() $1 "="
+            // here we take a shortcut : we do not implement and go down PrimaryExpression
+            tk = (NodeToken) ((NodeSequence) opt1.node).elementAt(1);
+            lnft = tk.beginLine;
+            cnft = tk.beginColumn;
+            return;
           }
-        } else {
-          // PrimitiveType()
-          tk = (NodeToken) ((PrimitiveType) ch.choice).f0.choice;
-        }
+          final NodeChoice ch = (NodeChoice) seq.elementAt(1);
+          final NodeSequence seq1 = (NodeSequence) ch.choice;
+          if (ch.which == 0) {
+            // &0 $0 IdentifierAsString() $1 Arguments()
+            tk = ((IdentifierAsString) seq1.elementAt(0)).f0;
+            lnft = tk.beginLine;
+            cnft = tk.beginColumn;
+          } else {
+            // &1 $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ] )
+            seq1.elementAt(0).accept(this);
+          }
+          return;
+
+        case 5:
+          // %5 #0 "(" #1 ExpansionChoices() #2 ")"
+          // .. #3 ( &0 "+" | &1 "*" | &2 "?" )?
+          seq = (NodeSequence) n.f0.choice;
+          tk = (NodeToken) seq.elementAt(0);
+          lnft = tk.beginLine;
+          cnft = tk.beginColumn;
+          return;
+
+        default:
+          Messages.hardErr("n.f0.which = " + String.valueOf(n.f0.which));
+          return;
       }
-      return tk.tokenImage;
     }
 
     /**
-     * Visits a {@link BNFProduction} node, whose children are the following :
+     * Visits a {@link Block} node, whose children are the following :
      * <p>
-     * f0 -> AccessModifier()<br>
-     * f1 -> ResultType()<br>
-     * f2 -> IdentifierAsString()<br>
-     * f3 -> FormalParameters()<br>
-     * f4 -> [ #0 "throws" #1 Name()<br>
-     * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
-     * f5 -> ":"<br>
-     * f6 -> Block()<br>
-     * f7 -> "{"<br>
-     * f8 -> ExpansionChoices()<br>
-     * f9 -> "}"<br>
+     * f0 -> "{"<br>
+     * f1 -> ( BlockStatement() )*<br>
+     * f2 -> "}"<br>
      * 
      * @param n - the node to visit
      */
     @Override
-    public void visit(final BNFProduction n) {
-      // f1 -> ResultType()
-      final ResultType rt = n.f1;
-      NodeToken tk;
-      final INode in = rt.f0.choice;
-      if (rt.f0.which == 0) {
-        // "void" : no need for return variable
-        return;
-      } else {
-        // Type()
-        final NodeChoice ch = ((Type) in).f0;
-        if (ch.which == 0) {
-          // ReferenceType()
-          final NodeChoice ch1 = ((ReferenceType) ch.choice).f0;
-          if (ch1.which == 0) {
-            // PrimitiveType() ( "[" "]" )+
-            tk = (NodeToken) ((PrimitiveType) ch1.choice).f0.choice;
-          } else {
-            // ClassOrInterfaceType() ( "[" "]" )*
-            tk = ((ClassOrInterfaceType) ((NodeSequence) ch1.choice).elementAt(0)).f0;
-          }
-        } else {
-          // PrimitiveType()
-          tk = (NodeToken) ((PrimitiveType) ch.choice).f0.choice;
-        }
-      }
-      final String resType = tk.tokenImage;
-      final String ident = n.f2.f0.tokenImage;
-      final String comm = "/** Return variable for {@link #".concat(ident)
-                                                            .concat("} production */");
-      retVarDecl.add(comm);
-      final String decl = (staticFlag ? "static " : "").concat(resType).concat(" ")
-                                                       .concat(jtbRtPrefix).concat(ident)
-                                                       .concat(";");
-      retVarDecl.add(decl);
+    public void visit(final Block n) {
+      // f0 -> "{"
+      lnft = n.f0.beginLine;
     }
+
+    /**
+     * Visits a {@link ExpansionUnitTCF} node, whose children are the following :
+     * <p>
+     * f0 -> "try"<br>
+     * f1 -> "{"<br>
+     * f2 -> ExpansionChoices()<br>
+     * f3 -> "}"<br>
+     * f4 -> ( #0 "catch" #1 "(" #2 Name() #3 < IDENTIFIER > #4 ")" #5 Block() )*<br>
+     * f5 -> [ #0 "finally" #1 Block() ]<br>
+     * 
+     * @param n - the node to visit
+     */
+    @Override
+    public void visit(final ExpansionUnitTCF n) {
+      // f0 -> "try"
+      lnft = n.f0.beginLine;
+    }
+
+/**
+     * Visits a {@link RegularExpression} node, whose children are the following :
+     * <p>
+     * f0 -> . %0 StringLiteral()<br>
+     * .. .. | %1 #0 "<"<br>
+     * .. .. . .. #1 [ $0 [ "#" ]<br>
+     * .. .. . .. .. . $1 IdentifierAsString() $2 ":" ]<br>
+     * .. .. . .. #2 ComplexRegularExpressionChoices() #3 ">"<br>
+     * .. .. | %2 #0 "<" #1 IdentifierAsString() #2 ">"<br>
+     * .. .. | %3 #0 "<" #1 "EOF" #2 ">"<br>
+     *
+     * @param n - the node to visit
+     */
+    @Override
+    public void visit(final RegularExpression n) {
+      if (n.f0.which == 0) {
+        // %0 StringLiteral()
+        lnft = ((StringLiteral) n.f0.choice).f0.beginLine;
+      } else {
+        // %1 #0 "<" #1 [ $0 [ "#" ] $1 IdentifierAsString() $2 ":" ] #2 ComplexRegularExpressionChoices() #3 ">"
+        // %2 #0 "<" #1 IdentifierAsString() #2 ">"
+        // %3 #0 "<" #1 "EOF" #2 ">"
+        final NodeSequence seq = (NodeSequence) n.f0.choice;
+        lnft = ((NodeToken) seq.elementAt(0)).beginLine;
+      }
+    }
+
   }
 
   /**
@@ -2454,7 +2501,7 @@ public class Annotator extends JavaCCPrinter {
       // f0 -> "{"
       n.f0.accept(this);
       // add return variables declarations
-      final int rvds = retVarDecl.size();
+      final int rvds = gdbv.getRetVarDecl().size();
       if (rvds > 0) {
         spc.updateSpc(+1);
         twoNewLines(n);
@@ -2470,17 +2517,17 @@ public class Annotator extends JavaCCPrinter {
         sb.append(spc.spc);
         for (int i = 0; i < rvds; i++) {
           // comment
-          sb.append(retVarDecl.get(i));
+          sb.append(gdbv.getRetVarDecl().get(i));
           oneNewLine(n, "b");
           sb.append(spc.spc);
           // declaration
-          sb.append(retVarDecl.get(++i));
+          sb.append(gdbv.getRetVarDecl().get(++i));
           if (i < rvds - 2) {
             twoNewLines(n);
             sb.append(spc.spc);
           }
         }
-        retVarDecl.clear();
+        gdbv.getRetVarDecl().clear();
         spc.updateSpc(-1);
       }
       // f1 -> ( ClassOrInterfaceBodyDeclaration() )*

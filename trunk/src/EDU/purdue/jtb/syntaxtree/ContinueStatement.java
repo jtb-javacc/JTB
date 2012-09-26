@@ -7,7 +7,7 @@ import EDU.purdue.jtb.visitor.*;
  * JTB node class for the production ContinueStatement:<br>
  * Corresponding grammar:<br>
  * f0 -> "continue"<br>
- * f1 -> [ < IDENTIFIER > ]<br>
+ * f1 -> [ <IDENTIFIER> ]<br>
  * f2 -> ";"<br>
  */
 public class ContinueStatement implements INode {

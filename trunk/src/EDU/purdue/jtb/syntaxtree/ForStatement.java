@@ -8,7 +8,7 @@ import EDU.purdue.jtb.visitor.*;
  * Corresponding grammar:<br>
  * f0 -> "for"<br>
  * f1 -> "("<br>
- * f2 -> ( %0 #0 VariableModifiers() #1 Type() #2 < IDENTIFIER > #3 ":" #4 Expression()<br>
+ * f2 -> ( %0 #0 VariableModifiers() #1 Type() #2 <IDENTIFIER> #3 ":" #4 Expression()<br>
  * .. .. | %1 #0 [ ForInit() ]<br>
  * .. .. . .. #1 ";"<br>
  * .. .. . .. #2 [ Expression() ]<br>

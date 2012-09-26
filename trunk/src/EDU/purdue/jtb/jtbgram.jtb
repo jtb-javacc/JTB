@@ -95,14 +95,18 @@
  *   to fit with JTB.java and 
  *   to use the try-ExpansionChoices-catch-finally syntax through the ExpansionUnitInTCF production
  */
-// MMa 06/2012 : modified AccessModifier(), BlockStatement(), LocalVariableDeclaration(), added VariableModifiers()
+// MMa 06/2012 : modified AccessModifier(), BlockStatement(), LocalVariableDeclaration()
+//                added VariableModifiers()
 // MMa 07/2012 : added assert, enum & strictfp java keywords
 //               fixed ForStatement() ; ForInit()
 //               renamed RSIGNEDSHIFT in RSignedShift and fixed it
 //               renamed RUNSIGNEDSHIFT in RUnsignedShift and fixed it
 //               modified RegularExpression (remove LANGLE & RANGLE definitions)
-//               TODO found problems in TypeDeclaration(), ExplicitConstructorInvocation(), PrimaryPrefix()
+//               TODO (JavaCC grammar) problems in TypeDeclaration(), ExplicitConstructorInvocation(),
+//                PrimaryPrefix()
 //               renamed ExpansionUnitInTCF into ExpansionUnitTCF
+// MMa 09/2012 : added "!" syntax in BNFProduction and RegExprSpec and ExpansionUnit for not generating
+//                the node creation in the callers ; fixed forbidding punctuation between productions
 
 options
 {
@@ -114,6 +118,7 @@ options
 
 // MMa : kept (from JavaCC.jj, but it does not exist in jtbgram.jj)
   STATIC = false;
+  
 }
 
 // MMa : adapted from JavaCC.jj to fit to JTB parser name, package, imports
@@ -595,6 +600,8 @@ void JavaCCInput() :
   { processing_cu = false; }
   "PARSER_END" "(" id2 = IdentifierAsString() { compare(getToken(0), id1, id2); } ")"
   ( Production() )+
+  // MMa 09/2012 : added to forbid punctuation between productions
+  < EOF >
 }
 
 // MMa : changed all javacc_options into JavaCCOptions to conform to class name convention
@@ -751,6 +758,8 @@ void BNFProduction() :
       }
     )*
   ]
+  // MMa 09/2012 : added for not generating the node creation within the callers (in BNFProduction)
+  [ "!" ]
   // MMa 07/2012 : '[node_descriptor()]' is missing here
   ":" Block
   (
@@ -881,6 +890,7 @@ void RegExprSpec(TokenProduction p) :
   }
   {
     RegularExpression(c)
+    // MMa 09/2012 : added for not generating the node creation within the callers (in RegExprSpec)    [ "!" ]
     {
       res.rexp = (RegularExpression_) c.member;
       res.rexp.tpContext = p;
@@ -1169,6 +1179,8 @@ void ExpansionUnit(Container c) :
         nt.setName(name);
         c.member = nt;
       }
+      // MMa 09/2012 : added for not generating the node creation within the callers (in ExpansionUnit IdentifierAsString)
+      [ "!" ]
     | RegularExpression(c)
       {
         ((RegularExpression_) (c.member)).lhsTokens = lhsTokens;
@@ -1180,6 +1192,8 @@ void ExpansionUnit(Container c) :
           ((RegularExpression_) (c.member)).rhsToken = t;
         }
       ]
+      // MMa 09/2012 : added for not generating the node creation within the callers (in ExpansionUnit RegularExpression)
+      [ "!" ]
     )
   | t = "(" ExpansionChoices(c) ")"
     (
@@ -1297,7 +1311,9 @@ void RegularExpression(Container c) :
       c.member = re;
     }
   | LOOKAHEAD(2)
-    "<" image = IdentifierAsString() ">"
+    "<"
+    image = IdentifierAsString()
+    ">"
     {
       c.member = new RJustName(t, image);
     }
@@ -2770,8 +2786,8 @@ void TryStatement() :
 void Annotation() :
 {}
 {
-  LOOKAHEAD("@" Name(null) "(" < IDENTIFIER > "="
-| ")")
+  // MMa 09/2012 : fixed (added parentheses)
+  LOOKAHEAD("@" Name(null) "(" (< IDENTIFIER > "=" | ")"))
   NormalAnnotation()
 | LOOKAHEAD("@" Name(null) "(")
   SingleMemberAnnotation()

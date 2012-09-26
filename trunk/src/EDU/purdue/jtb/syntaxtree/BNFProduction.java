@@ -12,11 +12,12 @@ import EDU.purdue.jtb.visitor.*;
  * f3 -> FormalParameters()<br>
  * f4 -> [ #0 "throws" #1 Name()<br>
  * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
- * f5 -> ":"<br>
- * f6 -> Block()<br>
- * f7 -> "{"<br>
- * f8 -> ExpansionChoices()<br>
- * f9 -> "}"<br>
+ * f5 -> [ "!" ]<br>
+ * f6 -> ":"<br>
+ * f7 -> Block()<br>
+ * f8 -> "{"<br>
+ * f9 -> ExpansionChoices()<br>
+ * f10 -> "}"<br>
  */
 public class BNFProduction implements INode {
 
@@ -36,19 +37,22 @@ public class BNFProduction implements INode {
   public NodeOptional f4;
 
   /** Child node 6 */
-  public NodeToken f5;
+  public NodeOptional f5;
 
   /** Child node 7 */
-  public Block f6;
+  public NodeToken f6;
 
   /** Child node 8 */
-  public NodeToken f7;
+  public Block f7;
 
   /** Child node 9 */
-  public ExpansionChoices f8;
+  public NodeToken f8;
 
   /** Child node 10 */
-  public NodeToken f9;
+  public ExpansionChoices f9;
+
+  /** Child node 11 */
+  public NodeToken f10;
 
   /** The serial version UID */
   private static final long serialVersionUID = 147L;
@@ -66,8 +70,9 @@ public class BNFProduction implements INode {
    * @param n7 - next child node
    * @param n8 - next child node
    * @param n9 - next child node
+   * @param n10 - next child node
    */
-  public BNFProduction(final AccessModifier n0, final ResultType n1, final IdentifierAsString n2, final FormalParameters n3, final NodeOptional n4, final NodeToken n5, final Block n6, final NodeToken n7, final ExpansionChoices n8, final NodeToken n9) {
+  public BNFProduction(final AccessModifier n0, final ResultType n1, final IdentifierAsString n2, final FormalParameters n3, final NodeOptional n4, final NodeOptional n5, final NodeToken n6, final Block n7, final NodeToken n8, final ExpansionChoices n9, final NodeToken n10) {
     f0 = n0;
     f1 = n1;
     f2 = n2;
@@ -78,6 +83,7 @@ public class BNFProduction implements INode {
     f7 = n7;
     f8 = n8;
     f9 = n9;
+    f10 = n10;
   }
 
   /**

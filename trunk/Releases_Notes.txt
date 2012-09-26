@@ -1,13 +1,23 @@
 ---------------
 Version 1.4.7
 ---------------
--> xx/xx/2012
+-> 25/09/2012
+- added sub comments in the generated visitors java code
+- did some optimizations
+- fixed bugs JTB-1 & JTB-2
+- fixed some generation errors
+- added a check when 'n = prod()' and 'void prod()'
+- added the '!' syntax for not generating a node creation (in a BNFProduction, RegExprSpec and ExpansionUnit)
+- fixed some Java grammar issues and did some refactoring
+- added column numbers in messages
+- performed tests on more limit cases
+- fixed missing <EOF> in JavaCCInput() and parentheses in Annotation()
 
 ---------------
 Version 1.4.6
 ---------------
 -> 25/01/2011
-- added -va and -npfx and -nsfx options (Francis Andre Kampbell)
+- added -va and -npfx and -nsfx options (Francis Andre)
 - added java code formatter & clean up preference files
 
 ---------------

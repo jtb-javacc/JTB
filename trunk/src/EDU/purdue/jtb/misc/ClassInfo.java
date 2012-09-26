@@ -41,6 +41,7 @@ import EDU.purdue.jtb.syntaxtree.ExpansionChoices;
 import EDU.purdue.jtb.syntaxtree.INode;
 import EDU.purdue.jtb.syntaxtree.NodeToken;
 import EDU.purdue.jtb.visitor.CommentsPrinter;
+import EDU.purdue.jtb.visitor.GlobalDataBuilder;
 
 /**
  * Class ClassInfo is used by the visitors to store and ask for information about a class including
@@ -52,11 +53,14 @@ import EDU.purdue.jtb.visitor.CommentsPrinter;
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  * @version 1.4.6 : 01/2011 : FA/MMa : added -va and -npfx and -nsfx options
  * @version 1.4.7 : 09/2012 : MMa : refactored comment handling to add sub comments and optimization
+ *          ; added the reference to the {@link GlobalDataBuilder}
  */
 public class ClassInfo {
 
-  /** The node */
-  public final INode             astNode;
+  /** The reference to the global data builder visitor */
+  final GlobalDataBuilder        gdbv;
+  /** The corresponding ExpansionChoices node */
+  public final INode             astEcNode;
   /** The class name (including optional prefix and suffix) */
   public final String            className;
   /** The list of the types of the class fields representing the node's children */
@@ -81,23 +85,23 @@ public class ClassInfo {
    * they are stored as an optimization)
    */
   public StringBuilder           visitFieldCmts              = null;
-  /** The comments printer visitor */
-  static CommentsPrinter         cpv                         = new CommentsPrinter();
 
   /**
    * Constructs an instance giving an ExpansionChoices node and a name.
    * 
    * @param aEC - the ExpansionChoices node
    * @param aCN - the class name
+   * @param aGdbv - the global data builder visitor
    */
-  public ClassInfo(final ExpansionChoices aEC, final String aCN) {
-    astNode = aEC;
+  public ClassInfo(final ExpansionChoices aEC, final String aCN, final GlobalDataBuilder aGdbv) {
+    astEcNode = aEC;
     className = getFixedName(aCN);
     final int nb = (aEC.f1.present() ? aEC.f1.size() + 1 : 1);
     fieldTypes = new ArrayList<String>(nb);
     fieldNames = new ArrayList<String>(nb);
     fieldInitializers = new ArrayList<String>(nb);
     fieldEUTCFCodes = new ArrayList<String>(nb);
+    gdbv = aGdbv;
   }
 
   /**
@@ -234,7 +238,7 @@ public class ClassInfo {
    */
   void genCommentsData() {
     if (fieldCmts == null) {
-      cpv.genCommentsData(this);
+      gdbv.getCpv().genCommentsData(this);
     }
   }
 

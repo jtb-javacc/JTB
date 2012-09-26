@@ -7,7 +7,7 @@ import EDU.purdue.jtb.visitor.*;
  * JTB node class for the production ConstructorDeclaration:<br>
  * Corresponding grammar:<br>
  * f0 -> [ TypeParameters() ]<br>
- * f1 -> < IDENTIFIER ><br>
+ * f1 -> <IDENTIFIER><br>
  * f2 -> FormalParameters()<br>
  * f3 -> [ #0 "throws" #1 NameList() ]<br>
  * f4 -> "{"<br>

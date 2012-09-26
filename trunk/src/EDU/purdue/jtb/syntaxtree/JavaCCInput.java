@@ -17,6 +17,7 @@ import EDU.purdue.jtb.visitor.*;
  * f8 -> IdentifierAsString()<br>
  * f9 -> ")"<br>
  * f10 -> ( Production() )+<br>
+ * f11 -> <EOF><br>
  */
 public class JavaCCInput implements INode {
 
@@ -53,6 +54,9 @@ public class JavaCCInput implements INode {
   /** Child node 11 */
   public NodeList f10;
 
+  /** Child node 12 */
+  public NodeToken f11;
+
   /** The serial version UID */
   private static final long serialVersionUID = 147L;
 
@@ -70,8 +74,9 @@ public class JavaCCInput implements INode {
    * @param n8 - next child node
    * @param n9 - next child node
    * @param n10 - next child node
+   * @param n11 - next child node
    */
-  public JavaCCInput(final JavaCCOptions n0, final NodeToken n1, final NodeToken n2, final IdentifierAsString n3, final NodeToken n4, final CompilationUnit n5, final NodeToken n6, final NodeToken n7, final IdentifierAsString n8, final NodeToken n9, final NodeList n10) {
+  public JavaCCInput(final JavaCCOptions n0, final NodeToken n1, final NodeToken n2, final IdentifierAsString n3, final NodeToken n4, final CompilationUnit n5, final NodeToken n6, final NodeToken n7, final IdentifierAsString n8, final NodeToken n9, final NodeList n10, final NodeToken n11) {
     f0 = n0;
     f1 = n1;
     f2 = n2;
@@ -83,6 +88,7 @@ public class JavaCCInput implements INode {
     f8 = n8;
     f9 = n9;
     f10 = n10;
+    f11 = n11;
   }
 
   /**

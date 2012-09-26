@@ -7,7 +7,7 @@ import EDU.purdue.jtb.visitor.*;
  * JTB node class for the production EnumConstant:<br>
  * Corresponding grammar:<br>
  * f0 -> Modifiers()<br>
- * f1 -> < IDENTIFIER ><br>
+ * f1 -> <IDENTIFIER><br>
  * f2 -> [ Arguments() ]<br>
  * f3 -> [ ClassOrInterfaceBody() ]<br>
  */

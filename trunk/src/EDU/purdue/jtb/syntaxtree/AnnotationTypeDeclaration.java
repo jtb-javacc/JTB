@@ -8,7 +8,7 @@ import EDU.purdue.jtb.visitor.*;
  * Corresponding grammar:<br>
  * f0 -> "@"<br>
  * f1 -> "interface"<br>
- * f2 -> < IDENTIFIER ><br>
+ * f2 -> <IDENTIFIER><br>
  * f3 -> AnnotationTypeBody()<br>
  */
 public class AnnotationTypeDeclaration implements INode {

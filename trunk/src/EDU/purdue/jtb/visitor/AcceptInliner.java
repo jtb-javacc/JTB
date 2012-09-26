@@ -25,7 +25,7 @@ import EDU.purdue.jtb.syntaxtree.NodeSequence;
 import EDU.purdue.jtb.syntaxtree.NodeToken;
 
 /**
- * The AcceptInliner visitor (an extension of {@link JavaCCPrinter visitor}) is called by
+ * The {@link AcceptInliner} visitor (an extension of {@link JavaCCPrinter visitor}) is called by
  * {@link DepthFirstVisitorsGenerator} (which calls
  * {@link #genAcceptMethods(StringBuilder, Spacing, ClassInfo, boolean, boolean)} to "inline" the
  * accept methods on the base classes nodes (in order to facilitate the user customization work by
@@ -47,10 +47,13 @@ import EDU.purdue.jtb.syntaxtree.NodeToken;
  * @version 1.4.7 : xx/05/2012 : MMa : fixed issues in visit ExpansionUnitTCF<br>
  *          1.4.7 : 07/2012 : MMa : followed changes in jtbgram.jtb (IndentifierAsString())<br>
  *          1.4.7 : 08-09/2012 : MMa : fixed generation problems on variables for ExpansionUnitTCF
- *          and ExpansionUnit (bug JTB-2), generated sub comments, extracted constants
+ *          and ExpansionUnit (bug JTB-2), generated sub comments, extracted constants ; added the
+ *          reference to the {@link GlobalDataBuilder}
  */
 public class AcceptInliner extends JavaCCPrinter {
 
+  /** The reference to the global data builder visitor */
+  final GlobalDataBuilder  gdbv;
   /** The processed ClassInfo */
   ClassInfo                ci;
   /** The ClassInfo field number */
@@ -99,9 +102,11 @@ public class AcceptInliner extends JavaCCPrinter {
 
   /**
    * Constructor which does nothing.
+   * 
+   * @param aGdbv - the global data builder visitor
    */
-  public AcceptInliner() {
-    // nothing done here
+  public AcceptInliner(final GlobalDataBuilder aGdbv) {
+    gdbv = aGdbv;
   }
 
   /**
@@ -130,7 +135,7 @@ public class AcceptInliner extends JavaCCPrinter {
     caseIx = -1;
     nameGen.reset();
     tcfLvl = -1;
-    aCI.astNode.accept(this);
+    aCI.astEcNode.accept(this);
   }
 
   /*
@@ -455,11 +460,11 @@ public class AcceptInliner extends JavaCCPrinter {
 
     // f1 -> ( ExpansionUnit() )+ : visit something within a sequence (nbEu > 1) or directly (nbEu == 1)
 
-    // count the number of non LocalLookahead nor Block ExpansionUnits
+    // count the number of non LocalLookahead nor Block nor not to be created nodes
     nbEu = 0;
     for (final Iterator<INode> e = n.f1.elements(); e.hasNext();) {
       final ExpansionUnit expUnit = (ExpansionUnit) e.next();
-      if (expUnit.f0.which > 1)
+      if (gdbv.isEuOk(expUnit))
         nbEu++;
     }
 
@@ -492,8 +497,8 @@ public class AcceptInliner extends JavaCCPrinter {
     final int sz = n.f1.size();
     for (int i = 0; i < sz; i++) {
       final ExpansionUnit expUnit = (ExpansionUnit) n.f1.elementAt(i);
-      // don't process LocalLookahead nor Block in ExpansionUnit
-      if (expUnit.f0.which > 1) {
+      // don't process LocalLookahead nor Block nor not to be created nodes
+      if (gdbv.isEuOk(expUnit)) {
 
         // generate variables except for ExpansionUnitTCF
         if (expUnit.f0.which != 3) {
@@ -562,13 +567,16 @@ public class AcceptInliner extends JavaCCPrinter {
    * Visits a {@link ExpansionUnit} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"<br>
+   * f0 -> . %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"<br>
    * .. .. | %1 Block()<br>
    * .. .. | %2 #0 "[" #1 ExpansionChoices() #2 "]"<br>
    * .. .. | %3 ExpansionUnitTCF()<br>
    * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ]<br>
    * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
+   * .. .. . .. .. . .. $2 [ "!" ]<br>
    * .. .. . .. .. | &1 $0 RegularExpression()<br>
-   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )<br>
+   * .. .. . .. .. . .. $1 [ ?0 "." ?1 <IDENTIFIER> ]<br>
+   * .. .. . .. .. . .. $2 [ "!" ] )<br>
    * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
    * .. .. . .. #3 ( &0 "+"<br>
    * .. .. . .. .. | &1 "*"<br>
@@ -656,8 +664,10 @@ public class AcceptInliner extends JavaCCPrinter {
       case 4:
         // %4 #0 [ $0 PrimaryExpression() $1 "=" ]
         // .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()
+        // .. .. . .. $2 [ "!" ]
         // .. .. | &1 $0 RegularExpression()
-        // .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )
+        // .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
+        // .. .. . .. $2 [ "!" ] )
         seq = (NodeSequence) n.f0.choice;
 
         // #0 [ $0 PrimaryExpression() $1 "=" ]
@@ -674,31 +684,49 @@ public class AcceptInliner extends JavaCCPrinter {
           //          oneNewLine(n, "4_._PrimaryExpression()");
         }
 
-        // #1 (...)
+        // #1 (&0 | &1)
         ch = (NodeChoice) seq.elementAt(1);
         final NodeSequence seq1 = (NodeSequence) ch.choice;
-        // $0 IdentifierAsString() $1 Arguments()
-        // and
-        // $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ]
-        if (depthLevel)
-          DepthFirstVisitorsGenerator.increaseDepthLevel(sb, spc);
-        sb.append(spc.spc);
-        if (ret)
-          sb.append(genRetVar).append(" = ");
-        sb.append(var).append(".accept(this");
-        if (argu)
-          sb.append(", ").append(genArguVar);
-        sb.append(");");
-        oneNewLine(n, "4_RegularExpression");
-        if (depthLevel)
-          DepthFirstVisitorsGenerator.decreaseDepthLevel(sb, spc);
-        // $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ]
-        if (ch.which == 1) {
-          opt = (NodeOptional) seq1.elementAt(1);
-          if (opt.present()) {
-            sb.append("// Please report to support with a real example of your grammar "
-                      + "if you want the suffix to be generated : $1 [ ?0 \".\" ?1 < IDENTIFIER > ]");
-            oneNewLine(n, "4_._<_IDENTIFIER_>");
+        if (ch.which == 0) {
+          if (!((NodeOptional) seq1.elementAt(2)).present()) {
+            // generate node creation if not requested not to do so
+            // $0 IdentifierAsString() $1 Arguments() $2 [ "!" ]
+            if (depthLevel)
+              DepthFirstVisitorsGenerator.increaseDepthLevel(sb, spc);
+            sb.append(spc.spc);
+            if (ret)
+              sb.append(genRetVar).append(" = ");
+            sb.append(var).append(".accept(this");
+            if (argu)
+              sb.append(", ").append(genArguVar);
+            sb.append(");");
+            oneNewLine(n, "4_0_RegularExpression");
+            if (depthLevel)
+              DepthFirstVisitorsGenerator.decreaseDepthLevel(sb, spc);
+          }
+        } else {
+          // $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ] $2 [ "!" ]
+          if (!((NodeOptional) seq1.elementAt(2)).present()) {
+            // generate node creation if not requested not to do so
+            if (depthLevel)
+              DepthFirstVisitorsGenerator.increaseDepthLevel(sb, spc);
+            sb.append(spc.spc);
+            if (ret)
+              sb.append(genRetVar).append(" = ");
+            sb.append(var).append(".accept(this");
+            if (argu)
+              sb.append(", ").append(genArguVar);
+            sb.append(");");
+            oneNewLine(n, "4_1_RegularExpression");
+            if (depthLevel)
+              DepthFirstVisitorsGenerator.decreaseDepthLevel(sb, spc);
+            // $1 [ ?0 "." ?1 < IDENTIFIER > ]
+            opt = (NodeOptional) seq1.elementAt(1);
+            if (opt.present()) {
+              sb.append("// Please report to support with a real example of your grammar "
+                        + "if you want the suffix to be generated : $1 [ ?0 \".\" ?1 < IDENTIFIER > ]");
+              oneNewLine(n, "4_._<_IDENTIFIER_>");
+            }
           }
         }
         break;

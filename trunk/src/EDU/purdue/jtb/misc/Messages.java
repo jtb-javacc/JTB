@@ -62,7 +62,7 @@ import static EDU.purdue.jtb.misc.Globals.jtbInputFileName;
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : enhanced
- * @version 1.4.7 : 09/2012 : MMa : fixed missing "soft error" label
+ * @version 1.4.7 : 09/2012 : MMa : fixed missing "soft error" label ; added column numbers
  */
 public class Messages {
 
@@ -84,23 +84,25 @@ public class Messages {
   /**
    * Prints on System.out an information text.
    * 
-   * @param s - an information text
+   * @param s - the information text
    */
   public static void info(final String s) {
-    info(s, -1);
+    info(s, -1, 0);
   }
 
   /**
    * Prints on System.out an information text and its line number.
    * 
-   * @param s - an information text
-   * @param lineNum - a warning line number
+   * @param s - the information text
+   * @param lineNum - the information line number
+   * @param colNum - the information column number
    */
-  public static void info(final String s, final int lineNum) {
+  public static void info(final String s, final int lineNum, final int colNum) {
     if (lineNum == -1)
       System.out.println(jtbInputFileName + ":  info:  " + s);
     else
-      System.out.println(jtbInputFileName + " (" + Integer.toString(lineNum) + "):  info:  " + s);
+      System.out.println(jtbInputFileName + " (" + Integer.toString(lineNum) + "," +
+                         Integer.toString(colNum) + "):  info:  " + s);
 
     ++numInfos;
   }
@@ -108,23 +110,25 @@ public class Messages {
   /**
    * Prints on System.err a warning text.
    * 
-   * @param s - a warning text
+   * @param s - the warning text
    */
   public static void warning(final String s) {
-    warning(s, -1);
+    warning(s, -1, 0);
   }
 
   /**
    * Prints on System.err a warning text and its line number.
    * 
-   * @param s - a warning text
-   * @param lineNum - a warning line number
+   * @param s - the warning text
+   * @param lineNum - the warning line number
+   * @param colNum - the warning column number
    */
-  public static void warning(final String s, final int lineNum) {
+  public static void warning(final String s, final int lineNum, final int colNum) {
     if (lineNum == -1)
       System.err.println(jtbInputFileName + ":  warning:  " + s);
     else
-      System.err.println(jtbInputFileName + " (" + Integer.toString(lineNum) + "):  warning:  " + s);
+      System.err.println(jtbInputFileName + " (" + Integer.toString(lineNum) + "," +
+                         Integer.toString(colNum) + "):  warning:  " + s);
 
     ++numWarnings;
   }
@@ -135,21 +139,22 @@ public class Messages {
    * @param s - an error text
    */
   public static void softErr(final String s) {
-    softErr(s, -1);
+    softErr(s, -1, 0);
   }
 
   /**
    * Prints on System.err a soft (non fatal) error text and its line number.
    * 
-   * @param s - an error text
-   * @param lineNum - an error line number
+   * @param s - the error text
+   * @param lineNum - the error line number
+   * @param colNum - the error column number
    */
-  public static void softErr(final String s, final int lineNum) {
+  public static void softErr(final String s, final int lineNum, final int colNum) {
     if (lineNum == -1)
       System.err.println(jtbInputFileName + ":  soft error:  " + s);
     else
-      System.err.println(jtbInputFileName + " (" + Integer.toString(lineNum) + "):  soft error:  " +
-                         s);
+      System.err.println(jtbInputFileName + " (" + Integer.toString(lineNum) + ", " +
+                         Integer.toString(colNum) + "):  soft error:  " + s);
 
     ++numErrors;
   }

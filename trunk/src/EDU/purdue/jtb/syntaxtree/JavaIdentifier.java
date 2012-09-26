@@ -6,7 +6,7 @@ import EDU.purdue.jtb.visitor.*;
 /**
  * JTB node class for the production JavaIdentifier:<br>
  * Corresponding grammar:<br>
- * f0 -> ( %00 < IDENTIFIER ><br>
+ * f0 -> ( %00 <IDENTIFIER><br>
  * .. .. | %01 "LOOKAHEAD"<br>
  * .. .. | %02 "IGNORE_CASE"<br>
  * .. .. | %03 "PARSER_BEGIN"<br>

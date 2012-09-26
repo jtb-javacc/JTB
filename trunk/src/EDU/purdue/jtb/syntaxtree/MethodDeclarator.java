@@ -6,7 +6,7 @@ import EDU.purdue.jtb.visitor.*;
 /**
  * JTB node class for the production MethodDeclarator:<br>
  * Corresponding grammar:<br>
- * f0 -> < IDENTIFIER ><br>
+ * f0 -> <IDENTIFIER><br>
  * f1 -> FormalParameters()<br>
  * f2 -> ( #0 "[" #1 "]" )*<br>
  */

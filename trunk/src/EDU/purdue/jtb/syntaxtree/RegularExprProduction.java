@@ -7,8 +7,8 @@ import EDU.purdue.jtb.visitor.*;
  * JTB node class for the production RegularExprProduction:<br>
  * Corresponding grammar:<br>
  * f0 -> [ %0 #0 "<" #1 "*" #2 ">"<br>
- * .. .. | %1 #0 "<" #1 < IDENTIFIER ><br>
- * .. .. . .. #2 ( $0 "," $1 < IDENTIFIER > )*<br>
+ * .. .. | %1 #0 "<" #1 <IDENTIFIER><br>
+ * .. .. . .. #2 ( $0 "," $1 <IDENTIFIER> )*<br>
  * .. .. . .. #3 ">" ]<br>
  * f1 -> RegExprKind()<br>
  * f2 -> [ #0 "[" #1 "IGNORE_CASE" #2 "]" ]<br>
