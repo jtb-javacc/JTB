@@ -7,7 +7,7 @@ import EDU.purdue.jtb.visitor.*;
  * JTB node class for the production BreakStatement:<br>
  * Corresponding grammar:<br>
  * f0 -> "break"<br>
- * f1 -> [ < IDENTIFIER > ]<br>
+ * f1 -> [ <IDENTIFIER> ]<br>
  * f2 -> ";"<br>
  */
 public class BreakStatement implements INode {

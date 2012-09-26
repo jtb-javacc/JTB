@@ -74,7 +74,8 @@ import EDU.purdue.jtb.parser.Options;
 import EDU.purdue.jtb.parser.ParseException;
 import EDU.purdue.jtb.syntaxtree.INode;
 import EDU.purdue.jtb.visitor.Annotator;
-import EDU.purdue.jtb.visitor.ClassGenerator;
+import EDU.purdue.jtb.visitor.ClassesFinder;
+import EDU.purdue.jtb.visitor.GlobalDataBuilder;
 import EDU.purdue.jtb.visitor.SemanticChecker;
 
 /**
@@ -91,6 +92,7 @@ import EDU.purdue.jtb.visitor.SemanticChecker;
  * @version 1.4.0.3 : 02/2010 : MMa : added static flag
  * @version 1.4.5 : 12/2010 : MMa : convert nodes and visitors output directories to absolute paths
  * @version 1.4.6 : 01/2011 : FA : added -va and -npfx and -nsfx options
+ * @version 1.4.7 : 09/2012 : MMa : some renamings ; added the use of the {@link GlobalDataBuilder}
  */
 public class JTB {
 
@@ -136,22 +138,26 @@ public class JTB {
       //
       // Perform actions based on input file or command-line options
       //
-      final ClassGenerator vcg = new ClassGenerator();
+      final GlobalDataBuilder gdbv = new GlobalDataBuilder();
+      root.accept(gdbv);
+
+      final ClassesFinder cfv = new ClassesFinder(gdbv);
       ArrayList<ClassInfo> classes;
       FilesGenerator fg = null;
 
       Messages.resetCounts();
 
       if (!noSemanticCheck) {
-        root.accept(new SemanticChecker());
+        root.accept(new SemanticChecker(gdbv));
 
         if (Messages.errorCount() > 0) {
           Messages.printSummary();
           return;
         }
       }
-      root.accept(vcg); // create the class list
-      classes = vcg.getClassList();
+      // create the classes list
+      root.accept(cfv);
+      classes = cfv.getClassList();
 
       if (Messages.errorCount() > 0) {
         Messages.printSummary();
@@ -166,9 +172,9 @@ public class JTB {
       }
 
       try {
-        final Annotator an = new Annotator();
-        root.accept(an);
-        an.saveToFile(jtbOutputFileName);
+        final Annotator anv = new Annotator(gdbv);
+        root.accept(anv);
+        anv.saveToFile(jtbOutputFileName);
 
         if (Messages.errorCount() > 0) {
           Messages.printSummary();
@@ -254,7 +260,7 @@ public class JTB {
                            "\" already exists.  Won't overwrite.");
       }
 
-      final DepthFirstVisitorsGenerator dfvg = new DepthFirstVisitorsGenerator(classes);
+      final DepthFirstVisitorsGenerator dfvg = new DepthFirstVisitorsGenerator(classes, gdbv);
 
       try {
         dfvg.genDepthFirstRetArguVisitorFile();

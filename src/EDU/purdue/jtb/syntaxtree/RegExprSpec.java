@@ -7,8 +7,9 @@ import EDU.purdue.jtb.visitor.*;
  * JTB node class for the production RegExprSpec:<br>
  * Corresponding grammar:<br>
  * f0 -> RegularExpression()<br>
- * f1 -> [ Block() ]<br>
- * f2 -> [ #0 ":" #1 < IDENTIFIER > ]<br>
+ * f1 -> [ "!" ]<br>
+ * f2 -> [ Block() ]<br>
+ * f3 -> [ #0 ":" #1 <IDENTIFIER> ]<br>
  */
 public class RegExprSpec implements INode {
 
@@ -21,6 +22,9 @@ public class RegExprSpec implements INode {
   /** Child node 3 */
   public NodeOptional f2;
 
+  /** Child node 4 */
+  public NodeOptional f3;
+
   /** The serial version UID */
   private static final long serialVersionUID = 147L;
 
@@ -30,11 +34,13 @@ public class RegExprSpec implements INode {
    * @param n0 - first child node
    * @param n1 - next child node
    * @param n2 - next child node
+   * @param n3 - next child node
    */
-  public RegExprSpec(final RegularExpression n0, final NodeOptional n1, final NodeOptional n2) {
+  public RegExprSpec(final RegularExpression n0, final NodeOptional n1, final NodeOptional n2, final NodeOptional n3) {
     f0 = n0;
     f1 = n1;
     f2 = n2;
+    f3 = n3;
   }
 
   /**

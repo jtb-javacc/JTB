@@ -121,7 +121,8 @@ import EDU.purdue.jtb.syntaxtree.TokenManagerDecls;
  *          1.4.0 : 11/2009 : MMa : output commented JTB options
  * @version 1.4.7 : 12/2011 : MMa : added comments in the JavaCodeProduction visit method<br>
  *          1.4.7 : 07/2012 : MMa : followed changes in jtbgram.jtb (AccessModifier(),
- *          IndentifierAsString())
+ *          IndentifierAsString())<br>
+ *          1.4.7 : 09/2012 : MMa : added non node creation
  */
 public class JavaCCPrinter extends DepthFirstVoidVisitor {
 
@@ -407,7 +408,6 @@ public class JavaCCPrinter extends DepthFirstVoidVisitor {
     oneNewLine(n);
     // f10 -> ( Production() )+
     for (final Iterator<INode> e = n.f10.elements(); e.hasNext();) {
-      // Production()
       e.next().accept(this);
       if (e.hasNext()) {
         oneNewLine(n);
@@ -579,16 +579,19 @@ public class JavaCCPrinter extends DepthFirstVoidVisitor {
    * f3 -> FormalParameters()<br>
    * f4 -> [ #0 "throws" #1 Name()<br>
    * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
-   * f5 -> ":"<br>
-   * f6 -> Block()<br>
-   * f7 -> "{"<br>
-   * f8 -> ExpansionChoices()<br>
-   * f9 -> "}"<br>
+   * f5 -> [ "!" ]<br>
+   * f6 -> ":"<br>
+   * f7 -> Block()<br>
+   * f8 -> "{"<br>
+   * f9 -> ExpansionChoices()<br>
+   * f10 -> "}"<br>
    * 
    * @param n - the node to visit
    */
   @Override
   public void visit(final BNFProduction n) {
+    // note : it looks we never fall here
+    //    throw new AssertionError("in JavaCCPrinter visiting BNFProduction");
     bnfLvl = 0;
     // f0 -> AccessModifier()
     n.f0.accept(this);
@@ -621,26 +624,30 @@ public class JavaCCPrinter extends DepthFirstVoidVisitor {
         }
       }
     }
-    // f5 -> ":"
-    n.f5.accept(this);
+    // f5 -> [ "!" ]
+    // print it in a block comment
+    if (n.f5.present())
+      sb.append(" /*!*/ ");
+    // f6 -> ":"
+    n.f6.accept(this);
     oneNewLine(n);
     sb.append(spc.spc);
-    // f6 -> Block()
-    sb.append(genJavaBranch(n.f6));
+    // f7 -> Block()
+    sb.append(genJavaBranch(n.f7));
     oneNewLine(n);
     sb.append(spc.spc);
-    // f7 -> "{"
-    n.f7.accept(this);
+    // f8 -> "{"
+    n.f8.accept(this);
     oneNewLine(n);
     spc.updateSpc(+1);
     sb.append(spc.spc);
-    // f8 -> ExpansionChoices()
-    n.f8.accept(this);
+    // f9 -> ExpansionChoices()
+    n.f9.accept(this);
     oneNewLine(n);
     spc.updateSpc(-1);
     sb.append(spc.spc);
-    // f9 -> "}"
-    n.f9.accept(this);
+    // f10 -> "}"
+    n.f10.accept(this);
     oneNewLine(n);
   }
 
@@ -773,26 +780,31 @@ public class JavaCCPrinter extends DepthFirstVoidVisitor {
    * Visits a {@link RegExprSpec} node, whose children are the following :
    * <p>
    * f0 -> RegularExpression()<br>
-   * f1 -> [ Block() ]<br>
-   * f2 -> [ #0 ":" #1 < IDENTIFIER > ]<br>
+   * f1 -> [ "!" ]<br>
+   * f2 -> [ Block() ]<br>
+   * f3 -> [ #0 ":" #1 < IDENTIFIER > ]<br>
    * 
    * @param n - the node to visit
    */
   @Override
   public void visit(final RegExprSpec n) {
-    // f0 -> RegularExpression(c)
+    // f0 -> RegularExpression()
     n.f0.accept(this);
-    // f1 -> [  Block() ]
-    if (n.f1.present()) {
+    // f1 -> [ "!" ]
+    // print it in a block comment
+    if (n.f1.present())
+      sb.append(" /*!*/");
+    // f2 -> [  Block() ]
+    if (n.f2.present()) {
       oneNewLine(n);
       spc.updateSpc(+1);
       sb.append(spc.spc);
-      sb.append(genJavaBranch(n.f1.node));
+      sb.append(genJavaBranch(n.f2.node));
       spc.updateSpc(-1);
     }
-    // f2 -> [ #0 ":" #1 < IDENTIFIER > ]
-    if (n.f2.present()) {
-      final NodeSequence seq = (NodeSequence) n.f2.node;
+    // f3 -> [ #0 ":" #1 < IDENTIFIER > ]
+    if (n.f3.present()) {
+      final NodeSequence seq = (NodeSequence) n.f3.node;
       sb.append(" ");
       // #0 ":"
       sb.append(seq.elementAt(0));
@@ -933,8 +945,10 @@ public class JavaCCPrinter extends DepthFirstVoidVisitor {
    * .. .. | %3 ExpansionUnitTCF()<br>
    * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ]<br>
    * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
+   * .. .. . .. .. . .. $2 [ "!" ]<br>
    * .. .. . .. .. | &1 $0 RegularExpression()<br>
-   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )<br>
+   * .. .. . .. .. . .. $1 [ ?0 "." ?1 <IDENTIFIER> ]<br>
+   * .. .. . .. .. . .. $2 [ "!" ] )<br>
    * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
    * .. .. . .. #3 ( &0 "+"<br>
    * .. .. . .. .. | &1 "*"<br>
@@ -989,8 +1003,10 @@ public class JavaCCPrinter extends DepthFirstVoidVisitor {
       case 4:
         // %4 #0 [ $0 PrimaryExpression() $1 "=" ]
         // .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()
+        // .. .. . .. $2 [ "!" ]
         // .. .. | &1 $0 RegularExpression()
         // .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )
+        // .. .. . .. $2 [ "!" ] )
         seq = (NodeSequence) n.f0.choice;
         // #0 [ $0 PrimaryExpression() $1 "=" ]
         opt = (NodeOptional) seq.elementAt(0);
@@ -1002,21 +1018,35 @@ public class JavaCCPrinter extends DepthFirstVoidVisitor {
           ((NodeSequence) opt.node).elementAt(1).accept(this);
           sb.append(" ");
         }
-        // #1 ( &0 $0 IdentifierAsString() $1 Arguments() &1 $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ] )
+        // #1 ( &0 $0 IdentifierAsString() $1 Arguments()
+        // .. .. . $2 [ "!" ]
+        // .. | &1 $0 RegularExpression()
+        // .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
+        // .. . .. $2 [ "!" ] )
         ch = (NodeChoice) seq.elementAt(1);
         final NodeSequence seq1 = (NodeSequence) ch.choice;
         if (ch.which == 0) {
-          // &0 $0 IdentifierAsString() $1 Arguments()
+          // $0 IdentifierAsString()
           seq1.elementAt(0).accept(this);
+          //) $1 Arguments()
           sb.append(genJavaBranch(seq1.elementAt(1)));
+          // $2 [ "!" ]
+          // print it in a block comment
+          if (((NodeOptional) seq1.elementAt(2)).present())
+            sb.append(" /*!*/ ");
         } else {
-          // &1 $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ]
+          // $0 RegularExpression()
           seq1.elementAt(0).accept(this);
+          // $1 [ ?0 "." ?1 < IDENTIFIER > ] 
           final NodeOptional opt1 = (NodeOptional) seq1.elementAt(1);
           if (opt1.present()) {
             ((NodeToken) ((NodeSequence) opt1.node).elementAt(0)).accept(this);
             ((NodeToken) ((NodeSequence) opt1.node).elementAt(1)).accept(this);
           }
+          // $2 [ "!" ]
+          // print it in a block comment
+          if (((NodeOptional) seq1.elementAt(2)).present())
+            sb.append(" /*!*/ ");
         }
         break;
 

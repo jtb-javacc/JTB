@@ -97,14 +97,18 @@
  *   to fit with JTB.java and 
  *   to use the try-ExpansionChoices-catch-finally syntax through the ExpansionUnitInTCF production
  */
-// MMa 06/2012 : modified AccessModifier(), BlockStatement(), LocalVariableDeclaration(), added VariableModifiers()
+// MMa 06/2012 : modified AccessModifier(), BlockStatement(), LocalVariableDeclaration()
+//                added VariableModifiers()
 // MMa 07/2012 : added assert, enum & strictfp java keywords
 //               fixed ForStatement() ; ForInit()
 //               renamed RSIGNEDSHIFT in RSignedShift and fixed it
 //               renamed RUNSIGNEDSHIFT in RUnsignedShift and fixed it
 //               modified RegularExpression (remove LANGLE & RANGLE definitions)
-//               TODO found problems in TypeDeclaration(), ExplicitConstructorInvocation(), PrimaryPrefix()
+//               TODO (JavaCC grammar) problems in TypeDeclaration(), ExplicitConstructorInvocation(),
+//                PrimaryPrefix()
 //               renamed ExpansionUnitInTCF into ExpansionUnitTCF
+// MMa 09/2012 : added "!" syntax in BNFProduction and RegExprSpec and ExpansionUnit for not generating
+//                the node creation in the callers ; fixed forbidding punctuation between productions
 options
 {
   // MMa : added (does not exist in JavaCC.jj nor in jtbgram.jj, but needed for Eclipse plugin)
@@ -135,25 +139,25 @@ public class JTBParser extends JavaCCParserInternals {
    * JTB generated return variables declarations
    */
 
-  /** Return variable for {@link #LocalLookahead} production */
+  /** Return variable for {@link #LocalLookahead} BNF production */
   Lookahead jtbrt_LocalLookahead;
 
-  /** Return variable for {@link #IdentifierAsString} production */
+  /** Return variable for {@link #IdentifierAsString} BNF production */
   String jtbrt_IdentifierAsString;
 
-  /** Return variable for {@link #JavaIdentifier} production */
+  /** Return variable for {@link #JavaIdentifier} BNF production */
   Token jtbrt_JavaIdentifier;
 
-  /** Return variable for {@link #Modifiers} production */
+  /** Return variable for {@link #Modifiers} BNF production */
   int jtbrt_Modifiers;
 
-  /** Return variable for {@link #IntegerLiteral} production */
+  /** Return variable for {@link #IntegerLiteral} BNF production */
   int jtbrt_IntegerLiteral;
 
-  /** Return variable for {@link #BooleanLiteral} production */
+  /** Return variable for {@link #BooleanLiteral} BNF production */
   boolean jtbrt_BooleanLiteral;
 
-  /** Return variable for {@link #StringLiteral} production */
+  /** Return variable for {@link #StringLiteral} BNF production */
   String jtbrt_StringLiteral;
 
   /**
@@ -618,6 +622,8 @@ JavaCCInput JavaCCInput() :
   Token n15 = null;
   NodeList n16 = new NodeList();
   Production n17 = null;
+  NodeToken n18 = null;
+  Token n19 = null;
   // --- user BNFProduction java block ---
   String id1, id2;
   initialize();
@@ -661,7 +667,13 @@ JavaCCInput JavaCCInput() :
     { n16.addNode(n17); }
   )+
   { n16.nodes.trimToSize(); }
-  { return new JavaCCInput(n0, n1, n3, n5, n6, n8, n9, n11, n13, n14, n16); }
+  n19 = < EOF >
+  {
+    n19.beginColumn++;
+    n19.endColumn++;
+    { n18 = JTBToolkit.makeNodeToken(n19); }
+  }
+  { return new JavaCCInput(n0, n1, n3, n5, n6, n8, n9, n11, n13, n14, n16, n18); }
 }
 
 // MMa : changed all javacc_options into JavaCCOptions to conform to class name convention
@@ -925,14 +937,17 @@ BNFProduction BNFProduction() :
   NodeToken n11 = null;
   Token n12 = null;
   Name n13 = null;
-  NodeToken n14 = null;
-  Token n15 = null;
-  Block n16 = null;
+  NodeOptional n14 = new NodeOptional();
+  NodeToken n15 = null;
+  Token n16 = null;
   NodeToken n17 = null;
   Token n18 = null;
-  ExpansionChoices n19 = null;
+  Block n19 = null;
   NodeToken n20 = null;
   Token n21 = null;
+  ExpansionChoices n22 = null;
+  NodeToken n23 = null;
+  Token n24 = null;
   // --- user BNFProduction java block ---
   BNFProduction_ p = new BNFProduction_();
   Container c = new Container();
@@ -987,24 +1002,30 @@ BNFProduction BNFProduction() :
     { n5.addNode(n9); }
     { n4.addNode(n5); }
   ]
-  n15 = // MMa 07/2012 : '[node_descriptor()]' is missing here
+  // MMa 09/2012 : added for not generating the node creation within the callers (in BNFProduction)
+  [
+    n16 = "!"
+    { n15 = JTBToolkit.makeNodeToken(n16); }
+    { n14.addNode(n15); }
+  ]
+  n18 = // MMa 07/2012 : '[node_descriptor()]' is missing here
   ":"
-  { n14 = JTBToolkit.makeNodeToken(n15); }
-  n16 = Block(p.getDeclarationTokens())
-  n18 = "{"
   { n17 = JTBToolkit.makeNodeToken(n18); }
-  n19 = ExpansionChoices(c)
-  n21 = "}"
+  n19 = Block(p.getDeclarationTokens())
+  n21 = "{"
   { n20 = JTBToolkit.makeNodeToken(n21); }
+  n22 = ExpansionChoices(c)
+  n24 = "}"
+  { n23 = JTBToolkit.makeNodeToken(n24); }
   
-  { t = n21; }
+  { t = n24; }
   {
     p.setLastToken(t);
     p.setJumpPatched(jumpPatched);
     production_addexpansion(p, (Expansion_)(c.member));
     addproduction(p);
   }
-  { return new BNFProduction(n0, n1, n2, n3, n4, n14, n16, n17, n19, n20); }
+  { return new BNFProduction(n0, n1, n2, n3, n4, n14, n17, n19, n20, n22, n23); }
 }
 
 AccessModifier AccessModifier(NormalProduction p) :
@@ -1321,13 +1342,16 @@ RegExprSpec RegExprSpec(TokenProduction p) :
   // --- JTB generated node declarations ---
   RegularExpression n0 = null;
   NodeOptional n1 = new NodeOptional();
-  Block n2 = null;
-  NodeOptional n3 = new NodeOptional();
-  NodeSequence n4 = null;
-  NodeToken n5 = null;
-  Token n6 = null;
-  NodeToken n7 = null;
-  Token n8 = null;
+  NodeToken n2 = null;
+  Token n3 = null;
+  NodeOptional n4 = new NodeOptional();
+  Block n5 = null;
+  NodeOptional n6 = new NodeOptional();
+  NodeSequence n7 = null;
+  NodeToken n8 = null;
+  Token n9 = null;
+  NodeToken n10 = null;
+  Token n11 = null;
   // --- user BNFProduction java block ---
   Container c = new Container();
   Action act = new Action();
@@ -1336,6 +1360,11 @@ RegExprSpec RegExprSpec(TokenProduction p) :
 }
 {
   n0 = RegularExpression(c)
+  // MMa 09/2012 : added for not generating the node creation within the callers (in RegExprSpec)  [
+    n3 = "!"
+    { n2 = JTBToolkit.makeNodeToken(n3); }
+    { n1.addNode(n2); }
+  ]
   {
     res.rexp = (RegularExpression_)c.member;
     res.rexp.tpContext = p;
@@ -1344,7 +1373,7 @@ RegExprSpec RegExprSpec(TokenProduction p) :
     {
       t = getToken(1);
     }
-    n2 = Block(act.getActionTokens())
+    n5 = Block(act.getActionTokens())
     {
       if (Options.getUserTokenManager()) {
         JavaCCErrors.warning(t, "Ignoring action in regular expression specification since option USER_TOKEN_MANAGER has been set to true.");
@@ -1353,32 +1382,32 @@ RegExprSpec RegExprSpec(TokenProduction p) :
         JavaCCErrors.parse_error(t, "Actions are not permitted on private (#) regular expressions.");
       }
     }
-    { n1.addNode(n2); }
+    { n4.addNode(n5); }
   ]
   [
-    { n4 = new NodeSequence(3); }
-    n6 = ":"
-    { n5 = JTBToolkit.makeNodeToken(n6); }
-    { n4.addNode(n5); }
-    n8 = < IDENTIFIER >
-    { n7 = JTBToolkit.makeNodeToken(n8); }
+    { n7 = new NodeSequence(3); }
+    n9 = ":"
+    { n8 = JTBToolkit.makeNodeToken(n9); }
+    { n7.addNode(n8); }
+    n11 = < IDENTIFIER >
+    { n10 = JTBToolkit.makeNodeToken(n11); }
     
-    { t = n8; }
-    { n4.addNode(n7); }
+    { t = n11; }
+    { n7.addNode(n10); }
     {
       res.nextState = t.image;
       if (res.rexp.private_rexp) {
         JavaCCErrors.parse_error(t, "Lexical state changes are not permitted after private (#) regular expressions.");
       }
     }
-    { n3.addNode(n4); }
+    { n6.addNode(n7); }
   ]
   {
     res.act = act;
     res.nsTok = t;
     p.respecs.add(res);
   }
-  { return new RegExprSpec(n0, n1, n3); }
+  { return new RegExprSpec(n0, n1, n4, n6); }
 }
 
 // MMa : changed all expansion_choices into ExpansionChoices to conform to class name convention
@@ -1641,28 +1670,34 @@ ExpansionUnit ExpansionUnit(Container c) :
   NodeSequence n24 = null;
   IdentifierAsString n25 = null;
   Arguments n26 = null;
-  NodeSequence n27 = null;
-  RegularExpression n28 = null;
-  NodeOptional n29 = new NodeOptional();
+  NodeOptional n27 = new NodeOptional();
+  NodeToken n28 = null;
+  Token n29 = null;
   NodeSequence n30 = null;
-  NodeToken n31 = null;
-  Token n32 = null;
-  NodeToken n33 = null;
-  Token n34 = null;
-  NodeSequence n35 = null;
+  RegularExpression n31 = null;
+  NodeOptional n32 = new NodeOptional();
+  NodeSequence n33 = null;
+  NodeToken n34 = null;
+  Token n35 = null;
   NodeToken n36 = null;
   Token n37 = null;
-  ExpansionChoices n38 = null;
+  NodeOptional n38 = new NodeOptional();
   NodeToken n39 = null;
   Token n40 = null;
-  NodeOptional n41 = new NodeOptional();
-  NodeChoice n42 = null;
-  NodeToken n43 = null;
-  Token n44 = null;
+  NodeSequence n41 = null;
+  NodeToken n42 = null;
+  Token n43 = null;
+  ExpansionChoices n44 = null;
   NodeToken n45 = null;
   Token n46 = null;
-  NodeToken n47 = null;
-  Token n48 = null;
+  NodeOptional n47 = new NodeOptional();
+  NodeChoice n48 = null;
+  NodeToken n49 = null;
+  Token n50 = null;
+  NodeToken n51 = null;
+  Token n52 = null;
+  NodeToken n53 = null;
+  Token n54 = null;
   // --- user BNFProduction java block ---
   String name;
   List<Token> lhsTokens = new ArrayList<Token>();
@@ -1795,7 +1830,7 @@ ExpansionUnit ExpansionUnit(Container c) :
           nt.setColumn(t.beginColumn);
           nt.setLhsTokens(lhsTokens);
         }
-        { n24 = new NodeSequence(4); }
+        { n24 = new NodeSequence(5); }
         n25 = IdentifierAsString()
         { name = jtbrt_IdentifierAsString; }
         { n24.addNode(n25); }
@@ -1805,76 +1840,90 @@ ExpansionUnit ExpansionUnit(Container c) :
           nt.setName(name);
           c.member = nt;
         }
+        // MMa 09/2012 : added for not generating the node creation within the callers (in ExpansionUnit IdentifierAsString)
+        [
+          n29 = "!"
+          { n28 = JTBToolkit.makeNodeToken(n29); }
+          { n27.addNode(n28); }
+        ]
+        { n24.addNode(n27); }
         { n23 = new NodeChoice(n24, 0, 2); }
       |
-        { n27 = new NodeSequence(3); }
-        n28 = RegularExpression(c)
-        { n27.addNode(n28); }
+        { n30 = new NodeSequence(4); }
+        n31 = RegularExpression(c)
+        { n30.addNode(n31); }
         {
           ((RegularExpression_)(c.member)).lhsTokens = lhsTokens;
           add_inline_regexpr((RegularExpression_)(c.member));
         }
         [
-          { n30 = new NodeSequence(3); }
-          n32 = "."
-          { n31 = JTBToolkit.makeNodeToken(n32); }
-          { n30.addNode(n31); }
-          n34 = < IDENTIFIER >
-          { n33 = JTBToolkit.makeNodeToken(n34); }
+          { n33 = new NodeSequence(3); }
+          n35 = "."
+          { n34 = JTBToolkit.makeNodeToken(n35); }
+          { n33.addNode(n34); }
+          n37 = < IDENTIFIER >
+          { n36 = JTBToolkit.makeNodeToken(n37); }
           
-          { t = n34; }
-          { n30.addNode(n33); }
+          { t = n37; }
+          { n33.addNode(n36); }
           {
             ((RegularExpression_)(c.member)).rhsToken = t;
           }
-          { n29.addNode(n30); }
+          { n32.addNode(n33); }
         ]
-        { n27.addNode(n29); }
-        { n23 = new NodeChoice(n27, 1, 2); }
+        { n30.addNode(n32); }
+        // MMa 09/2012 : added for not generating the node creation within the callers (in ExpansionUnit RegularExpression)
+        [
+          n40 = "!"
+          { n39 = JTBToolkit.makeNodeToken(n40); }
+          { n38.addNode(n39); }
+        ]
+        { n30.addNode(n38); }
+        { n23 = new NodeChoice(n30, 1, 2); }
       )
       
     )
     { n17.addNode(n23); }
     { n0 = new NodeChoice(n17, 4, 6); }
   |
-    { n35 = new NodeSequence(4); }
-    n37 = "("
-    { n36 = JTBToolkit.makeNodeToken(n37); }
+    { n41 = new NodeSequence(4); }
+    n43 = "("
+    { n42 = JTBToolkit.makeNodeToken(n43); }
     
-    { t = n37; }
-    { n35.addNode(n36); }
-    n38 = ExpansionChoices(c)
-    { n35.addNode(n38); }
-    n40 = ")"
-    { n39 = JTBToolkit.makeNodeToken(n40); }
-    { n35.addNode(n39); }
+    { t = n43; }
+    { n41.addNode(n42); }
+    n44 = ExpansionChoices(c)
+    { n41.addNode(n44); }
+    n46 = ")"
+    { n45 = JTBToolkit.makeNodeToken(n46); }
+    { n41.addNode(n45); }
     (
       (
-        n44 = "+"
-        { n43 = JTBToolkit.makeNodeToken(n44); }
+        n50 = "+"
+        { n49 = JTBToolkit.makeNodeToken(n50); }
         {
           c.member = new OneOrMore(t, (Expansion_)c.member);
         }
-        { n42 = new NodeChoice(n43, 0, 3); }
+        { n48 = new NodeChoice(n49, 0, 3); }
       |
-        n46 = "*"
-        { n45 = JTBToolkit.makeNodeToken(n46); }
+        n52 = "*"
+        { n51 = JTBToolkit.makeNodeToken(n52); }
         {
           c.member = new ZeroOrMore(t, (Expansion_)c.member);
         }
-        { n42 = new NodeChoice(n45, 1, 3); }
+        { n48 = new NodeChoice(n51, 1, 3); }
       |
-        n48 = "?"
-        { n47 = JTBToolkit.makeNodeToken(n48); }
+        n54 = "?"
+        { n53 = JTBToolkit.makeNodeToken(n54); }
         {
           c.member = new ZeroOrOne(t, (Expansion_)c.member);
         }
-        { n42 = new NodeChoice(n47, 2, 3); }
+        { n48 = new NodeChoice(n53, 2, 3); }
       )
-      { n41.addNode(n42); }
+      { n47.addNode(n48); }
     )?
-    { n35.addNode(n41); }
-    { n0 = new NodeChoice(n35, 5, 6); }
+    { n41.addNode(n47); }
+    { n0 = new NodeChoice(n41, 5, 6); }
   )
   { return new ExpansionUnit(n0); }
 }
@@ -6488,7 +6537,8 @@ Annotation Annotation() :
 }
 {
   (
-    LOOKAHEAD( "@" Name(null) "(" < IDENTIFIER > "=" | ")" )
+    // MMa 09/2012 : fixed (added parentheses)
+    LOOKAHEAD( "@" Name(null) "(" ( < IDENTIFIER > "=" | ")" ) )
     n1 = NormalAnnotation()
     { n0 = new NodeChoice(n1, 0, 3); }
   |

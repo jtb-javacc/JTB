@@ -21,9 +21,6 @@ import EDU.purdue.jtb.syntaxtree.NodeChoice;
 import EDU.purdue.jtb.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.syntaxtree.NodeSequence;
 import EDU.purdue.jtb.syntaxtree.NodeToken;
-import EDU.purdue.jtb.syntaxtree.RegExprSpec;
-import EDU.purdue.jtb.syntaxtree.RegularExprProduction;
-import EDU.purdue.jtb.syntaxtree.RegularExpression;
 import EDU.purdue.jtb.syntaxtree.StringLiteral;
 
 /**
@@ -31,9 +28,9 @@ import EDU.purdue.jtb.syntaxtree.StringLiteral;
  * {@link ClassInfo} (through {@link #visit(ExpansionChoices)} to find which part of the production
  * each field corresponds, and to format the class, method or field corresponding javadoc comments.
  * <p>
- * {@link Annotator}, {@link CommentsPrinter}, {@link ClassGenerator} depend on each other to create
+ * {@link Annotator}, {@link CommentsPrinter}, {@link ClassesFinder} depend on each other to create
  * and use classes. A field comment should be created for each field, but visiting methods of
- * CommentsPrinter and {@link ClassGenerator} have been coded quite independently, so some checking
+ * CommentsPrinter and {@link ClassesFinder} have been coded quite independently, so some checking
  * and rewriting could be welcomed.<br>
  * <p>
  * Each field comment is terminated by a break tag and a newline, and may be splitted, for better
@@ -186,10 +183,13 @@ import EDU.purdue.jtb.syntaxtree.StringLiteral;
  * @version 1.4.3.1 : 04/2010 : MMa : fixed case 4 of getExpUnitBaseNodeType (bug n°2990962)
  * @version 1.4.7 : 07/2012 : MMa : followed changes in jtbgram.jtb (IndentifierAsString())<br>
  *          1.4.7 : 08-09/2012 : MMa : fixed problems in ExpansionUnitTCF, fixed new lines in
- *          Expansion, generated sub comments<br>
+ *          Expansion, generated sub comments ; added non node creation and the reference to the
+ *          {@link GlobalDataBuilder}
  */
 public class CommentsPrinter extends JavaCCPrinter {
 
+  /** The reference to the global data builder visitor */
+  final GlobalDataBuilder     gdbv;
   /**
    * The Expansion level we are in : 0, 1, ... : first, second, ... ; incremented at each level,
    * except in an ExpansionChoice with no choice and in ExpansionUnitTCF
@@ -238,12 +238,15 @@ public class CommentsPrinter extends JavaCCPrinter {
 
   /**
    * Constructor which just allocates the internal buffer.
+   * 
+   * @param aGdbv - the global data builder visitor
    */
-  public CommentsPrinter() {
+  public CommentsPrinter(final GlobalDataBuilder aGdbv) {
     sb = new StringBuilder(512);
     fcb = new StringBuilder(128);
     if (inlineAcceptMethods)
       scb = new StringBuilder(128);
+    gdbv = aGdbv;
   }
 
   /*
@@ -490,12 +493,13 @@ public class CommentsPrinter extends JavaCCPrinter {
   public void visit(final Expansion n) {
     // don't take f0, only f1
 
-    // count the number of non LocalLookahead nor Block ExpansionUnits
+    // count the number of non LocalLookahead nor Block nor not to be created nodes
     int nbEuOk = 0;
     for (final Iterator<INode> e = n.f1.elements(); e.hasNext();) {
       final ExpansionUnit expUnit = (ExpansionUnit) e.next();
-      if (expUnit.f0.which > 1)
+      if (gdbv.isEuOk(expUnit)) {
         nbEuOk++;
+      }
     }
     final boolean outSeq = nbEuOk > 1;
     final boolean bigSeq = nbEuOk > 10;
@@ -509,8 +513,8 @@ public class CommentsPrinter extends JavaCCPrinter {
     final int sz = n.f1.size();
     for (int i = 0; i < sz; i++) {
       final ExpansionUnit expUnit = (ExpansionUnit) n.f1.elementAt(i);
-      // don't process LocalLookahead or Block ExpansionUnits
-      if (expUnit.f0.which > 1) {
+      // don't process LocalLookahead nor Block nor not to be created nodes
+      if (gdbv.isEuOk(expUnit)) {
 
         boolean addSpace = false;
         if (expLvl == 0) {
@@ -616,7 +620,7 @@ public class CommentsPrinter extends JavaCCPrinter {
         wantedToBeOnNewLine = expUnit.f0.which == 5 || expUnit.f0.which == 2;
         numEuOk++;
 
-      } // end don't process LocalLookahead or Block ExpansionUnits
+      } // end don't process LocalLookahead or Block nor not to be generated nodes
     } // end for loop on all ExpansionUnits
 
     // close last sub comment
@@ -634,8 +638,10 @@ public class CommentsPrinter extends JavaCCPrinter {
    * .. .. | %3 ExpansionUnitTCF()<br>
    * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ]<br>
    * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
+   * .. .. . .. .. . .. $2 [ "!" ]<br>
    * .. .. . .. .. | &1 $0 RegularExpression()<br>
-   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )<br>
+   * .. .. . .. .. . .. $1 [ ?0 "." ?1 <IDENTIFIER> ]<br>
+   * .. .. . .. .. . .. $2 [ "!" ] )<br>
    * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
    * .. .. . .. #3 ( &0 "+"<br>
    * .. .. . .. .. | &1 "*"<br>
@@ -681,26 +687,32 @@ public class CommentsPrinter extends JavaCCPrinter {
       case 4:
         // %4 #0 [ $0 PrimaryExpression() $1 "=" ]
         // .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()
+        // .. .. . $2 [ "!" ]
         // .. .. | &1 $0 RegularExpression()
-        // .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )
+        // .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
+        // .. .. . .. $2 [ "!" ] )
         seq = (NodeSequence) n.f0.choice;
         ch = (NodeChoice) seq.elementAt(1);
         final NodeSequence seq1 = (NodeSequence) ch.choice;
         if (ch.which == 0) {
-          // $0 IdentifierAsString() $1 Arguments()
-          // visit IdentifierAsString
-          seq1.elementAt(0).accept(this);
-          // don't visit / print arguments, only parenthesis (for readability)
-          curCtn.addId("()");
+          // $0 IdentifierAsString() $1 Arguments() $2 [ "!" ]
+          // add the comment only if node creation is not requested not to be generated
+          if (!((NodeOptional) seq1.elementAt(2)).present()) {
+            seq1.elementAt(0).accept(this);
+            // don't visit for printing arguments, only parenthesis (for readability)
+            curCtn.addId("()");
+          }
         } else {
-          // $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ]
-          // visit RegularExpression
-          seq1.elementAt(0).accept(this);
-          final NodeOptional opt1 = (NodeOptional) seq1.elementAt(1);
-          if (opt1.present()) {
-            curCtn.addId('.');
-            // visit < IDENTIFIER >
-            ((NodeSequence) opt1.node).elementAt(1).accept(this);
+          // $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ] $2 [ "!" ]
+          // add the comment only if node creation is not requested not to be generated
+          if (!((NodeOptional) seq1.elementAt(2)).present()) {
+            seq1.elementAt(0).accept(this);
+            final NodeOptional opt1 = (NodeOptional) seq1.elementAt(1);
+            if (opt1.present()) {
+              curCtn.addId('.');
+              // visit < IDENTIFIER >
+              ((NodeSequence) opt1.node).elementAt(1).accept(this);
+            }
           }
         }
         break;
@@ -963,130 +975,6 @@ public class CommentsPrinter extends JavaCCPrinter {
     tcfLvl--;
   }
 
-/**
-   * Visits a {@link RegularExprProduction} node, whose children are the following :
-   * <p>
-   * f0 -> [ %0 #0 "<"<br>
-   * .. .. . .. #1 "*"<br>
-   * .. .. . .. #2 ">"<br>
-   * .. .. | %1 #0 "<"<br>
-   * .. .. . .. #1 < IDENTIFIER ><br>
-   * .. .. . .. #2 ( $0 ","<br>
-   * .. .. . .. .. . $1 < IDENTIFIER > )*<br>
-   * .. .. . .. #3 ">" ]<br>
-   * f1 -> RegExprKind()<br>
-   * f2 -> [ #0 "["<br>
-   * .. .. . #1 "IGNORE_CASE"<br>
-   * .. .. . #2 "]" ]<br>
-   * f3 -> ":"<br>
-   * f4 -> "{"<br>
-   * f5 -> RegExprSpec()<br>
-   * f6 -> ( #0 "|"<br>
-   * .. .. . #1 RegExprSpec() )*<br>
-   * f7 -> "}"<br>
-   *
-   * @param n - the node to visit
-   */
-  @Override
-  public void visit(final RegularExprProduction n) {
-    // f5 -> RegExprSpec()
-    n.f5.accept(this);
-    // f6 -> ( #0 "|" #1 RegExprSpec() )*
-    if (n.f6.present()) {
-      for (final Iterator<INode> e = n.f6.elements(); e.hasNext();) {
-        final NodeSequence seq = (NodeSequence) e.next();
-        // #0 "|"
-        // here we change the choice sub comment
-        curCtn.addChoice("| ");
-        // #1 RegExprSpec()
-        seq.elementAt(1).accept(this);
-      }
-    }
-  }
-
-  /**
-   * Visits a {@link RegExprSpec} node, whose children are the following :
-   * <p>
-   * f0 -> RegularExpression()<br>
-   * f1 -> [ Block() ]<br>
-   * f2 -> [ #0 ":" #1 < IDENTIFIER > ]<br>
-   * 
-   * @param n - the node to visit
-   */
-  @Override
-  public void visit(final RegExprSpec n) {
-    // f0 -> RegularExpression()
-    n.f0.accept(this);
-  }
-
-/**
-   * Visits a {@link RegularExpression} node, whose children are the following :
-   * <p>
-   * f0 -> . %0 StringLiteral()<br>
-   * .. .. | %1 #0 "<"<br>
-   * .. .. . .. #1 [ $0 [ "#" ] $1 IdentifierAsString() $2 ":" ] #2 ComplexRegularExpressionChoices() #3 ">"<br>
-   * .. .. | %2 #0 "<" #1 IdentifierAsString() #2 ">"<br>
-   * .. .. | %3 #0 "<" #1 "EOF" #2 ">"<br>
-   *
-   * @param n - the node to visit
-   */
-  @Override
-  public void visit(final RegularExpression n) {
-    if (n.f0.which == 0) {
-      // %0 StringLiteral()
-      // we indeed fall here
-      //      throw new AssertionError("CP RE 0");
-      n.f0.choice.accept(this);
-    } else if (n.f0.which == 1) {
-      // %1 #0 "<" #1 [ $0 [ "#" ] $1 IdentifierAsString() $2 ":" ] #2 ComplexRegularExpressionChoices() #3 ">"
-      // it looks we never fall here
-      //      throw new AssertionError("CP RE 1");
-      final NodeSequence seq = (NodeSequence) n.f0.choice;
-      // #0 "<"
-      curCtn.addId("< ");
-      // #1 [ $0 [ "#" ] $1 IdentifierAsString() $2 ":" ]
-      // we skip this label definition which seems useless in JTB visitors
-      //      final NodeOptional opt = (NodeOptional) seq.elementAt(1);
-      //      if (opt.present()) {
-      //        // $0 [ "#" ]
-      //        final NodeSequence seq1 = (NodeSequence) opt.node;
-      //        if (((NodeOptional) seq1.elementAt(0)).present()) {
-      //          curCtn.addId('#');
-      //        }
-      //        // $1 IdentifierAsString()
-      //        seq1.elementAt(1).accept(this);
-      //        curCtn.addId(' ');
-      //        // $2 ":"
-      //        curCtn.addId(": ");
-      //      }
-      // #2 ComplexRegularExpressionChoices()
-      // here we can use super class (JavaCCPrinter) methods which do not add newlines nor indentation
-      seq.elementAt(2).accept(this);
-      // #3 ">"
-      curCtn.addId(" >");
-    } else if (n.f0.which == 2) {
-      // %2 #0 "<" #1 IdentifierAsString() #2 ">"
-      // we indeed fall here
-      //      throw new AssertionError("CP RE 2");
-      // #0 "<"
-      curCtn.addId("< ");
-      // #1 IdentifierAsString()
-      ((NodeSequence) n.f0.choice).elementAt(1).accept(this);
-      // #2 ">"
-      curCtn.addId(" >");
-    } else {
-      // %3 #0 "<" #1 "EOF" #2 ">"
-      // we indeed fall here
-      //      throw new AssertionError("CP RE 3");
-      // #0 "<"
-      curCtn.addId("< ");
-      // #1 "EOF"
-      ((NodeSequence) n.f0.choice).elementAt(1).accept(this);
-      // #2 ">"
-      curCtn.addId(" >");
-    }
-  }
-
   /**
    * Visits a {@link IdentifierAsString} node, whose children are the following :
    * <p>
@@ -1173,8 +1061,8 @@ public class CommentsPrinter extends JavaCCPrinter {
       return;
     curCtn = roots.get(0);
     //    assert curCtn != null : "curCtn is null !";
-    // work
-    classInfo.astNode.accept(this);
+    // produce comments data
+    classInfo.astEcNode.accept(this);
     // end comment processing
     storeClassInfoComments();
   }
@@ -1275,7 +1163,7 @@ public class CommentsPrinter extends JavaCCPrinter {
     //                 (aCtn.children == null ? "null" : "not null, size = " + aCtn.children.size()) +
     //                 ") not opposed !";
     if (aCtn.children == null)
-      fcb.append(aCtn.id == null ? "no node" : aCtn.id);
+      fcb.append(aCtn.id);
     else {
       StringBuilder pfx = null;
       final int len = (aPrefix == null ? 0 : aPrefix.length()) +
@@ -1354,7 +1242,7 @@ public class CommentsPrinter extends JavaCCPrinter {
 
     // copy id member or walk down the sub comments
     if (aCtn.children == null)
-      scb.append(aCtn.id == null ? "no node" : aCtn.id);
+      scb.append(aCtn.id);
     else {
       StringBuilder pfx = null;
       final int len = (aPrefix == null ? 0 : aPrefix.length()) +

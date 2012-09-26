@@ -70,6 +70,7 @@ import EDU.purdue.jtb.syntaxtree.NodeSequence;
 import EDU.purdue.jtb.syntaxtree.NodeTCF;
 import EDU.purdue.jtb.syntaxtree.NodeToken;
 import EDU.purdue.jtb.visitor.AcceptInliner;
+import EDU.purdue.jtb.visitor.GlobalDataBuilder;
 
 /**
  * Class DepthFirstVisitorsGenerator contains methods to generate the different DepthFirstXXXVisitor
@@ -82,10 +83,13 @@ import EDU.purdue.jtb.visitor.AcceptInliner;
  *          genNodeTokenVisit
  * @version 1.4.3.3 : 27/04/2009 : MMa : put back @SuppressWarnings("unused") in genNodeTokenVisit
  * @version 1.4.6 : 01/2011 : FA : added -va and -npfx and -nsfx options
- * @version 1.4.7 : 09/2012 : MMa : extracted constants and methods
+ * @version 1.4.7 : 09/2012 : MMa : extracted constants and methods ; added the reference to the
+ *          {@link GlobalDataBuilder}
  */
 public class DepthFirstVisitorsGenerator {
 
+  /** The reference to the global data builder visitor */
+  final GlobalDataBuilder            gdbv;
   /** The classes list */
   private final ArrayList<ClassInfo> classesList;
   /** The (generated) visitors directory */
@@ -107,9 +111,12 @@ public class DepthFirstVisitorsGenerator {
    * Constructor. Creates the visitor directory if it does not exist.
    * 
    * @param aClassesList - the classes list
+   * @param aGdbv - the global data builder visitor
    */
-  public DepthFirstVisitorsGenerator(final ArrayList<ClassInfo> aClassesList) {
+  public DepthFirstVisitorsGenerator(final ArrayList<ClassInfo> aClassesList,
+                                     final GlobalDataBuilder aGdbv) {
     classesList = aClassesList;
+    gdbv = aGdbv;
     sb = new StringBuilder(sbBufferSize());
 
     visitorDir = new File(visitorsDirName);
@@ -117,7 +124,8 @@ public class DepthFirstVisitorsGenerator {
       visitorDir.mkdir();
 
     if (inlineAcceptMethods)
-      accInl = new AcceptInliner();
+      accInl = new AcceptInliner(gdbv);
+
   }
 
   /*

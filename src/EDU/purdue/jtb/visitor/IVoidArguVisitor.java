@@ -87,6 +87,7 @@ public interface IVoidArguVisitor<A> {
    * f8 -> IdentifierAsString()<br>
    * f9 -> ")"<br>
    * f10 -> ( Production() )+<br>
+   * f11 -> <EOF><br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -108,7 +109,7 @@ public interface IVoidArguVisitor<A> {
   /**
    * Visits a {@link OptionBinding} node, whose children are the following :
    * <p>
-   * f0 -> ( %0 < IDENTIFIER ><br>
+   * f0 -> ( %0 <IDENTIFIER><br>
    * .. .. | %1 "LOOKAHEAD"<br>
    * .. .. | %2 "IGNORE_CASE"<br>
    * .. .. | %3 "static" )<br>
@@ -162,11 +163,12 @@ public interface IVoidArguVisitor<A> {
    * f3 -> FormalParameters()<br>
    * f4 -> [ #0 "throws" #1 Name()<br>
    * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
-   * f5 -> ":"<br>
-   * f6 -> Block()<br>
-   * f7 -> "{"<br>
-   * f8 -> ExpansionChoices()<br>
-   * f9 -> "}"<br>
+   * f5 -> [ "!" ]<br>
+   * f6 -> ":"<br>
+   * f7 -> Block()<br>
+   * f8 -> "{"<br>
+   * f9 -> ExpansionChoices()<br>
+   * f10 -> "}"<br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -190,8 +192,8 @@ public interface IVoidArguVisitor<A> {
    * Visits a {@link RegularExprProduction} node, whose children are the following :
    * <p>
    * f0 -> [ %0 #0 "<" #1 "*" #2 ">"<br>
-   * .. .. | %1 #0 "<" #1 < IDENTIFIER ><br>
-   * .. .. . .. #2 ( $0 "," $1 < IDENTIFIER > )*<br>
+   * .. .. | %1 #0 "<" #1 <IDENTIFIER><br>
+   * .. .. . .. #2 ( $0 "," $1 <IDENTIFIER> )*<br>
    * .. .. . .. #3 ">" ]<br>
    * f1 -> RegExprKind()<br>
    * f2 -> [ #0 "[" #1 "IGNORE_CASE" #2 "]" ]<br>
@@ -235,8 +237,9 @@ public interface IVoidArguVisitor<A> {
    * Visits a {@link RegExprSpec} node, whose children are the following :
    * <p>
    * f0 -> RegularExpression()<br>
-   * f1 -> [ Block() ]<br>
-   * f2 -> [ #0 ":" #1 < IDENTIFIER > ]<br>
+   * f1 -> [ "!" ]<br>
+   * f2 -> [ Block() ]<br>
+   * f3 -> [ #0 ":" #1 <IDENTIFIER> ]<br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -288,8 +291,10 @@ public interface IVoidArguVisitor<A> {
    * .. .. | %3 ExpansionUnitTCF()<br>
    * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ]<br>
    * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
+   * .. .. . .. .. . .. $2 [ "!" ]<br>
    * .. .. . .. .. | &1 $0 RegularExpression()<br>
-   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )<br>
+   * .. .. . .. .. . .. $1 [ ?0 "." ?1 <IDENTIFIER> ]<br>
+   * .. .. . .. .. . .. $2 [ "!" ] )<br>
    * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
    * .. .. . .. #3 ( &0 "+"<br>
    * .. .. . .. .. | &1 "*"<br>
@@ -307,7 +312,7 @@ public interface IVoidArguVisitor<A> {
    * f1 -> "{"<br>
    * f2 -> ExpansionChoices()<br>
    * f3 -> "}"<br>
-   * f4 -> ( #0 "catch" #1 "(" #2 Name() #3 < IDENTIFIER > #4 ")" #5 Block() )*<br>
+   * f4 -> ( #0 "catch" #1 "(" #2 Name() #3 <IDENTIFIER> #4 ")" #5 Block() )*<br>
    * f5 -> [ #0 "finally" #1 Block() ]<br>
    *
    * @param n - the node to visit
@@ -400,7 +405,7 @@ public interface IVoidArguVisitor<A> {
   /**
    * Visits a {@link IdentifierAsString} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -410,7 +415,7 @@ public interface IVoidArguVisitor<A> {
   /**
    * Visits a {@link JavaIdentifier} node, whose children are the following :
    * <p>
-   * f0 -> ( %00 < IDENTIFIER ><br>
+   * f0 -> ( %00 <IDENTIFIER><br>
    * .. .. | %01 "LOOKAHEAD"<br>
    * .. .. | %02 "IGNORE_CASE"<br>
    * .. .. | %03 "PARSER_BEGIN"<br>
@@ -506,7 +511,7 @@ public interface IVoidArguVisitor<A> {
    * <p>
    * f0 -> ( %0 "class"<br>
    * .. .. | %1 "interface" )<br>
-   * f1 -> < IDENTIFIER ><br>
+   * f1 -> <IDENTIFIER><br>
    * f2 -> [ TypeParameters() ]<br>
    * f3 -> [ ExtendsList() ]<br>
    * f4 -> [ ImplementsList() ]<br>
@@ -545,7 +550,7 @@ public interface IVoidArguVisitor<A> {
    * Visits a {@link EnumDeclaration} node, whose children are the following :
    * <p>
    * f0 -> "enum"<br>
-   * f1 -> < IDENTIFIER ><br>
+   * f1 -> <IDENTIFIER><br>
    * f2 -> [ ImplementsList() ]<br>
    * f3 -> EnumBody()<br>
    *
@@ -574,7 +579,7 @@ public interface IVoidArguVisitor<A> {
    * Visits a {@link EnumConstant} node, whose children are the following :
    * <p>
    * f0 -> Modifiers()<br>
-   * f1 -> < IDENTIFIER ><br>
+   * f1 -> <IDENTIFIER><br>
    * f2 -> [ Arguments() ]<br>
    * f3 -> [ ClassOrInterfaceBody() ]<br>
    *
@@ -599,7 +604,7 @@ public interface IVoidArguVisitor<A> {
   /**
    * Visits a {@link TypeParameter} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    * f1 -> [ TypeBound() ]<br>
    *
    * @param n - the node to visit
@@ -675,7 +680,7 @@ public interface IVoidArguVisitor<A> {
   /**
    * Visits a {@link VariableDeclaratorId} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    * f1 -> ( #0 "[" #1 "]" )*<br>
    *
    * @param n - the node to visit
@@ -726,7 +731,7 @@ public interface IVoidArguVisitor<A> {
   /**
    * Visits a {@link MethodDeclarator} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    * f1 -> FormalParameters()<br>
    * f2 -> ( #0 "[" #1 "]" )*<br>
    *
@@ -765,7 +770,7 @@ public interface IVoidArguVisitor<A> {
    * Visits a {@link ConstructorDeclaration} node, whose children are the following :
    * <p>
    * f0 -> [ TypeParameters() ]<br>
-   * f1 -> < IDENTIFIER ><br>
+   * f1 -> <IDENTIFIER><br>
    * f2 -> FormalParameters()<br>
    * f3 -> [ #0 "throws" #1 NameList() ]<br>
    * f4 -> "{"<br>
@@ -828,9 +833,9 @@ public interface IVoidArguVisitor<A> {
   /**
    * Visits a {@link ClassOrInterfaceType} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    * f1 -> [ TypeArguments() ]<br>
-   * f2 -> ( #0 "." #1 < IDENTIFIER ><br>
+   * f2 -> ( #0 "." #1 <IDENTIFIER><br>
    * .. .. . #2 [ TypeArguments() ] )*<br>
    *
    * @param n - the node to visit
@@ -1182,7 +1187,7 @@ public interface IVoidArguVisitor<A> {
    * .. .. . .. #3 ( &0 "~"<br>
    * .. .. . .. .. | &1 "!"<br>
    * .. .. . .. .. | &2 "("<br>
-   * .. .. . .. .. | &3 < IDENTIFIER ><br>
+   * .. .. . .. .. | &3 <IDENTIFIER><br>
    * .. .. . .. .. | &4 "this"<br>
    * .. .. . .. .. | &5 "super"<br>
    * .. .. . .. .. | &6 "new"<br>
@@ -1232,7 +1237,7 @@ public interface IVoidArguVisitor<A> {
    * <p>
    * f0 -> "."<br>
    * f1 -> TypeArguments()<br>
-   * f2 -> < IDENTIFIER ><br>
+   * f2 -> <IDENTIFIER><br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -1244,7 +1249,7 @@ public interface IVoidArguVisitor<A> {
    * <p>
    * f0 -> . %0 Literal()<br>
    * .. .. | %1 "this"<br>
-   * .. .. | %2 #0 "super" #1 "." #2 < IDENTIFIER ><br>
+   * .. .. | %2 #0 "super" #1 "." #2 <IDENTIFIER><br>
    * .. .. | %3 #0 "(" #1 Expression() #2 ")"<br>
    * .. .. | %4 AllocationExpression()<br>
    * .. .. | %5 #0 ResultType() #1 "." #2 "class"<br>
@@ -1262,7 +1267,7 @@ public interface IVoidArguVisitor<A> {
    * .. .. | %1 #0 "." #1 AllocationExpression()<br>
    * .. .. | %2 MemberSelector()<br>
    * .. .. | %3 #0 "[" #1 Expression() #2 "]"<br>
-   * .. .. | %4 #0 "." #1 < IDENTIFIER ><br>
+   * .. .. | %4 #0 "." #1 <IDENTIFIER><br>
    * .. .. | %5 Arguments()<br>
    *
    * @param n - the node to visit
@@ -1273,10 +1278,10 @@ public interface IVoidArguVisitor<A> {
   /**
    * Visits a {@link Literal} node, whose children are the following :
    * <p>
-   * f0 -> . %0 < INTEGER_LITERAL ><br>
-   * .. .. | %1 < FLOATING_POINT_LITERAL ><br>
-   * .. .. | %2 < CHARACTER_LITERAL ><br>
-   * .. .. | %3 < STRING_LITERAL ><br>
+   * f0 -> . %0 <INTEGER_LITERAL><br>
+   * .. .. | %1 <FLOATING_POINT_LITERAL><br>
+   * .. .. | %2 <CHARACTER_LITERAL><br>
+   * .. .. | %3 <STRING_LITERAL><br>
    * .. .. | %4 BooleanLiteral()<br>
    * .. .. | %5 NullLiteral()<br>
    *
@@ -1288,7 +1293,7 @@ public interface IVoidArguVisitor<A> {
   /**
    * Visits a {@link IntegerLiteral} node, whose children are the following :
    * <p>
-   * f0 -> < INTEGER_LITERAL ><br>
+   * f0 -> <INTEGER_LITERAL><br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -1309,7 +1314,7 @@ public interface IVoidArguVisitor<A> {
   /**
    * Visits a {@link StringLiteral} node, whose children are the following :
    * <p>
-   * f0 -> < STRING_LITERAL ><br>
+   * f0 -> <STRING_LITERAL><br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -1418,7 +1423,7 @@ public interface IVoidArguVisitor<A> {
   /**
    * Visits a {@link LabeledStatement} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    * f1 -> ":"<br>
    * f2 -> Statement()<br>
    *
@@ -1578,7 +1583,7 @@ public interface IVoidArguVisitor<A> {
    * <p>
    * f0 -> "for"<br>
    * f1 -> "("<br>
-   * f2 -> ( %0 #0 VariableModifiers() #1 Type() #2 < IDENTIFIER > #3 ":" #4 Expression()<br>
+   * f2 -> ( %0 #0 VariableModifiers() #1 Type() #2 <IDENTIFIER> #3 ":" #4 Expression()<br>
    * .. .. | %1 #0 [ ForInit() ]<br>
    * .. .. . .. #1 ";"<br>
    * .. .. . .. #2 [ Expression() ]<br>
@@ -1628,7 +1633,7 @@ public interface IVoidArguVisitor<A> {
    * Visits a {@link BreakStatement} node, whose children are the following :
    * <p>
    * f0 -> "break"<br>
-   * f1 -> [ < IDENTIFIER > ]<br>
+   * f1 -> [ <IDENTIFIER> ]<br>
    * f2 -> ";"<br>
    *
    * @param n - the node to visit
@@ -1640,7 +1645,7 @@ public interface IVoidArguVisitor<A> {
    * Visits a {@link ContinueStatement} node, whose children are the following :
    * <p>
    * f0 -> "continue"<br>
-   * f1 -> [ < IDENTIFIER > ]<br>
+   * f1 -> [ <IDENTIFIER> ]<br>
    * f2 -> ";"<br>
    *
    * @param n - the node to visit
@@ -1764,7 +1769,7 @@ public interface IVoidArguVisitor<A> {
   /**
    * Visits a {@link MemberValuePair} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    * f1 -> "="<br>
    * f2 -> MemberValue()<br>
    *
@@ -1804,7 +1809,7 @@ public interface IVoidArguVisitor<A> {
    * <p>
    * f0 -> "@"<br>
    * f1 -> "interface"<br>
-   * f2 -> < IDENTIFIER ><br>
+   * f2 -> <IDENTIFIER><br>
    * f3 -> AnnotationTypeBody()<br>
    *
    * @param n - the node to visit
@@ -1828,7 +1833,7 @@ public interface IVoidArguVisitor<A> {
    * Visits a {@link AnnotationTypeMemberDeclaration} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 Modifiers()<br>
-   * .. .. . .. #1 ( &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"<br>
+   * .. .. . .. #1 ( &0 $0 Type() $1 <IDENTIFIER> $2 "(" $3 ")"<br>
    * .. .. . .. .. . .. $4 [ DefaultValue() ]<br>
    * .. .. . .. .. . .. $5 ";"<br>
    * .. .. . .. .. | &1 ClassOrInterfaceDeclaration()<br>

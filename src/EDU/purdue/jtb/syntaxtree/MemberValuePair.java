@@ -6,7 +6,7 @@ import EDU.purdue.jtb.visitor.*;
 /**
  * JTB node class for the production MemberValuePair:<br>
  * Corresponding grammar:<br>
- * f0 -> < IDENTIFIER ><br>
+ * f0 -> <IDENTIFIER><br>
  * f1 -> "="<br>
  * f2 -> MemberValue()<br>
  */

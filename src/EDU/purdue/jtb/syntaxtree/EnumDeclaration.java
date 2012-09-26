@@ -7,7 +7,7 @@ import EDU.purdue.jtb.visitor.*;
  * JTB node class for the production EnumDeclaration:<br>
  * Corresponding grammar:<br>
  * f0 -> "enum"<br>
- * f1 -> < IDENTIFIER ><br>
+ * f1 -> <IDENTIFIER><br>
  * f2 -> [ ImplementsList() ]<br>
  * f3 -> EnumBody()<br>
  */

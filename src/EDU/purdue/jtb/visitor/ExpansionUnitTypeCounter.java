@@ -62,12 +62,14 @@ import EDU.purdue.jtb.syntaxtree.NodeListOptional;
 import EDU.purdue.jtb.syntaxtree.NodeSequence;
 
 /**
- * The ExpansionUnitTypeCounter visitor counts the different types of the ExpansionUnits found in an
- * ExpansionChoices subtree, without descending further into the tree than the first ExpansionUnit
- * level.
+ * The {@link ExpansionUnitTypeCounter} visitor counts the different types of the ExpansionUnits
+ * found in an ExpansionChoices subtree, without descending further into the tree than the first
+ * ExpansionUnit level.<br>
+ * May be {@link GlobalDataBuilder#isEuOk(ExpansionUnit)} should be used instead of this visitor.
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
+ * @version 1.4.7 : 09/2012 : MMa : added some comments, commented out unused getters
  */
 public class ExpansionUnitTypeCounter extends DepthFirstVoidVisitor {
 
@@ -75,7 +77,7 @@ public class ExpansionUnitTypeCounter extends DepthFirstVoidVisitor {
   private int numLookaheads = 0;
   /** Number of blocks counter (ExpansionUnit type 1) */
   private int numBlocks     = 0;
-  /** Number of (bracket) options counter (ExpansionUnit type 2) */
+  /** Number of "bracket options" counter (ExpansionUnit type 2) */
   private int numBrackets   = 0;
   /** Number of try-catch-finally counter (ExpansionUnit type 3) */
   private int numTCFs       = 0;
@@ -133,8 +135,10 @@ public class ExpansionUnitTypeCounter extends DepthFirstVoidVisitor {
    * .. .. | %3 ExpansionUnitTCF()<br>
    * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ]<br>
    * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
+   * .. .. . .. .. . .. $2 [ "!" ]<br>
    * .. .. . .. .. | &1 $0 RegularExpression()<br>
-   * .. .. . .. .. . .. $1 [ £0 "." £1 < IDENTIFIER > ] )<br>
+   * .. .. . .. .. . .. $1 [ ?0 "." ?1 <IDENTIFIER> ]<br>
+   * .. .. . .. .. . .. $2 [ "!" ] )<br>
    * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
    * .. .. . .. #3 ( &0 "+"<br>
    * .. .. . .. .. | &1 "*"<br>
@@ -176,58 +180,59 @@ public class ExpansionUnitTypeCounter extends DepthFirstVoidVisitor {
   }
 
   /**
-   * @return the number of groupings (brackets, try-s and modifiers) plus the number of terms
+   * @return the number of brackets, TCFs, terms and modifiers (types 2, 3, 4 & 5)
    */
   public int getNbNormals() {
     return numBrackets + numTCFs + numModifiers + numTerms;
   }
 
-  /**
-   * @return the number of groupings (brackets, try-s and modifiers)
-   */
-  public int getNumGroupings() {
-    return numBrackets + numTCFs + numModifiers;
-  }
+  //  /**
+  //   * @return the number of groupings (brackets, TCFs and modifiers) (types 2, 3 & 5)
+  //   */
+  //  public int getNumGroupings() {
+  //    return numBrackets + numTCFs + numModifiers;
+  //  }
+  //
+  //  /**
+  //   * @return the number of lookaheads (type 0)
+  //   */
+  //  public int getNumLookaheads() {
+  //    return numLookaheads;
+  //  }
+  //
+  //  /**
+  //   * @return the number of blocks (type 1)
+  //   */
+  //  public int getNumBlocks() {
+  //    return numBlocks;
+  //  }
+  //
+  //  /**
+  //   * @return the number of brackets (type 2)
+  //   */
+  //  public int getNumBrackets() {
+  //    return numBrackets;
+  //  }
+  //
+  //  /**
+  //   * @return the number of TCFs (type 3)
+  //   */
+  //  public int getNumTCFs() {
+  //    return numTCFs;
+  //  }
+  //
+  //  /**
+  //   * @return the number of terms (type 4)
+  //   */
+  //  public int getNumTerms() {
+  //    return numTerms;
+  //  }
+  //
+  //  /**
+  //   * @return the number of modifiers (type 5)
+  //   */
+  //  public int getNumModifiers() {
+  //    return numModifiers;
+  //  }
 
-  /**
-   * @return the number of lookaheads
-   */
-  public int getNumLookaheads() {
-    return numLookaheads;
-  }
-
-  /**
-   * @return the number of blocks
-   */
-  public int getNumBlocks() {
-    return numBlocks;
-  }
-
-  /**
-   * @return the number of brackets
-   */
-  public int getNumBrackets() {
-    return numBrackets;
-  }
-
-  /**
-   * @return the number of try-s
-   */
-  public int getNumTrys() {
-    return numTCFs;
-  }
-
-  /**
-   * @return the number of terms
-   */
-  public int getNumTerms() {
-    return numTerms;
-  }
-
-  /**
-   * @return the number of modifiers
-   */
-  public int getNumModifiers() {
-    return numModifiers;
-  }
 }

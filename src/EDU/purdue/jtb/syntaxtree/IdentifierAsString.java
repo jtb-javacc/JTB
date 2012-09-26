@@ -6,7 +6,7 @@ import EDU.purdue.jtb.visitor.*;
 /**
  * JTB node class for the production IdentifierAsString:<br>
  * Corresponding grammar:<br>
- * f0 -> < IDENTIFIER ><br>
+ * f0 -> <IDENTIFIER><br>
  */
 public class IdentifierAsString implements INode {
 

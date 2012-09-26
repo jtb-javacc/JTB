@@ -32,9 +32,9 @@
 package EDU.purdue.jtb.visitor;
 
 import static EDU.purdue.jtb.misc.Globals.*;
+import static EDU.purdue.jtb.visitor.GlobalDataBuilder.DONT_CREATE_NODE_STR;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Iterator;
 
 import EDU.purdue.jtb.misc.ClassInfo;
@@ -55,17 +55,15 @@ import EDU.purdue.jtb.syntaxtree.NodeChoice;
 import EDU.purdue.jtb.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.syntaxtree.NodeSequence;
 import EDU.purdue.jtb.syntaxtree.NodeToken;
-import EDU.purdue.jtb.syntaxtree.Production;
 import EDU.purdue.jtb.syntaxtree.RegularExprProduction;
 import EDU.purdue.jtb.syntaxtree.RegularExpression;
-import EDU.purdue.jtb.syntaxtree.StringLiteral;
 import EDU.purdue.jtb.syntaxtree.TokenManagerDecls;
 
 /**
- * The {@link ClassGenerator} visitor creates a list of {@link ClassInfo} objects describing every
+ * The {@link ClassesFinder} visitor creates a list of {@link ClassInfo} objects describing every
  * class to be generated.
  * <p>
- * {@link Annotator}, {@link CommentsPrinter} and {@link ClassGenerator} depend on each other to
+ * {@link Annotator}, {@link CommentsPrinter} and {@link ClassesFinder} depend on each other to
  * create and use classes.
  * <p>
  * Programming note: we do not continue down the tree once a new field has been added to curClass,
@@ -78,36 +76,38 @@ import EDU.purdue.jtb.syntaxtree.TokenManagerDecls;
  *          added bareJavaNodeCode and fixed problems in visiting ExpansionUnitTCF<br>
  *          1.4.7 : 07/2012 : MMa : followed changes in jtbgram.jtb (IndentifierAsString())<br>
  *          1.4.7 : 09/2012 : MMa : changed some comments and removed one JavaBranchPrinter visitor
- *          ; removed printToken as of no use
+ *          ; removed printToken and regExpr as of no use ; added non node creation and the
+ *          reference to the {@link GlobalDataBuilder}
  */
-public class ClassGenerator extends DepthFirstVoidVisitor {
+public class ClassesFinder extends DepthFirstVoidVisitor {
 
+  /** The reference to the global data builder visitor */
+  final GlobalDataBuilder            gdbv;
   /** Visitor to print a java node and its subtree with default indentation */
-  final JavaBranchPrinter             jbpv    = new JavaBranchPrinter(null);
-  /** Visitor for finding return variables declarations */
-  final VoidJavaCodeProductionsFinder vjcpfv  = new VoidJavaCodeProductionsFinder();
-  //  /** Flag to print the token or not */
-  //  private boolean                     printToken = false;
-  /** The table used to generate default constructors if a token has a constant regexpr */
-  private Hashtable<String, String>   tokenTable;
+  final JavaBranchPrinter            jbpv   = new JavaBranchPrinter(null);
   /** The current generated class */
-  private ClassInfo                   ci;
+  private ClassInfo                  ci;
   /** The list of generated classes */
-  private final ArrayList<ClassInfo>  ciList  = new ArrayList<ClassInfo>();
+  private final ArrayList<ClassInfo> ciList = new ArrayList<ClassInfo>();
   /** The field names generator (descriptive or not, depending on -f option) */
-  private final FieldNameGenerator    gen     = new FieldNameGenerator();
-  /** Global variable to pass RegularExpression info between methods (as they are recursive) */
-  String                              regExpr = "";
+  private final FieldNameGenerator   gen    = new FieldNameGenerator();
   /** Global variable to pass IdentifierAsString info between methods (as they are recursive) */
-  String                              ident   = "";
-  /** The JavaCodeProductions table */
-  Hashtable<String, String>           jcpHT   = new Hashtable<String, String>();
+  String                             ident  = "";
   /** The OS line separator as a string */
-  public static final String          LS      = System.getProperty("line.separator");
+  public static final String         LS     = System.getProperty("line.separator");
   /** The OS line separator string length */
-  public static final int             LS_LEN  = LS.length();
+  public static final int            LS_LEN = LS.length();
   /** The OS line separator first character */
-  public static final char            LS0     = LS.charAt(0);
+  public static final char           LS0    = LS.charAt(0);
+
+  /**
+   * Constructor.
+   * 
+   * @param aGdbv - the global data builder visitor
+   */
+  public ClassesFinder(final GlobalDataBuilder aGdbv) {
+    gdbv = aGdbv;
+  }
 
   /**
    * Getter for the class list.
@@ -141,13 +141,10 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
    */
   @Override
   public void visit(final JavaCCInput n) {
-    // find first global data
-    n.accept(vjcpfv);
-    // build the token table and visit only Production
-    final TokenTableBuilder builder = new TokenTableBuilder();
-    n.accept(builder);
-    tokenTable = builder.getTokenTable();
-    n.f10.accept(this);
+    // f10 -> ( Production() )+
+    for (final Iterator<INode> e = n.f10.elements(); e.hasNext();) {
+      e.next().accept(this);
+    }
   }
 
   /**
@@ -178,22 +175,24 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
    * f3 -> FormalParameters()<br>
    * f4 -> [ #0 "throws" #1 Name()<br>
    * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
-   * f5 -> ":"<br>
-   * f6 -> Block()<br>
-   * f7 -> "{"<br>
-   * f8 -> ExpansionChoices()<br>
-   * f9 -> "}"<br>
+   * f5 -> [ "!" ]<br>
+   * f6 -> ":"<br>
+   * f7 -> Block()<br>
+   * f8 -> "{"<br>
+   * f9 -> ExpansionChoices()<br>
+   * f10 -> "}"<br>
    * 
    * @param n - the node to visit
    */
   @Override
   public void visit(final BNFProduction n) {
     gen.reset();
-    //    printToken = true;
-    ci = new ClassInfo(n.f8, n.f2.f0.tokenImage);
+    // f5 -> [ "!" ]
+    // generate the class even if the node generation is not requested
+    ci = new ClassInfo(n.f9, n.f2.f0.tokenImage, gdbv);
     ciList.add(ci);
-    n.f8.accept(this);
-    //    printToken = false;
+    // f9 -> ExpansionChoices()
+    n.f9.accept(this);
   }
 
 /**
@@ -296,9 +295,11 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
    * .. .. | %2 #0 "[" #1 ExpansionChoices() #2 "]"<br>
    * .. .. | %3 ExpansionUnitTCF()<br>
    * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ]<br>
+   * .. .. . .. .. . .. $2 [ "!" ]<br>
    * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
    * .. .. . .. .. | &1 $0 RegularExpression()<br>
-   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )<br>
+   * .. .. . .. .. . .. $1 [ ?0 "." ?1 <IDENTIFIER> ]<br>
+   * .. .. . .. .. . .. $2 [ "!" ] )<br>
    * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
    * .. .. . .. #3 ( &0 "+"<br>
    * .. .. . .. .. | &1 "*"<br>
@@ -332,22 +333,26 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
       case 4:
         // %4 #0 [ $0 PrimaryExpression() $1 "=" ]
         // .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()
+        // .. .. . $2 [ "!" ]
         // .. .. | &1 $0 RegularExpression()
-        // .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ] )
+        // .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
+        // .. .. . .. $2 [ "!" ] )
         seq = (NodeSequence) n.f0.choice;
         ch = (NodeChoice) seq.elementAt(1);
         final NodeSequence seq1 = (NodeSequence) ch.choice;
         if (ch.which == 0) {
-          // &0 $0 IdentifierAsString() $1 Arguments()
+          // &0 $0 IdentifierAsString() $1 Arguments() $2 [ "!" ]
           // ident will be set further down the tree
           seq1.elementAt(0).accept(this);
-          // add the field if not a JavaCodeProduction
-          if (!jcpHT.containsKey(ident)) {
+          // add field only if node creation is not requested not to be generated
+          if (!gdbv.getNcnHT().containsKey(ident) && !((NodeOptional) seq1.elementAt(2)).present()) {
             ci.addField(getFixedName(ident), gen.genFieldName(ident));
           }
         } else {
-          // &1 $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ] )
-          seq1.elementAt(0).accept(this);
+          // &1 $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ] $2 [ "!" ]
+          // add field only if node creation is not requested not to be generated
+          if (!((NodeOptional) seq1.elementAt(2)).present())
+            seq1.elementAt(0).accept(this);
         }
         return;
 
@@ -472,41 +477,40 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
    */
   @Override
   public void visit(final RegularExpression n) {
-    regExpr = "";
-    // there are no cases where printToken is false, so it is removed
-    //    assert printToken : "printToken is false";
-    //    if (!printToken)
-    //      return;
     switch (n.f0.which) {
       case 0: // %0 StringLiteral()
         // we indeed fall here while building JTB
         //        throw new AssertionError("CG RE 0");
-        n.f0.choice.accept(this);
         break;
+
       case 1: // %1 #0 "<" #1 [ $0 [ "#" ] $1 IdentifierAsString() $2 ":" ] #2 ComplexRegularExpressionChoices() #3 ">"
         // we indeed fall here while building JTB
         //        throw new AssertionError("CG RE 1");
-        regExpr = "";
         break;
+
       case 2: // %2 #0 "<" #1 IdentifierAsString() #2 ">"
         // we indeed fall here while building JTB
         //        throw new AssertionError("CG RE 2");
         final NodeSequence seq = (NodeSequence) n.f0.choice;
-        // ident will be set further down the tree
+        // ident will be set further down the tree of IdentifierAsString
         seq.elementAt(1).accept(this);
-        regExpr = tokenTable.get(ident);
+        String regExpr = gdbv.getTokenHT().get(ident);
         if (regExpr == null) {
           final NodeToken ident_nt = ((IdentifierAsString) seq.elementAt(1)).f0;
-          Messages.softErr("Undefined token \"" + ident_nt + "\".", ident_nt.beginLine);
+          Messages.softErr("Undefined token \"" + ident_nt + "\".", ident_nt.beginLine,
+                           ident_nt.beginColumn);
           regExpr = "";
           ident = "";
+        } else if (DONT_CREATE_NODE_STR.equals(regExpr)) {
+          // requested not to create the node
+          return;
         }
         break;
+
       case 3: // %3 #0 "<" #1 "EOF" #2 ">"
         // we do not fall here while building JTB but we do when generating from a grammar with EOF
         //        assert false : "case 3 RegularExpression";
         //        throw new AssertionError("CG RE 3");
-        regExpr = "";
         break;
       default:
         Messages.hardErr("Unreachable code executed!");
@@ -524,18 +528,6 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
   @Override
   public void visit(final IdentifierAsString n) {
     ident = n.f0.tokenImage;
-  }
-
-  /**
-   * Visits a {@link StringLiteral} node, whose children are the following :
-   * <p>
-   * f0 -> < STRING_LITERAL ><br>
-   * 
-   * @param n - the node to visit
-   */
-  @Override
-  public void visit(final StringLiteral n) {
-    regExpr = n.f0.tokenImage;
   }
 
   /**
@@ -609,82 +601,4 @@ public class ClassGenerator extends DepthFirstVoidVisitor {
     eosPlusEolSpacesEos = eolEosPlusEol + spacesEos;
   }
 
-  /**
-   * The VoidJavaCodeProductionsFinder visitor finds all "void" JavaCodeProductions and adds them to
-   * a Hashtable (which will be used to avoid creating later invalid child nodes).
-   */
-  class VoidJavaCodeProductionsFinder extends DepthFirstVoidVisitor {
-
-    /**
-     * Constructor, with a given buffer and a default indentation.
-     */
-    VoidJavaCodeProductionsFinder() {
-      super();
-    }
-
-    /**
-     * Visits a {@link JavaCCInput} node, whose children are the following :
-     * <p>
-     * f0 -> JavaCCOptions()<br>
-     * f1 -> "PARSER_BEGIN"<br>
-     * f2 -> "("<br>
-     * f3 -> IdentifierAsString()<br>
-     * f4 -> ")"<br>
-     * f5 -> CompilationUnit()<br>
-     * f6 -> "PARSER_END"<br>
-     * f7 -> "("<br>
-     * f8 -> IdentifierAsString()<br>
-     * f9 -> ")"<br>
-     * f10 -> ( Production() )+<br>
-     * 
-     * @param n - the node to visit
-     */
-    @Override
-    public void visit(final JavaCCInput n) {
-      // visits only Productions
-      // f10 -> ( Production() )+
-      for (final Iterator<INode> e = n.f10.elements(); e.hasNext();) {
-        e.next().accept(this);
-      }
-    }
-
-    /**
-     * Visits a {@link Production} node, whose children are the following :
-     * <p>
-     * f0 -> . %0 JavaCodeProduction()<br>
-     * .. .. | %1 RegularExprProduction()<br>
-     * .. .. | %2 TokenManagerDecls()<br>
-     * .. .. | %3 BNFProduction()<br>
-     * 
-     * @param n - the node to visit
-     */
-    @Override
-    public void visit(final Production n) {
-      // visits only JavaCodeProduction
-      if (n.f0.which == 0)
-        n.f0.accept(this);
-    }
-
-    /**
-     * Visits a {@link JavaCodeProduction} node, whose children are the following :
-     * <p>
-     * f0 -> "JAVACODE"<br>
-     * f1 -> AccessModifier()<br>
-     * f2 -> ResultType()<br>
-     * f3 -> IdentifierAsString()<br>
-     * f4 -> FormalParameters()<br>
-     * f5 -> [ #0 "throws" #1 Name()<br>
-     * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
-     * f6 -> Block()<br>
-     * 
-     * @param n - the node to visit
-     */
-    @Override
-    public void visit(final JavaCodeProduction n) {
-      // store it in the hashtable
-      // f3 -> IdentifierAsString()
-      final String id = n.f3.f0.tokenImage;
-      jcpHT.put(id, id);
-    }
-  }
 }
