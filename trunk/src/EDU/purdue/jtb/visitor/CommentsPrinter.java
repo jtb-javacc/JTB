@@ -7,8 +7,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import EDU.purdue.jtb.misc.ClassInfo;
-import EDU.purdue.jtb.misc.ClassInfo.CommentData;
-import EDU.purdue.jtb.misc.ClassInfo.CommentLineData;
+import EDU.purdue.jtb.misc.CommentData;
+import EDU.purdue.jtb.misc.CommentLineData;
+import EDU.purdue.jtb.misc.ClassInfoForJava;
 import EDU.purdue.jtb.misc.Messages;
 import EDU.purdue.jtb.misc.UnicodeConverter;
 import EDU.purdue.jtb.syntaxtree.Expansion;
@@ -25,10 +26,10 @@ import EDU.purdue.jtb.syntaxtree.StringLiteral;
 
 /**
  * The {@link CommentsPrinter} visitor (an extension of {@link JavaCCPrinter visitor}) is called by
- * {@link ClassInfo} (through {@link #visit(ExpansionChoices)} to find which part of the production
+ * {@link ClassInfoForJava} (through {@link #visit(ExpansionChoices)} to find which part of the production
  * each field corresponds, and to format the class, method or field corresponding javadoc comments.
  * <p>
- * {@link Annotator}, {@link CommentsPrinter}, {@link ClassesFinder} depend on each other to create
+ * {@link AnnotatorForJava}, {@link CommentsPrinter}, {@link ClassesFinder} depend on each other to create
  * and use classes. A field comment should be created for each field, but visiting methods of
  * CommentsPrinter and {@link ClassesFinder} have been coded quite independently, so some checking
  * and rewriting could be welcomed.<br>
@@ -231,7 +232,7 @@ public class CommentsPrinter extends JavaCCPrinter {
   StringBuilder               fcb         = null;
   /** An auxiliary buffer for the sub comments */
   StringBuilder               scb         = null;
-  /** The ClassInfo the visitor is working on */
+  /** The ClassInfoForJava the visitor is working on */
   ClassInfo                   classInfo;
   /** A debug switch, to change prefix and field names strings */
   public static final boolean DEBUG_CHARS = false;
@@ -413,7 +414,7 @@ public class CommentsPrinter extends JavaCCPrinter {
     if (expLvl == 0) {
       // if at first ExpansionChoices level
       // output generated field name (on the new field comment)
-      final String fx = classInfo.fieldNames.get(fni++);
+      final String fx = classInfo.getFieldNames().get(fni++);
       //  see ReferenceType
       if (DEBUG_CHARS)
         curCtn.addFn(fx, " ?> . ");
@@ -525,7 +526,7 @@ public class CommentsPrinter extends JavaCCPrinter {
             oneNewLineSwitchFieldCmt(n, "b==0");
           }
           // output generated field name (on the new field comment)
-          final String fx = classInfo.fieldNames.get(fni++);
+          final String fx = classInfo.getFieldNames().get(fni++);
           if (DEBUG_CHARS)
             curCtn.addFn(fx, " :> ");
           else
@@ -575,7 +576,7 @@ public class CommentsPrinter extends JavaCCPrinter {
             if (numEuOk > 0) {
               // and if not first ExpansionUnit,
               // output generated field name (on the new field comment)
-              final String fx = classInfo.fieldNames.get(fni++);
+              final String fx = classInfo.getFieldNames().get(fni++);
               if (DEBUG_CHARS)
                 curCtn.addFn(fx, " >> ");
               else
@@ -784,7 +785,7 @@ public class CommentsPrinter extends JavaCCPrinter {
 
     // f1 -> "{"
     if (tcfLvl == 0) {
-      fx = classInfo.fieldNames.get(fni++);
+      fx = classInfo.getFieldNames().get(fni++);
       curCtn.addFn(fx, " -> ");
       curCtn.addId("\"{\"");
       // end the field comment
@@ -801,7 +802,7 @@ public class CommentsPrinter extends JavaCCPrinter {
 
     // f2 -> ExpansionChoices()
     if (tcfLvl == 0) {
-      fx = classInfo.fieldNames.get(fni++);
+      fx = classInfo.getFieldNames().get(fni++);
       if (DEBUG_CHARS)
         curCtn.addFn(fx, " ~> ");
       else
@@ -826,7 +827,7 @@ public class CommentsPrinter extends JavaCCPrinter {
 
     // f3 -> "}"
     if (tcfLvl == 0) {
-      fx = classInfo.fieldNames.get(fni++);
+      fx = classInfo.getFieldNames().get(fni++);
       curCtn.addFn(fx, " -> ");
       // no real need for prefix
     } else {
@@ -846,7 +847,7 @@ public class CommentsPrinter extends JavaCCPrinter {
 
         // "catch"
         if (tcfLvl == 0) {
-          fx = classInfo.fieldNames.get(fni++);
+          fx = classInfo.getFieldNames().get(fni++);
           curCtn.addFn(fx, " -> ");
           // no real need for prefix
         } else {
@@ -861,7 +862,7 @@ public class CommentsPrinter extends JavaCCPrinter {
         // save a (previous) field comment only at first level
         oneNewLineCreFieldCmtAtFirstTcfLvl(n);
         if (tcfLvl == 0) {
-          fx = classInfo.fieldNames.get(fni++);
+          fx = classInfo.getFieldNames().get(fni++);
           curCtn.addFn(fx, " -> ");
           // no real need for prefix
         } else {
@@ -876,7 +877,7 @@ public class CommentsPrinter extends JavaCCPrinter {
         // save a (previous) field comment only at first level
         oneNewLineCreFieldCmtAtFirstTcfLvl(n);
         if (tcfLvl == 0) {
-          fx = classInfo.fieldNames.get(fni++);
+          fx = classInfo.getFieldNames().get(fni++);
           curCtn.addFn(fx, " -> ");
           // no real need for prefix
         } else {
@@ -891,7 +892,7 @@ public class CommentsPrinter extends JavaCCPrinter {
         // save a (previous) field comment only at first level
         oneNewLineCreFieldCmtAtFirstTcfLvl(n);
         if (tcfLvl == 0) {
-          fx = classInfo.fieldNames.get(fni++);
+          fx = classInfo.getFieldNames().get(fni++);
           curCtn.addFn(fx, " -> ");
           // no real need for prefix
         } else {
@@ -906,7 +907,7 @@ public class CommentsPrinter extends JavaCCPrinter {
         // save a (previous) field comment only at first level
         oneNewLineCreFieldCmtAtFirstTcfLvl(n);
         if (tcfLvl == 0) {
-          fx = classInfo.fieldNames.get(fni++);
+          fx = classInfo.getFieldNames().get(fni++);
           curCtn.addFn(fx, " -> ");
           // no real need for prefix
         } else {
@@ -921,7 +922,7 @@ public class CommentsPrinter extends JavaCCPrinter {
         // save a (previous) field comment only at first level
         oneNewLineCreFieldCmtAtFirstTcfLvl(n);
         if (tcfLvl == 0) {
-          fx = classInfo.fieldNames.get(fni++);
+          fx = classInfo.getFieldNames().get(fni++);
           curCtn.addFn(fx, " -> ");
           // no real need for prefix
         } else {
@@ -941,7 +942,7 @@ public class CommentsPrinter extends JavaCCPrinter {
 
       // #0 "finally"
       if (tcfLvl == 0) {
-        fx = classInfo.fieldNames.get(fni++);
+        fx = classInfo.getFieldNames().get(fni++);
         curCtn.addFn(fx, " -> ");
         // no real need for prefix
       } else {
@@ -956,7 +957,7 @@ public class CommentsPrinter extends JavaCCPrinter {
 
       // #1 Block()
       if (tcfLvl == 0) {
-        fx = classInfo.fieldNames.get(fni++);
+        fx = classInfo.getFieldNames().get(fni++);
         curCtn.addFn(fx, " -> ");
         // no real need for prefix
       } else {
@@ -1041,18 +1042,18 @@ public class CommentsPrinter extends JavaCCPrinter {
    */
 
   /**
-   * Generates the field comments and sub comments data. Called by {@link ClassInfo}.
+   * Generates the field comments and sub comments data. Called by {@link ClassInfoForJava}.
    * 
-   * @param aCI - the ClassInfo to work on
+   * @param classInfo - the ClassInfoForJava to work on
    */
-  public void genCommentsData(final ClassInfo aCI) {
+  public void genCommentsData(final ClassInfo classInfo) {
     // various initializations
-    classInfo = aCI;
+    this.classInfo = classInfo;
     fni = expLvl = seqLvl = chLvl = 0;
     tcfLvl = -1;
     prefix.setLength(0);
     // allocate structures
-    final int sz = classInfo.fieldNames.size();
+    final int sz = classInfo.getFieldNames().size();
     roots = new ArrayList<CommentsTreeNode>(sz);
     for (int i = 0; i < sz; i++)
       roots.add(new CommentsTreeNode(null));
@@ -1062,13 +1063,13 @@ public class CommentsPrinter extends JavaCCPrinter {
     curCtn = roots.get(0);
     //    assert curCtn != null : "curCtn is null !";
     // produce comments data
-    classInfo.astEcNode.accept(this);
+    classInfo.getASTECNode().accept(this);
     // end comment processing
     storeClassInfoComments();
   }
 
   /**
-   * Stores the comments tree into the current {@link ClassInfo} corresponding fields.
+   * Stores the comments tree into the current {@link ClassInfoForJava} corresponding fields.
    */
   void storeClassInfoComments() {
     //    assert fld == roots.size() : "fld (" + fld + ") is not equal to roots.size() (" + roots.size();
@@ -1078,15 +1079,15 @@ public class CommentsPrinter extends JavaCCPrinter {
     //      for (final CommentsTreeNode root : roots)
     //        printCtn(root, k);
 
-    // allocate lists
-    classInfo.fieldCmts = new ArrayList<CommentData>(fld);
-    if (inlineAcceptMethods)
-      classInfo.subCmts = new ArrayList<CommentData>(2 * fld);
+//    // allocate lists
+//    classInfo.fieldCmts = new ArrayList<CommentData>(fld);
+//    if (inlineAcceptMethods)
+//      classInfo.subCmts = new ArrayList<CommentData>(2 * fld);
     // loop on all fields
     for (final CommentsTreeNode root : roots) {
       // allocate structures for the field comment, not (yet) for the sub comments
-      final CommentData fldCmtData = classInfo.new CommentData();
-      classInfo.fieldCmts.add(fldCmtData);
+      final CommentData fldCmtData = new CommentData();
+      classInfo.getFieldCmts().add(fldCmtData);
       final int nbLines = countNbLines(root);
       fldCmtData.lines = new ArrayList<CommentLineData>(nbLines);
       processNode(root, fldCmtData, true, null, false);
@@ -1132,10 +1133,10 @@ public class CommentsPrinter extends JavaCCPrinter {
 
   /**
    * Recursively processes a given comments tree node to store its data into the current
-   * {@link ClassInfo} field comments data and sub comments data members.
+   * {@link ClassInfoForJava} field comments data and sub comments data members.
    * 
    * @param aCtn - a comments tree node
-   * @param aFcd - the ClassInfo field comment data
+   * @param aFcd - the ClassInfoForJava field comment data
    * @param aWithSubComments - true if create also sub comments, false otherwise
    * @param aPrefix - the prefix of the calling level
    * @param aApplyPrefix - true if the passed prefix is to be applied, false otherwise
@@ -1191,7 +1192,7 @@ public class CommentsPrinter extends JavaCCPrinter {
     //    assert aCtn.debug == null || aCtn.hasNL : "no new line but debug (" + aCtn.debug +
     //                                              ") not null !";
     if (aCtn.hasNL) {
-      final CommentLineData fcld = classInfo.new CommentLineData();
+      final CommentLineData fcld = new CommentLineData();
       aFcd.lines.add(fcld);
       fcld.bare = fcb.toString();
       if (aCtn.debug != null)
@@ -1208,7 +1209,7 @@ public class CommentsPrinter extends JavaCCPrinter {
 
   /**
    * Recursively processes a given comments tree node to store its data into the current
-   * {@link ClassInfo} sub comments data member.
+   * {@link ClassInfoForJava} sub comments data member.
    * 
    * @param aCtn - a comments tree node
    * @param aNewSubComment - true to create a new sub comment, false otherwise
@@ -1221,8 +1222,8 @@ public class CommentsPrinter extends JavaCCPrinter {
     /* process this sub comment first */
     // create a new sub comment at first call level
     if (aNewSubComment) {
-      final CommentData subCmtData = classInfo.new CommentData();
-      classInfo.subCmts.add(subCmtData);
+      final CommentData subCmtData = new CommentData();
+      classInfo.getSubCmts().add(subCmtData);
       subCmtData.lines = new ArrayList<CommentLineData>();
       scb.setLength(0);
     }
@@ -1274,8 +1275,8 @@ public class CommentsPrinter extends JavaCCPrinter {
 
     // create sub comment line if needed
     if (aNewSubComment || aCtn.hasNL) {
-      final CommentLineData scld = classInfo.new CommentLineData();
-      classInfo.subCmts.get(classInfo.subCmts.size() - 1).lines.add(scld);
+      final CommentLineData scld = new CommentLineData();
+      classInfo.getSubCmts().get(classInfo.getSubCmts().size() - 1).lines.add(scld);
       scld.bare = scb.toString();
       scb.setLength(0);
     }
