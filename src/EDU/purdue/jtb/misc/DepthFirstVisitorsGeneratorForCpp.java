@@ -448,7 +448,12 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
           classInfo.fmt1JavacodeFieldCmt(sb, spc, k++);
           if (depthLevel)
             increaseDepthLevel(sb, spc);
-          sb.append(spc.spc).append(genNodeVar).append(".").append(fn);
+          sb.append(spc.spc);
+          if (aRet) {
+            sb.append(genRetVar).append(" = ");
+          }
+
+          sb.append(genNodeVar).append(".").append(fn);
           sb.append("->").append("accept(*this");
           if (aArgu)
             sb.append(", ").append(varargs? genArgsVar : genArguVar);
