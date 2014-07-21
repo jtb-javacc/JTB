@@ -52,7 +52,7 @@
  */
 package EDU.purdue.jtb;
 
-import static EDU.purdue.jtb.misc.Globals.DEF_ND_DIR_NAME;
+import static EDU.purdue.jtb.misc.Globals.*;
 import static EDU.purdue.jtb.misc.Globals.DEF_ND_PKG_NAME;
 import static EDU.purdue.jtb.misc.Globals.DEF_VIS_DIR_NAME;
 import static EDU.purdue.jtb.misc.Globals.DEF_VIS_PKG_NAME;
@@ -87,6 +87,7 @@ import static EDU.purdue.jtb.misc.Globals.printClassList;
 import static EDU.purdue.jtb.misc.Globals.printerToolkit;
 import static EDU.purdue.jtb.misc.Globals.schemeToolkit;
 import static EDU.purdue.jtb.misc.Globals.staticFlag;
+import static EDU.purdue.jtb.misc.Globals.target;
 import static EDU.purdue.jtb.misc.Globals.varargs;
 import static EDU.purdue.jtb.misc.Globals.visitorsDirName;
 import static EDU.purdue.jtb.misc.Globals.visitorsDirPath;
@@ -109,11 +110,21 @@ import EDU.purdue.jtb.misc.FilesGenerator;
 import EDU.purdue.jtb.misc.FilesGeneratorForCpp;
 import EDU.purdue.jtb.misc.FilesGeneratorForJava;
 import EDU.purdue.jtb.misc.Globals;
+import EDU.purdue.jtb.misc.IRetArguVisitorForCpp;
+import EDU.purdue.jtb.misc.IRetArguVisitorForJava;
+import EDU.purdue.jtb.misc.Language;
 import EDU.purdue.jtb.misc.Messages;
+import EDU.purdue.jtb.misc.RetArguVisitorForCpp;
+import EDU.purdue.jtb.misc.RetArguVisitorForJava;
+import EDU.purdue.jtb.misc.RetVisitorForCpp;
+import EDU.purdue.jtb.misc.RetVisitorForJava;
 import EDU.purdue.jtb.misc.TreeDumperGenerator;
 import EDU.purdue.jtb.misc.TreeDumperGeneratorForCpp;
 import EDU.purdue.jtb.misc.TreeDumperGeneratorForJava;
 import EDU.purdue.jtb.misc.TreeFormatterGenerator;
+import EDU.purdue.jtb.misc.VoidArguVisitorForCpp;
+import EDU.purdue.jtb.misc.VoidArguVisitorForJava;
+import EDU.purdue.jtb.misc.VoidVisitorForJava;
 import EDU.purdue.jtb.parser.JTBParser;
 import EDU.purdue.jtb.parser.Options;
 import EDU.purdue.jtb.parser.ParseException;
@@ -488,6 +499,28 @@ public class JTB {
 
     staticFlag = ((Boolean) jtbOpt.get("STATIC")).booleanValue();
 
+    str = (String) jtbOpt.get("OUTPUT_LANGUAGE");
+    if (!"".equals(str)) {
+      if (str.equalsIgnoreCase("c++"))
+        str = "cpp";
+      target = Language.valueOf(str);
+    }
+    switch (target) {
+      case java:
+        retArguVisitor = new RetArguVisitorForJava();
+        iRetArguVisitor = new IRetArguVisitorForJava();
+        retVisitor = new RetVisitorForJava();
+        voidArguVisitor = new VoidArguVisitorForJava();
+        voidVisitor = new VoidVisitorForJava();
+        break;
+      case cpp:
+        retArguVisitor = new RetArguVisitorForCpp();
+        iRetArguVisitor = new IRetArguVisitorForCpp();
+        retVisitor = new RetVisitorForCpp();
+        voidArguVisitor = new VoidArguVisitorForCpp();
+        voidVisitor = new VoidVisitorForJava();
+        break;
+    }
   }
 
   /**
