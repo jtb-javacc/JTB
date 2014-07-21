@@ -153,11 +153,11 @@ public class FieldNameGenerator {
    */
   public String getNameForMod(final String mod) {
     if (mod.equals("+"))
-      return nodeList;
+      return nodeList.getName();
     else if (mod.equals("*"))
-      return nodeListOpt;
+      return nodeListOpt.getName();
     else if (mod.equals("?"))
-      return nodeOpt;
+      return nodeOpt.getName();
     else {
       Messages.hardErr("Illegal EBNF modifier in " + "ExpansionUnit: mod = " + mod);
       return "";

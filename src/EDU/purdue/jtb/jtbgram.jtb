@@ -2060,8 +2060,8 @@ void ResultType(List<Token> tokens) :
 }
 {
   (
-    "void"
-  | Type()
+    "void" [ * ]
+  | [ "const" ] Type() [ "*" | "&" ]
   )
   {
     Token last = getToken(0);
