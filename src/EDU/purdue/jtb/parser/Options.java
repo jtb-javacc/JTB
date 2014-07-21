@@ -28,6 +28,7 @@
 package EDU.purdue.jtb.parser;
 
 import static EDU.purdue.jtb.misc.Globals.DEF_OUT_FILE_NAME;
+import static EDU.purdue.jtb.misc.Globals.astNodesDirName;
 import static EDU.purdue.jtb.misc.Globals.depthLevel;
 import static EDU.purdue.jtb.misc.Globals.descriptiveFieldNames;
 import static EDU.purdue.jtb.misc.Globals.inlineAcceptMethods;
@@ -37,7 +38,6 @@ import static EDU.purdue.jtb.misc.Globals.noOverwrite;
 import static EDU.purdue.jtb.misc.Globals.noSemanticCheck;
 import static EDU.purdue.jtb.misc.Globals.nodePrefix;
 import static EDU.purdue.jtb.misc.Globals.nodeSuffix;
-import static EDU.purdue.jtb.misc.Globals.astNodesDirName;
 import static EDU.purdue.jtb.misc.Globals.nodesPackageName;
 import static EDU.purdue.jtb.misc.Globals.parentPointer;
 import static EDU.purdue.jtb.misc.Globals.printClassList;
@@ -51,6 +51,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import EDU.purdue.jtb.misc.Language;
 
 /**
  * A class with static state that stores all option information.
@@ -612,8 +614,8 @@ public class Options {
    * 
    * @return The requested output directory.
    */
-  public static File getOutputLanguage() {
-    return new File(stringValue("OUTPUT_LANGUAGE"));
+  public static Language getOutputLanguage() {
+    return Language.valueOf(stringValue("OUTPUT_LANGUAGE"));
   }
 
   /**

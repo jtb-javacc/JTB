@@ -54,6 +54,7 @@ package EDU.purdue.jtb.misc;
 
 import java.io.File;
 
+import EDU.purdue.jtb.parser.Options;
 import EDU.purdue.jtb.parser.Token;
 
 /**
@@ -306,7 +307,7 @@ public class Globals {
   /**
    * -nd & -d options which defines the nodes directory name (default is syntaxtree)
    */
-  public static String              astNodesDirName          = DEF_ND_DIR_NAME;
+  public static String              astNodesDirName       = DEF_ND_DIR_NAME;
   /**
    * -vd & -d options which defines the visitors directory name (default is visitor)
    */
@@ -329,28 +330,12 @@ public class Globals {
   /**
    * target generation language
    */
-  public static Language            target                = Language.cpp;
+  public static Language            target                = Language.java;
   public static String              jtbNamespace          = DEF_JTB_NAMESPACE;
   public static String              astNamespace          = DEF_AST_NAMESPACE;
   public static String              vstNamespace          = DEF_VST_NAMESPACE;
 
   static {
-    switch (target) {
-      case java:
-        retArguVisitor = new RetArguVisitorForJava();
-        iRetArguVisitor = new IRetArguVisitorForJava();
-        retVisitor = new RetVisitorForJava();
-        voidArguVisitor = new VoidArguVisitorForJava();
-        voidVisitor = new VoidVisitorForJava();
-        break;
-      case cpp:
-        retArguVisitor = new RetArguVisitorForCpp();
-        iRetArguVisitor = new IRetArguVisitorForCpp();
-        retVisitor = new RetVisitorForCpp();
-        voidArguVisitor = new VoidArguVisitorForCpp();
-        voidVisitor = new VoidVisitorForJava();
-        break;
-    }
   }
 
   public static final String        NSQUAL                = "::";
