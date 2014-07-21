@@ -52,7 +52,20 @@
  */
 package EDU.purdue.jtb.misc;
 
-import static EDU.purdue.jtb.misc.Globals.*;
+import static EDU.purdue.jtb.misc.Globals.INDENT_AMT;
+import static EDU.purdue.jtb.misc.Globals.LS;
+import static EDU.purdue.jtb.misc.Globals.dFVoidVisitor;
+import static EDU.purdue.jtb.misc.Globals.genFileHeaderComment;
+import static EDU.purdue.jtb.misc.Globals.iNode;
+import static EDU.purdue.jtb.misc.Globals.iNodeList;
+import static EDU.purdue.jtb.misc.Globals.javaDocComments;
+import static EDU.purdue.jtb.misc.Globals.nodeList;
+import static EDU.purdue.jtb.misc.Globals.nodeListOpt;
+import static EDU.purdue.jtb.misc.Globals.nodeOpt;
+import static EDU.purdue.jtb.misc.Globals.nodeToken;
+import static EDU.purdue.jtb.misc.Globals.nodesPackageName;
+import static EDU.purdue.jtb.misc.Globals.visitorsDirName;
+import static EDU.purdue.jtb.misc.Globals.visitorsPackageName;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -61,6 +74,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Class TreeFormatterBuilder generates the TreeFormatter visitor which is a skeleton
@@ -88,7 +102,7 @@ public class TreeFormatterGenerator {
   /** The visitors directory */
   private final File                 visitorDir;
   /** The classes list */
-  private final ArrayList<ClassInfo> classList;
+  private final List<ClassInfo> classList;
   /** The buffer to print into */
   protected StringBuilder            sb;
 
@@ -98,7 +112,7 @@ public class TreeFormatterGenerator {
    * 
    * @param classes - the list of classes
    */
-  public TreeFormatterGenerator(final ArrayList<ClassInfo> classes) {
+  public TreeFormatterGenerator(final List<ClassInfo> classes) {
     classList = classes;
     sb = new StringBuilder(500 * classes.size());
     visitorDir = new File(visitorsDirName);
@@ -424,11 +438,11 @@ public class TreeFormatterGenerator {
     sb.append("  // User-generated visitor methods below").append(LS);
     sb.append("  //").append(LS).append(LS);
     final Spacing spc = new Spacing(INDENT_AMT);
-    spc.updateSpc(+1);
+    spc.update(+1);
 
     for (final Iterator<ClassInfo> e = classList.iterator(); e.hasNext();) {
       final ClassInfo cur = e.next();
-      final String className = cur.className;
+      final String className = cur.getClassName();
 
       if (javaDocComments) {
         sb.append(spc.spc).append("/**").append(LS);
@@ -440,10 +454,10 @@ public class TreeFormatterGenerator {
       sb.append(spc.spc).append("public void visit");
       sb.append("(final ").append(className).append(" n) {").append(LS);
 
-      spc.updateSpc(+1);
+      spc.update(+1);
 
-      final Iterator<String> names = cur.fieldNames.iterator();
-      final Iterator<String> types = cur.fieldTypes.iterator();
+      final Iterator<String> names = cur.getFieldNames().iterator();
+      final Iterator<String> types = cur.getFieldTypes().iterator();
 
       while (names.hasNext() && types.hasNext()) {
         final String name = names.next();
@@ -453,27 +467,27 @@ public class TreeFormatterGenerator {
           if (type.equals(nodeList))
             sb.append(spc.spc).append("processList(n.").append(name).append(");").append(LS);
           else if (type.equals(nodeListOpt)) {
-            sb.append(spc.spc).append("if (n.").append(name).append(".present()) {").append(LS);
-            spc.updateSpc(+1);
+            sb.append(spc.spc).append("if (n.").append(name).append(".").append("present()) {").append(LS);
+            spc.update(+1);
             sb.append(spc.spc).append("processList(n.").append(name).append(");").append(LS);
-            spc.updateSpc(-1);
+            spc.update(-1);
             sb.append(spc.spc).append("}").append(LS);
           } else if (type.equals(nodeOpt)) {
-            sb.append(spc.spc).append("if (n.").append(name).append(".present()) {").append(LS);
-            spc.updateSpc(+1);
-            sb.append(spc.spc).append("n.").append(name).append(".accept(this);").append(LS);
+            sb.append(spc.spc).append("if (n.").append(name).append(".").append("present()) {").append(LS);
+            spc.update(+1);
+            sb.append(spc.spc).append("n.").append(name).append(".").append("accept(this);").append(LS);
 
-            spc.updateSpc(-1);
+            spc.update(-1);
             sb.append(spc.spc).append("}").append(LS);
           } else
-            sb.append(spc.spc).append("n.").append(name).append(".accept(this);").append(LS);
+            sb.append(spc.spc).append("n.").append(name).append(".").append("accept(this);").append(LS);
       }
 
-      spc.updateSpc(-1);
+      spc.update(-1);
       sb.append(spc.spc).append("}").append(LS).append(LS);
     }
 
-    spc.updateSpc(-1);
+    spc.update(-1);
     sb.append(spc.spc).append("}").append(LS).append(LS);
 
     //
