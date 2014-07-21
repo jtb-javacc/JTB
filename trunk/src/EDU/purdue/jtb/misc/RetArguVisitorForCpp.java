@@ -3,9 +3,10 @@ package EDU.purdue.jtb.misc;
 
 @SuppressWarnings("javadoc")
 public class RetArguVisitorForCpp extends RetArguVisitor{
+
   @Override
-  public String getClassName() {
-    return "DepthFirstRetArguVisitor";
+  public String getOutfileName() {
+    return getClassName() + ".h";
   }
 
 

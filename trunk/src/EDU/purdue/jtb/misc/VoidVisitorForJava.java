@@ -5,8 +5,8 @@ package EDU.purdue.jtb.misc;
 public class VoidVisitorForJava extends VoidVisitor {
 
   @Override
-  public String getClassName() {
-    return "DepthFirstVoidVisitor";
+  public String getOutfileName() {
+    return getClassName() + ".java";
   }
 
 }

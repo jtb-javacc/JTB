@@ -20,4 +20,8 @@ abstract public class AbstractIVisitorClassForCpp extends AbstractIVisitorClass 
     return getClassName() + ".h";
   }
 
+  @Override
+  public String getOutfileName() {
+    return getClassName() + ".h";
+  }
 }

@@ -53,13 +53,13 @@
 package EDU.purdue.jtb.misc;
 
 import static EDU.purdue.jtb.misc.Globals.LS;
-import static EDU.purdue.jtb.misc.Globals.dFVoidVisitor;
 import static EDU.purdue.jtb.misc.Globals.genFileHeaderComment;
 import static EDU.purdue.jtb.misc.Globals.noOverwrite;
 import static EDU.purdue.jtb.misc.Globals.nodeToken;
 import static EDU.purdue.jtb.misc.Globals.nodesPackageName;
 import static EDU.purdue.jtb.misc.Globals.visitorsDirName;
 import static EDU.purdue.jtb.misc.Globals.visitorsPackageName;
+import static EDU.purdue.jtb.misc.Globals.voidVisitor;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -140,7 +140,7 @@ public class TreeDumperGeneratorForJava implements TreeDumperGenerator {
     sb.append(" * Dumps the syntax tree using the location information in each NodeToken.")
       .append(LS);
     sb.append(" */").append(LS);
-    sb.append("public class TreeDumper extends " + dFVoidVisitor + " {").append(LS).append(LS);
+    sb.append("public class TreeDumper extends " + voidVisitor + " {").append(LS).append(LS);
 
     sb.append("  /** The PrintWriter to write to */").append(LS);
     sb.append("  protected PrintWriter out;").append(LS);
@@ -282,5 +282,9 @@ public class TreeDumperGeneratorForJava implements TreeDumperGenerator {
     sb.append("    out.flush();").append(LS);
     sb.append("  }").append(LS).append(LS);
     sb.append("}").append(LS);
+  }
+  @Override
+  public String outFilename() {
+    return "TreeDumper.java";
   }
 }

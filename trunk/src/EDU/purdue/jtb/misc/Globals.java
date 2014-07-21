@@ -144,8 +144,8 @@ public class Globals {
   public static VisitorClass        retArguVisitor;
   /** "RetArgu" visitor interface name (with return type and a user object argument) */
   public static IVisitorClass       iRetArguVisitor;
-  /** Depth First "RetArgu" visitor class name (with return type and a user object argument) */
-  public static final String        dFRetArguVisitor      = "DepthFirstRetArguVisitor";
+//  /** Depth First "RetArgu" visitor class name (with return type and a user object argument) */
+//  public static final String        dFRetArguVisitor      = "DepthFirstRetArguVisitor";
   /** Javadoc comment fragment for "RetArgu" visitor */
   public static final String        retArguVisitorCmt     = "RetArgu";
 
@@ -153,8 +153,8 @@ public class Globals {
   public static VisitorClass        retVisitor;
   /** "Ret" visitor interface name (with return type and no user object argument) */
   public static final IVisitorClass iRetVisitor           = new IRetVisitorForJava();
-  /** Depth First "Ret" visitor class name (with return type and no user object argument) */
-  public static final String        dFRetVisitor          = "DepthFirstRetVisitor";
+//  /** Depth First "Ret" visitor class name (with return type and no user object argument) */
+//  public static final String        dFRetVisitor          = "DepthFirstRetVisitor";
   /** Javadoc comment fragment for "Ret" visitor */
   public static final String        retVisitorCmt         = "Ret";
 
@@ -162,8 +162,8 @@ public class Globals {
   public static VisitorClass        voidArguVisitor;
   /** "VoidArgu" visitor interface name (with no return type and a user object argument) */
   public static final IVisitorClass iVoidArguVisitor      = new IVoidArguVisitorForJava();
-  /** Depth First "VoidArgu" visitor class name (with no return type and a user object argument) */
-  public static final String        dFVoidArguVisitor     = "DepthFirstVoidArguVisitor";
+//  /** Depth First "VoidArgu" visitor class name (with no return type and a user object argument) */
+//  public static final String        dFVoidArguVisitor     = "DepthFirstVoidArguVisitor";
   /** Javadoc comment fragment for "VoidArgu" visitor */
   public static final String        voidArguVisitorCmt    = "VoidArgu";
 
@@ -171,8 +171,8 @@ public class Globals {
   public static VisitorClass        voidVisitor;
   /** "Void" visitor interface name (with no return type and no user object argument)) */
   public static final IVisitorClass iVoidVisitor          = new IVoidVisitorForJava();
-  /** Depth First "Void" visitor class name (with no return type and no user object argument) */
-  public static final String        dFVoidVisitor         = "DepthFirstVoidVisitor";
+//  /** Depth First "Void" visitor class name (with no return type and no user object argument) */
+//  public static final String        dFVoidVisitor         = "DepthFirstVoidVisitor";
   /** Javadoc comment fragment for "Void" visitor */
   public static final String        voidVisitorCmt        = "Void";
 

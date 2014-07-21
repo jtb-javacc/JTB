@@ -5,8 +5,8 @@ package EDU.purdue.jtb.misc;
 public class RetVisitorForCpp extends RetVisitor {
 
   @Override
-  public String getClassName() {
-    return "DepthFirstRetVisitor";
+  public String getOutfileName() {
+    return getClassName() + ".h";
   }
 
 }

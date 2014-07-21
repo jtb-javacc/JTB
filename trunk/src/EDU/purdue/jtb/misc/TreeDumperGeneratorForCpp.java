@@ -276,4 +276,9 @@ public class TreeDumperGeneratorForCpp implements TreeDumperGenerator {
     sb.append("}").append(LS);
     sb.append("#endif").append(LS);
   }
+
+  @Override
+  public String outFilename() {
+    return "TreeDumper.h";
+  }
 }

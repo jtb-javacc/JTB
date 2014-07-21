@@ -54,7 +54,6 @@ package EDU.purdue.jtb.misc;
 
 import static EDU.purdue.jtb.misc.Globals.INDENT_AMT;
 import static EDU.purdue.jtb.misc.Globals.LS;
-import static EDU.purdue.jtb.misc.Globals.dFVoidVisitor;
 import static EDU.purdue.jtb.misc.Globals.genFileHeaderComment;
 import static EDU.purdue.jtb.misc.Globals.iNode;
 import static EDU.purdue.jtb.misc.Globals.iNodeList;
@@ -66,13 +65,13 @@ import static EDU.purdue.jtb.misc.Globals.nodeToken;
 import static EDU.purdue.jtb.misc.Globals.nodesPackageName;
 import static EDU.purdue.jtb.misc.Globals.visitorsDirName;
 import static EDU.purdue.jtb.misc.Globals.visitorsPackageName;
+import static EDU.purdue.jtb.misc.Globals.voidVisitor;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -170,7 +169,7 @@ public class TreeFormatterGenerator {
       .append(LS);
     sb.append(" * in order to \"pretty print\" your tree.").append(LS);
     sb.append(" */").append(LS);
-    sb.append("public class TreeFormatter extends " + dFVoidVisitor + " {").append(LS).append(LS);
+    sb.append("public class TreeFormatter extends " + voidVisitor + " {").append(LS).append(LS);
 
     sb.append("  /** The list of formatting commands */").append(LS);
     sb.append("  private final ArrayList<FormatCommand> cmdQueue = new ArrayList<FormatCommand>();")
@@ -575,4 +574,5 @@ public class TreeFormatterGenerator {
     sb.append("}").append(LS);
 
   }
+
 }

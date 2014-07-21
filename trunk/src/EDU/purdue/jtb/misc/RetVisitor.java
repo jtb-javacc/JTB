@@ -5,6 +5,10 @@ package EDU.purdue.jtb.misc;
 abstract  class RetVisitor implements VisitorClass {
 
   @Override
+  public String getClassName() {
+    return "DepthFirstRetVisitor";
+  }
+  @Override
   public String toString() {
     return getClassName();
   }

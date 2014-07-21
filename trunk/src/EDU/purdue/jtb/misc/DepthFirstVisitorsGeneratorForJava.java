@@ -52,12 +52,7 @@
  */
 package EDU.purdue.jtb.misc;
 
-import static EDU.purdue.jtb.misc.Globals.INDENT_AMT;
 import static EDU.purdue.jtb.misc.Globals.LS;
-import static EDU.purdue.jtb.misc.Globals.dFRetArguVisitor;
-import static EDU.purdue.jtb.misc.Globals.dFRetVisitor;
-import static EDU.purdue.jtb.misc.Globals.dFVoidArguVisitor;
-import static EDU.purdue.jtb.misc.Globals.dFVoidVisitor;
 import static EDU.purdue.jtb.misc.Globals.depthLevel;
 import static EDU.purdue.jtb.misc.Globals.genArguType;
 import static EDU.purdue.jtb.misc.Globals.genArguVar;
@@ -83,12 +78,15 @@ import static EDU.purdue.jtb.misc.Globals.nodeSeq;
 import static EDU.purdue.jtb.misc.Globals.nodeTCF;
 import static EDU.purdue.jtb.misc.Globals.nodeToken;
 import static EDU.purdue.jtb.misc.Globals.nodesPackageName;
+import static EDU.purdue.jtb.misc.Globals.retArguVisitor;
 import static EDU.purdue.jtb.misc.Globals.retArguVisitorCmt;
+import static EDU.purdue.jtb.misc.Globals.retVisitor;
 import static EDU.purdue.jtb.misc.Globals.retVisitorCmt;
 import static EDU.purdue.jtb.misc.Globals.varargs;
-import static EDU.purdue.jtb.misc.Globals.visitorsDirName;
 import static EDU.purdue.jtb.misc.Globals.visitorsPackageName;
+import static EDU.purdue.jtb.misc.Globals.voidArguVisitor;
 import static EDU.purdue.jtb.misc.Globals.voidArguVisitorCmt;
+import static EDU.purdue.jtb.misc.Globals.voidVisitor;
 import static EDU.purdue.jtb.misc.Globals.voidVisitorCmt;
 
 import java.io.BufferedWriter;
@@ -96,7 +94,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -107,7 +104,6 @@ import EDU.purdue.jtb.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.syntaxtree.NodeSequence;
 import EDU.purdue.jtb.syntaxtree.NodeTCF;
 import EDU.purdue.jtb.syntaxtree.NodeToken;
-import EDU.purdue.jtb.visitor.AcceptInliner;
 import EDU.purdue.jtb.visitor.GlobalDataBuilder;
 
 /**
@@ -148,7 +144,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
    */
   @Override
   public void genDepthFirstRetArguVisitorFile() throws FileExistsException {
-    final String outFilename = dFRetArguVisitor + ".java";
+    final String outFilename = retArguVisitor.getOutfileName();
     try {
       final File file = new File(visitorDir, outFilename);
       if (noOverwrite && file.exists())
@@ -169,7 +165,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
    */
   @Override
   public void genDepthFirstRetVisitorFile() throws FileExistsException {
-    final String outFilename = dFRetVisitor + ".java";
+    final String outFilename = retVisitor.getOutfileName();
     try {
       final File file = new File(visitorDir, outFilename);
       if (noOverwrite && file.exists())
@@ -190,7 +186,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
    */
   @Override
   public void genDepthFirstVoidArguVisitorFile() throws FileExistsException {
-    final String outFilename = dFVoidArguVisitor + ".java";
+    final String outFilename = voidArguVisitor.getOutfileName();
     try {
       final File file = new File(visitorDir, outFilename);
       if (noOverwrite && file.exists())
@@ -211,7 +207,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
    */
   @Override
   public void genDepthFirstVoidVisitorFile() throws FileExistsException {
-    final String outFilename = dFVoidVisitor + ".java";
+    final String outFilename = voidVisitor.getOutfileName();
     try {
       final File file = new File(visitorDir, outFilename);
       if (noOverwrite && file.exists())
@@ -236,7 +232,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
    */
   public StringBuilder genDepthFirstRetArguVisitor() {
     buf.setLength(0);
-    buf.append(dFRetArguVisitor).append("<").append(genRetType).append(", ").append(genArguType)
+    buf.append(retArguVisitor).append("<").append(genRetType).append(", ").append(genArguType)
        .append("> implements ").append(iRetArguVisitor).append("<").append(genRetType).append(", ")
        .append(genArguType).append(">");
     final String clDecl = buf.toString();
@@ -255,7 +251,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
    */
   public StringBuilder genDepthFirstRetVisitor() {
     buf.setLength(0);
-    buf.append(dFRetVisitor).append("<").append(genRetType).append("> implements ")
+    buf.append(retVisitor).append("<").append(genRetType).append("> implements ")
        .append(iRetVisitor).append("<").append(genRetType).append(">");
     final String clDecl = buf.toString();
     final String consBeg = genRetType.concat(" visit(final ");
@@ -270,7 +266,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
    */
   public StringBuilder genDepthFirstVoidArguVisitor() {
     buf.setLength(0);
-    buf.append(dFVoidArguVisitor).append("<").append(genArguType).append("> implements ")
+    buf.append(voidArguVisitor).append("<").append(genArguType).append("> implements ")
        .append(iVoidArguVisitor).append("<").append(genArguType).append(">");
     final String clDecl = buf.toString();
     final String consBeg = "void visit(final ";
@@ -287,7 +283,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
    * @return the buffer with the DepthFirstRetArguVisitor class source
    */
   public StringBuilder genDepthFirstVoidVisitor() {
-    final String clDecl = dFVoidVisitor.concat(" implements ").concat(iVoidVisitor.toString());
+    final String clDecl = voidVisitor.toString().concat(" implements ").concat(iVoidVisitor.toString());
     final String consBeg = "void visit(final ";
     final String consEnd = " ".concat(genNodeVar).concat(")");
     return genAnyDepthFirstVisitor(voidVisitorCmt, clDecl, consBeg, consEnd, false, false);

@@ -8,5 +8,9 @@ public class VoidArguVisitorForCpp extends VoidArguVisitor {
   public String getClassName() {
     return "DepthFirstVoidArguVisitor";
   }
+  @Override
+  public String getOutfileName() {
+    return getClassName() + ".h";
+  }
 
 }
