@@ -30,4 +30,8 @@ abstract public class AbstractIVisitorClassForJava extends AbstractIVisitorClass
     return null;
   }
 
+  @Override
+  public String getOutfileName() {
+    return getClassName() + ".java";
+  }
 }

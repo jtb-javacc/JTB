@@ -5,8 +5,8 @@ package EDU.purdue.jtb.misc;
 public class VoidArguVisitorForJava extends VoidArguVisitor {
 
   @Override
-  public String getClassName() {
-    return "DepthFirstVoidArguVisitor";
+  public String getOutfileName() {
+    return getClassName() + ".java";
   }
 
 }

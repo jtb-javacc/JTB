@@ -52,7 +52,7 @@
  */
 package EDU.purdue.jtb;
 
-import static EDU.purdue.jtb.misc.Globals.*;
+import static EDU.purdue.jtb.misc.Globals.DEF_ND_DIR_NAME;
 import static EDU.purdue.jtb.misc.Globals.DEF_ND_PKG_NAME;
 import static EDU.purdue.jtb.misc.Globals.DEF_VIS_DIR_NAME;
 import static EDU.purdue.jtb.misc.Globals.DEF_VIS_PKG_NAME;
@@ -61,10 +61,6 @@ import static EDU.purdue.jtb.misc.Globals.SCRIPT_NAME;
 import static EDU.purdue.jtb.misc.Globals.VERSION;
 import static EDU.purdue.jtb.misc.Globals.astNodesDirName;
 import static EDU.purdue.jtb.misc.Globals.astNodesDirPath;
-import static EDU.purdue.jtb.misc.Globals.dFRetArguVisitor;
-import static EDU.purdue.jtb.misc.Globals.dFRetVisitor;
-import static EDU.purdue.jtb.misc.Globals.dFVoidArguVisitor;
-import static EDU.purdue.jtb.misc.Globals.dFVoidVisitor;
 import static EDU.purdue.jtb.misc.Globals.depthLevel;
 import static EDU.purdue.jtb.misc.Globals.descriptiveFieldNames;
 import static EDU.purdue.jtb.misc.Globals.iRetArguVisitor;
@@ -85,6 +81,8 @@ import static EDU.purdue.jtb.misc.Globals.nodesSuperclass;
 import static EDU.purdue.jtb.misc.Globals.parentPointer;
 import static EDU.purdue.jtb.misc.Globals.printClassList;
 import static EDU.purdue.jtb.misc.Globals.printerToolkit;
+import static EDU.purdue.jtb.misc.Globals.retArguVisitor;
+import static EDU.purdue.jtb.misc.Globals.retVisitor;
 import static EDU.purdue.jtb.misc.Globals.schemeToolkit;
 import static EDU.purdue.jtb.misc.Globals.staticFlag;
 import static EDU.purdue.jtb.misc.Globals.target;
@@ -92,6 +90,8 @@ import static EDU.purdue.jtb.misc.Globals.varargs;
 import static EDU.purdue.jtb.misc.Globals.visitorsDirName;
 import static EDU.purdue.jtb.misc.Globals.visitorsDirPath;
 import static EDU.purdue.jtb.misc.Globals.visitorsPackageName;
+import static EDU.purdue.jtb.misc.Globals.voidArguVisitor;
+import static EDU.purdue.jtb.misc.Globals.voidVisitor;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -296,42 +296,45 @@ public class JTB {
 
       try {
         fg.genRetArguIVisitorFile();
-        System.err.println(progName + ":  Visitor interface \"" + iRetArguVisitor +
-                           ".java\" generated into directory \"" + visitorsDirName + "\".");
+        System.err.println(progName + ":  Visitor interface \"" + iRetArguVisitor.getOutfileName() +
+                           "\" generated into directory \"" + visitorsDirName + "\".");
       }
       catch (final FileExistsException e) {
         System.err.println(progName + ":  \"" + iRetArguVisitor +
-                           "\" already exists.  Won't overwrite.");
+                           " already exists.  Won't overwrite.");
       }
 
+      if (target == Language.java)
       try {
         fg.genVoidIVisitorFile();
-        System.err.println(progName + ":  Visitor interface \"" + iVoidVisitor +
-                           ".java\" generated into directory \"" + visitorsDirName + "\".");
+        System.err.println(progName + ":  Visitor interface \"" + iVoidVisitor.getOutfileName() +
+                           "\" generated into directory \"" + visitorsDirName + "\".");
       }
       catch (final FileExistsException e) {
         System.err.println(progName + ":  \"" + iVoidVisitor +
-                           "\" already exists.  Won't overwrite.");
+                           " already exists.  Won't overwrite.");
       }
 
+      if (target == Language.java)
       try {
         fg.genRetIVisitorFile();
-        System.err.println(progName + ":  Visitor interface \"" + iRetVisitor +
-                           ".java\" generated into directory \"" + visitorsDirName + "\".");
+        System.err.println(progName + ":  Visitor interface \"" + iRetVisitor.getOutfileName() +
+                           "\" generated into directory \"" + visitorsDirName + "\".");
       }
       catch (final FileExistsException e) {
         System.err.println(progName + ":  \"" + iRetVisitor +
-                           "\" already exists.  Won't overwrite.");
+                           " already exists.  Won't overwrite.");
       }
 
+      if (target == Language.java)
       try {
         fg.genVoidArguIVisitorFile();
-        System.err.println(progName + ":  Visitor interface \"" + iVoidArguVisitor +
-                           ".java\" generated into directory \"" + visitorsDirName + "\".");
+        System.err.println(progName + ":  Visitor interface \"" + iVoidArguVisitor.getOutfileName() +
+                           "\" generated into directory \"" + visitorsDirName + "\".");
       }
       catch (final FileExistsException e) {
         System.err.println(progName + ":  \"" + iVoidArguVisitor +
-                           "\" already exists.  Won't overwrite.");
+                           " already exists.  Won't overwrite.");
       }
 
       
@@ -347,42 +350,45 @@ public class JTB {
 
       try {
         dfvg.genDepthFirstRetArguVisitorFile();
-        System.err.println(progName + ":  Visitor class \"" + dFRetArguVisitor +
-                           ".java\" generated into directory \"" + visitorsDirName + "\".");
+        System.err.println(progName + ":  Visitor class \"" + retArguVisitor.getOutfileName() +
+                           "\" generated into directory \"" + visitorsDirName + "\".");
       }
       catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + dFRetArguVisitor +
-                           ".java\" already exists.  Won't overwrite.");
+        System.err.println(progName + ":  \"" + retArguVisitor.getOutfileName() +
+                           " already exists.  Won't overwrite.");
       }
 
+      if (target == Language.java)
       try {
         dfvg.genDepthFirstRetVisitorFile();
-        System.err.println(progName + ":  Visitor class \"" + dFRetVisitor +
-                           ".java\" generated into directory \"" + visitorsDirName + "\".");
+        System.err.println(progName + ":  Visitor class \"" + retVisitor.getOutfileName() +
+                           "\" generated into directory \"" + visitorsDirName + "\".");
       }
       catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + dFRetVisitor +
-                           ".java\" already exists.  Won't overwrite.");
+        System.err.println(progName + ":  \"" + retVisitor.getOutfileName() +
+                           " already exists.  Won't overwrite.");
       }
 
+      if (target == Language.java)
       try {
         dfvg.genDepthFirstVoidArguVisitorFile();
-        System.err.println(progName + ":  Visitor class \"" + dFVoidArguVisitor +
-                           ".java\" generated into directory \"" + visitorsDirName + "\".");
+        System.err.println(progName + ":  Visitor class \"" + voidArguVisitor.getOutfileName() +
+                           "\" generated into directory \"" + visitorsDirName + "\".");
       }
       catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + dFVoidArguVisitor +
-                           ".java\" already exists.  Won't overwrite.");
+        System.err.println(progName + ":  \"" + voidArguVisitor.getOutfileName() +
+                           " already exists.  Won't overwrite.");
       }
 
+      if (target == Language.java)
       try {
         dfvg.genDepthFirstVoidVisitorFile();
-        System.err.println(progName + ":  Visitor class \"" + dFVoidVisitor +
-                           ".java\" generated into directory \"" + visitorsDirName + "\".");
+        System.err.println(progName + ":  Visitor class \"" + voidVisitor.getOutfileName() +
+                           "\" generated into directory \"" + visitorsDirName + "\".");
       }
       catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + dFVoidVisitor +
-                           ".java\" already exists.  Won't overwrite.");
+        System.err.println(progName + ":  \"" + voidVisitor.getOutfileName() +
+                           " already exists.  Won't overwrite.");
       }
 
       System.err.println();
@@ -400,11 +406,11 @@ public class JTB {
         try {
           tdg.generateTreeDumper();
           tdg.saveToFile();
-          System.err.println(progName + ":  Visitor class \"" + TreeDumperGeneratorForJava.outFilename +
+          System.err.println(progName + ":  Visitor class \"" + tdg.outFilename() +
                              "\" generated into directory \"" + visitorsDirName + "\".");
         }
         catch (final FileExistsException e) {
-          System.err.println(progName + ":  \"" + TreeDumperGeneratorForJava.outFilename +
+          System.err.println(progName + ":  \"" + tdg.outFilename() +
                              "\" already exists.  Won't overwrite.");
         }
 

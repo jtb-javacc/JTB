@@ -14,4 +14,5 @@ public interface IVisitorClass {
   String getDefine();
   String getIncludePath();
   String getASTdcl();
+  String getOutfileName();
 }
