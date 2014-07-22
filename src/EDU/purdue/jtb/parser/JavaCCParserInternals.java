@@ -30,6 +30,11 @@ package EDU.purdue.jtb.parser;
 import java.util.Hashtable;
 import java.util.List;
 
+import static EDU.purdue.jtb.misc.Globals.*;
+import static EDU.purdue.jtb.misc.Language.*;
+import EDU.purdue.jtb.misc.Globals;
+import EDU.purdue.jtb.misc.Language;
+
 /**
  * Utilities.
  * 
@@ -87,7 +92,7 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
       add_cu_token_here.add(first_cu_token);
       first_cu_token = first_cu_token.next;
     }
-    if (!insertionpoint1set || !insertionpoint2set) {
+    if ((Globals.target == Language.java) && (!insertionpoint1set || !insertionpoint2set)) {
       JavaCCErrors.parse_error(t,
                                "Parser class has not been defined between PARSER_BEGIN and PARSER_END.");
     }
