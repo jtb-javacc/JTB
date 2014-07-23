@@ -74,9 +74,9 @@ public class Globals {
   /** Turns on / off debugging class comment printing */
   public static final boolean       PRINT_CLASS_COMMENT   = false;
   /** The program version */
-  public static final String        VERSION               = "1.4.9";
+  public static final String        VERSION               = "1.4.7";
   /** The serial uid version */
-  public static final long          SERIAL_UID            = 149;
+  public static final long          SERIAL_UID            = 147;
   /** The java program name */
   public static final String        PROG_NAME             = "JTB";
   /** The shell script name */
@@ -196,7 +196,7 @@ public class Globals {
   public static final String        genDepthLevelVar      = "depthLevel";
 
   /** The JTB result type variables prefix */
-  public static final String        jtbRtPrefix           = "jtbrt_";
+  public static final String        JTBRT_PREFIX           = "jtbrt_";
 
   /*
    * Changeable flags (command line options)
