@@ -415,7 +415,7 @@ public class JavaCCPrinter extends DepthFirstVoidVisitor {
       // #2 ( OptionBinding() )*
       final NodeListOptional nlo = (NodeListOptional) seq.elementAt(2);
       if (nlo.present()) {
-        spc.update(+1);
+        spc.updateSpc(+1);
         oneNewLine(n);
         sb.append(spc.spc);
         for (final Iterator<INode> e = nlo.elements(); e.hasNext();) {
@@ -426,7 +426,7 @@ public class JavaCCPrinter extends DepthFirstVoidVisitor {
             sb.append(spc.spc);
           }
         }
-        spc.update(-1);
+        spc.updateSpc(-1);
         oneNewLine(n);
         sb.append(spc.spc);
       }
@@ -616,12 +616,12 @@ public class JavaCCPrinter extends DepthFirstVoidVisitor {
     // f8 -> "{"
     n.f8.accept(this);
     oneNewLine(n);
-    spc.update(+1);
+    spc.updateSpc(+1);
     sb.append(spc.spc);
     // f9 -> ExpansionChoices()
     n.f9.accept(this);
     oneNewLine(n);
-    spc.update(-1);
+    spc.updateSpc(-1);
     sb.append(spc.spc);
     // f10 -> "}"
     n.f10.accept(this);
@@ -692,7 +692,7 @@ public class JavaCCPrinter extends DepthFirstVoidVisitor {
     oneNewLine(n);
     // f4 -> "{"
     n.f4.accept(this);
-    spc.update(+1);
+    spc.updateSpc(+1);
     oneNewLine(n);
     sb.append(spc.spc);
     // f5 -> RegExprSpec()
@@ -709,7 +709,7 @@ public class JavaCCPrinter extends DepthFirstVoidVisitor {
         seq.elementAt(1).accept(this);
       }
     }
-    spc.update(-1);
+    spc.updateSpc(-1);
     oneNewLine(n);
     sb.append(spc.spc);
     // f7 -> "}"
@@ -774,10 +774,10 @@ public class JavaCCPrinter extends DepthFirstVoidVisitor {
     // f2 -> [  Block() ]
     if (n.f2.present()) {
       oneNewLine(n);
-      spc.update(+1);
+      spc.updateSpc(+1);
       sb.append(spc.spc);
       sb.append(genJavaBranch(n.f2.node));
-      spc.update(-1);
+      spc.updateSpc(-1);
     }
     // f3 -> [ #0 ":" #1 < IDENTIFIER > ]
     if (n.f3.present()) {
@@ -1073,13 +1073,13 @@ public class JavaCCPrinter extends DepthFirstVoidVisitor {
     sb.append(" ");
     //f1 -> "{"
     n.f1.accept(this);
-    spc.update(+1);
+    spc.updateSpc(+1);
     oneNewLine(n);
     sb.append(spc.spc);
     // f2 -> ExpansionChoices()
     n.f2.accept(this);
     sb.append(" ");
-    spc.update(-1);
+    spc.updateSpc(-1);
     // f3 -> "}"
     n.f3.accept(this);
     oneNewLine(n);
