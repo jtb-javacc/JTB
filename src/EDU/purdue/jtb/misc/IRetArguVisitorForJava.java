@@ -19,7 +19,7 @@ public class IRetArguVisitorForJava extends AbstractIVisitorClassForJava {
   }
   @Override
   public String getClassParamType() {
-    return "<".concat(genRetType).concat(",").concat(varargs ? genArgusType : genArguType).concat(">");
+    return "<".concat(genRetType).concat(",").concat(genArguType).concat(">");
   }
   @Override
   public String getClassPrefix() {

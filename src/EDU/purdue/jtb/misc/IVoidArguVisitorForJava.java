@@ -19,7 +19,7 @@ public class IVoidArguVisitorForJava extends AbstractIVisitorClassForJava {
   }
   @Override
   public String getClassParamType() {
-    return "<".concat(varargs ? genArgusType : genArguType).concat(">");
+    return "<".concat(genArguType).concat(">");
   }
   @Override
   public String getClassPrefix() {
