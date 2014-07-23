@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>JTB-svn_java.net</name>
-	<comment>Nature JavaCC</comment>
+	<name>jtb-1.4.7</name>
+	<comment></comment>
 	<projects>
 	</projects>
 	<buildSpec>
@@ -13,6 +13,5 @@
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
-		<nature>sf.eclipse.javacc.javaccnature</nature>
 	</natures>
 </projectDescription>

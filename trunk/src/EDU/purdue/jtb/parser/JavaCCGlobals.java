@@ -86,73 +86,73 @@ public class JavaCCGlobals {
   /**
    * The name of the parser class (what appears in PARSER_BEGIN and PARSER_END).
    */
-  static public String        cu_name;
+  static public String                                                                      cu_name;
 
   /**
    * This is a list of tokens that appear after "PARSER_BEGIN(name)" all the way until (but not
    * including) the opening brace "{" of the class "name".
    */
-  static public List<Token>   cu_to_insertion_point_1   = new ArrayList<Token>();
+  static public List<Token>                                                                 cu_to_insertion_point_1   = new ArrayList<Token>();
 
   /**
    * This is the list of all tokens that appear after the tokens in "cu_to_insertion_point_1" and
    * until (but not including) the closing brace "}" of the class "name".
    */
-  static public List<Token>   cu_to_insertion_point_2   = new ArrayList<Token>();
+  static public List<Token>                                                                 cu_to_insertion_point_2   = new ArrayList<Token>();
 
   /**
    * This is the list of all tokens that appear after the tokens in "cu_to_insertion_point_2" and
    * until "PARSER_END(name)".
    */
-  static public List<Token>  cu_from_insertion_point_2 = new ArrayList<Token>();
+  static public List<Token>                                                                 cu_from_insertion_point_2 = new ArrayList<Token>();
 
   /**
    * A list of all grammar productions - normal and JAVACODE - in the order they appear in the input
    * file. Each entry here will be a subclass of "NormalProduction".
    */
-  static public List<NormalProduction>   bnfproductions            = new ArrayList<NormalProduction>();
+  static public List<NormalProduction>                                                      bnfproductions            = new ArrayList<NormalProduction>();
 
   /**
    * A symbol table of all grammar productions - normal and JAVACODE. The symbol table is indexed by
    * the name of the left hand side non-terminal. Its contents are of type "NormalProduction".
    */
-  static public Map<String, NormalProduction>    production_table          = new HashMap<String, NormalProduction>();
+  static public Map<String, NormalProduction>                                               production_table          = new HashMap<String, NormalProduction>();
 
   /**
    * A mapping of lexical state strings to their integer internal representation. Integers are
    * stored as java.lang.Integer's.
    */
-  static public Hashtable<String, Integer>   lexstate_S2I              = new Hashtable<String, Integer>();
+  static public Hashtable<String, Integer>                                                  lexstate_S2I              = new Hashtable<String, Integer>();
 
   /**
    * A mapping of the internal integer representations of lexical states to their strings. Integers
    * are stored as java.lang.Integer's.
    */
-  static public Hashtable<Integer, String>   lexstate_I2S              = new Hashtable<Integer, String>();
+  static public Hashtable<Integer, String>                                                  lexstate_I2S              = new Hashtable<Integer, String>();
 
   /**
    * The declarations to be inserted into the TokenManager class.
    */
-  static public List<Token>                  token_mgr_decls;
+  static public List<Token>                                                                 token_mgr_decls;
 
   /**
    * The list of all TokenProductions from the input file. This list includes implicit
    * TokenProductions that are created for uses of regular expressions within BNF productions.
    */
-  static public List<TokenProduction>        rexprlist                 = new ArrayList<TokenProduction>();
+  static public List<TokenProduction>                                                       rexprlist                 = new ArrayList<TokenProduction>();
 
   /**
    * The total number of distinct tokens. This is therefore one more than the largest assigned token
    * ordinal.
    */
-  static public int                          tokenCount;
+  static public int                                                                         tokenCount;
 
   /**
    * This is a symbol table that contains all named tokens (those that are defined with a label).
    * The index to the table is the image of the label and the contents of the table are of type
    * "RegularExpression_".
    */
-  static public Map<String, RegularExpression_>   named_tokens_table        = new HashMap<String, RegularExpression_>();
+  static public Map<String, RegularExpression_>                                             named_tokens_table        = new HashMap<String, RegularExpression_>();
 
   /**
    * Contains the same entries as "named_tokens_table", but this is an ordered list which is ordered

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 
-import EDU.purdue.jtb.misc.ClassInfoForJava;
+import EDU.purdue.jtb.misc.ClassInfo;
 import EDU.purdue.jtb.syntaxtree.BNFProduction;
 import EDU.purdue.jtb.syntaxtree.ClassOrInterfaceType;
 import EDU.purdue.jtb.syntaxtree.ComplexRegularExpression;
@@ -43,7 +43,7 @@ import EDU.purdue.jtb.syntaxtree.Type;
  * JavaCodeProductions and BNFProductions for which the node creation has not been forbidden</li>
  * <li>a Hashtable ({@link #tokenHT}) of tokens which have a constant regular expression, e.g. <
  * PLUS : "+" >, which will be used to generate a default constructor,</li>
- * <li>a {@link CommentsPrinter} (to be used by all {@link ClassInfoForJava}.</li>
+ * <li>a {@link CommentsPrinter} (to be used by all {@link ClassInfo}.</li>
  * </ul>
  * 
  * @version 1.4.7 : 09/2012 : MMa : created from the old GlobalDataFinder in Annotator and
