@@ -31,26 +31,15 @@
  */
 package EDU.purdue.jtb.visitor;
 
-import static EDU.purdue.jtb.misc.Globals.getFixedName;
-import static EDU.purdue.jtb.misc.Globals.nodeChoice;
-import static EDU.purdue.jtb.misc.Globals.nodeList;
-import static EDU.purdue.jtb.misc.Globals.nodeListOpt;
-import static EDU.purdue.jtb.misc.Globals.nodeOpt;
-import static EDU.purdue.jtb.misc.Globals.nodeSeq;
-import static EDU.purdue.jtb.misc.Globals.nodeTCF;
-import static EDU.purdue.jtb.misc.Globals.nodeToken;
+import static EDU.purdue.jtb.misc.Globals.*;
 import static EDU.purdue.jtb.visitor.GlobalDataBuilder.DONT_CREATE_NODE_STR;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import EDU.purdue.jtb.misc.ClassInfo;
-import EDU.purdue.jtb.misc.ClassInfoForCpp;
 import EDU.purdue.jtb.misc.FieldNameGenerator;
-import EDU.purdue.jtb.misc.Globals;
 import EDU.purdue.jtb.misc.JavaBranchPrinter;
-import EDU.purdue.jtb.misc.ClassInfoForJava;
 import EDU.purdue.jtb.misc.Messages;
 import EDU.purdue.jtb.syntaxtree.BNFProduction;
 import EDU.purdue.jtb.syntaxtree.Expansion;
@@ -71,10 +60,10 @@ import EDU.purdue.jtb.syntaxtree.RegularExpression;
 import EDU.purdue.jtb.syntaxtree.TokenManagerDecls;
 
 /**
- * The {@link ClassesFinder} visitor creates a list of {@link ClassInfoForJava} objects describing every
+ * The {@link ClassesFinder} visitor creates a list of {@link ClassInfo} objects describing every
  * class to be generated.
  * <p>
- * {@link AnnotatorForJava}, {@link CommentsPrinter} and {@link ClassesFinder} depend on each other to
+ * {@link Annotator}, {@link CommentsPrinter} and {@link ClassesFinder} depend on each other to
  * create and use classes.
  * <p>
  * Programming note: we do not continue down the tree once a new field has been added to curClass,
@@ -99,7 +88,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
   /** The current generated class */
   private ClassInfo                  ci;
   /** The list of generated classes */
-  private final List<ClassInfo> ciList = new ArrayList<ClassInfo>();
+  private final ArrayList<ClassInfo> ciList = new ArrayList<ClassInfo>();
   /** The field names generator (descriptive or not, depending on -f option) */
   private final FieldNameGenerator   gen    = new FieldNameGenerator();
   /** Global variable to pass IdentifierAsString info between methods (as they are recursive) */
@@ -125,7 +114,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    * 
    * @return the class list
    */
-  public List<ClassInfo> getClassList() {
+  public ArrayList<ClassInfo> getClassList() {
     return ciList;
   }
 
@@ -200,14 +189,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
     gen.reset();
     // f5 -> [ "!" ]
     // generate the class even if the node generation is not requested
-    switch(Globals.target) {
-      case java:
-        ci = new ClassInfoForJava(n.f9, n.f2.f0.tokenImage, gdbv);
-        break;
-      case cpp:
-        ci = new ClassInfoForCpp(n.f9, n.f2.f0.tokenImage, gdbv);
-        break;
-    }
+    ci = new ClassInfo(n.f9, n.f2.f0.tokenImage, gdbv);
     ciList.add(ci);
     // f9 -> ExpansionChoices()
     n.f9.accept(this);
@@ -270,7 +252,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
       // f0 -> Expansion()
       n.f0.accept(this);
     else {
-      ci.addField(nodeChoice.getName(), gen.genFieldName(nodeChoice.getName()));
+      ci.addField(nodeChoice, gen.genFieldName(nodeChoice));
     }
   }
 
@@ -340,7 +322,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
 
       case 2:
         // %2 #0 "[" #1 ExpansionChoices() #2 "]"
-        ci.addField(nodeOpt.getName(), gen.genFieldName(nodeOpt.getName()));
+        ci.addField(nodeOpt, gen.genFieldName(nodeOpt));
         return;
 
       case 3:
@@ -386,10 +368,10 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
         } else {
           if (((ExpansionChoices) seq.elementAt(1)).f1.present()) {
             // f1 -> ( "|" Expansion() )*
-            ci.addField(nodeChoice.getName(), gen.genFieldName(nodeChoice.getName()));
+            ci.addField(nodeChoice, gen.genFieldName(nodeChoice));
           } else {
             // f0 -> Expansion()
-            ci.addField(nodeSeq.getName(), gen.genFieldName(nodeSeq.getName()));
+            ci.addField(nodeSeq, gen.genFieldName(nodeSeq));
           }
         }
         return;
@@ -418,46 +400,46 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
     INode inode;
     final String newNodeTCF = "new " + nodeTCF;
     // f0 -> "try"
-    ci.addField(nodeTCF.getName(), gen.genFieldName(nodeTCF.getName()), newNodeTCF + "(\"try\")", null);
+    ci.addField(nodeTCF, gen.genFieldName(nodeTCF), newNodeTCF + "(\"try\")", null);
     // f1 -> "{"
-    ci.addField(nodeTCF.getName(), gen.genFieldName(nodeTCF.getName()), newNodeTCF + "(\"{\")", null);
+    ci.addField(nodeTCF, gen.genFieldName(nodeTCF), newNodeTCF + "(\"{\")", null);
     // f2 -> ExpansionChoices()
     n.f2.accept(this);
     // f3 -> "}"
-    ci.addField(nodeTCF.getName(), gen.genFieldName(nodeTCF.getName()), newNodeTCF + "(\"}\")", null);
+    ci.addField(nodeTCF, gen.genFieldName(nodeTCF), newNodeTCF + "(\"}\")", null);
 
     // f4 -> ( #0 "catch" #1 "(" #2 Name() #3 < IDENTIFIER > #4 ")" #5 Block() )*
     if (n.f4.present()) {
       for (int i = 0; i < n.f4.size(); i++) {
         // #0 "catch"
-        ci.addField(nodeTCF.getName(), gen.genFieldName(nodeTCF.getName()), newNodeTCF + "(\"catch\")", null);
+        ci.addField(nodeTCF, gen.genFieldName(nodeTCF), newNodeTCF + "(\"catch\")", null);
         // #1 "("
-        ci.addField(nodeTCF.getName(), gen.genFieldName(nodeTCF.getName()), newNodeTCF + "(\"(\")", null);
+        ci.addField(nodeTCF, gen.genFieldName(nodeTCF), newNodeTCF + "(\"(\")", null);
         // #2 Name()
         inode = ((NodeSequence) n.f4.elementAt(i)).elementAt(2);
         fmtStr = newNodeTCF + "(\"" + fmtJavaNodeCode(inode) + "\")";
-        ci.addField(nodeTCF.getName(), gen.genFieldName(nodeTCF.getName()), fmtStr, bareJavaNodeCode(inode));
+        ci.addField(nodeTCF, gen.genFieldName(nodeTCF), fmtStr, bareJavaNodeCode(inode));
         // #3 < IDENTIFIER >
         inode = ((NodeSequence) n.f4.elementAt(i)).elementAt(3);
         fmtStr = newNodeTCF + "(\"" + fmtJavaNodeCode(inode) + "\")";
-        ci.addField(nodeTCF.getName(), gen.genFieldName(nodeTCF.getName()), fmtStr, bareJavaNodeCode(inode));
+        ci.addField(nodeTCF, gen.genFieldName(nodeTCF), fmtStr, bareJavaNodeCode(inode));
         // #4 ")"
-        ci.addField(nodeTCF.getName(), gen.genFieldName(nodeTCF.getName()), newNodeTCF + "(\")\")", null);
+        ci.addField(nodeTCF, gen.genFieldName(nodeTCF), newNodeTCF + "(\")\")", null);
         // #5 Block()
         inode = ((NodeSequence) n.f4.elementAt(i)).elementAt(5);
         fmtStr = newNodeTCF + "(\"" + fmtJavaNodeCode(inode) + "\")";
-        ci.addField(nodeTCF.getName(), gen.genFieldName(nodeTCF.getName()), fmtStr, bareJavaNodeCode(inode));
+        ci.addField(nodeTCF, gen.genFieldName(nodeTCF), fmtStr, bareJavaNodeCode(inode));
       }
     }
 
     // f5 -> [ #0 "finally" #1 Block() ]
     if (n.f5.present()) {
       // #0 "finally"
-      ci.addField(nodeTCF.getName(), gen.genFieldName(nodeTCF.getName()), newNodeTCF + "(\"finally\")", null);
+      ci.addField(nodeTCF, gen.genFieldName(nodeTCF), newNodeTCF + "(\"finally\")", null);
       // #1 Block()
       inode = ((NodeSequence) n.f5.node).elementAt(1);
       fmtStr = newNodeTCF + "(\"" + fmtJavaNodeCode(inode) + "\")";
-      ci.addField(nodeTCF.getName(), gen.genFieldName(nodeTCF.getName()), fmtStr, bareJavaNodeCode(inode));
+      ci.addField(nodeTCF, gen.genFieldName(nodeTCF), fmtStr, bareJavaNodeCode(inode));
     }
   }
 
@@ -469,11 +451,11 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    */
   private String getNodeNameForMod(final int mod) {
     if (mod == 0)
-      return nodeList.getName();
+      return nodeList;
     else if (mod == 1)
-      return nodeListOpt.getName();
+      return nodeListOpt;
     else if (mod == 2)
-      return nodeOpt.getName();
+      return nodeOpt;
     else {
       Messages.hardErr("Illegal EBNF modifier in " + "ExpansionUnit: mod = " + mod);
       return "";
@@ -533,7 +515,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
       default:
         Messages.hardErr("Unreachable code executed!");
     }
-    ci.addField(nodeToken.getName(), gen.genFieldName(nodeToken.getName()));
+    ci.addField(nodeToken, gen.genFieldName(nodeToken));
   }
 
   /**
@@ -606,8 +588,8 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
   /** Indentation spaces, EndOfString (escaped double quotes) */
   public static String spacesEos;
   static {
-    final StringBuilder res = new StringBuilder(nodeTCF.getName().length() + 21);
-    for (int j = 0; j < nodeTCF.getName().length(); j++)
+    final StringBuilder res = new StringBuilder(nodeTCF.length() + 21);
+    for (int j = 0; j < nodeTCF.length(); j++)
       res.append(" ");
     res.append("                    \"");
     spacesEos = res.toString();

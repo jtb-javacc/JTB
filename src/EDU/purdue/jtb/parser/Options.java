@@ -27,32 +27,13 @@
  */
 package EDU.purdue.jtb.parser;
 
-import static EDU.purdue.jtb.misc.Globals.DEF_OUT_FILE_NAME;
-import static EDU.purdue.jtb.misc.Globals.astNodesDirName;
-import static EDU.purdue.jtb.misc.Globals.depthLevel;
-import static EDU.purdue.jtb.misc.Globals.descriptiveFieldNames;
-import static EDU.purdue.jtb.misc.Globals.inlineAcceptMethods;
-import static EDU.purdue.jtb.misc.Globals.javaDocComments;
-import static EDU.purdue.jtb.misc.Globals.keepSpecialTokens;
-import static EDU.purdue.jtb.misc.Globals.noOverwrite;
-import static EDU.purdue.jtb.misc.Globals.noSemanticCheck;
-import static EDU.purdue.jtb.misc.Globals.nodePrefix;
-import static EDU.purdue.jtb.misc.Globals.nodeSuffix;
-import static EDU.purdue.jtb.misc.Globals.nodesPackageName;
-import static EDU.purdue.jtb.misc.Globals.parentPointer;
-import static EDU.purdue.jtb.misc.Globals.printClassList;
-import static EDU.purdue.jtb.misc.Globals.printerToolkit;
-import static EDU.purdue.jtb.misc.Globals.schemeToolkit;
-import static EDU.purdue.jtb.misc.Globals.visitorsDirName;
-import static EDU.purdue.jtb.misc.Globals.visitorsPackageName;
+import static EDU.purdue.jtb.misc.Globals.*;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import EDU.purdue.jtb.misc.Language;
 
 /**
  * A class with static state that stores all option information.
@@ -162,8 +143,6 @@ public class Options {
     optionValues.put("NODE_SUFFIX", "");
     optionValues.put("OTHER_AMBIGUITY_CHECK", new Integer(1));
     optionValues.put("OUTPUT_DIRECTORY", ".");
-    optionValues.put("OUTPUT_LANGUAGE", "java");
-    optionValues.put("NAMESPACE", "AST");
     optionValues.put("SANITY_CHECK", Boolean.TRUE);
     optionValues.put("STATIC", Boolean.TRUE);
     optionValues.put("SUPPORT_CLASS_VISIBILITY_PUBLIC", Boolean.TRUE);
@@ -190,7 +169,7 @@ public class Options {
     if (optionValues.get("JTB_JD") == null)
       optionValues.put("JTB_JD", new Boolean(javaDocComments));
     if (optionValues.get("JTB_ND") == null)
-      optionValues.put("JTB_ND", astNodesDirName);
+      optionValues.put("JTB_ND", nodesDirName);
     if (optionValues.get("JTB_NP") == null)
       optionValues.put("JTB_NP", nodesPackageName);
     if (optionValues.get("JTB_NPFX") == null)
@@ -607,15 +586,6 @@ public class Options {
    */
   public static File getOutputDirectory() {
     return new File(stringValue("OUTPUT_DIRECTORY"));
-  }
-
-  /**
-   * Find the output directory.
-   * 
-   * @return The requested output directory.
-   */
-  public static Language getOutputLanguage() {
-    return Language.valueOf(stringValue("OUTPUT_LANGUAGE"));
   }
 
   /**

@@ -187,6 +187,29 @@ public class JavaCCPrinter extends DepthFirstVoidVisitor {
     this(null, aSPC);
   }
 
+  /**
+   * Saves the current buffer to an output file.
+   * 
+   * @param outFile - the output file
+   * @throws FileExistsException - if the file exists and the noOverwrite flag is set
+   */
+  public void saveToFile(final String outFile) throws FileExistsException {
+    try {
+      final File file = new File(outFile);
+      if (noOverwrite && file.exists())
+        throw new FileExistsException(outFile);
+      else {
+        final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file),
+                                                                   sb.length()));
+        out.print(sb);
+        out.close();
+      }
+    }
+    catch (final IOException e) {
+      Messages.hardErr(e);
+    }
+  }
+
   /*
    * Base classes visit methods
    */
