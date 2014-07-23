@@ -76,7 +76,7 @@ public class Spacing {
   public Spacing(final int indentAmt, final int aIndentLevel) {
     this(indentAmt);
     if (aIndentLevel > 0) {
-      update(aIndentLevel);
+      updateSpc(aIndentLevel);
     }
   }
 
@@ -101,7 +101,7 @@ public class Spacing {
    * 
    * @param numIndentLvls - the (positive or negative) indentation level delta.
    */
-  public void update(final int numIndentLvls) {
+  public void updateSpc(final int numIndentLvls) {
     indentLevel += numIndentLvls;
     if (indentLevel < 0)
       indentLevel = 0;
