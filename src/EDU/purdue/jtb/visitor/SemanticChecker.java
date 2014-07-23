@@ -52,15 +52,7 @@
  */
 package EDU.purdue.jtb.visitor;
 
-import static EDU.purdue.jtb.misc.Globals.iNode;
-import static EDU.purdue.jtb.misc.Globals.iNodeList;
-import static EDU.purdue.jtb.misc.Globals.jtbRtPrefix;
-import static EDU.purdue.jtb.misc.Globals.nodeChoice;
-import static EDU.purdue.jtb.misc.Globals.nodeList;
-import static EDU.purdue.jtb.misc.Globals.nodeListOpt;
-import static EDU.purdue.jtb.misc.Globals.nodeOpt;
-import static EDU.purdue.jtb.misc.Globals.nodeSeq;
-import static EDU.purdue.jtb.misc.Globals.nodeToken;
+import static EDU.purdue.jtb.misc.Globals.*;
 import static EDU.purdue.jtb.visitor.GlobalDataBuilder.DONT_CREATE_NODE_STR;
 
 import java.util.Iterator;

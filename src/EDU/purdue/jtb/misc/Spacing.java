@@ -29,7 +29,6 @@
 package EDU.purdue.jtb.misc;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Class Spacing manages the indentation information for pretty printing.
@@ -47,7 +46,7 @@ public class Spacing {
   /** The indentation level */
   public int                      indentLevel = 0;
   /** The internal list of indentation strings for the indentation levels */
-  private final List<String> str;
+  private final ArrayList<String> str;
 
   /**
    * Constructor.

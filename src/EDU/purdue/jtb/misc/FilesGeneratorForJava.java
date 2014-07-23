@@ -375,9 +375,11 @@ public class FilesGeneratorForJava extends AbstractFilesGenerator {
   void genAnyIVisitorBeg(final StringBuilder aSb, final String aComment, final IVisitorClass aIntf,
                          final boolean aRet, final boolean aArgu) {
     aSb.append(genFileHeaderComment()).append(LS);
+    if (Globals.target == Language.java) {
     aSb.append("package ").append(visitorsPackageName).append(";").append(LS).append(LS);
     if (!visitorsPackageName.equals(nodesPackageName))
       aSb.append("import ").append(nodesPackageName).append(".*;").append(LS).append(LS);
+    }
     if (javaDocComments) {
       aSb.append("/**").append(LS);
       aSb.append(" * All \"").append(aComment).append("\" visitors must implement this interface.")
@@ -388,7 +390,14 @@ public class FilesGeneratorForJava extends AbstractFilesGenerator {
         aSb.append(" * @param <A> - The user argument type").append(LS);
       aSb.append(" */").append(LS);
     }
-    aSb.append("public interface ").append(aIntf).append(aIntf.getClassParamType()).append(" {").append(LS);
+    switch(Globals.target) {
+      case java:
+        aSb.append("public interface ").append(aIntf).append(" {").append(LS);
+        break;
+      case cpp:
+        aSb.append("public ").append(aIntf).append(" {").append(LS);
+       break;
+    }
   }
 
   /**
