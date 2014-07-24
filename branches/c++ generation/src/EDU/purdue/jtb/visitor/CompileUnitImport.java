@@ -195,7 +195,7 @@ class CompilationUnitPrinter extends JavaPrinter {
     // add return variables declarations
     final int rvds = gdbv.getRetVarDecl().size();
     if (rvds > 0) {
-      spc.update(+1);
+      spc.updateSpc(+1);
       twoNewLines(n);
       sb.append(spc.spc);
       sb.append("/*");
@@ -220,11 +220,11 @@ class CompilationUnitPrinter extends JavaPrinter {
         }
       }
       gdbv.getRetVarDecl().clear();
-      spc.update(-1);
+      spc.updateSpc(-1);
     }
     // f1 -> ( ClassOrInterfaceBodyDeclaration() )*
     if (n.f1.present()) {
-      spc.update(+1);
+      spc.updateSpc(+1);
       twoNewLines(n);
       sb.append(spc.spc);
       for (final Iterator<INode> e = n.f1.elements(); e.hasNext();) {
@@ -235,7 +235,7 @@ class CompilationUnitPrinter extends JavaPrinter {
           sb.append(spc.spc);
         }
       }
-      spc.update(-1);
+      spc.updateSpc(-1);
     }
     sb.append(spc.spc);
     // f2 -> "}"
