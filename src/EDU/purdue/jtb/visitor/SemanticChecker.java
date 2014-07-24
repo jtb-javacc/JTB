@@ -54,7 +54,7 @@ package EDU.purdue.jtb.visitor;
 
 import static EDU.purdue.jtb.misc.Globals.iNode;
 import static EDU.purdue.jtb.misc.Globals.iNodeList;
-import static EDU.purdue.jtb.misc.Globals.jtbRtPrefix;
+import static EDU.purdue.jtb.misc.Globals.JTBRT_PREFIX;
 import static EDU.purdue.jtb.misc.Globals.nodeChoice;
 import static EDU.purdue.jtb.misc.Globals.nodeList;
 import static EDU.purdue.jtb.misc.Globals.nodeListOpt;
@@ -469,10 +469,10 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
       if (!resType.equals(ident))
         Messages.warning("Non 'void' BNF production. Result type '" + resType +
                          "' will be changed into '" + ident + "', and a parser class variable '" +
-                         jtbRtPrefix + ident + "' of type '" + resType +
+                         JTBRT_PREFIX + ident + "' of type '" + resType +
                          "' will be added to hold the return values.", tk.beginLine, tk.beginColumn);
       else
-        Messages.info("A parser class variable '" + jtbRtPrefix + ident + "' of type '" + resType +
+        Messages.info("A parser class variable '" + JTBRT_PREFIX + ident + "' of type '" + resType +
                       "' will be added to hold the return values.", tk.beginLine, tk.beginColumn);
     }
     // f7 -> Block()
