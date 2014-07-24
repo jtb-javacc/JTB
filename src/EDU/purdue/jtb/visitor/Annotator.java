@@ -61,6 +61,7 @@ import java.util.Iterator;
 import EDU.purdue.jtb.misc.Messages;
 import EDU.purdue.jtb.misc.Spacing;
 import EDU.purdue.jtb.misc.VarInfo;
+import EDU.purdue.jtb.misc.VarInfoFactory;
 import EDU.purdue.jtb.syntaxtree.BNFProduction;
 import EDU.purdue.jtb.syntaxtree.Block;
 import EDU.purdue.jtb.syntaxtree.BlockStatement;
@@ -631,7 +632,8 @@ public class Annotator extends JavaCCPrinter {
       n.f0.accept(this);
     else {
       final String name = genNewVarName();
-      final VarInfo varInfo = new VarInfo(nodeChoice, name, "null");
+//      final VarInfo varInfo = new VarInfo(nodeChoice, name, "null");
+      final VarInfo varInfo = VarInfoFactory.newVarInfo(nodeChoice, name, "null");
       varList.add(varInfo);
       genExpChWithChoices(n, name);
       finalActions(varInfo);
@@ -749,7 +751,7 @@ public class Annotator extends JavaCCPrinter {
         annotateNode = true;
       } else {
         final String name = genNewVarName();
-        final VarInfo varInfo = new VarInfo(nodeSeq, name, "null");
+        final VarInfo varInfo = VarInfoFactory.newVarInfo(nodeSeq, name, "null");
         varList.add(varInfo);
         genExpSequence(n, name);
         prevVar = varInfo;
@@ -913,7 +915,10 @@ public class Annotator extends JavaCCPrinter {
           VarInfo varInfo = null;
           if (creLocNode) {
             name = genNewVarName();
-            varInfo = inEUT3 ? new VarInfo(ident, name, "null") : new VarInfo(ident, name);
+            if (inEUT3) 
+              varInfo = VarInfoFactory.newVarInfo(ident, name, "null");
+            else
+              varInfo = VarInfoFactory.newVarInfo(ident, name);
             varList.add(varInfo);
             sb.append(name);
             sb.append(" = ");
@@ -938,7 +943,7 @@ public class Annotator extends JavaCCPrinter {
             seq2.elementAt(1).accept(this);
             sb.append(" ");
             // IdentifierAsString() -> jtbrt_Identifier
-            sb.append(jtbRtPrefix).append(ident);
+            sb.append(JTBRT_PREFIX).append(ident);
             sb.append("; }");
             oneNewLine(n, "4b");
             sb.append(spc.spc);
@@ -1190,8 +1195,11 @@ public class Annotator extends JavaCCPrinter {
                            tk.beginLine, tk.beginColumn);
         }
         name = genNewVarName();
-        final VarInfo varInfo = inEUT3 ? new VarInfo(nodeSeq, name, "null") : new VarInfo(nodeSeq,
-                                                                                          name);
+        final VarInfo varInfo;
+        if (inEUT3)
+          varInfo = VarInfoFactory.newVarInfo(nodeSeq, name, "null");
+        else
+          varInfo = VarInfoFactory.newVarInfo(nodeSeq, name);
         varList.add(varInfo);
         genExpSequence(ec.f0, name);
         finalActions(varInfo);
@@ -1335,24 +1343,48 @@ public class Annotator extends JavaCCPrinter {
    * @param initialize - the need to initialize flag
    * @return the new VarInfo object
    */
+//  VarInfo creNewVarInfoForMod(final NodeChoice modifier, final String varName,
+//                              final boolean initialize) {
+//    if (initialize) {
+//      if (modifier.which == 0) // "+"
+//        return new VarInfo(nodeList, varName, "new ".concat(nodeList).concat("()"));
+//      else if (modifier.which == 1) // "*"
+//        return new VarInfo(nodeListOpt, varName, "new ".concat(nodeListOpt).concat("()"));
+//      else if (modifier.which == 2) // "?"
+//        return new VarInfo(nodeOpt, varName, "new ".concat(nodeOpt).concat("()"));
+//      else
+//        Messages.hardErr("Illegal BNF modifier: '" + modifier.choice.toString() + "'.");
+//    } else {
+//      if (modifier.which == 0) // "+"
+//        return new VarInfo(nodeList, varName);
+//      else if (modifier.which == 1) // "*"
+//        return new VarInfo(nodeListOpt, varName);
+//      else if (modifier.which == 2) // "?"
+//        return new VarInfo(nodeOpt, varName);
+//      else
+//        Messages.hardErr("Illegal BNF modifier: '" + modifier.choice.toString() + "'.");
+//    }
+//    return null; // shouldn't happen
+//  }
   VarInfo creNewVarInfoForMod(final NodeChoice modifier, final String varName,
                               final boolean initialize) {
     if (initialize) {
       if (modifier.which == 0) // "+"
-        return new VarInfo(nodeList, varName, "new ".concat(nodeList).concat("()"));
+        return VarInfoFactory.newVarInfo(nodeList, varName, "new ".concat(nodeList.getQualifiedName()).concat("()"));
       else if (modifier.which == 1) // "*"
-        return new VarInfo(nodeListOpt, varName, "new ".concat(nodeListOpt).concat("()"));
+        return VarInfoFactory.newVarInfo(nodeListOpt, varName, "new ".concat(nodeListOpt.getQualifiedName())
+                                                       .concat("()"));
       else if (modifier.which == 2) // "?"
-        return new VarInfo(nodeOpt, varName, "new ".concat(nodeOpt).concat("()"));
+        return VarInfoFactory.newVarInfo(nodeOpt, varName, "new ".concat(nodeOpt.getQualifiedName()).concat("()"));
       else
         Messages.hardErr("Illegal BNF modifier: '" + modifier.choice.toString() + "'.");
     } else {
       if (modifier.which == 0) // "+"
-        return new VarInfo(nodeList, varName);
+        return VarInfoFactory.newVarInfo(nodeList, varName);
       else if (modifier.which == 1) // "*"
-        return new VarInfo(nodeListOpt, varName);
+        return VarInfoFactory.newVarInfo(nodeListOpt, varName);
       else if (modifier.which == 2) // "?"
-        return new VarInfo(nodeOpt, varName);
+        return VarInfoFactory.newVarInfo(nodeOpt, varName);
       else
         Messages.hardErr("Illegal BNF modifier: '" + modifier.choice.toString() + "'.");
     }
@@ -1366,11 +1398,18 @@ public class Annotator extends JavaCCPrinter {
    * @param initializer - the initializer presence flag
    * @return the new VarInfo object
    */
+//  VarInfo creNewVarInfoForBracket(final String varName, final boolean initializer) {
+//    if (initializer) {
+//      return new VarInfo(nodeOpt, varName, "new ".concat(nodeOpt).concat("()"));
+//    } else {
+//      return new VarInfo(nodeOpt, varName);
+//    }
+//  }
   VarInfo creNewVarInfoForBracket(final String varName, final boolean initializer) {
     if (initializer) {
-      return new VarInfo(nodeOpt, varName, "new ".concat(nodeOpt).concat("()"));
+      return VarInfoFactory.newVarInfo(nodeOpt, varName, "new ".concat(nodeOpt.getQualifiedName()).concat("()"));
     } else {
-      return new VarInfo(nodeOpt, varName);
+      return VarInfoFactory.newVarInfo(nodeOpt, varName);
     }
   }
 
@@ -1407,8 +1446,8 @@ public class Annotator extends JavaCCPrinter {
     if (creThisNode) {
       nodeName = genNewVarName();
       reTokenName = genNewVarName();
-      nodeTokenInfo = new VarInfo(nodeToken, nodeName);
-      final VarInfo tokenNameInfo = new VarInfo(jjToken, reTokenName);
+      nodeTokenInfo = VarInfoFactory.newVarInfo(nodeToken, nodeName);
+      final VarInfo tokenNameInfo =VarInfoFactory.newVarInfo(jjToken, reTokenName);
       varList.add(nodeTokenInfo);
       varList.add(tokenNameInfo);
       sb.append(reTokenName);
@@ -2011,7 +2050,7 @@ public class Annotator extends JavaCCPrinter {
       // change return statement only if something to return,
       // otherwise do not generate anything (for example for void productions)
       if (n.f1.present()) {
-        sb.append(jtbRtPrefix).append(getFixedName(curProduction)).append(" = ");
+        sb.append(JTBRT_PREFIX).append(getFixedName(curProduction)).append(" = ");
         // f1 -> [ Expression() ]
         sb.append(genJavaBranch(n.f1));
         // f2 -> ";"
