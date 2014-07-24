@@ -5,6 +5,10 @@ package EDU.purdue.jtb.misc;
 abstract class VoidVisitor implements VisitorClass {
 
    @Override
+   public String getClassName() {
+     return "DepthFirstVoidVisitor";
+   }
+  @Override
   public String toString() {
      return getClassName();
    }

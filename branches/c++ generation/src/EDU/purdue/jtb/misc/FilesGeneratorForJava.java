@@ -145,7 +145,7 @@ public class FilesGeneratorForJava extends AbstractFilesGenerator {
       final String className = classInfo.getClassName();
 
       sb.append("class ").append(className).append(":").append(LS);
-      spc.update(+1);
+      spc.updateSpc(+1);
 
       final Iterator<String> types = classInfo.getFieldTypes().iterator();
       final Iterator<String> names = classInfo.getFieldNames().iterator();
@@ -154,7 +154,7 @@ public class FilesGeneratorForJava extends AbstractFilesGenerator {
         sb.append(spc.spc).append(types.next()).append(" ").append(names.next()).append(LS);
 
       sb.append(LS);
-      spc.update(-1);
+      spc.updateSpc(-1);
     }
     return sb;
   }
@@ -375,11 +375,9 @@ public class FilesGeneratorForJava extends AbstractFilesGenerator {
   void genAnyIVisitorBeg(final StringBuilder aSb, final String aComment, final IVisitorClass aIntf,
                          final boolean aRet, final boolean aArgu) {
     aSb.append(genFileHeaderComment()).append(LS);
-    if (Globals.target == Language.java) {
     aSb.append("package ").append(visitorsPackageName).append(";").append(LS).append(LS);
     if (!visitorsPackageName.equals(nodesPackageName))
       aSb.append("import ").append(nodesPackageName).append(".*;").append(LS).append(LS);
-    }
     if (javaDocComments) {
       aSb.append("/**").append(LS);
       aSb.append(" * All \"").append(aComment).append("\" visitors must implement this interface.")
@@ -390,14 +388,7 @@ public class FilesGeneratorForJava extends AbstractFilesGenerator {
         aSb.append(" * @param <A> - The user argument type").append(LS);
       aSb.append(" */").append(LS);
     }
-    switch(Globals.target) {
-      case java:
-        aSb.append("public interface ").append(aIntf).append(" {").append(LS);
-        break;
-      case cpp:
-        aSb.append("public ").append(aIntf).append(" {").append(LS);
-       break;
-    }
+    aSb.append("public interface ").append(aIntf).append(aIntf.getClassParamType()).append(" {").append(LS);
   }
 
   /**
@@ -412,7 +403,7 @@ public class FilesGeneratorForJava extends AbstractFilesGenerator {
   void genAnyIVisitorEnd(final StringBuilder aSb, final String aConsBeg, final String aConsEnd,
                          final boolean aRet, final boolean aArgu) {
     final Spacing spc = new Spacing(INDENT_AMT);
-    spc.update(+1);
+    spc.updateSpc(+1);
     if (javaDocComments) {
       aSb.append(spc.spc).append("/*").append(LS);
       aSb.append(spc.spc).append(" * User grammar generated visit methods").append(LS);
@@ -439,7 +430,7 @@ public class FilesGeneratorForJava extends AbstractFilesGenerator {
       aSb.append(spc.spc).append("public ").append(aConsBeg).append(className).append(aConsEnd)
          .append(";").append(LS).append(LS);
     }
-    spc.update(-1);
+    spc.updateSpc(-1);
     aSb.append("}").append(LS);
   }
 

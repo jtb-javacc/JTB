@@ -54,59 +54,27 @@ package EDU.purdue.jtb.misc;
 
 import static EDU.purdue.jtb.misc.Globals.INDENT_AMT;
 import static EDU.purdue.jtb.misc.Globals.LS;
-import static EDU.purdue.jtb.misc.Globals.dFRetArguVisitor;
-import static EDU.purdue.jtb.misc.Globals.dFRetVisitor;
-import static EDU.purdue.jtb.misc.Globals.dFVoidArguVisitor;
-import static EDU.purdue.jtb.misc.Globals.dFVoidVisitor;
 import static EDU.purdue.jtb.misc.Globals.depthLevel;
 import static EDU.purdue.jtb.misc.Globals.genArguType;
 import static EDU.purdue.jtb.misc.Globals.genArguVar;
 import static EDU.purdue.jtb.misc.Globals.genArgusType;
 import static EDU.purdue.jtb.misc.Globals.genDepthLevelVar;
-import static EDU.purdue.jtb.misc.Globals.genFileHeaderComment;
 import static EDU.purdue.jtb.misc.Globals.genNodeVar;
 import static EDU.purdue.jtb.misc.Globals.genRetType;
 import static EDU.purdue.jtb.misc.Globals.genRetVar;
 import static EDU.purdue.jtb.misc.Globals.iNode;
-import static EDU.purdue.jtb.misc.Globals.iRetArguVisitor;
-import static EDU.purdue.jtb.misc.Globals.iRetVisitor;
-import static EDU.purdue.jtb.misc.Globals.iVoidArguVisitor;
-import static EDU.purdue.jtb.misc.Globals.iVoidVisitor;
 import static EDU.purdue.jtb.misc.Globals.inlineAcceptMethods;
 import static EDU.purdue.jtb.misc.Globals.javaDocComments;
-import static EDU.purdue.jtb.misc.Globals.noOverwrite;
-import static EDU.purdue.jtb.misc.Globals.nodeChoice;
 import static EDU.purdue.jtb.misc.Globals.nodeList;
-import static EDU.purdue.jtb.misc.Globals.nodeListOpt;
-import static EDU.purdue.jtb.misc.Globals.nodeOpt;
 import static EDU.purdue.jtb.misc.Globals.nodeSeq;
-import static EDU.purdue.jtb.misc.Globals.nodeTCF;
-import static EDU.purdue.jtb.misc.Globals.nodeToken;
-import static EDU.purdue.jtb.misc.Globals.nodesPackageName;
-import static EDU.purdue.jtb.misc.Globals.retArguVisitorCmt;
-import static EDU.purdue.jtb.misc.Globals.retVisitorCmt;
 import static EDU.purdue.jtb.misc.Globals.varargs;
 import static EDU.purdue.jtb.misc.Globals.visitorsDirName;
-import static EDU.purdue.jtb.misc.Globals.visitorsPackageName;
-import static EDU.purdue.jtb.misc.Globals.voidArguVisitorCmt;
-import static EDU.purdue.jtb.misc.Globals.voidVisitorCmt;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import EDU.purdue.jtb.syntaxtree.NodeChoice;
 import EDU.purdue.jtb.syntaxtree.NodeList;
-import EDU.purdue.jtb.syntaxtree.NodeListOptional;
-import EDU.purdue.jtb.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.syntaxtree.NodeTCF;
-import EDU.purdue.jtb.syntaxtree.NodeToken;
 import EDU.purdue.jtb.visitor.AcceptInliner;
 import EDU.purdue.jtb.visitor.GlobalDataBuilder;
 
@@ -188,7 +156,7 @@ public abstract class AbstractDepthFirstVisitorsGenerator implements DepthFirstV
         .append(LS);
     sb.append(aSpc.spc).append("for (final Iterator<").append(iNode).append("> e = ")
       .append(genNodeVar).append(".elements(); e.hasNext();) {").append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     if (depthLevel)
       increaseDepthLevel(sb, aSpc);
     sb.append(aSpc.spc);
@@ -233,7 +201,7 @@ public abstract class AbstractDepthFirstVisitorsGenerator implements DepthFirstV
         .append(LS);
     sb.append(aSpc.spc).append("for (final Iterator<").append(iNode).append("> e = ")
       .append(genNodeVar).append(".elements(); e.hasNext();) {").append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     if (depthLevel)
       increaseDepthLevel(sb, aSpc);
     sb.append(aSpc.spc);
@@ -278,7 +246,7 @@ public abstract class AbstractDepthFirstVisitorsGenerator implements DepthFirstV
       aSb.append(", final ").append(varargs ? genArgusType : genArguType).append(' ')
          .append(genArguVar);
     aSb.append(") {").append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     if (aRet) {
       aSb.append(aSpc.spc).append("/* You have to adapt which data is returned")
          .append(" (result variables below are just examples) */").append(LS);
@@ -318,7 +286,7 @@ public abstract class AbstractDepthFirstVisitorsGenerator implements DepthFirstV
    * @param aSpc - the indentation
    */
    void baseNodeVisitMethodCloseBrace(final StringBuilder aSb, final Spacing aSpc) {
-    aSpc.update(-1);
+    aSpc.updateSpc(-1);
     aSb.append(aSpc.spc).append('}').append(LS);
   }
 

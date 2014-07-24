@@ -174,7 +174,6 @@ public class VarInfoForJava implements VarInfo {
       // always initialize even if initializer is null
       final String fullName = Globals.getFixedName(production);
       buf.append(fullName);
-      buf.append('*');
       buf.append(" ").append(name).append(" = ").append(initializer).append(";");
       declaration = buf.toString();
     }
