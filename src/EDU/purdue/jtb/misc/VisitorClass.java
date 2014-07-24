@@ -5,4 +5,5 @@ package EDU.purdue.jtb.misc;
 public interface VisitorClass {
   String getClassName();
   IVisitorClass getInterface();
+  String getOutfileName();
 }

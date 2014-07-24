@@ -109,7 +109,7 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
    */
   @Override
   public void genDepthFirstRetArguVisitorFile() throws FileExistsException {
-    final String outFilename = dFRetArguVisitor + ".h";
+    final String outFilename = retArguVisitor.getOutfileName();
     try {
       final File file = new File(visitorDir, outFilename);
       if (noOverwrite && file.exists())
@@ -130,7 +130,7 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
    */
   @Override
   public void genDepthFirstRetVisitorFile() throws FileExistsException {
-    final String outFilename = dFRetVisitor + ".h";
+    final String outFilename = retVisitor.getOutfileName();
    if (true)
       return;
     else
@@ -154,7 +154,7 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
    */
   @Override
   public void genDepthFirstVoidArguVisitorFile() throws FileExistsException {
-    final String outFilename = dFVoidArguVisitor + ".h";
+    final String outFilename = voidArguVisitor.getOutfileName();
     if (true)
       return;
     else
@@ -178,7 +178,7 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
    */
   @Override
   public void genDepthFirstVoidVisitorFile() throws FileExistsException {
-    final String outFilename = dFVoidVisitor + ".h";
+    final String outFilename = voidVisitor.getOutfileName();
     if (true)
       return;
     else
@@ -207,7 +207,7 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
   public StringBuilder genDepthFirstRetArguVisitor() {
     buf.setLength(0);
     buf.append(iRetArguVisitor.getClassPrefix()).append(LS);
-    buf.append("class ").append(dFRetArguVisitor);
+    buf.append("class ").append(retArguVisitor);
     buf.append(": public ").append(iRetArguVisitor.getClassName()).append(iRetArguVisitor.getClassParamType());
     final String clDecl = buf.toString();
     
@@ -226,7 +226,7 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
    */
   public StringBuilder genDepthFirstRetVisitor() {
     buf.setLength(0);
-    buf.append(dFRetVisitor).append("<").append(genRetType).append("> : public ")
+    buf.append(retVisitor).append("<").append(genRetType).append("> : public ")
        .append(iRetVisitor).append("<").append(genRetType).append(">");
     final String clDecl = buf.toString();
     final String consBeg = genRetType.concat(" visit(const ");
@@ -241,7 +241,7 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
    */
   public StringBuilder genDepthFirstVoidArguVisitor() {
     buf.setLength(0);
-    buf.append(dFVoidArguVisitor).append("<").append(genArguType).append("> : public ")
+    buf.append(voidArguVisitor).append("<").append(genArguType).append("> : public ")
        .append(iVoidArguVisitor).append("<").append(genArguType).append(">");
     final String clDecl = buf.toString();
     final String consBeg = "void visit(const ";
@@ -258,7 +258,7 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
    * @return the buffer with the DepthFirstRetArguVisitor class source
    */
   public StringBuilder genDepthFirstVoidVisitor() {
-    final String clDecl = dFVoidVisitor.concat(" : public ").concat(iVoidVisitor.getClassName());
+    final String clDecl = voidVisitor.toString().concat(" : public ").concat(iVoidVisitor.getClassName());
     final String consBeg = "void visit(const ";
     final String consEnd = "* ".concat(genNodeVar).concat(")");
     return genAnyDepthFirstVisitor(voidVisitor, voidVisitorCmt, clDecl, consBeg, consEnd, false, false);
@@ -321,7 +321,7 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
     }
     sb.append(aClDecl).append(" {").append(LS);
 
-    spc.update(+1);
+    spc.updateSpc(+1);
 
     if (depthLevel) {
       if (javaDocComments) {
@@ -344,7 +344,7 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
     }
 
     // end of (visitor) class
-    spc.update(-1);
+    spc.updateSpc(-1);
     sb.append("};").append(LS);
     sb.append("#endif ").append(LS);
 
@@ -384,7 +384,7 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
 
     sb.append(spc.spc).append(aConsBeg).append(className).append(aConsEnd).append(" {").append(LS);
 
-    spc.update(+1);
+    spc.updateSpc(+1);
 
     if (aRet)
       sb.append(spc.spc).append(genRetType).append(" ").append(genRetVar).append(";").append(LS);
@@ -423,9 +423,9 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
               sb.append(spc.spc).append("try");
             } else if ("{".equals(tcfStr)) {
               sb.append(" {").append(LS);
-              spc.update(+1);
+              spc.updateSpc(+1);
             } else if ("}".equals(tcfStr)) {
-              spc.update(-1);
+              spc.updateSpc(-1);
               sb.append(spc.spc).append('}').append(LS);
             } else if ("catch".equals(tcfStr)) {
               sb.append(spc.spc).append("catch");
@@ -448,7 +448,12 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
           classInfo.fmt1JavacodeFieldCmt(sb, spc, k++);
           if (depthLevel)
             increaseDepthLevel(sb, spc);
-          sb.append(spc.spc).append(genNodeVar).append(".").append(fn);
+          sb.append(spc.spc);
+          if (aRet) {
+            sb.append(genRetVar).append(" = ");
+          }
+
+          sb.append(genNodeVar).append(".").append(fn);
           sb.append("->").append("accept(*this");
           if (aArgu)
             sb.append(", ").append(varargs? genArgsVar : genArguVar);
@@ -461,7 +466,7 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
     if (aRet)
       sb.append(spc.spc).append("return ").append(genRetVar).append(';').append(LS);
 
-    spc.update(-1);
+    spc.updateSpc(-1);
     sb.append(spc.spc).append('}').append(LS).append(LS);
   }
 
@@ -563,7 +568,7 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
         .append(LS);
     sb.append(aSpc.spc);
     sb.append("for (auto it = n.elements().begin(); it != n.elements().end(); it++) {").append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     if (depthLevel)
       increaseDepthLevel(sb, aSpc);
     sb.append(aSpc.spc);
@@ -612,10 +617,10 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
       sb.append(aSpc.spc).append(genRetType).append(" ").append(genRetVar).append(";")
         .append(LS);
     sb.append(aSpc.spc).append("if (").append(genNodeVar).append(".").append("present()) {").append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     sb.append(aSpc.spc);
     sb.append("for (auto it = n.elements().begin(); it != n.elements().end(); it++) {").append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     if (depthLevel)
       increaseDepthLevel(sb, aSpc);
     sb.append(aSpc.spc);
@@ -628,9 +633,9 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
     sb.append(");").append(LS);
     if (depthLevel)
       decreaseDepthLevel(sb, aSpc);
-    aSpc.update(-1);
+    aSpc.updateSpc(-1);
     sb.append(aSpc.spc).append('}').append(LS);
-    aSpc.update(-1);
+    aSpc.updateSpc(-1);
     sb.append(aSpc.spc).append("}").append(LS);
     sb.append(aSpc.spc).append("return");
     if (aRet)
@@ -660,7 +665,7 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
     if (aRet)
       sb.append("  ").append(genRetType).append(" ").append(genRetVar).append(";").append(LS);
     sb.append(aSpc.spc).append("if (").append(genNodeVar).append(".").append("present()) {").append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     if (depthLevel)
       increaseDepthLevel(sb, aSpc);
     sb.append(aSpc.spc);
@@ -670,7 +675,7 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
     sb.append(");").append(LS);
     if (depthLevel)
       decreaseDepthLevel(sb, aSpc);
-    aSpc.update(-1);
+    aSpc.updateSpc(-1);
     sb.append(aSpc.spc).append("}").append(LS);
 //    aSpc.updateSpc(+1);
 //    sb.append(aSpc.spc).append("return").append(aRet ? " null" : "").append(';').append(LS);
@@ -711,7 +716,7 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
      */
     sb.append(aSpc.spc);
     sb.append("for (auto it = n.elements().begin(); it != n.elements().end(); it++) {").append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     if (depthLevel)
       increaseDepthLevel(sb, aSpc);
     sb.append(aSpc.spc);
@@ -815,7 +820,7 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
       aSb.append(", ").append(varargs ? genArgusType : genArguType).append(" ")
          .append(genArguVar);
     aSb.append(") {").append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
   }
 
   /**
@@ -852,7 +857,7 @@ public class DepthFirstVisitorsGeneratorForCpp extends AbstractDepthFirstVisitor
    */
    @Override
   void baseNodeVisitMethodCloseBrace(final StringBuilder aSb, final Spacing aSpc) {
-    aSpc.update(-1);
+    aSpc.updateSpc(-1);
     aSb.append(aSpc.spc).append('}').append(LS);
   }
 

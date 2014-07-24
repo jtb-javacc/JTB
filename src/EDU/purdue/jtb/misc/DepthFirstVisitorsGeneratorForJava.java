@@ -52,12 +52,7 @@
  */
 package EDU.purdue.jtb.misc;
 
-import static EDU.purdue.jtb.misc.Globals.INDENT_AMT;
 import static EDU.purdue.jtb.misc.Globals.LS;
-import static EDU.purdue.jtb.misc.Globals.dFRetArguVisitor;
-import static EDU.purdue.jtb.misc.Globals.dFRetVisitor;
-import static EDU.purdue.jtb.misc.Globals.dFVoidArguVisitor;
-import static EDU.purdue.jtb.misc.Globals.dFVoidVisitor;
 import static EDU.purdue.jtb.misc.Globals.depthLevel;
 import static EDU.purdue.jtb.misc.Globals.genArguType;
 import static EDU.purdue.jtb.misc.Globals.genArguVar;
@@ -83,12 +78,15 @@ import static EDU.purdue.jtb.misc.Globals.nodeSeq;
 import static EDU.purdue.jtb.misc.Globals.nodeTCF;
 import static EDU.purdue.jtb.misc.Globals.nodeToken;
 import static EDU.purdue.jtb.misc.Globals.nodesPackageName;
+import static EDU.purdue.jtb.misc.Globals.retArguVisitor;
 import static EDU.purdue.jtb.misc.Globals.retArguVisitorCmt;
+import static EDU.purdue.jtb.misc.Globals.retVisitor;
 import static EDU.purdue.jtb.misc.Globals.retVisitorCmt;
 import static EDU.purdue.jtb.misc.Globals.varargs;
-import static EDU.purdue.jtb.misc.Globals.visitorsDirName;
 import static EDU.purdue.jtb.misc.Globals.visitorsPackageName;
+import static EDU.purdue.jtb.misc.Globals.voidArguVisitor;
 import static EDU.purdue.jtb.misc.Globals.voidArguVisitorCmt;
+import static EDU.purdue.jtb.misc.Globals.voidVisitor;
 import static EDU.purdue.jtb.misc.Globals.voidVisitorCmt;
 
 import java.io.BufferedWriter;
@@ -96,7 +94,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -107,7 +104,6 @@ import EDU.purdue.jtb.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.syntaxtree.NodeSequence;
 import EDU.purdue.jtb.syntaxtree.NodeTCF;
 import EDU.purdue.jtb.syntaxtree.NodeToken;
-import EDU.purdue.jtb.visitor.AcceptInliner;
 import EDU.purdue.jtb.visitor.GlobalDataBuilder;
 
 /**
@@ -148,7 +144,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
    */
   @Override
   public void genDepthFirstRetArguVisitorFile() throws FileExistsException {
-    final String outFilename = dFRetArguVisitor + ".java";
+    final String outFilename = retArguVisitor.getOutfileName();
     try {
       final File file = new File(visitorDir, outFilename);
       if (noOverwrite && file.exists())
@@ -169,7 +165,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
    */
   @Override
   public void genDepthFirstRetVisitorFile() throws FileExistsException {
-    final String outFilename = dFRetVisitor + ".java";
+    final String outFilename = retVisitor.getOutfileName();
     try {
       final File file = new File(visitorDir, outFilename);
       if (noOverwrite && file.exists())
@@ -190,7 +186,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
    */
   @Override
   public void genDepthFirstVoidArguVisitorFile() throws FileExistsException {
-    final String outFilename = dFVoidArguVisitor + ".java";
+    final String outFilename = voidArguVisitor.getOutfileName();
     try {
       final File file = new File(visitorDir, outFilename);
       if (noOverwrite && file.exists())
@@ -211,7 +207,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
    */
   @Override
   public void genDepthFirstVoidVisitorFile() throws FileExistsException {
-    final String outFilename = dFVoidVisitor + ".java";
+    final String outFilename = voidVisitor.getOutfileName();
     try {
       final File file = new File(visitorDir, outFilename);
       if (noOverwrite && file.exists())
@@ -236,7 +232,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
    */
   public StringBuilder genDepthFirstRetArguVisitor() {
     buf.setLength(0);
-    buf.append(dFRetArguVisitor).append("<").append(genRetType).append(", ").append(genArguType)
+    buf.append(retArguVisitor).append("<").append(genRetType).append(", ").append(genArguType)
        .append("> implements ").append(iRetArguVisitor).append("<").append(genRetType).append(", ")
        .append(genArguType).append(">");
     final String clDecl = buf.toString();
@@ -255,7 +251,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
    */
   public StringBuilder genDepthFirstRetVisitor() {
     buf.setLength(0);
-    buf.append(dFRetVisitor).append("<").append(genRetType).append("> implements ")
+    buf.append(retVisitor).append("<").append(genRetType).append("> implements ")
        .append(iRetVisitor).append("<").append(genRetType).append(">");
     final String clDecl = buf.toString();
     final String consBeg = genRetType.concat(" visit(final ");
@@ -270,7 +266,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
    */
   public StringBuilder genDepthFirstVoidArguVisitor() {
     buf.setLength(0);
-    buf.append(dFVoidArguVisitor).append("<").append(genArguType).append("> implements ")
+    buf.append(voidArguVisitor).append("<").append(genArguType).append("> implements ")
        .append(iVoidArguVisitor).append("<").append(genArguType).append(">");
     final String clDecl = buf.toString();
     final String consBeg = "void visit(final ";
@@ -287,7 +283,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
    * @return the buffer with the DepthFirstRetArguVisitor class source
    */
   public StringBuilder genDepthFirstVoidVisitor() {
-    final String clDecl = dFVoidVisitor.concat(" implements ").concat(iVoidVisitor.toString());
+    final String clDecl = voidVisitor.toString().concat(" implements ").concat(iVoidVisitor.toString());
     final String consBeg = "void visit(final ";
     final String consEnd = " ".concat(genNodeVar).concat(")");
     return genAnyDepthFirstVisitor(voidVisitorCmt, clDecl, consBeg, consEnd, false, false);
@@ -334,7 +330,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
     }
     sb.append("public class ").append(aClDecl).append(" {").append(LS).append(LS);
 
-    spc.update(+1);
+    spc.updateSpc(+1);
 
     if (depthLevel) {
       if (javaDocComments) {
@@ -357,7 +353,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
     }
 
     // end of (visitor) class
-    spc.update(-1);
+    spc.updateSpc(-1);
     sb.append('}').append(LS);
 
     return sb;
@@ -397,7 +393,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
     sb.append(spc.spc).append("public ").append(aConsBeg).append(className).append(aConsEnd)
       .append(" {").append(LS);
 
-    spc.update(+1);
+    spc.updateSpc(+1);
 
     if (aRet)
       sb.append(spc.spc).append(genRetType).append(' ').append(genRetVar).append(" = null;")
@@ -437,9 +433,9 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
               sb.append(spc.spc).append("try");
             } else if ("{".equals(tcfStr)) {
               sb.append(" {").append(LS);
-              spc.update(+1);
+              spc.updateSpc(+1);
             } else if ("}".equals(tcfStr)) {
-              spc.update(-1);
+              spc.updateSpc(-1);
               sb.append(spc.spc).append('}').append(LS);
             } else if ("catch".equals(tcfStr)) {
               sb.append(spc.spc).append("catch");
@@ -475,7 +471,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
     if (aRet)
       sb.append(spc.spc).append("return ").append(genRetVar).append(';').append(LS);
 
-    spc.update(-1);
+    spc.updateSpc(-1);
     sb.append(spc.spc).append('}').append(LS).append(LS);
   }
 
@@ -577,7 +573,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
         .append(LS);
     sb.append(aSpc.spc).append("for (final Iterator<").append(iNode).append("> e = ")
       .append(genNodeVar).append(".elements(); e.hasNext();) {").append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     if (depthLevel)
       increaseDepthLevel(sb, aSpc);
     sb.append(aSpc.spc);
@@ -618,13 +614,13 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
 
     baseNodeVisitMethodBegin(sb, aSpc, aRet, aArgu, nodeListOpt);
     sb.append(aSpc.spc).append("if (").append(genNodeVar).append(".").append("present()) {").append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     if (aRet)
       sb.append(aSpc.spc).append(genRetType).append(' ').append(genRetVar).append(" = null;")
         .append(LS);
     sb.append(aSpc.spc).append("for (final Iterator<").append(iNode).append("> e = ")
       .append(genNodeVar).append(".elements(); e.hasNext();) {").append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     if (depthLevel)
       increaseDepthLevel(sb, aSpc);
     sb.append(aSpc.spc);
@@ -639,16 +635,16 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
     if (depthLevel)
       decreaseDepthLevel(sb, aSpc);
     sb.append(aSpc.spc).append('}').append(LS);
-    aSpc.update(-1);
+    aSpc.updateSpc(-1);
     sb.append(aSpc.spc).append("return");
     if (aRet)
       sb.append(' ').append(genRetVar);
     sb.append(';').append(LS);
-    aSpc.update(-1);
+    aSpc.updateSpc(-1);
     sb.append(aSpc.spc).append("} else").append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     sb.append(aSpc.spc).append("return").append(aRet ? " null" : "").append(';').append(LS);
-    aSpc.update(-1);
+    aSpc.updateSpc(-1);
     baseNodeVisitMethodCloseBrace(sb, aSpc);
 
     return sb;
@@ -671,7 +667,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
 
     baseNodeVisitMethodBegin(sb, aSpc, aRet, aArgu, nodeOpt);
     sb.append(aSpc.spc).append("if (").append(genNodeVar).append(".").append("present()) {").append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     if (depthLevel)
       increaseDepthLevel(sb, aSpc);
     sb.append(aSpc.spc);
@@ -687,11 +683,11 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
     if (aRet)
       sb.append(' ').append(genRetVar);
     sb.append(';').append(LS);
-    aSpc.update(-1);
+    aSpc.updateSpc(-1);
     sb.append(aSpc.spc).append("} else").append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     sb.append(aSpc.spc).append("return").append(aRet ? " null" : "").append(';').append(LS);
-    aSpc.update(-1);
+    aSpc.updateSpc(-1);
     baseNodeVisitMethodCloseBrace(sb, aSpc);
 
     return sb;
@@ -719,7 +715,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
         .append(LS);
     sb.append(aSpc.spc).append("for (final Iterator<").append(iNode).append("> e = ")
       .append(genNodeVar).append(".elements(); e.hasNext();) {").append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     if (depthLevel)
       increaseDepthLevel(sb, aSpc);
     sb.append(aSpc.spc);
@@ -826,7 +822,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
       aSb.append(", final ").append(varargs ? genArgusType : genArguType).append(' ')
          .append(genArguVar);
     aSb.append(") {").append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     if (aRet) {
       aSb.append(aSpc.spc).append("/* You have to adapt which data is returned")
          .append(" (result variables below are just examples) */").append(LS);
@@ -867,7 +863,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
    */
    @Override
   void baseNodeVisitMethodCloseBrace(final StringBuilder aSb, final Spacing aSpc) {
-    aSpc.update(-1);
+    aSpc.updateSpc(-1);
     aSb.append(aSpc.spc).append('}').append(LS);
   }
 

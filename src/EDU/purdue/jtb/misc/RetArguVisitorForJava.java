@@ -5,8 +5,8 @@ package EDU.purdue.jtb.misc;
 public class RetArguVisitorForJava extends RetArguVisitor{
 
   @Override
-  public String getClassName() {
-    return "DepthFirstRetArguVisitor";
+  public String getOutfileName() {
+    return getClassName() + ".java";
   }
 
 }

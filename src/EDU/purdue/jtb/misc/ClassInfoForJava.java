@@ -252,7 +252,7 @@ public class ClassInfoForJava  extends AbstractClassInfo  {
     if (nodesSuperclass != null)
       sb.append(" extends ").append(nodesSuperclass);
     sb.append(" implements ").append(iNode).append(" {").append(LS).append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
 
     /*
      * data fields declarations
@@ -305,20 +305,20 @@ public class ClassInfoForJava  extends AbstractClassInfo  {
      */
 
     names = fieldNames.iterator();
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     for (int count = 0; names.hasNext(); ++count) {
       final String nm = names.next();
       sb.append(aSpc.spc).append(nm).append(" = n").append(count).append(";").append(LS);
       if (parentPointer) {
         sb.append(aSpc.spc).append("if (").append(nm).append(" != null)").append(LS);
-        aSpc.update(+1);
+        aSpc.updateSpc(+1);
         sb.append(aSpc.spc).append(nm);
         sb.append(".").append("setParent(this);").append(LS);
-        aSpc.update(-1);
+        aSpc.updateSpc(-1);
       }
     }
 
-    aSpc.update(-1);
+    aSpc.updateSpc(-1);
     sb.append(aSpc.spc).append("}").append(LS);
 
     /*
@@ -380,7 +380,7 @@ public class ClassInfoForJava  extends AbstractClassInfo  {
       int count = 0;
       names = fieldNames.iterator();
       inits = fieldInitializers.iterator();
-      aSpc.update(+1);
+      aSpc.updateSpc(+1);
       while (names.hasNext()) {
         final String nm = names.next();
         final String init = inits.next();
@@ -392,13 +392,13 @@ public class ClassInfoForJava  extends AbstractClassInfo  {
         }
         if (parentPointer) {
           sb.append(aSpc.spc).append("if (").append(nm).append(" != null)").append(LS);
-          aSpc.update(+1);
+          aSpc.updateSpc(+1);
           sb.append(aSpc.spc).append("  ").append(nm);
           sb.append(".").append("setParent(this);").append(LS);
-          aSpc.update(-1);
+          aSpc.updateSpc(-1);
         }
       }
-      aSpc.update(-1);
+      aSpc.updateSpc(-1);
       sb.append(aSpc.spc).append("}").append(LS);
     }
 
@@ -426,9 +426,9 @@ public class ClassInfoForJava  extends AbstractClassInfo  {
       .append("<" + genRetType).append(", ").append(genArguType)
       .append("> vis, final " + (varargs ? genArgusType : genArguType)).append(" argu) {")
       .append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     sb.append(aSpc.spc).append("return vis.visit(this, argu);").append(LS);
-    aSpc.update(-1);
+    aSpc.updateSpc(-1);
     sb.append(aSpc.spc).append("}").append(LS);
 
     sb.append(LS);
@@ -446,9 +446,9 @@ public class ClassInfoForJava  extends AbstractClassInfo  {
     sb.append(aSpc.spc).append("public <").append(genRetType).append("> ")
       .append(genRetType + " accept(final ").append(iRetVisitor).append("<").append(genRetType)
       .append("> vis) {").append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     sb.append(aSpc.spc).append("return vis.visit(this);").append(LS);
-    aSpc.update(-1);
+    aSpc.updateSpc(-1);
     sb.append(aSpc.spc).append("}").append(LS);
 
     sb.append(LS);
@@ -467,9 +467,9 @@ public class ClassInfoForJava  extends AbstractClassInfo  {
       .append("> void accept(final " + iVoidArguVisitor).append("<").append(genArguType)
       .append("> vis, final " + (varargs ? genArgusType : genArguType)).append(" argu) {")
       .append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     sb.append(aSpc.spc).append("vis.visit(this, argu);").append(LS);
-    aSpc.update(-1);
+    aSpc.updateSpc(-1);
     sb.append(aSpc.spc).append("}").append(LS);
 
     sb.append(LS);
@@ -483,9 +483,9 @@ public class ClassInfoForJava  extends AbstractClassInfo  {
     }
     sb.append(aSpc.spc).append("public void accept(final ").append(iVoidVisitor).append(" vis) {")
       .append(LS);
-    aSpc.update(+1);
+    aSpc.updateSpc(+1);
     sb.append(aSpc.spc).append("vis.visit(this);").append(LS);
-    aSpc.update(-1);
+    aSpc.updateSpc(-1);
     sb.append(aSpc.spc).append("}").append(LS);
 
     /*
@@ -503,9 +503,9 @@ public class ClassInfoForJava  extends AbstractClassInfo  {
       }
       sb.append(aSpc.spc).append("public void setParent(final ").append(iNode).append(" n) {")
         .append(LS);
-      aSpc.update(+1);
+      aSpc.updateSpc(+1);
       sb.append(aSpc.spc).append("parent = n;").append(LS);
-      aSpc.update(-1);
+      aSpc.updateSpc(-1);
       sb.append(aSpc.spc).append("}").append(LS);
       sb.append(LS);
       if (javaDocComments) {
@@ -516,9 +516,9 @@ public class ClassInfoForJava  extends AbstractClassInfo  {
         sb.append(aSpc.spc).append(" */").append(LS);
       }
       sb.append(aSpc.spc).append("public ").append(iNode).append(" getParent() {").append(LS);
-      aSpc.update(+1);
+      aSpc.updateSpc(+1);
       sb.append(aSpc.spc).append("return parent;").append(LS);
-      aSpc.update(-1);
+      aSpc.updateSpc(-1);
       sb.append(aSpc.spc).append("}").append(LS);
     }
 
@@ -526,7 +526,7 @@ public class ClassInfoForJava  extends AbstractClassInfo  {
      * end
      */
 
-    aSpc.update(-1);
+    aSpc.updateSpc(-1);
     sb.append(aSpc.spc).append(LS);
     sb.append(aSpc.spc).append("}").append(LS);
 

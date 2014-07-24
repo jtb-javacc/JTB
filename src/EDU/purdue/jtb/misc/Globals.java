@@ -54,6 +54,7 @@ package EDU.purdue.jtb.misc;
 
 import java.io.File;
 
+import EDU.purdue.jtb.parser.Options;
 import EDU.purdue.jtb.parser.Token;
 
 /**
@@ -73,9 +74,9 @@ public class Globals {
   /** Turns on / off debugging class comment printing */
   public static final boolean       PRINT_CLASS_COMMENT   = false;
   /** The program version */
-  public static final String        VERSION               = "1.4.9";
+  public static final String        VERSION               = "1.4.7";
   /** The serial uid version */
-  public static final long          SERIAL_UID            = 149;
+  public static final long          SERIAL_UID            = 147;
   /** The java program name */
   public static final String        PROG_NAME             = "JTB";
   /** The shell script name */
@@ -143,8 +144,8 @@ public class Globals {
   public static VisitorClass        retArguVisitor;
   /** "RetArgu" visitor interface name (with return type and a user object argument) */
   public static IVisitorClass       iRetArguVisitor;
-  /** Depth First "RetArgu" visitor class name (with return type and a user object argument) */
-  public static final String        dFRetArguVisitor      = "DepthFirstRetArguVisitor";
+//  /** Depth First "RetArgu" visitor class name (with return type and a user object argument) */
+//  public static final String        dFRetArguVisitor      = "DepthFirstRetArguVisitor";
   /** Javadoc comment fragment for "RetArgu" visitor */
   public static final String        retArguVisitorCmt     = "RetArgu";
 
@@ -152,8 +153,8 @@ public class Globals {
   public static VisitorClass        retVisitor;
   /** "Ret" visitor interface name (with return type and no user object argument) */
   public static final IVisitorClass iRetVisitor           = new IRetVisitorForJava();
-  /** Depth First "Ret" visitor class name (with return type and no user object argument) */
-  public static final String        dFRetVisitor          = "DepthFirstRetVisitor";
+//  /** Depth First "Ret" visitor class name (with return type and no user object argument) */
+//  public static final String        dFRetVisitor          = "DepthFirstRetVisitor";
   /** Javadoc comment fragment for "Ret" visitor */
   public static final String        retVisitorCmt         = "Ret";
 
@@ -161,8 +162,8 @@ public class Globals {
   public static VisitorClass        voidArguVisitor;
   /** "VoidArgu" visitor interface name (with no return type and a user object argument) */
   public static final IVisitorClass iVoidArguVisitor      = new IVoidArguVisitorForJava();
-  /** Depth First "VoidArgu" visitor class name (with no return type and a user object argument) */
-  public static final String        dFVoidArguVisitor     = "DepthFirstVoidArguVisitor";
+//  /** Depth First "VoidArgu" visitor class name (with no return type and a user object argument) */
+//  public static final String        dFVoidArguVisitor     = "DepthFirstVoidArguVisitor";
   /** Javadoc comment fragment for "VoidArgu" visitor */
   public static final String        voidArguVisitorCmt    = "VoidArgu";
 
@@ -170,8 +171,8 @@ public class Globals {
   public static VisitorClass        voidVisitor;
   /** "Void" visitor interface name (with no return type and no user object argument)) */
   public static final IVisitorClass iVoidVisitor          = new IVoidVisitorForJava();
-  /** Depth First "Void" visitor class name (with no return type and no user object argument) */
-  public static final String        dFVoidVisitor         = "DepthFirstVoidVisitor";
+//  /** Depth First "Void" visitor class name (with no return type and no user object argument) */
+//  public static final String        dFVoidVisitor         = "DepthFirstVoidVisitor";
   /** Javadoc comment fragment for "Void" visitor */
   public static final String        voidVisitorCmt        = "Void";
 
@@ -195,7 +196,7 @@ public class Globals {
   public static final String        genDepthLevelVar      = "depthLevel";
 
   /** The JTB result type variables prefix */
-  public static final String        jtbRtPrefix           = "jtbrt_";
+  public static final String        JTBRT_PREFIX           = "jtbrt_";
 
   /*
    * Changeable flags (command line options)
@@ -306,7 +307,7 @@ public class Globals {
   /**
    * -nd & -d options which defines the nodes directory name (default is syntaxtree)
    */
-  public static String              astNodesDirName          = DEF_ND_DIR_NAME;
+  public static String              astNodesDirName       = DEF_ND_DIR_NAME;
   /**
    * -vd & -d options which defines the visitors directory name (default is visitor)
    */
@@ -329,28 +330,12 @@ public class Globals {
   /**
    * target generation language
    */
-  public static Language            target                = Language.cpp;
+  public static Language            target                = Language.java;
   public static String              jtbNamespace          = DEF_JTB_NAMESPACE;
   public static String              astNamespace          = DEF_AST_NAMESPACE;
   public static String              vstNamespace          = DEF_VST_NAMESPACE;
 
   static {
-    switch (target) {
-      case java:
-        retArguVisitor = new RetArguVisitorForJava();
-        iRetArguVisitor = new IRetArguVisitorForJava();
-        retVisitor = new RetVisitorForJava();
-        voidArguVisitor = new VoidArguVisitorForJava();
-        voidVisitor = new VoidVisitorForJava();
-        break;
-      case cpp:
-        retArguVisitor = new RetArguVisitorForCpp();
-        iRetArguVisitor = new IRetArguVisitorForCpp();
-        retVisitor = new RetVisitorForCpp();
-        voidArguVisitor = new VoidArguVisitorForCpp();
-        voidVisitor = new VoidVisitorForJava();
-        break;
-    }
   }
 
   public static final String        NSQUAL                = "::";

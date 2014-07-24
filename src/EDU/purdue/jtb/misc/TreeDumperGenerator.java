@@ -8,4 +8,6 @@ public interface TreeDumperGenerator {
 
   void saveToFile() throws FileExistsException;
 
+  String outFilename();
+
 }
