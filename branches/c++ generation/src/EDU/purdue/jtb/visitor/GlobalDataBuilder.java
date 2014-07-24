@@ -1,6 +1,6 @@
 package EDU.purdue.jtb.visitor;
 
-import static EDU.purdue.jtb.misc.Globals.jtbRtPrefix;
+import static EDU.purdue.jtb.misc.Globals.JTBRT_PREFIX;
 import static EDU.purdue.jtb.misc.Globals.staticFlag;
 
 import java.util.ArrayList;
@@ -164,7 +164,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
                                                             .concat("} JavaCode production */");
       retVarDecl.add(comm);
       final String decl = (staticFlag ? "static " : "").concat(resType).concat(" ")
-                                                       .concat(jtbRtPrefix).concat(ident)
+                                                       .concat(JTBRT_PREFIX).concat(ident)
                                                        .concat(";");
       retVarDecl.add(decl);
     }
@@ -271,7 +271,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
                                                               .concat("} BNF production */");
         retVarDecl.add(comm);
         final String decl = (staticFlag ? "static " : "").concat(resType).concat(" ")
-                                                         .concat(jtbRtPrefix).concat(ident)
+                                                         .concat(JTBRT_PREFIX).concat(ident)
                                                          .concat(";");
         retVarDecl.add(decl);
       }
