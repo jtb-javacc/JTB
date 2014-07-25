@@ -132,6 +132,8 @@ import EDU.purdue.jtb.parser.Options;
 import EDU.purdue.jtb.parser.ParseException;
 import EDU.purdue.jtb.syntaxtree.INode;
 import EDU.purdue.jtb.visitor.Annotator;
+import EDU.purdue.jtb.visitor.AnnotatorForCpp;
+import EDU.purdue.jtb.visitor.AnnotatorForJava;
 import EDU.purdue.jtb.visitor.ClassesFinder;
 import EDU.purdue.jtb.visitor.GlobalDataBuilder;
 import EDU.purdue.jtb.visitor.SemanticChecker;
@@ -231,16 +233,15 @@ public class JTB {
       }
 
       try {
-//        AnnotatorVisitor anv = null;
-//        switch (Globals.target) {
-//          case java:
-//            anv = new AnnotatorForJava(gdbv);
-//            break;
-//          case cpp:
-//            anv = new AnnotatorForCpp(gdbv);
-//            break;
-//        }
-        Annotator anv = new Annotator(gdbv);
+        Annotator anv = null;
+        switch (Globals.target) {
+          case java:
+            anv = new AnnotatorForJava(gdbv);
+            break;
+          case cpp:
+            anv = new AnnotatorForCpp(gdbv);
+            break;
+        }
         root.accept(anv);
         anv.saveToFile(jtbOutputFileName);
 

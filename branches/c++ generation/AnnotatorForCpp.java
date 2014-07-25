@@ -52,41 +52,37 @@
  */
 package EDU.purdue.jtb.visitor;
 
-import static EDU.purdue.jtb.misc.Globals.JTBRT_PREFIX;
-import static EDU.purdue.jtb.misc.Globals.PRINT_CLASS_COMMENT;
 import static EDU.purdue.jtb.misc.Globals.getFixedName;
+import static EDU.purdue.jtb.misc.Globals.getQualifiedName;
+import static EDU.purdue.jtb.misc.Globals.jtbRtPrefix;
 import static EDU.purdue.jtb.misc.Globals.keepSpecialTokens;
-import static EDU.purdue.jtb.misc.Globals.nodesPackageName;
 
 import java.util.Iterator;
 
+import EDU.purdue.jtb.misc.Globals;
 import EDU.purdue.jtb.misc.Messages;
-import EDU.purdue.jtb.misc.Spacing;
 import EDU.purdue.jtb.misc.VarInfo;
 import EDU.purdue.jtb.misc.VarInfoFactory;
 import EDU.purdue.jtb.syntaxtree.BNFProduction;
-import EDU.purdue.jtb.syntaxtree.ClassOrInterfaceBody;
 import EDU.purdue.jtb.syntaxtree.CompilationUnit;
 import EDU.purdue.jtb.syntaxtree.ExpansionUnit;
 import EDU.purdue.jtb.syntaxtree.INode;
 import EDU.purdue.jtb.syntaxtree.IdentifierAsString;
-import EDU.purdue.jtb.syntaxtree.ImportDeclaration;
 import EDU.purdue.jtb.syntaxtree.NodeChoice;
 import EDU.purdue.jtb.syntaxtree.NodeListOptional;
 import EDU.purdue.jtb.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.syntaxtree.StringLiteral;
 
 /**
- * The {@link AnnotatorForJava} visitor generates the (jtb) annotated .jj file containing the tree-building
+ * The {@link AnnotatorForCpp} visitor generates the (jtb) annotated .jj file containing the tree-building
  * code.
  * <p>
- * {@link AnnotatorForJava}, {@link CommentsPrinter} and {@link ClassesFinder} depend on each other to
+ * {@link AnnotatorForCpp}, {@link CommentsPrinter} and {@link ClassesFinder} depend on each other to
  * create and use classes.
  * <p>
  * Code is printed in a buffer and {@link #saveToFile} is called to save it in the output file.
  * <p>
- * {@link AnnotatorForJava} works as follows:
+ * {@link AnnotatorForCpp} works as follows:
  * <ul>
  * <li>in generateRHS in visit(BNFProduction) and others, it redirects output to a temporary buffer,
  * <li>it walks down the tree, prints the RHS into the temporary buffer, and builds the varList,
@@ -110,21 +106,85 @@ import EDU.purdue.jtb.syntaxtree.StringLiteral;
  *          messages labels and added the line number finder visitor ; moved the inner
  *          GlobalDataFinder to {@link GlobalDataBuilder}
  */
-public class AnnotatorForJava extends Annotator {
-
-  /**
-   * Constructor which will allocate a default buffer and indentation.
-   * 
-   * @param aGdbv - the global data builder visitor
-   */
-  public AnnotatorForJava(final GlobalDataBuilder aGdbv) {
+@SuppressWarnings("javadoc")
+public class AnnotatorForCpp extends AbstractAnnotator {
+  public static final String POINTER = "*";
+  
+  public AnnotatorForCpp(GlobalDataBuilder aGdbv) {
     super(aGdbv);
-    cupv = new JavaCompilationUnitPrinter(sb, spc);
   }
 
-  /*
-   * User grammar generated and overridden visit methods below
+
+  /**
+   * Visits a {@link CompilationUnit} node, whose children are the following :
+   * <p>
+   * f0 -> [ PackageDeclaration() ]<br>
+   * f1 -> ( ImportDeclaration() )*<br>
+   * f2 -> ( TypeDeclaration() )*<br>
+   * 
+   * @param n - the node to visit
    */
+  @Override
+  public void visit(final CompilationUnit n) {
+    // f0 -> [ PackageDeclaration() ]
+    if (n.f0.present()) {
+      n.f0.node.accept(this);
+      twoNewLines(n);
+    }
+    // f1 -> ( ImportDeclaration() )*
+//    cupv.printImports(n.f1);
+//    twoNewLines(n);
+    // f2 -> ( TypeDeclaration() )*
+//    if (n.f2.present()) {
+//      for (final Iterator<INode> e = n.f2.elements(); e.hasNext();) {
+//        e.next().accept(this);
+//        if (e.hasNext()) {
+//          twoNewLines(n);
+//        }
+//      }
+//    }
+    // builds specials into tree
+    if (keepSpecialTokens) {
+      sb.append(LS);
+      sb.append("class JTBToolkit {").append(LS);
+      sb.append(LS);
+      sb.append("  static NodeToken makeNodeToken(final Token tok) {").append(LS);
+      sb.append("    final NodeToken node = new NodeToken(tok.image.intern(), tok.kind, tok.beginLine, tok.beginColumn, tok.endLine, tok.endColumn);")
+        .append(LS);
+      sb.append("    if (tok.specialToken == null)").append(LS);
+      sb.append("      return node;").append(LS);
+      sb.append("    Token t = tok;").append(LS);
+      sb.append("    int nbt = 0;").append(LS);
+      sb.append("    while (t.specialToken != null) {").append(LS);
+      sb.append("      t = t.specialToken;").append(LS);
+      sb.append("      nbt++;").append(LS);
+      sb.append("    }").append(LS);
+      sb.append("    final java.util.ArrayList<NodeToken> temp = new java.util.ArrayList<NodeToken>(nbt);")
+        .append(LS);
+      sb.append("    t = tok;").append(LS);
+      sb.append("    while (t.specialToken != null) {").append(LS);
+      sb.append("      t = t.specialToken;").append(LS);
+      sb.append("      temp.add(new NodeToken(t.image.intern(), t.kind, t.beginLine, t.beginColumn, t.endLine, t.endColumn));")
+        .append(LS);
+      sb.append("    }").append(LS);
+      sb.append("    for (int i = nbt - 1; i >= 0; --i)").append(LS);
+      sb.append("      node.addSpecial(temp.get(i));").append(LS);
+      sb.append("    // node.trimSpecials();").append(LS);
+      sb.append("    return node;").append(LS);
+      sb.append("  }").append(LS);
+      sb.append("}");
+      oneNewLine(n);
+    } else {
+      sb.append(LS);
+      sb.append("  template<typename R, typename... A>").append(LS);
+      sb.append("  AST::NodeToken<R, A...>* makeNodeToken(const Token* t) {").append(LS);
+      sb.append("    return new  AST::NodeToken<R, A...>(").append(LS);
+      sb.append("       t->image, t->kind, t->beginLine, t->beginColumn, t->endLine, t->endColumn").append(LS);
+      sb.append("    );").append(LS);
+      sb.append("  }").append(LS);
+      oneNewLine(n);
+    }
+  }
 
   /**
    * Visits a {@link BNFProduction} node, whose children are the following :
@@ -146,7 +206,7 @@ public class AnnotatorForJava extends Annotator {
    */
   @Override
   public void visit(final BNFProduction n) {
-    varList.clear();
+    getVarList().clear();
     outerVars.clear();
     prevVar = null;
     resetVarNum();
@@ -159,7 +219,9 @@ public class AnnotatorForJava extends Annotator {
     // just print the f1 specials, then print the IdentifierAsString instead of the ResultType
     getResultTypeSpecials(n.f1);
     sb.append(resultTypeSpecials);
-    sb.append(getFixedName(curProduction));
+    sb.append("template<typename R, typename ... A>").append(LS);
+    sb.append(getQualifiedName(curProduction));
+    sb.append("<R, A...>").append(POINTER);
     sb.append(" ");
     // f2 -> IdentifierAsString()
     // must be prefixed / suffixed
@@ -203,7 +265,7 @@ public class AnnotatorForJava extends Annotator {
     sb.append("// --- JTB generated node declarations ---");
     oneNewLine(n, "c");
     sb.append(spc.spc);
-    for (final Iterator<VarInfo> e = varList.iterator(); e.hasNext();) {
+    for (final Iterator<VarInfo> e = getVarList().iterator(); e.hasNext();) {
       sb.append(e.next().generateNodeDeclaration());
       if (e.hasNext()) {
         oneNewLine(n, "d");
@@ -241,59 +303,6 @@ public class AnnotatorForJava extends Annotator {
     resultType = null;
   }
 
-  /**
-   * Returns a string with the RHS of the current BNF production.<br>
-   * When this function returns, varList and outerVars will have been built and will be used by the
-   * calling method.
-   * <p>
-   * Visits the {@link BNFProduction}<br>
-   * f0 -> AccessModifier()<br>
-   * f1 -> ResultType()<br>
-   * f2 -> IdentifierAsString()<br>
-   * f3 -> FormalParameters()<br>
-   * f4 -> [ #0 "throws" #1 Name()<br>
-   * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
-   * f5 -> [ "!" ]<br>
-   * f6 -> ":"<br>
-   * f7 -> Block()<br>
-   * f8 -> "{"<br>
-   * f9 -> ExpansionChoices()<br>
-   * f10 -> "}"<br>
-   * 
-   * @param n - the node to process
-   * @return the generated buffer
-   */
-  StringBuilder generateRHS(final BNFProduction n) {
-    final StringBuilder mainSB = sb;
-    final StringBuilder newSB = new StringBuilder(512);
-    sb = jccpv.sb = newSB;
-    // f5 -> [ "!" ]
-    // do nothing (here we are in the callee)
-    // f8 -> "{"
-    n.f8.accept(this);
-    oneNewLine(n, "generateRHS a");
-    spc.updateSpc(+1);
-    sb.append(spc.spc);
-    // outerVars will be set further down the tree in finalActions
-    // f9 -> ExpansionChoices()
-    n.f9.accept(this);
-    // must be prefixed / suffixed
-    sb.append("{ return new ").append(getFixedName(n.f2.f0.tokenImage)).append("(");
-    final Iterator<VarInfo> e = outerVars.iterator();
-    if (e.hasNext()) {
-      sb.append(e.next().getName());
-      for (; e.hasNext();)
-        sb.append(", ").append(e.next().getName());
-    }
-    sb.append("); }");
-    oneNewLine(n, "generateRHS b");
-    spc.updateSpc(-1);
-    sb.append(spc.spc);
-    // f10 -> "}"
-    n.f10.accept(this);
-    sb = jccpv.sb = mainSB;
-    return newSB;
-  }
 
   /**
    * Visits a {@link ExpansionUnit} node, whose children are the following :
@@ -372,17 +381,20 @@ public class AnnotatorForJava extends Annotator {
           VarInfo varInfo = null;
           if (creLocNode) {
             name = genNewVarName();
-            if (inEUT3) 
-              varInfo = VarInfoFactory.newVarInfo(ident, name, "null");
+            String production = ident + "<R, A...>";
+            if (inEUT3)
+              varInfo = VarInfoFactory.newVarInfo(Globals.astNamespace + "::" + production, production, name, "null");
             else
-              varInfo = VarInfoFactory.newVarInfo(ident, name);
-            varList.add(varInfo);
+              varInfo = VarInfoFactory.newVarInfo(Globals.astNamespace + "::" + production, production, name, "null");
+            addVarList(varInfo);
             sb.append(name);
             sb.append(" = ");
+            sb.append(" ");
           }
           // $0 IdentifierAsString()
           // must be prefixed / suffixed
-          sb.append(getFixedName(((IdentifierAsString) seq1.elementAt(0)).f0.tokenImage));
+//          sb.append(getFixedName(((IdentifierAsString) seq1.elementAt(0)).f0.tokenImage));
+          sb.append(varInfo.getProduction());
           // $1 Arguments()
           sb.append(genJavaBranch(seq1.elementAt(1)));
           if (creLocNode)
@@ -400,7 +412,7 @@ public class AnnotatorForJava extends Annotator {
             seq2.elementAt(1).accept(this);
             sb.append(" ");
             // IdentifierAsString() -> jtbrt_Identifier
-            sb.append(JTBRT_PREFIX).append(ident);
+            sb.append(jtbRtPrefix).append(ident);
             sb.append("; }");
             oneNewLine(n, "4b");
             sb.append(spc.spc);
@@ -414,7 +426,7 @@ public class AnnotatorForJava extends Annotator {
           // $1 [ ?0 "." ?1 < IDENTIFIER > ]
           final NodeOptional opt2 = (NodeOptional) seq1.elementAt(1);
           if (opt2.present()) {
-            sb.append(".");
+            sb.append(qualifier());
             ((NodeSequence) opt2.node).elementAt(1).accept(this);
           }
           if (createRENode && opt1.present()) {
@@ -451,6 +463,60 @@ public class AnnotatorForJava extends Annotator {
     }
   }
 
+  /**
+   * Returns a string with the RHS of the current BNF production.<br>
+   * When this function returns, varList and outerVars will have been built and will be used by the
+   * calling method.
+   * <p>
+   * Visits the {@link BNFProduction}<br>
+   * f0 -> AccessModifier()<br>
+   * f1 -> ResultType()<br>
+   * f2 -> IdentifierAsString()<br>
+   * f3 -> FormalParameters()<br>
+   * f4 -> [ #0 "throws" #1 Name()<br>
+   * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
+   * f5 -> [ "!" ]<br>
+   * f6 -> ":"<br>
+   * f7 -> Block()<br>
+   * f8 -> "{"<br>
+   * f9 -> ExpansionChoices()<br>
+   * f10 -> "}"<br>
+   * 
+   * @param n - the node to process
+   * @return the generated buffer
+   */
+  StringBuilder generateRHS(final BNFProduction n) {
+    final StringBuilder mainSB = sb;
+    final StringBuilder newSB = new StringBuilder(512);
+    sb = jccpv.sb = newSB;
+    // f5 -> [ "!" ]
+    // do nothing (here we are in the callee)
+    // f8 -> "{"
+    n.f8.accept(this);
+    oneNewLine(n, "generateRHS a");
+    spc.updateSpc(+1);
+    sb.append(spc.spc);
+    // outerVars will be set further down the tree in finalActions
+    // f9 -> ExpansionChoices()
+    n.f9.accept(this);
+    // must be prefixed / suffixed
+    sb.append("{ return new ").append(getQualifiedName(n.f2.f0.tokenImage)).append("<R, A...>(");
+    final Iterator<VarInfo> e = outerVars.iterator();
+    if (e.hasNext()) {
+      sb.append(e.next().getName());
+      for (; e.hasNext();)
+        sb.append(", ").append(e.next().getName());
+    }
+    sb.append("); }");
+    oneNewLine(n, "generateRHS b");
+    spc.updateSpc(-1);
+    sb.append(spc.spc);
+    // f10 -> "}"
+    n.f10.accept(this);
+    sb = jccpv.sb = mainSB;
+    return newSB;
+  }
+
   @Override
   public String newConstructor() {
     return "";
@@ -458,340 +524,17 @@ public class AnnotatorForJava extends Annotator {
 
   @Override
   public String qualifier() {
-    return ".";
+    return "->";
   }
-  
+
   @Override
   public String makeNodeToken() {
-    return "JTBToolkit.makeNodeToken";
+    return "makeNodeToken<R, A...>";
   }
+
   @Override
   public String niew() {
     return "new";
   }
 
-
-
-
-  /**
-   * The {@link JavaCompilationUnitPrinter} visitor<br>
-   * determines if an import statement for the syntax tree package is needed in the grammar file,<br>
-   * prints the compilation unit (with appropriate tool kit methods), inserting the import
-   * statements if necessary.
-   */
-  class JavaCompilationUnitPrinter extends JavaPrinter {
-
-    /**
-     * Constructor, with a given buffer and a default indentation.
-     * 
-     * @param aSb - the buffer to print into (will be allocated if null)
-     * @param aSPC - the Spacing indentation object (will be allocated and set to a default if null)
-     */
-    JavaCompilationUnitPrinter(final StringBuilder aSb, final Spacing aSPC) {
-      super(aSb, aSPC);
-    }
-
-    /*
-     * Convenience methods
-     */
-
-    /**
-     * Prints into the current buffer a node class comment and a new line.
-     * 
-     * @param n - the node for the node class comment
-     */
-    @Override
-    void oneNewLine(final INode n) {
-      sb.append(nodeClassComment(n)).append(LS);
-    }
-
-    /**
-     * Prints into the current buffer a node class comment, an extra given comment, and a new line.
-     * 
-     * @param n - the node for the node class comment
-     * @param str - the extra comment
-     */
-    @Override
-    void oneNewLine(final INode n, final String str) {
-      sb.append(nodeClassComment(n, str)).append(LS);
-    }
-
-    /**
-     * Prints twice into the current buffer a node class comment and a new line.
-     * 
-     * @param n - the node for the node class comment
-     */
-    @Override
-    void twoNewLines(final INode n) {
-      oneNewLine(n);
-      oneNewLine(n);
-    }
-
-    /**
-     * Returns a node class comment (a //!! followed by the node class short name if global flag
-     * set, nothing otherwise).
-     * 
-     * @param n - the node for the node class comment
-     * @return the node class comment
-     */
-    String nodeClassComment(final INode n) {
-      if (PRINT_CLASS_COMMENT) {
-        final String s = n.toString();
-        final int b = s.lastIndexOf('.') + 1;
-        final int e = s.indexOf('@');
-        if (b == -1 || e == -1)
-          return " //!! " + s;
-        else
-          return " //!! " + s.substring(b, e);
-      } else
-        return "";
-    }
-
-    /**
-     * Returns a node class comment with an extra comment (a //!! followed by the node class short
-     * name plus the extra comment if global flag set, nothing otherwise).
-     * 
-     * @param n - the node for the node class comment
-     * @param str - the extra comment
-     * @return the node class comment
-     */
-    String nodeClassComment(final INode n, final String str) {
-      if (PRINT_CLASS_COMMENT)
-        return nodeClassComment(n).concat(" ").concat(str);
-      else
-        return "";
-    }
-
-    /*
-     * User grammar generated and overridden visit methods below
-     */
-
-    /**
-     * Visits a {@link CompilationUnit} node, whose children are the following :
-     * <p>
-     * f0 -> [ PackageDeclaration() ]<br>
-     * f1 -> ( ImportDeclaration() )*<br>
-     * f2 -> ( TypeDeclaration() )*<br>
-     * 
-     * @param n - the node to visit
-     */
-    @Override
-    public void visit(final CompilationUnit n) {
-      // f0 -> [ PackageDeclaration() ]
-      if (n.f0.present()) {
-        n.f0.node.accept(this);
-        twoNewLines(n);
-      }
-      // f1 -> ( ImportDeclaration() )*
-      printImports(n.f1);
-      twoNewLines(n);
-      // f2 -> ( TypeDeclaration() )*
-      if (n.f2.present()) {
-        for (final Iterator<INode> e = n.f2.elements(); e.hasNext();) {
-          e.next().accept(this);
-          if (e.hasNext()) {
-            twoNewLines(n);
-          }
-        }
-      }
-      // builds specials into tree
-      if (!keepSpecialTokens) {
-        sb.append(LS);
-        sb.append("class JTBToolkit {").append(LS);
-        sb.append(LS);
-        sb.append("  static NodeToken makeNodeToken(final Token t) {").append(LS);
-        sb.append("    return new NodeToken(t.image.intern(), t.kind, t.beginLine, t.beginColumn, t.endLine, t.endColumn);")
-          .append(LS);
-        sb.append("  }").append(LS);
-        sb.append("}");
-        oneNewLine(n);
-      } else {
-        sb.append(LS);
-        sb.append("class JTBToolkit {").append(LS);
-        sb.append(LS);
-        sb.append("  static NodeToken makeNodeToken(final Token tok) {").append(LS);
-        sb.append("    final NodeToken node = new NodeToken(tok.image.intern(), tok.kind, tok.beginLine, tok.beginColumn, tok.endLine, tok.endColumn);")
-          .append(LS);
-        sb.append("    if (tok.specialToken == null)").append(LS);
-        sb.append("      return node;").append(LS);
-        sb.append("    Token t = tok;").append(LS);
-        sb.append("    int nbt = 0;").append(LS);
-        sb.append("    while (t.specialToken != null) {").append(LS);
-        sb.append("      t = t.specialToken;").append(LS);
-        sb.append("      nbt++;").append(LS);
-        sb.append("    }").append(LS);
-        sb.append("    final java.util.ArrayList<NodeToken> temp = new java.util.ArrayList<NodeToken>(nbt);")
-          .append(LS);
-        sb.append("    t = tok;").append(LS);
-        sb.append("    while (t.specialToken != null) {").append(LS);
-        sb.append("      t = t.specialToken;").append(LS);
-        sb.append("      temp.add(new NodeToken(t.image.intern(), t.kind, t.beginLine, t.beginColumn, t.endLine, t.endColumn));")
-          .append(LS);
-        sb.append("    }").append(LS);
-        sb.append("    for (int i = nbt - 1; i >= 0; --i)").append(LS);
-        sb.append("      node.addSpecial(temp.get(i));").append(LS);
-        sb.append("    // node.trimSpecials();").append(LS);
-        sb.append("    return node;").append(LS);
-        sb.append("  }").append(LS);
-        sb.append("}");
-        oneNewLine(n);
-      }
-    }
-
-    /**
-     * Visits the {@link ImportDeclaration}<br>
-     * f0 -> "import"<br>
-     * f1 -> [ "static" ]<br>
-     * f2 -> Name(null)<br>
-     * f3 -> [ "." "*" ]<br>
-     * f4 -> ";"<br>
-     * 
-     * @param n - the node to process
-     */
-    void printImports(final NodeListOptional n) {
-      if ("".equals(nodesPackageName))
-        return;
-      boolean foundTreeImport = false;
-      final StringBuilder mainSB = sb;
-      final StringBuilder newSB = new StringBuilder(128);
-      sb = newSB;
-      final String npns = nodesPackageName + ".*;";
-      for (final Iterator<?> e = n.elements(); e.hasNext();) {
-        final ImportDeclaration dec = (ImportDeclaration) e.next();
-
-        newSB.setLength(0);
-        dec.accept(this);
-        final String s = newSB.toString();
-        mainSB.append(s).append(nodeClassComment(n, " Y")).append(LS);
-
-        if (s.equals(npns))
-          foundTreeImport = true;
-      }
-      sb = mainSB;
-      if (!foundTreeImport) {
-        sb.append("import ").append(nodesPackageName).append(".*;");
-        oneNewLine(n, "Z");
-      }
-    }
-
-    /**
-     * Visits a {@link ImportDeclaration} node, whose children are the following :
-     * <p>
-     * f0 -> "import"<br>
-     * f1 -> [ "static" ]<br>
-     * f2 -> Name()<br>
-     * f3 -> [ #0 "." #1 "*" ]<br>
-     * f4 -> ";"<br>
-     * 
-     * @param n - the node to visit
-     */
-    @Override
-    public void visit(final ImportDeclaration n) {
-      // f0 -> "import"
-      n.f0.accept(this);
-      sb.append(" ");
-      // f1 -> [ "static" ]
-      if (n.f1.present()) {
-        n.f1.accept(this);
-        sb.append(" ");
-      }
-      // f2 -> Name()
-      n.f2.accept(this);
-      // f3 -> [ #0 "." #1 "*" ]
-      if (n.f3.present()) {
-        n.f3.accept(this);
-      }
-      // f4 -> ";"
-      n.f4.accept(this);
-    }
-
-    /**
-     * Visits a {@link ClassOrInterfaceBody} node, whose children are the following :
-     * <p>
-     * f0 -> "{"<br>
-     * f1 -> ( ClassOrInterfaceBodyDeclaration() )*<br>
-     * f2 -> "}"<br>
-     * 
-     * @param n - the node to visit
-     */
-    @Override
-    public void visit(final ClassOrInterfaceBody n) {
-      // f0 -> "{"
-      n.f0.accept(this);
-      // add return variables declarations
-      final int rvds = gdbv.getRetVarDecl().size();
-      if (rvds > 0) {
-        spc.updateSpc(+1);
-        twoNewLines(n);
-        sb.append(spc.spc);
-        sb.append("/*");
-        oneNewLine(n);
-        sb.append(spc.spc);
-        sb.append(" * JTB generated return variables declarations");
-        oneNewLine(n);
-        sb.append(spc.spc);
-        sb.append(" */");
-        twoNewLines(n);
-        sb.append(spc.spc);
-        for (int i = 0; i < rvds; i++) {
-          // comment
-          sb.append(gdbv.getRetVarDecl().get(i));
-          oneNewLine(n, "b");
-          sb.append(spc.spc);
-          // declaration
-          sb.append(gdbv.getRetVarDecl().get(++i));
-          if (i < rvds - 2) {
-            twoNewLines(n);
-            sb.append(spc.spc);
-          }
-        }
-        gdbv.getRetVarDecl().clear();
-        spc.updateSpc(-1);
-      }
-      // f1 -> ( ClassOrInterfaceBodyDeclaration() )*
-      if (n.f1.present()) {
-        spc.updateSpc(+1);
-        twoNewLines(n);
-        sb.append(spc.spc);
-        for (final Iterator<INode> e = n.f1.elements(); e.hasNext();) {
-          e.next().accept(this);
-          oneNewLine(n, "c");
-          if (e.hasNext()) {
-            oneNewLine(n, "d");
-            sb.append(spc.spc);
-          }
-        }
-        spc.updateSpc(-1);
-      }
-      sb.append(spc.spc);
-      // f2 -> "}"
-      n.f2.accept(this);
-      oneNewLine(n, "e");
-    }
-
-    /**
-     * Visits a {@link IdentifierAsString} node, whose children are the following :
-     * <p>
-     * f0 -> < IDENTIFIER ><br>
-     * 
-     * @param n - the node to visit
-     */
-    @Override
-    public void visit(final IdentifierAsString n) {
-      n.f0.accept(this);
-    }
-
-    /**
-     * Visits a {@link StringLiteral} node, whose children are the following :
-     * <p>
-     * f0 -> < STRING_LITERAL ><br>
-     * 
-     * @param n - the node to visit
-     */
-    @Override
-    public void visit(final StringLiteral n) {
-      n.f0.accept(this);
-    }
-
-  }
 }
