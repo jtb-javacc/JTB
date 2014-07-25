@@ -1,66 +1,15 @@
-/**
- * Copyright (c) 2004,2005 UCLA Compilers Group.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *  Redistributions of source code must retain the above copyright
- *  notice, this list of conditions and the following disclaimer.
- *
- *  Redistributions in binary form must reproduce the above copyright
- *  notice, this list of conditions and the following disclaimer in the
- *  documentation and/or other materials provided with the distribution.
- *
- *  Neither UCLA nor the names of its contributors may be used to endorse
- *  or promote products derived from this software without specific prior
- *  written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **/
-/*
- * All files in the distribution of JTB, The Java Tree Builder are
- * Copyright 1997, 1998, 1999 by the Purdue Research Foundation of Purdue
- * University.  All rights reserved.
- *
- * Redistribution and use in source and binary forms are permitted
- * provided that this entire copyright notice is duplicated in all
- * such copies, and that any documentation, announcements, and
- * other materials related to such distribution and use acknowledge
- * that the software was developed at Purdue University, West Lafayette,
- * Indiana by Kevin Tao and Jens Palsberg.  No charge may be made
- * for copies, derivations, or distributions of this material
- * without the express written consent of the copyright holder.
- * Neither the name of the University nor the name of the author
- * may be used to endorse or promote products derived from this
- * material without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR ANY PARTICULAR PURPOSE.
- */
 package EDU.purdue.jtb.visitor;
 
+import static EDU.purdue.jtb.misc.Globals.JTBRT_PREFIX;
 import static EDU.purdue.jtb.misc.Globals.getFixedName;
 import static EDU.purdue.jtb.misc.Globals.getQualifiedName;
-import static EDU.purdue.jtb.misc.Globals.jtbRtPrefix;
 import static EDU.purdue.jtb.misc.Globals.keepSpecialTokens;
 
 import java.util.Iterator;
 
 import EDU.purdue.jtb.misc.Globals;
 import EDU.purdue.jtb.misc.Messages;
+import EDU.purdue.jtb.misc.Spacing;
 import EDU.purdue.jtb.misc.VarInfo;
 import EDU.purdue.jtb.misc.VarInfoFactory;
 import EDU.purdue.jtb.syntaxtree.BNFProduction;
@@ -73,47 +22,30 @@ import EDU.purdue.jtb.syntaxtree.NodeListOptional;
 import EDU.purdue.jtb.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.syntaxtree.NodeSequence;
 
-/**
- * The {@link AnnotatorForCpp} visitor generates the (jtb) annotated .jj file containing the tree-building
- * code.
- * <p>
- * {@link AnnotatorForCpp}, {@link CommentsPrinter} and {@link ClassesFinder} depend on each other to
- * create and use classes.
- * <p>
- * Code is printed in a buffer and {@link #saveToFile} is called to save it in the output file.
- * <p>
- * {@link AnnotatorForCpp} works as follows:
- * <ul>
- * <li>in generateRHS in visit(BNFProduction) and others, it redirects output to a temporary buffer,
- * <li>it walks down the tree, prints the RHS into the temporary buffer, and builds the varList,
- * <li>it traverses varList, prints the variable declarations to the main buffer
- * <li>it prints the Block to the main buffer, then the temporary buffer into the main buffer.
- * </ul>
- * When it wants to print a node and its subtree without annotating it, it uses
- * n.accept(JavaCCPrinter).
- * <p>
- * 
- * @author Marc Mazas
- * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
- * @version 1.4.0.2 : 01/2010 : MMa : fixed output of else in IfStatement
- * @version 1.4.6 : 01/2011 : FA/MMa : add -va and -npfx and -nsfx options
- * @version 1.4.7 : 12/2011 : MMa : commented the JavaCodeProduction visit method ; optimized
- *          JTBToolkit class's code<br>
- *          1.4.7 : 07/2012 : MMa : followed changes in jtbgram.jtb (IndentifierAsString(),
- *          ForStatement()), updated grammar comments in the code<br>
- *          1.4.7 : 08-09/2012 : MMa : fixed soft errors for empty NodeChoice (bug JTB-1) ; fixed
- *          error on return statement for a void production ; added non node creation ; tuned
- *          messages labels and added the line number finder visitor ; moved the inner
- *          GlobalDataFinder to {@link GlobalDataBuilder}
- */
-@SuppressWarnings("javadoc")
-public class AnnotatorForCpp extends AbstractAnnotator {
+
+public class AnnotatorForCpp extends Annotator {
   public static final String POINTER = "*";
   
-  public AnnotatorForCpp(GlobalDataBuilder aGdbv) {
+  /**
+   * Constructor which will allocate a default buffer and indentation.
+   * 
+   * @param aGdbv - the global data builder visitor
+   */
+  public AnnotatorForCpp(final GlobalDataBuilder aGdbv) {
     super(aGdbv);
+    cupv = new CppCompilationUnitPrinter(sb, spc);
   }
 
+  /**
+   * 
+   *
+   */
+  class CppCompilationUnitPrinter extends DepthFirstVoidVisitor {
+
+    public CppCompilationUnitPrinter(StringBuilder sb, Spacing spc) {
+    }
+    
+  }
 
   /**
    * Visits a {@link CompilationUnit} node, whose children are the following :
@@ -259,7 +191,7 @@ public class AnnotatorForCpp extends AbstractAnnotator {
     sb.append(spc.spc);
     // block left brace
     n.f7.f0.accept(this);
-    spc.update(+1);
+    spc.updateSpc(+1);
     oneNewLine(n, "b");
     sb.append(spc.spc);
     sb.append("// --- JTB generated node declarations ---");
@@ -290,7 +222,7 @@ public class AnnotatorForCpp extends AbstractAnnotator {
         }
       }
     }
-    spc.update(-1);
+    spc.updateSpc(-1);
     oneNewLine(n, "h");
     sb.append(spc.spc);
     // block right brace
@@ -412,7 +344,7 @@ public class AnnotatorForCpp extends AbstractAnnotator {
             seq2.elementAt(1).accept(this);
             sb.append(" ");
             // IdentifierAsString() -> jtbrt_Identifier
-            sb.append(jtbRtPrefix).append(ident);
+            sb.append(JTBRT_PREFIX).append(ident);
             sb.append("; }");
             oneNewLine(n, "4b");
             sb.append(spc.spc);
@@ -494,7 +426,7 @@ public class AnnotatorForCpp extends AbstractAnnotator {
     // f8 -> "{"
     n.f8.accept(this);
     oneNewLine(n, "generateRHS a");
-    spc.update(+1);
+    spc.updateSpc(+1);
     sb.append(spc.spc);
     // outerVars will be set further down the tree in finalActions
     // f9 -> ExpansionChoices()
@@ -509,7 +441,7 @@ public class AnnotatorForCpp extends AbstractAnnotator {
     }
     sb.append("); }");
     oneNewLine(n, "generateRHS b");
-    spc.update(-1);
+    spc.updateSpc(-1);
     sb.append(spc.spc);
     // f10 -> "}"
     n.f10.accept(this);

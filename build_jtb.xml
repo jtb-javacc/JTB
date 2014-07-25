@@ -26,7 +26,7 @@
 	<!-- import JavaCC / JJTree properties -->
 	<!-- property name="javacc_imp_dir" value="D:/Devs/javaCC-4.2-src" / -->
 	<!-- import file="${javacc_imp_dir}/build_javacc_props.xml" / -->
-	<property name="javacc_ok_jar" value="D:\Devs\Parsers-workspace\sf.eclipse.javacc/javacc.jar" />
+	<property name="javacc_ok_jar" value="Z:\DEV\COB\javacc~svn\target\javacc.jar" />
 	<property name="javacc_main" value="org.javacc.parser.Main" />
 
 	<!-- Build new jar and test regenerate files with new jtb jar and compile -->
