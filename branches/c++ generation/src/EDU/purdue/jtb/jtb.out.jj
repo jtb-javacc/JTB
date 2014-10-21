@@ -123,6 +123,7 @@ options
 PARSER_BEGIN(JTBParser)
 package EDU.purdue.jtb.parser;
 
+import static EDU.purdue.jtb.parser.Options.*;
 import java.util.List;
 import java.util.ArrayList;
 import EDU.purdue.jtb.syntaxtree.*;
@@ -159,6 +160,14 @@ public class JTBParser extends JavaCCParserInternals {
 
   /** Return variable for {@link #StringLiteral} BNF production */
   String jtbrt_StringLiteral;
+
+  protected static boolean isJavaLanguage() {
+    return language == Language.java;
+  }
+
+  protected static boolean isCppLanguage() {
+    return language == Language.cpp;
+  }
 
   /**
    * The name of the parser class.
@@ -646,6 +655,13 @@ JavaCCInput JavaCCInput() :
   {
     processing_cu = true;
     parser_class_name = id1;
+    if (language == Language.cpp) {
+      JavaCCGlobals.cppDclTokenBeg = getToken(1);
+      while (getToken(1).kind != _PARSER_END) {
+        getNextToken();
+      } 
+      JavaCCGlobals.cppDclTokenEnd = getToken(1);
+    }
   }
   n8 = CompilationUnit()
   {

@@ -61,7 +61,6 @@ import java.util.Set;
  * @version 1.4.6 : 01/2011 : FA/MMa : added JTB_VA and JTB_NPFX and JTB_NSFX options
  */
 public class Options {
-
   /**
    * Limit sub classing to derived classes.
    */
@@ -162,6 +161,7 @@ public class Options {
     optionValues.put("OUTPUT_DIRECTORY", ".");
     optionValues.put("OUTPUT_LANGUAGE", "java");
     optionValues.put("NAMESPACE", "AST");
+    
     optionValues.put("SANITY_CHECK", Boolean.TRUE);
     optionValues.put("STATIC", Boolean.TRUE);
     optionValues.put("SUPPORT_CLASS_VISIBILITY_PUBLIC", Boolean.TRUE);
@@ -171,6 +171,15 @@ public class Options {
     optionValues.put("UNICODE_INPUT", Boolean.FALSE);
     optionValues.put("USER_CHAR_STREAM", Boolean.FALSE);
     optionValues.put("USER_TOKEN_MANAGER", Boolean.FALSE);
+    
+    optionValues.put("TOKEN_MANAGER_SUPER_CLASS", "");
+    optionValues.put("TOKEN_MANAGER_INCLUDES", "");
+    optionValues.put("PARSER_INCLUDES", "");
+    optionValues.put("PARSER_SUPER_CLASS", "");
+    optionValues.put("TOKEN_EXTENDS", "");
+    optionValues.put("TOKEN_INCLUDES", "");
+
+    
     // JTB Options (with default values or command line arguments)
     // -h & -si are not managed in an input file
     if (optionValues.get("JTB_CL") == null)
@@ -219,7 +228,12 @@ public class Options {
       optionValues.put("JTB_W", new Boolean(noOverwrite));
   }
 
-  /**
+  public static enum Language {
+    java, cpp;
+  }
+  public static Language language = Language.java;
+  
+ /**
    * Returns a string representation of the specified options of interest. Used when, for example,
    * generating Token.java to record the JavaCC options that were used to generate the file. All of
    * the options must be boolean values.
@@ -283,13 +297,13 @@ public class Options {
   public static void setInputFileOption(final Object nameloc, final Object valueloc,
                                         final String name, final Object value) {
     Object val = value;
-    final String s = name.toUpperCase();
-    if (!optionValues.containsKey(s)) {
+    final String optionNameUpperCase = name.toUpperCase();
+    if (!optionValues.containsKey(optionNameUpperCase)) {
       JavaCCErrors.warning(nameloc, "Bad option name \"" + name +
                                     "\".  Option setting will be ignored.");
       return;
     }
-    final Object existingValue = optionValues.get(s);
+    final Object existingValue = optionValues.get(optionNameUpperCase);
     val = upgradeValue(name, val);
     if (existingValue != null) {
       if ((existingValue.getClass() != val.getClass()) ||
@@ -298,21 +312,27 @@ public class Options {
                                        "\".  Option setting will be ignored.");
         return;
       }
-      if (inputFileSetting.contains(s)) {
+      if (inputFileSetting.contains(optionNameUpperCase)) {
         JavaCCErrors.warning(nameloc, "Duplicate option setting for \"" + name +
                                       "\" will be ignored.");
         return;
       }
-      if (cmdLineSetting.contains(s)) {
+      if (cmdLineSetting.contains(optionNameUpperCase)) {
         if (!existingValue.equals(val)) {
           JavaCCErrors.warning(nameloc, "Command line setting of \"" + name +
                                         "\" modifies option value in file.");
         }
         return;
       }
+      if (optionNameUpperCase.equalsIgnoreCase("OUTPUT_LANGUAGE")) {
+        String l = (String)value;
+        if (l.equalsIgnoreCase("c++")) {
+          language = Language.cpp;
+        }
+      }
     }
-    optionValues.put(s, val);
-    inputFileSetting.add(s);
+    optionValues.put(optionNameUpperCase, val);
+    inputFileSetting.add(optionNameUpperCase);
   }
 
   /**
@@ -608,12 +628,12 @@ public class Options {
   }
 
   /**
-   * Find the output directory.
+   * Find the output language.
    * 
-   * @return The requested output directory.
+   * @return The requested output language.
    */
-  public static File getOutputLanguage() {
-    return new File(stringValue("OUTPUT_LANGUAGE"));
+  public static Language getOutputLanguage() {
+    return language;
   }
 
   /**

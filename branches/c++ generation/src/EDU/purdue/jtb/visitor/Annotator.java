@@ -26,7 +26,7 @@ import java.util.List;
 
 import EDU.purdue.jtb.misc.FileExistsException;
 import EDU.purdue.jtb.misc.Globals;
-import EDU.purdue.jtb.misc.Language;
+import EDU.purdue.jtb.misc.Globals.Language;
 import EDU.purdue.jtb.misc.Messages;
 import EDU.purdue.jtb.misc.VarInfo;
 import EDU.purdue.jtb.misc.VarInfoFactory;
@@ -986,7 +986,7 @@ public abstract class Annotator extends JavaCCPrinter {
       // "+" or "*" or "?"
       ch.choice.accept(this);
       oneNewLine(n, "genParenExpCh 7");
-      if (ch.which != 2 && Globals.target == Language.java) { //FIXME should not test target
+      if (ch.which != 2 && Globals.language == Language.java) { //FIXME should not test target
         //        // temporary displays : production;node;size;normals
         //        sb.append(spc.spc);
         //        sb.append("{ System.out.println(\"").append(curProduction).append(";").append(name)

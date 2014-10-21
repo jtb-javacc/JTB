@@ -23,7 +23,7 @@ abstract class AbstractNodeClass implements NodeClass{
   public String getQualifiedName() {
     String qualifiedName = null;
     
-    switch(Globals.target) {
+    switch(Globals.language) {
       case java:
         qualifiedName =  getName();
         break;

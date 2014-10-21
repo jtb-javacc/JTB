@@ -5,7 +5,7 @@ public class VarInfoFactory {
 
   public static VarInfo newVarInfo(final String type, final String name, final String init) {
     VarInfo varInfo = null;
-    switch (Globals.target) {
+    switch (Globals.language) {
       case java:
         varInfo = new VarInfoForJava(type, name, init);
         break;
@@ -18,7 +18,7 @@ public class VarInfoFactory {
 
   public static VarInfo newVarInfo(final NodeClass type, final String name, final String init) {
     VarInfo varInfo = null;
-    switch (Globals.target) {
+    switch (Globals.language) {
       case java:
         varInfo = new VarInfoForJava(type, name, init);
         break;
@@ -31,7 +31,7 @@ public class VarInfoFactory {
 
   public static VarInfo newVarInfo(final String type, final String name) {
     VarInfo varInfo = null;
-    switch (Globals.target) {
+    switch (Globals.language) {
       case java:
         varInfo = new VarInfoForJava(type, name);
         break;
@@ -44,7 +44,7 @@ public class VarInfoFactory {
 
   public static VarInfo newVarInfo(final NodeClass type, final String name) {
     VarInfo varInfo = null;
-    switch (Globals.target) {
+    switch (Globals.language) {
       case java:
         varInfo = new VarInfoForJava(type, name);
         break;
@@ -57,7 +57,7 @@ public class VarInfoFactory {
 
   public static VarInfo newVarInfo(String resultType, String production, String name, String initialization) {
     VarInfo varInfo = null;
-    switch (Globals.target) {
+    switch (Globals.language) {
       case java:
         varInfo = new VarInfoForJava(resultType, production, name, initialization);
         break;

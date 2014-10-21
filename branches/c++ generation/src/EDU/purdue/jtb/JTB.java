@@ -72,6 +72,7 @@ import static EDU.purdue.jtb.misc.Globals.javaDocComments;
 import static EDU.purdue.jtb.misc.Globals.jtbInputFileName;
 import static EDU.purdue.jtb.misc.Globals.jtbOutputFileName;
 import static EDU.purdue.jtb.misc.Globals.keepSpecialTokens;
+import static EDU.purdue.jtb.misc.Globals.language;
 import static EDU.purdue.jtb.misc.Globals.noOverwrite;
 import static EDU.purdue.jtb.misc.Globals.noSemanticCheck;
 import static EDU.purdue.jtb.misc.Globals.nodePrefix;
@@ -85,7 +86,6 @@ import static EDU.purdue.jtb.misc.Globals.retArguVisitor;
 import static EDU.purdue.jtb.misc.Globals.retVisitor;
 import static EDU.purdue.jtb.misc.Globals.schemeToolkit;
 import static EDU.purdue.jtb.misc.Globals.staticFlag;
-import static EDU.purdue.jtb.misc.Globals.target;
 import static EDU.purdue.jtb.misc.Globals.varargs;
 import static EDU.purdue.jtb.misc.Globals.visitorsDirName;
 import static EDU.purdue.jtb.misc.Globals.visitorsDirPath;
@@ -110,9 +110,9 @@ import EDU.purdue.jtb.misc.FilesGenerator;
 import EDU.purdue.jtb.misc.FilesGeneratorForCpp;
 import EDU.purdue.jtb.misc.FilesGeneratorForJava;
 import EDU.purdue.jtb.misc.Globals;
+import EDU.purdue.jtb.misc.Globals.Language;
 import EDU.purdue.jtb.misc.IRetArguVisitorForCpp;
 import EDU.purdue.jtb.misc.IRetArguVisitorForJava;
-import EDU.purdue.jtb.misc.Language;
 import EDU.purdue.jtb.misc.Messages;
 import EDU.purdue.jtb.misc.RetArguVisitorForCpp;
 import EDU.purdue.jtb.misc.RetArguVisitorForJava;
@@ -234,7 +234,7 @@ public class JTB {
 
       try {
         Annotator anv = null;
-        switch (Globals.target) {
+        switch (Globals.language) {
           case java:
             anv = new AnnotatorForJava(gdbv);
             break;
@@ -259,7 +259,7 @@ public class JTB {
       }
 
       if (fg == null) {
-        switch (Globals.target) {
+        switch (Globals.language) {
           case java:
             fg = new FilesGeneratorForJava(classes);
             break;
@@ -306,7 +306,7 @@ public class JTB {
                            " already exists.  Won't overwrite.");
       }
 
-      if (target == Language.java)
+      if (language == Language.java)
         try {
           fg.genVoidIVisitorFile();
           System.err.println(progName + ":  Visitor interface \"" + iVoidVisitor.getOutfileName() +
@@ -317,7 +317,7 @@ public class JTB {
                              " already exists.  Won't overwrite.");
         }
 
-      if (target == Language.java)
+      if (language == Language.java)
         try {
           fg.genRetIVisitorFile();
           System.err.println(progName + ":  Visitor interface \"" + iRetVisitor.getOutfileName() +
@@ -328,7 +328,7 @@ public class JTB {
                              " already exists.  Won't overwrite.");
         }
 
-      if (target == Language.java)
+      if (language == Language.java)
         try {
           fg.genVoidArguIVisitorFile();
           System.err.println(progName + ":  Visitor interface \"" +
@@ -341,7 +341,7 @@ public class JTB {
         }
 
       DepthFirstVisitorsGenerator dfvg = null;
-      switch (Globals.target) {
+      switch (Globals.language) {
         case java:
           dfvg = new DepthFirstVisitorsGeneratorForJava(classes, gdbv);
           break;
@@ -360,7 +360,7 @@ public class JTB {
                            " already exists.  Won't overwrite.");
       }
 
-      if (target == Language.java)
+      if (language == Language.java)
         try {
           dfvg.genDepthFirstRetVisitorFile();
           System.err.println(progName + ":  Visitor class \"" + retVisitor.getOutfileName() +
@@ -371,7 +371,7 @@ public class JTB {
                              " already exists.  Won't overwrite.");
         }
 
-      if (target == Language.java)
+      if (language == Language.java)
         try {
           dfvg.genDepthFirstVoidArguVisitorFile();
           System.err.println(progName + ":  Visitor class \"" + voidArguVisitor.getOutfileName() +
@@ -382,7 +382,7 @@ public class JTB {
                              " already exists.  Won't overwrite.");
         }
 
-      if (target == Language.java)
+      if (language == Language.java)
         try {
           dfvg.genDepthFirstVoidVisitorFile();
           System.err.println(progName + ":  Visitor class \"" + voidVisitor.getOutfileName() +
@@ -397,7 +397,7 @@ public class JTB {
 
       if (printerToolkit) {
         TreeDumperGenerator tdg = new TreeDumperGeneratorForJava();
-        switch (Globals.target) {
+        switch (Globals.language) {
           case java:
             tdg = new TreeDumperGeneratorForJava();
             break;
@@ -418,7 +418,7 @@ public class JTB {
 
         TreeFormatterGenerator tfg = null;
         try {
-          switch (Globals.target) {
+          switch (Globals.language) {
             case java:
               tfg = new TreeFormatterGeneratorForJava(classes);
               break;
@@ -519,9 +519,9 @@ public class JTB {
     if (!"".equals(str)) {
       if (str.equalsIgnoreCase("c++"))
         str = "cpp";
-      target = Language.valueOf(str);
+      language = Language.valueOf(str);
     }
-    switch (target) {
+    switch (language) {
       case java:
         retArguVisitor = new RetArguVisitorForJava();
         iRetArguVisitor = new IRetArguVisitorForJava();
