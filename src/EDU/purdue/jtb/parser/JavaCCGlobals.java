@@ -107,6 +107,14 @@ public class JavaCCGlobals {
   static public List<Token>  cu_from_insertion_point_2 = new ArrayList<Token>();
 
   /**
+   * 
+   */
+  static public Token cppDclTokenBeg;
+  /**
+   * 
+   */
+  static public Token cppDclTokenEnd;
+  /**
    * A list of all grammar productions - normal and JAVACODE - in the order they appear in the input
    * file. Each entry here will be a subclass of "NormalProduction".
    */

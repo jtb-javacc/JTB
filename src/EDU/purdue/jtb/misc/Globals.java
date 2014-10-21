@@ -330,7 +330,11 @@ public class Globals {
   /**
    * target generation language
    */
-  public static Language            target                = Language.java;
+  public static enum Language {
+    java, cpp
+  }
+
+  public static Language            language              = Language.java;
   public static String              jtbNamespace          = DEF_JTB_NAMESPACE;
   public static String              astNamespace          = DEF_AST_NAMESPACE;
   public static String              vstNamespace          = DEF_VST_NAMESPACE;
@@ -384,14 +388,14 @@ public class Globals {
     if (name.equals(jjToken) || name.equals(nodeToken) || name.equals(nodeChoice) ||
         name.equals(nodeList) || name.equals(nodeListOpt) || name.equals(nodeSeq) ||
         name.equals(nodeOpt)) {
-      if (target == Language.cpp) {
+      if (language == Language.cpp) {
         sb.append(jtbNamespace);
         sb.append(NSQUAL);
       }
       sb.append(name);
       return sb.toString();
     }
-    if (target == Language.cpp) {
+    if (language == Language.cpp) {
       sb.append(astNamespace);
       sb.append(NSQUAL);
     }

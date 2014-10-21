@@ -125,6 +125,7 @@ options
 PARSER_BEGIN(JTBParser)
 package EDU.purdue.jtb.parser;
 
+import static EDU.purdue.jtb.parser.Options.*;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -136,6 +137,15 @@ import java.util.ArrayList;
 // MMa : adapted from JavaCC.jj to fit to JTB class name
 public class JTBParser extends JavaCCParserInternals
 {
+  protected static boolean isJavaLanguage()
+  {
+    return language == Language.java;
+  }
+  protected static boolean isCppLanguage()
+  {
+    return language == Language.cpp;
+  }
+  
   /**
    * The name of the parser class.
    */
@@ -594,8 +604,17 @@ void JavaCCInput() :
 }
 {
   JavaCCOptions()
-  "PARSER_BEGIN" "(" id1 = IdentifierAsString() { addcuname(id1); } ")"
-  { processing_cu = true; parser_class_name = id1; }
+  "PARSER_BEGIN" "(" id1 = IdentifierAsString()
+  { addcuname(id1);  } ")"
+  { processing_cu = true; parser_class_name = id1;
+    if (language == Language.cpp) {
+       JavaCCGlobals.cppDclTokenBeg = getToken(1);
+       while(getToken(1).kind != _PARSER_END) {
+          getNextToken();
+       }
+       JavaCCGlobals.cppDclTokenEnd = getToken(1);
+      }
+  }
   CompilationUnit()
   { processing_cu = false; }
   "PARSER_END" "(" id2 = IdentifierAsString() { compare(getToken(0), id1, id2); } ")"

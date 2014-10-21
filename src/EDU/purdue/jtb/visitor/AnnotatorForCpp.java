@@ -40,9 +40,10 @@ public class AnnotatorForCpp extends Annotator {
    * 
    *
    */
-  class CppCompilationUnitPrinter extends DepthFirstVoidVisitor {
+  class CppCompilationUnitPrinter extends CppPrinter {
 
     public CppCompilationUnitPrinter(StringBuilder sb, Spacing spc) {
+      super(sb, spc);
     }
     
   }

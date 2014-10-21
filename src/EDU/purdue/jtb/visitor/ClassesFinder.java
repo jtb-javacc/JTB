@@ -200,7 +200,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
     gen.reset();
     // f5 -> [ "!" ]
     // generate the class even if the node generation is not requested
-    switch(Globals.target) {
+    switch(Globals.language) {
       case java:
         ci = new ClassInfoForJava(n.f9, n.f2.f0.tokenImage, gdbv);
         break;
