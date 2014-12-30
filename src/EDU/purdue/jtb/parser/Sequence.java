@@ -37,6 +37,7 @@ import java.util.Set;
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public class Sequence extends Expansion_ {
 
@@ -45,10 +46,17 @@ public class Sequence extends Expansion_ {
    */
   public List<Expansion_> units = new ArrayList<Expansion_>();
 
+  /** Standard constructor */
   public Sequence() {
     expType = EXP_TYPE.SEQUENCE;
   }
 
+  /**
+   * Constructor with parameters
+   * 
+   * @param token - the token
+   * @param lookahead - the lookahead
+   */
   public Sequence(final Token token, final Lookahead lookahead) {
     this();
     this.setLine(token.beginLine);
@@ -66,7 +74,7 @@ public class Sequence extends Expansion_ {
     final StringBuilder sb = super.dump(indent, alreadyDumped);
     for (final Iterator<Expansion_> it = units.iterator(); it.hasNext();) {
       final Expansion_ next = it.next();
-      sb.append(eol).append(next.dump(indent + 1, alreadyDumped));
+      sb.append(EOL).append(next.dump(indent + 1, alreadyDumped));
     }
     return sb;
   }

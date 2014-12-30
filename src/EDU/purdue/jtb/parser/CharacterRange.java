@@ -32,26 +32,29 @@ package EDU.purdue.jtb.parser;
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public class CharacterRange {
 
-  /**
-   * The line and column number of the construct that corresponds most closely to this node.
-   */
+  /** The column number of the construct that corresponds most closely to this node */
   private int  column;
-
+  /** The line number of the construct that corresponds most closely to this node */
   private int  line;
-
-  /**
-   * The leftmost and the rightmost characters in this character range.
-   */
+  /** The leftmost character in this character range */
   private char right;
-
+  /** The rightmost character in this character range */
   private char left;
 
+  /** Standard constructor */
   CharacterRange() {
   }
 
+  /**
+   * Constructor with parameters
+   * 
+   * @param l - the leftmost character in this character range
+   * @param r - the rightmost character in this character range
+   */
   CharacterRange(final char l, final char r) {
     if (l > r)
       JavaCCErrors.semantic_error(this, "Invalid range : \"" + (int) l + "\" - \"" + (int) r +
@@ -62,7 +65,7 @@ public class CharacterRange {
   }
 
   /**
-   * @param line - the line to set
+   * @param ln - the line to set
    */
   final void setLine(final int ln) {
     line = ln;
@@ -76,7 +79,7 @@ public class CharacterRange {
   }
 
   /**
-   * @param column - the column to set
+   * @param cl - the column to set
    */
   final void setColumn(final int cl) {
     column = cl;
@@ -90,7 +93,7 @@ public class CharacterRange {
   }
 
   /**
-   * @param left - the left to set
+   * @param lf - the left to set
    */
   public final void setLeft(final char lf) {
     left = lf;
@@ -104,7 +107,7 @@ public class CharacterRange {
   }
 
   /**
-   * @param right - the right to set
+   * @param rg - the right to set
    */
   public final void setRight(final char rg) {
     right = rg;

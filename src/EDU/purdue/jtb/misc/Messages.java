@@ -63,6 +63,7 @@ import static EDU.purdue.jtb.misc.Globals.jtbInputFileName;
  * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : enhanced
  * @version 1.4.7 : 09/2012 : MMa : fixed missing "soft error" label ; added column numbers
+ * @version 1.4.8 : 10/2014 : MMa : fixed extra space before column number for "soft error"
  */
 public class Messages {
 
@@ -153,7 +154,7 @@ public class Messages {
     if (lineNum == -1)
       System.err.println(jtbInputFileName + ":  soft error:  " + s);
     else
-      System.err.println(jtbInputFileName + " (" + Integer.toString(lineNum) + ", " +
+      System.err.println(jtbInputFileName + " (" + Integer.toString(lineNum) + "," +
                          Integer.toString(colNum) + "):  soft error:  " + s);
 
     ++numErrors;
@@ -195,11 +196,11 @@ public class Messages {
    * @param t - a Throwable
    */
   public static void hardErr(final Throwable t) {
-    System.err.println(jtbInputFileName + ":  unexpected program error:  " + t.getMessage());
     System.err.println();
+    System.err.println(jtbInputFileName + ":  unexpected program error:  " + t.getMessage());
+    t.printStackTrace();
     System.err.println("Please report this to " + SUPPORT);
     System.err.println();
-    //    t.printStackTrace();
     System.exit(-1);
   }
 

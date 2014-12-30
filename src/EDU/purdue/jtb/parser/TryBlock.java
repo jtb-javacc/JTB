@@ -35,6 +35,7 @@ import java.util.Set;
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public class TryBlock extends Expansion_ {
 
@@ -62,6 +63,7 @@ public class TryBlock extends Expansion_ {
    */
   public List<Token>       finallyblk;
 
+  /** Standard constructor */
   public TryBlock() {
     expType = EXP_TYPE.TRY_BLOCK;
   }
@@ -73,7 +75,7 @@ public class TryBlock extends Expansion_ {
     if (alreadyDumped.contains(this))
       return sb;
     alreadyDumped.add(this);
-    sb.append(eol).append(exp.dump(indent + 1, alreadyDumped));
+    sb.append(EOL).append(exp.dump(indent + 1, alreadyDumped));
     return sb;
   }
 }

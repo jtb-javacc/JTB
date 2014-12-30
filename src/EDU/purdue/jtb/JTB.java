@@ -59,7 +59,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import EDU.purdue.jtb.misc.ClassInfo;
@@ -83,10 +83,7 @@ import EDU.purdue.jtb.visitor.SemanticChecker;
  * <p>
  * Class JTB contains the main() method of the program as well as related methods.
  * 
- * @author Kevin Tao
- * @author Wanjun Wang, wanjun@purdue.edu
- * @author Marc Mazas
- * @author Francis Andre, francis.andre.kampbell@orange.fr
+ * @author Kevin Tao, Wanjun Wang, Marc Mazas, Francis Andre
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5<br>
  *          1.4.0 : 11/2009 : MMa : added input file options management
  * @version 1.4.0.3 : 02/2010 : MMa : added static flag
@@ -138,11 +135,16 @@ public class JTB {
       //
       // Perform actions based on input file or command-line options
       //
+      Messages.resetCounts();
       final GlobalDataBuilder gdbv = new GlobalDataBuilder();
       root.accept(gdbv);
+      if (Messages.errorCount() > 0) {
+        Messages.printSummary();
+        return;
+      }
 
       final ClassesFinder cfv = new ClassesFinder(gdbv);
-      ArrayList<ClassInfo> classes;
+      List<ClassInfo> classes;
       FilesGenerator fg = null;
 
       Messages.resetCounts();
@@ -172,9 +174,9 @@ public class JTB {
       }
 
       try {
-        final Annotator anv = new Annotator(gdbv);
-        root.accept(anv);
-        anv.saveToFile(jtbOutputFileName);
+        final Annotator av = new Annotator(gdbv);
+        root.accept(av);
+        av.saveToFile(jtbOutputFileName);
 
         if (Messages.errorCount() > 0) {
           Messages.printSummary();
@@ -701,9 +703,7 @@ class InvalCmdLineException extends Exception {
   /** Default serialVersionUID */
   private static final long serialVersionUID = 1L;
 
-  /**
-   * Standard constructor with no argument.
-   */
+  /** Standard constructor */
   InvalCmdLineException() {
     super();
   }

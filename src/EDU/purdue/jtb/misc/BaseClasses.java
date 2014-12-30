@@ -75,32 +75,35 @@ import EDU.purdue.jtb.syntaxtree.NodeToken;
  * @version 1.4.7 : 12/2011 : MMa : fixed extendsClause() in genNodeTCFClass<br>
  *          1.4.7 : 09/2012 : MMa : extracted constants, added missing visit methods (NodeChoice and
  *          NodeTCF)
+ * @version 1.4.8 : 10/2014 : MMa : minor fix<br>
+ *          1.4.8 : 12/2014 : MMa : added printing override annotations ;<br>
+ *          improved specials printing in {@link NodeToken}
  */
 class BaseClasses {
 
-  /** Return and Argument parameter types */
+  /** The Return and Argument parameter types */
   final static String parRetArgu  = genClassParamType(true, true);
-  /** Beginning of argument list for Return and Argument parameter types */
+  /** The beginning of argument list for Return and Argument parameter types */
   final static String begRetArgu  = begArgList(true);
-  /** End of argument list for Return and Argument parameter types */
+  /** The end of argument list for Return and Argument parameter types */
   final static String endRetArgu  = endArgList(true);
-  /** Return and no Argument parameter type */
+  /** The Return and no Argument parameter type */
   final static String parRet      = genClassParamType(true, false);
-  /** Beginning of argument list for Return and no Argument parameter types */
+  /** The beginning of argument list for Return and no Argument parameter types */
   final static String begRet      = begArgList(true);
-  /** End of argument list for Return and no Argument parameter types */
+  /** The end of argument list for Return and no Argument parameter types */
   final static String endRet      = endArgList(false);
-  /** No Return and Argument parameter types */
+  /** The No Return and Argument parameter types */
   final static String parVoidArgu = genClassParamType(false, true);
-  /** Beginning of argument list for no Return and Argument parameter types */
+  /** The beginning of argument list for no Return and Argument parameter types */
   final static String begVoidArgu = begArgList(false);
-  /** End of argument list for no Return and Argument parameter types */
+  /** The end of argument list for no Return and Argument parameter types */
   final static String endVoidArgu = endArgList(true);
-  /** No Return and no Argument parameter types */
+  /** The No Return and no Argument parameter types */
   final static String parVoid     = genClassParamType(false, false);
-  /** Beginning of argument list for no Return and no Argument parameter types */
+  /** The beginning of argument list for no Return and no Argument parameter types */
   final static String begVoid     = begArgList(false);
-  /** End of argument list for no Return and no Argument parameter types */
+  /** The end of argument list for no Return and no Argument parameter types */
   final static String endVoid     = endArgList(false);
 
   /*
@@ -134,7 +137,7 @@ class BaseClasses {
     sb.append("  public static final String LS = System.getProperty(\"line.separator\");")
       .append(LS).append(LS);
 
-    interfacesAcceptMethods(sb);
+    interfacesAcceptMethods(sb, false);
 
     if (parentPointer) {
       if (javaDocComments) {
@@ -219,7 +222,7 @@ class BaseClasses {
     }
     sb.append("  public int size();").append(LS).append(LS);
 
-    interfacesAcceptMethods(sb);
+    interfacesAcceptMethods(sb, true);
 
     sb.append('}').append(LS);
     return sb;
@@ -308,6 +311,7 @@ class BaseClasses {
     if (javaDocComments) {
       genAcceptRetArguComment(sb);
     }
+    sb.append("  @Override").append(LS);
     sb.append("  public ").append(parRetArgu).append(' ').append(begRetArgu)
       .append(iRetArguVisitor).append(parRetArgu).append(endRetArgu).append(" {").append(LS);
     sb.append("    return choice.accept(vis, argu);").append(LS);
@@ -316,6 +320,7 @@ class BaseClasses {
     if (javaDocComments) {
       genAcceptRetComment(sb);
     }
+    sb.append("  @Override").append(LS);
     sb.append("  public ").append(parRet).append(' ').append(begRet).append(iRetVisitor)
       .append(parRet).append(endRet).append(" {").append(LS);
     sb.append("    return choice.accept(vis);").append(LS);
@@ -324,6 +329,7 @@ class BaseClasses {
     if (javaDocComments) {
       genAcceptVoidArguComment(sb);
     }
+    sb.append("  @Override").append(LS);
     sb.append("  public ").append(parVoidArgu).append(' ').append(begVoidArgu)
       .append(iVoidArguVisitor).append(parVoidArgu).append(endVoidArgu).append(" {").append(LS);
     sb.append("    choice.accept(vis, argu);").append(LS);
@@ -332,6 +338,7 @@ class BaseClasses {
     if (javaDocComments) {
       genAcceptVoidComment(sb);
     }
+    sb.append("  @Override").append(LS);
     sb.append("  public ").append(parVoid).append(begVoid).append(iVoidVisitor).append(parVoid)
       .append(endVoid).append(" {").append(LS);
     sb.append("    choice.accept(vis);").append(LS);
@@ -445,6 +452,7 @@ class BaseClasses {
       sb.append("   * @param n - the node to add").append(LS);
       sb.append("   */").append(LS);
     }
+    sb.append("  @Override").append(LS);
     sb.append("  public void addNode(final ").append(iNode).append(" n) {").append(LS);
     sb.append("    if (++allocNb < allocTb.length)").append(LS);
     sb.append("      nodes.ensureCapacity(allocTb[allocNb]);").append(LS);
@@ -567,6 +575,7 @@ class BaseClasses {
       sb.append("   * @param n - the node to add").append(LS);
       sb.append("   */").append(LS);
     }
+    sb.append("  @Override").append(LS);
     sb.append("  public void addNode(final ").append(iNode).append(" n) {").append(LS);
     sb.append("    if (++allocNb < allocTb.length)").append(LS);
     sb.append("      nodes.ensureCapacity(allocTb[allocNb]);").append(LS);
@@ -775,6 +784,7 @@ class BaseClasses {
       sb.append("   * @param n - the node to add").append(LS);
       sb.append("   */").append(LS);
     }
+    sb.append("  @Override").append(LS);
     sb.append("  public void addNode(final ").append(iNode).append(" n) {").append(LS);
     sb.append("    nodes.add(n);").append(LS);
     parentPointerSetCall(sb);
@@ -825,8 +835,7 @@ class BaseClasses {
     if (javaDocComments) {
       sb.append("  /** The list of special tokens */").append(LS);
     }
-    sb.append("  public ArrayList<").append(nodeToken).append("> specialTokens;").append(LS)
-      .append(LS);
+    sb.append("  public List<").append(nodeToken).append("> specialTokens;").append(LS).append(LS);
 
     if (javaDocComments) {
       sb.append("  /** The token first line (-1 means not available) */").append(LS);
@@ -941,7 +950,7 @@ class BaseClasses {
     sb.append("  public void trimSpecials() {").append(LS);
     sb.append("    if (specialTokens == null)").append(LS);
     sb.append("      return;").append(LS);
-    sb.append("    specialTokens.trimToSize();").append(LS);
+    sb.append("    ((ArrayList<NodeToken>) specialTokens).trimToSize();").append(LS);
     sb.append("  }").append(LS).append(LS);
 
     if (javaDocComments) {
@@ -967,21 +976,51 @@ class BaseClasses {
     sb.append("  public String getSpecials(final String spc) {").append(LS);
     sb.append("    if (specialTokens == null)").append(LS);
     sb.append("      return \"\";").append(LS);
-    sb.append("    StringBuilder buf = new StringBuilder(64);").append(LS);
-    sb.append("    for (final Iterator<").append(nodeToken)
-      .append("> e = specialTokens.iterator(); e.hasNext();) {").append(LS);
-    sb.append("      final String s = e.next().tokenImage;").append(LS);
-    sb.append("      final int p = s.length() - 1;").append(LS);
-    sb.append("      final char c = s.charAt(p);").append(LS);
-    sb.append("      buf.append(s);").append(LS);
-    sb.append("      // TODO modify specials to include end of lines").append(LS);
-    sb.append("      if (c == '\\n' || c == '\\r')").append(LS);
-    sb.append("        buf.append(spc);").append(LS);
-    sb.append("      else").append(LS);
-    sb.append("        buf.append(LS).append(spc);").append(LS);
+    sb.append("    int stLastLine = -1;").append(LS);
+    sb.append("    final StringBuilder buf = new StringBuilder(64);").append(LS);
+    sb.append("    boolean hasEol = false;").append(LS);
+    sb.append("    for (final Iterator<NodeToken> e = specialTokens.iterator(); e.hasNext();) {")
+      .append(LS);
+    sb.append("      final NodeToken st = e.next();").append(LS);
+    sb.append("      final char c = st.tokenImage.charAt(st.tokenImage.length() - 1);").append(LS);
+    sb.append("      hasEol = c == '\\n' || c == '\\r';").append(LS);
+    //    sb.append("      buf.append(\" /* getSpecials stLastLine = \").append(stLastLine).append(\", st.beginLine = \")")
+    //      .append(LS);
+    //    sb.append("        .append(st.beginLine).append(\", c = \").append(hasEol ? \"eol\" : String.valueOf(c))")
+    //      .append(LS);
+    //    sb.append("        .append(\" */\");").append(LS);
+    sb.append("      if (stLastLine != -1)").append(LS);
+    sb.append("        // not first line ").append(LS);
+    sb.append("        if (stLastLine != st.beginLine)").append(LS);
+    sb.append("          // if not on the same line as the previous").append(LS);
+    sb.append("          buf.append(spc);").append(LS);
+    sb.append("        else").append(LS);
+    sb.append("          // on the same line as the previous").append(LS);
+    sb.append("          buf.append(' ');").append(LS);
+    sb.append("      buf.append(st.tokenImage);").append(LS);
+    sb.append("      if (!hasEol && e.hasNext()) {").append(LS);
+    sb.append("        // not a single line comment and not the last one").append(LS);
+    sb.append("        buf.append(LS);").append(LS);
+    sb.append("      }").append(LS);
+    sb.append("      stLastLine = st.endLine;").append(LS);
     sb.append("    }").append(LS);
+    sb.append("    // keep the same number of blank lines before the current non special")
+      .append(LS);
+    sb.append("    for (int i = stLastLine + (hasEol ? 1 : 0); i < beginLine; i++) {").append(LS);
+    sb.append("      buf.append(LS);").append(LS);
+    sb.append("      if (i != beginLine - 1)").append(LS);
+    sb.append("        buf.append(spc);").append(LS);
+    sb.append("    }").append(LS);
+    sb.append("    // indent if the current non special is not on the same line").append(LS);
+    sb.append("    if (stLastLine != beginLine)").append(LS);
+    sb.append("      buf.append(spc);").append(LS);
+    //    sb.append("    buf.append(\" /* getSpecials stLastLine = \").append(stLastLine).append(\", beginLine = \")")
+    //      .append(LS);
+    //    sb.append("      .append(beginLine).append(\", size = \").append(specialTokens.size()).append(\", hasEol = \")")
+    //      .append(LS);
+    //    sb.append("      .append(hasEol).append(\" */ \");").append(LS);
     sb.append("    return buf.toString();").append(LS);
-    sb.append("  }").append(LS).append(LS);
+    sb.append("  }").append(LS);
 
     if (javaDocComments) {
       sb.append("  /**").append(LS);
@@ -996,12 +1035,46 @@ class BaseClasses {
       sb.append("   */").append(LS);
     }
     sb.append("  public String withSpecials(final String spc) {").append(LS);
+    sb.append("    return withSpecials(spc, null);").append(LS);
+    sb.append("  }").append(LS).append(LS);
+
+    if (javaDocComments) {
+      sb.append("  /**").append(LS);
+      sb.append("   * Returns the list of special tokens of the current {@link NodeToken} ")
+        .append("and the current<br>").append(LS);
+      sb.append("   * {@link NodeToken} as a string, taking in account a given indentation and a given ")
+        .append("assignment.").append(LS);
+      sb.append("   *").append(LS);
+      sb.append("   * @param spc - the indentation").append(LS);
+      sb.append("   * @param var - the variable assignment to be inserted").append(LS);
+      sb.append("   * @return the string representing the special tokens list and the token")
+        .append(LS);
+      sb.append("   */").append(LS);
+    }
+    sb.append("  public String withSpecials(final String spc, final String var) {").append(LS);
     sb.append("    final String specials = getSpecials(spc);").append(LS);
-    sb.append("    final int len = specials.length();").append(LS);
+    sb.append("    int len = specials.length();").append(LS);
     sb.append("    if (len == 0)").append(LS);
-    sb.append("      return tokenImage;").append(LS);
+    sb.append("      return (var == null ? tokenImage : var + tokenImage);").append(LS);
+    sb.append("    if (var != null)").append(LS);
+    sb.append("      len += var.length();").append(LS);
     sb.append("    StringBuilder buf = new StringBuilder(len + tokenImage.length());").append(LS);
-    sb.append("    buf.append(specials).append(tokenImage);").append(LS);
+    sb.append("    buf.append(specials).append(var == null ? \"\" : var).append(tokenImage);")
+      .append(LS);
+    sb.append("  // see if needed to add a space").append(LS);
+    sb.append("  int stLastLine = -1;").append(LS);
+    sb.append("  for (final Iterator<NodeToken> e = specialTokens.iterator(); e.hasNext();) {")
+      .append(LS);
+    sb.append("    stLastLine = e.next().endLine;").append(LS);
+    sb.append("  }").append(LS);
+    sb.append("  if (stLastLine == beginLine)").append(LS);
+    sb.append("    buf.append(' ');").append(LS);
+    sb.append("  if (var != null)").append(LS);
+    sb.append("    buf.append(var);").append(LS);
+    sb.append("  buf.append(tokenImage);").append(LS);
+    //    sb.append("  buf.append(\" /* withSpecials lastLine = \").append(stLastLine).append(\", beginLine = \")")
+    //      .append(LS);
+    //    sb.append("    .append(beginLine).append(\" */ \");").append(LS);
     sb.append("    return buf.toString();").append(LS);
     sb.append("  }").append(LS).append(LS);
 
@@ -1640,6 +1713,7 @@ class BaseClasses {
       aSb.append("   * @return the node").append(LS);
       aSb.append("   */").append(LS);
     }
+    aSb.append("  @Override").append(LS);
     aSb.append("  public ").append(iNode).append(" elementAt(final int i) {").append(LS);
     aSb.append("    return nodes.get(i); }").append(LS).append(LS);
 
@@ -1650,6 +1724,7 @@ class BaseClasses {
       aSb.append("   * @return the iterator").append(LS);
       aSb.append("   */").append(LS);
     }
+    aSb.append("  @Override").append(LS);
     aSb.append("  public Iterator<").append(iNode).append("> elements() {").append(LS);
     aSb.append("    return nodes.iterator(); }").append(LS).append(LS);
 
@@ -1660,6 +1735,7 @@ class BaseClasses {
       aSb.append("   * @return the list size").append(LS);
       aSb.append("   */").append(LS);
     }
+    aSb.append("  @Override").append(LS);
     aSb.append("  public int size() {").append(LS);
     aSb.append("    return nodes.size(); }").append(LS).append(LS);
   }
@@ -1668,11 +1744,14 @@ class BaseClasses {
    * Generates the node interfaces accept methods.
    * 
    * @param aSb - a buffer to print into (must be non null)
+   * @param withOverride - true if printing the override annotation, false otherwise
    */
-  static void interfacesAcceptMethods(final StringBuilder aSb) {
+  static void interfacesAcceptMethods(final StringBuilder aSb, final boolean withOverride) {
     if (javaDocComments) {
       genAcceptRetArguComment(aSb);
     }
+    if (withOverride)
+      aSb.append("  @Override").append(LS);
     aSb.append("  public ").append(parRetArgu).append(' ').append(begRetArgu)
        .append(iRetArguVisitor).append(parRetArgu).append(endRetArgu).append(';').append(LS)
        .append(LS);
@@ -1680,12 +1759,16 @@ class BaseClasses {
     if (javaDocComments) {
       genAcceptRetComment(aSb);
     }
+    if (withOverride)
+      aSb.append("  @Override").append(LS);
     aSb.append("  public ").append(parRet).append(' ').append(begRet).append(iRetVisitor)
        .append(parRet).append(endRet).append(';').append(LS).append(LS);
 
     if (javaDocComments) {
       genAcceptVoidArguComment(aSb);
     }
+    if (withOverride)
+      aSb.append("  @Override").append(LS);
     aSb.append("  public ").append(parVoidArgu).append(' ').append(begVoidArgu)
        .append(iVoidArguVisitor).append(parVoidArgu).append(endVoidArgu).append(';').append(LS)
        .append(LS);
@@ -1693,6 +1776,8 @@ class BaseClasses {
     if (javaDocComments) {
       genAcceptVoidComment(aSb);
     }
+    if (withOverride)
+      aSb.append("  @Override").append(LS);
     aSb.append("  public ").append(parVoid).append(begVoid).append(iVoidVisitor).append(parVoid)
        .append(endVoid).append(';').append(LS).append(LS);
   }
@@ -1770,6 +1855,7 @@ class BaseClasses {
     if (javaDocComments) {
       genAcceptRetArguComment(aSb);
     }
+    aSb.append("  @Override").append(LS);
     aSb.append("  public ").append(parRetArgu).append(' ').append(begRetArgu)
        .append(iRetArguVisitor).append(parRetArgu).append(endRetArgu).append(" {").append(LS);
     aSb.append("    return vis.visit(this, argu);").append(LS);
@@ -1778,6 +1864,7 @@ class BaseClasses {
     if (javaDocComments) {
       genAcceptRetComment(aSb);
     }
+    aSb.append("  @Override").append(LS);
     aSb.append("  public ").append(parRet).append(' ').append(begRet).append(iRetVisitor)
        .append(parRet).append(endRet).append(" {").append(LS);
     aSb.append("    return vis.visit(this);").append(LS);
@@ -1786,6 +1873,7 @@ class BaseClasses {
     if (javaDocComments) {
       genAcceptVoidArguComment(aSb);
     }
+    aSb.append("  @Override").append(LS);
     aSb.append("  public ").append(parVoidArgu).append(' ').append(begVoidArgu)
        .append(iVoidArguVisitor).append(parVoidArgu).append(endVoidArgu).append(" {").append(LS);
     aSb.append("    vis.visit(this, argu);").append(LS);
@@ -1794,6 +1882,7 @@ class BaseClasses {
     if (javaDocComments) {
       genAcceptVoidComment(aSb);
     }
+    aSb.append("  @Override").append(LS);
     aSb.append("  public ").append(parVoid).append(begVoid).append(iVoidVisitor).append(parVoid)
        .append(endVoid).append(" {").append(LS);
     aSb.append("    vis.visit(this);").append(LS);

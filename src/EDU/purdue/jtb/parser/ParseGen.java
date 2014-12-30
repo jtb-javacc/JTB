@@ -27,6 +27,9 @@
  */
 package EDU.purdue.jtb.parser;
 
+import static EDU.purdue.jtb.parser.JavaCCParserConstants.CLASS;
+import static EDU.purdue.jtb.parser.JavaCCParserConstants.IMPLEMENTS;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -41,9 +44,17 @@ import java.util.List;
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : moved to imports static
  */
-public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
+public class ParseGen extends JavaCCGlobals {
 
+  /** The PrintWriter */
+  static private PrintWriter out;
+
+  /**
+   * @return the compilation unit name
+   * @throws MetaParseException - in case of parse or semantic error
+   */
   // ModMMa : modified for Token.template with GTToken
   //static public void start() throws MetaParseException {
   static public String start() throws MetaParseException {
@@ -52,13 +63,8 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       throw new MetaParseException();
     if (Options.getBuildParser()) {
       try {
-        ostr = new PrintWriter(
-                               new BufferedWriter(
-                                                  new FileWriter(
-                                                                 new File(
-                                                                          Options.getOutputDirectory(),
-                                                                          cu_name + ".java")),
-                                                  4 * 8192));
+        final File file = new File(Options.getOutputDirectory(), cu_name + ".java");
+        out = new PrintWriter(new BufferedWriter(new FileWriter(file), 4 * 8192));
       }
       catch (final IOException e) {
         JavaCCErrors.semantic_error("Could not open file " + cu_name + ".java for writing.");
@@ -66,7 +72,7 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       }
       final List<String> tn = new ArrayList<String>(toolNames);
       tn.add(toolName);
-      ostr.println("/* " + getIdString(tn, cu_name + ".java") + " */");
+      out.println("/* " + getIdString(tn, cu_name + ".java") + " */");
       boolean implementsExists = false;
       final String tsClassOrVar = (Options.getStatic() ? cu_name + "TokenManager" : "token_source");
       if (cu_to_insertion_point_1.size() != 0) {
@@ -79,708 +85,705 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
           } else if (t.kind == CLASS) {
             implementsExists = false;
           }
-          printToken(t, ostr);
+          printToken(t, out);
         }
       }
       if (implementsExists) {
-        ostr.print(", ");
+        out.print(", ");
       } else {
-        ostr.print(" implements ");
+        out.print(" implements ");
       }
-      ostr.print(cu_name + "Constants ");
+      out.print(cu_name + "Constants ");
       if (cu_to_insertion_point_2.size() != 0) {
         printTokenSetup((cu_to_insertion_point_2.get(0)));
         for (final Iterator<Token> it = cu_to_insertion_point_2.iterator(); it.hasNext();) {
           t = it.next();
-          printToken(t, ostr);
+          printToken(t, out);
         }
       }
-      ostr.println("");
-      ostr.println("");
-      ParseEngine.build(ostr);
+      out.println("");
+      out.println("");
+      ParseEngine.build(out);
       if (Options.getStatic()) {
-        ostr.println("  static private boolean jj_initialized_once = false;");
+        out.println("  static private boolean jj_initialized_once = false;");
       }
       if (Options.getUserTokenManager()) {
-        ostr.println("  /** User defined Token Manager. */");
-        ostr.println("  " + staticOpt() + "public TokenManager token_source;");
+        out.println("  /** User defined Token Manager. */");
+        out.println("  " + staticOpt() + "public TokenManager token_source;");
       } else {
-        ostr.println("  /** Generated Token Manager. */");
-        ostr.println("  " + staticOpt() + "public " + cu_name + "TokenManager token_source;");
+        out.println("  /** Generated Token Manager. */");
+        out.println("  " + staticOpt() + "public " + cu_name + "TokenManager token_source;");
         if (!Options.getUserCharStream()) {
           if (Options.getJavaUnicodeEscape()) {
-            ostr.println("  " + staticOpt() + "JavaCharStream jj_input_stream;");
+            out.println("  " + staticOpt() + "JavaCharStream jj_input_stream;");
           } else {
-            ostr.println("  " + staticOpt() + "SimpleCharStream jj_input_stream;");
+            out.println("  " + staticOpt() + "SimpleCharStream jj_input_stream;");
           }
         }
       }
-      ostr.println("  /** Current token. */");
-      ostr.println("  " + staticOpt() + "public Token token;");
-      ostr.println("  /** Next token. */");
-      ostr.println("  " + staticOpt() + "public Token jj_nt;");
+      out.println("  /** Current token. */");
+      out.println("  " + staticOpt() + "public Token token;");
+      out.println("  /** Next token. */");
+      out.println("  " + staticOpt() + "public Token jj_nt;");
       if (!Options.getCacheTokens()) {
-        ostr.println("  " + staticOpt() + "private int jj_ntk;");
+        out.println("  " + staticOpt() + "private int jj_ntk;");
       }
       if (jj2index != 0) {
-        ostr.println("  " + staticOpt() + "private Token jj_scanpos, jj_lastpos;");
-        ostr.println("  " + staticOpt() + "private int jj_la;");
+        out.println("  " + staticOpt() + "private Token jj_scanpos, jj_lastpos;");
+        out.println("  " + staticOpt() + "private int jj_la;");
         if (lookaheadNeeded) {
-          ostr.println("  /** Whether we are looking ahead. */");
-          ostr.println("  " + staticOpt() + "private boolean jj_lookingAhead = false;");
-          ostr.println("  " + staticOpt() + "private boolean jj_semLA;");
+          out.println("  /** Whether we are looking ahead. */");
+          out.println("  " + staticOpt() + "private boolean jj_lookingAhead = false;");
+          out.println("  " + staticOpt() + "private boolean jj_semLA;");
         }
       }
       if (Options.getErrorReporting()) {
-        ostr.println("  " + staticOpt() + "private int jj_gen;");
-        ostr.println("  " + staticOpt() + "final private int[] jj_la1 = new int[" + maskindex +
-                     "];");
+        out.println("  " + staticOpt() + "private int jj_gen;");
+        out.println("  " + staticOpt() + "final private int[] jj_la1 = new int[" + maskindex + "];");
         final int tokenMaskSize = (tokenCount - 1) / 32 + 1;
         for (int i = 0; i < tokenMaskSize; i++)
-          ostr.println("  static private int[] jj_la1_" + i + ";");
-        ostr.println("  static {");
+          out.println("  static private int[] jj_la1_" + i + ";");
+        out.println("  static {");
         for (int i = 0; i < tokenMaskSize; i++)
-          ostr.println("      jj_la1_init_" + i + "();");
-        ostr.println("   }");
+          out.println("      jj_la1_init_" + i + "();");
+        out.println("   }");
         for (int i = 0; i < tokenMaskSize; i++) {
-          ostr.println("   private static void jj_la1_init_" + i + "() {");
-          ostr.print("      jj_la1_" + i + " = new int[] {");
+          out.println("   private static void jj_la1_init_" + i + "() {");
+          out.print("      jj_la1_" + i + " = new int[] {");
           for (final Iterator<int[]> it = maskVals.iterator(); it.hasNext();) {
             final int[] tokenMask = (it.next());
-            ostr.print("0x" + Integer.toHexString(tokenMask[i]) + ",");
+            out.print("0x" + Integer.toHexString(tokenMask[i]) + ",");
           }
-          ostr.println("};");
-          ostr.println("   }");
+          out.println("};");
+          out.println("   }");
         }
       }
       if (jj2index != 0 && Options.getErrorReporting()) {
-        ostr.println("  " + staticOpt() + "final private JJCalls[] jj_2_rtns = new JJCalls[" +
-                     jj2index + "];");
-        ostr.println("  " + staticOpt() + "private boolean jj_rescan = false;");
-        ostr.println("  " + staticOpt() + "private int jj_gc = 0;");
+        out.println("  " + staticOpt() + "final private JJCalls[] jj_2_rtns = new JJCalls[" +
+                    jj2index + "];");
+        out.println("  " + staticOpt() + "private boolean jj_rescan = false;");
+        out.println("  " + staticOpt() + "private int jj_gc = 0;");
       }
-      ostr.println("");
+      out.println("");
       if (!Options.getUserTokenManager()) {
         if (Options.getUserCharStream()) {
-          ostr.println("  /** Constructor with user supplied CharStream. */");
-          ostr.println("  public " + cu_name + "(CharStream stream) {");
+          out.println("  /** Constructor with user supplied CharStream. */");
+          out.println("  public " + cu_name + "(CharStream stream) {");
           if (Options.getStatic()) {
-            ostr.println("    if (jj_initialized_once) {");
-            ostr.println("      System.out.println(\"ERROR: Second call to constructor of static parser.  \");");
-            ostr.println("      System.out.println(\"       You must either use ReInit() "
-                         + "or set the JavaCC option STATIC to false\");");
-            ostr.println("      System.out.println(\"       during parser generation.\");");
-            ostr.println("      throw new Error();");
-            ostr.println("    }");
-            ostr.println("    jj_initialized_once = true;");
+            out.println("    if (jj_initialized_once) {");
+            out.println("      System.out.println(\"ERROR: Second call to constructor of static parser.  \");");
+            out.println("      System.out.println(\"       You must either use ReInit() "
+                        + "or set the JavaCC option STATIC to false\");");
+            out.println("      System.out.println(\"       during parser generation.\");");
+            out.println("      throw new Error();");
+            out.println("    }");
+            out.println("    jj_initialized_once = true;");
           }
           if (Options.getTokenManagerUsesParser() && !Options.getStatic()) {
-            ostr.println("    token_source = new " + cu_name + "TokenManager(this, stream);");
+            out.println("    token_source = new " + cu_name + "TokenManager(this, stream);");
           } else {
-            ostr.println("    token_source = new " + cu_name + "TokenManager(stream);");
+            out.println("    token_source = new " + cu_name + "TokenManager(stream);");
           }
-          ostr.println("    token = new Token();");
+          out.println("    token = new Token();");
           if (Options.getCacheTokens()) {
-            ostr.println("    token.next = jj_nt = " + tsClassOrVar + ".getNextToken();");
+            out.println("    token.next = jj_nt = " + tsClassOrVar + ".getNextToken();");
           } else {
-            ostr.println("    jj_ntk = -1;");
+            out.println("    jj_ntk = -1;");
           }
           if (Options.getErrorReporting()) {
-            ostr.println("    jj_gen = 0;");
-            ostr.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
+            out.println("    jj_gen = 0;");
+            out.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
             if (jj2index != 0) {
-              ostr.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
+              out.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
             }
           }
-          ostr.println("  }");
-          ostr.println("");
-          ostr.println("  /** Reinitialize. */");
-          ostr.println("  " + staticOpt() + "public void ReInit(final CharStream stream) {");
-          ostr.println("    " + tsClassOrVar + ".ReInit(stream);");
-          ostr.println("    token = new Token();");
+          out.println("  }");
+          out.println("");
+          out.println("  /** Reinitialize. */");
+          out.println("  " + staticOpt() + "public void ReInit(final CharStream stream) {");
+          out.println("    " + tsClassOrVar + ".ReInit(stream);");
+          out.println("    token = new Token();");
           if (Options.getCacheTokens()) {
-            ostr.println("    token.next = jj_nt = " + tsClassOrVar + ".getNextToken();");
+            out.println("    token.next = jj_nt = " + tsClassOrVar + ".getNextToken();");
           } else {
-            ostr.println("    jj_ntk = -1;");
+            out.println("    jj_ntk = -1;");
           }
           if (lookaheadNeeded) {
-            ostr.println("    jj_lookingAhead = false;");
+            out.println("    jj_lookingAhead = false;");
           }
           if (jjtreeGenerated) {
-            ostr.println("    jjtree.reset();");
+            out.println("    jjtree.reset();");
           }
           if (Options.getErrorReporting()) {
-            ostr.println("    jj_gen = 0;");
-            ostr.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
+            out.println("    jj_gen = 0;");
+            out.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
             if (jj2index != 0) {
-              ostr.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
+              out.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
             }
           }
-          ostr.println("  }");
+          out.println("  }");
         } else {
-          ostr.println("  /** Constructor with InputStream. */");
-          ostr.println("  public " + cu_name + "(java.io.InputStream stream) {");
-          ostr.println("     this(stream, null);");
-          ostr.println("  }");
-          ostr.println("  /** Constructor with InputStream and supplied encoding */");
-          ostr.println("  public " + cu_name + "(java.io.InputStream stream, String encoding) {");
+          out.println("  /** Constructor with InputStream. */");
+          out.println("  public " + cu_name + "(java.io.InputStream stream) {");
+          out.println("     this(stream, null);");
+          out.println("  }");
+          out.println("  /** Constructor with InputStream and supplied encoding */");
+          out.println("  public " + cu_name + "(java.io.InputStream stream, String encoding) {");
           if (Options.getStatic()) {
-            ostr.println("    if (jj_initialized_once) {");
-            ostr.println("      System.out.println(\"ERROR: Second call to constructor of static parser.  \");");
-            ostr.println("      System.out.println(\"       You must either use ReInit() or "
-                         + "set the JavaCC option STATIC to false\");");
-            ostr.println("      System.out.println(\"       during parser generation.\");");
-            ostr.println("      throw new Error();");
-            ostr.println("    }");
-            ostr.println("    jj_initialized_once = true;");
+            out.println("    if (jj_initialized_once) {");
+            out.println("      System.out.println(\"ERROR: Second call to constructor of static parser.  \");");
+            out.println("      System.out.println(\"       You must either use ReInit() or "
+                        + "set the JavaCC option STATIC to false\");");
+            out.println("      System.out.println(\"       during parser generation.\");");
+            out.println("      throw new Error();");
+            out.println("    }");
+            out.println("    jj_initialized_once = true;");
           }
           if (Options.getJavaUnicodeEscape()) {
             if (!Options.getGenerateChainedException()) {
-              ostr.println("    try { jj_input_stream = new JavaCharStream(stream, encoding, 1, 1); } "
-                           + "catch(java.io.UnsupportedEncodingException e) {"
-                           + " throw new RuntimeException(e.getMessage()); }");
+              out.println("    try { jj_input_stream = new JavaCharStream(stream, encoding, 1, 1); } "
+                          + "catch(java.io.UnsupportedEncodingException e) {"
+                          + " throw new RuntimeException(e.getMessage()); }");
             } else {
-              ostr.println("    try { jj_input_stream = new JavaCharStream(stream, encoding, 1, 1); } "
-                           + "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
+              out.println("    try { jj_input_stream = new JavaCharStream(stream, encoding, 1, 1); } "
+                          + "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
             }
           } else {
             if (!Options.getGenerateChainedException()) {
-              ostr.println("    try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } "
-                           + "catch(java.io.UnsupportedEncodingException e) { "
-                           + "throw new RuntimeException(e.getMessage()); }");
+              out.println("    try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } "
+                          + "catch(java.io.UnsupportedEncodingException e) { "
+                          + "throw new RuntimeException(e.getMessage()); }");
             } else {
-              ostr.println("    try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } "
-                           + "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
+              out.println("    try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } "
+                          + "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
             }
           }
           if (Options.getTokenManagerUsesParser() && !Options.getStatic()) {
-            ostr.println("    token_source = new " + cu_name +
-                         "TokenManager(this, jj_input_stream);");
+            out.println("    token_source = new " + cu_name +
+                        "TokenManager(this, jj_input_stream);");
           } else {
-            ostr.println("    token_source = new " + cu_name + "TokenManager(jj_input_stream);");
+            out.println("    token_source = new " + cu_name + "TokenManager(jj_input_stream);");
           }
-          ostr.println("    token = new Token();");
+          out.println("    token = new Token();");
           if (Options.getCacheTokens()) {
-            ostr.println("    token.next = jj_nt = " + tsClassOrVar + ".getNextToken();");
+            out.println("    token.next = jj_nt = " + tsClassOrVar + ".getNextToken();");
           } else {
-            ostr.println("    jj_ntk = -1;");
+            out.println("    jj_ntk = -1;");
           }
           if (Options.getErrorReporting()) {
-            ostr.println("    jj_gen = 0;");
-            ostr.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
+            out.println("    jj_gen = 0;");
+            out.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
             if (jj2index != 0) {
-              ostr.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
+              out.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
             }
           }
-          ostr.println("  }");
-          ostr.println("");
-          ostr.println("  /** Reinitialize. */");
-          ostr.println("  " + staticOpt() +
-                       "public void ReInit(final java.io.InputStream stream) {");
-          ostr.println("     ReInit(stream, null);");
-          ostr.println("  }");
-          ostr.println("  /** Reinitialize. */");
-          ostr.println("  " + staticOpt() +
-                       "public void ReInit(final java.io.InputStream stream, final String encoding) {");
+          out.println("  }");
+          out.println("");
+          out.println("  /** Reinitialize. */");
+          out.println("  " + staticOpt() + "public void ReInit(final java.io.InputStream stream) {");
+          out.println("     ReInit(stream, null);");
+          out.println("  }");
+          out.println("  /** Reinitialize. */");
+          out.println("  " + staticOpt() +
+                      "public void ReInit(final java.io.InputStream stream, final String encoding) {");
           if (!Options.getGenerateChainedException()) {
-            ostr.println("    try { jj_input_stream.ReInit(stream, encoding, 1, 1); } "
-                         + "catch(java.io.UnsupportedEncodingException e) { "
-                         + "throw new RuntimeException(e.getMessage()); }");
+            out.println("    try { jj_input_stream.ReInit(stream, encoding, 1, 1); } "
+                        + "catch(java.io.UnsupportedEncodingException e) { "
+                        + "throw new RuntimeException(e.getMessage()); }");
           } else {
-            ostr.println("    try { jj_input_stream.ReInit(stream, encoding, 1, 1); } "
-                         + "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
+            out.println("    try { jj_input_stream.ReInit(stream, encoding, 1, 1); } "
+                        + "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
           }
-          ostr.println("    " + tsClassOrVar + ".ReInit(jj_input_stream);");
-          ostr.println("    token = new Token();");
+          out.println("    " + tsClassOrVar + ".ReInit(jj_input_stream);");
+          out.println("    token = new Token();");
           if (Options.getCacheTokens()) {
-            ostr.println("    token.next = jj_nt = " + tsClassOrVar + ".getNextToken();");
+            out.println("    token.next = jj_nt = " + tsClassOrVar + ".getNextToken();");
           } else {
-            ostr.println("    jj_ntk = -1;");
+            out.println("    jj_ntk = -1;");
           }
           if (jjtreeGenerated) {
-            ostr.println("    jjtree.reset();");
+            out.println("    jjtree.reset();");
           }
           if (Options.getErrorReporting()) {
-            ostr.println("    jj_gen = 0;");
-            ostr.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
+            out.println("    jj_gen = 0;");
+            out.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
             if (jj2index != 0) {
-              ostr.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
+              out.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
             }
           }
-          ostr.println("  }");
-          ostr.println("");
-          ostr.println("  /** Constructor. */");
-          ostr.println("  public " + cu_name + "(java.io.Reader stream) {");
+          out.println("  }");
+          out.println("");
+          out.println("  /** Constructor. */");
+          out.println("  public " + cu_name + "(java.io.Reader stream) {");
           if (Options.getStatic()) {
-            ostr.println("    if (jj_initialized_once) {");
-            ostr.println("      System.out.println(\"ERROR: Second call to constructor of static parser. \");");
-            ostr.println("      System.out.println(\"       You must either use ReInit() or "
-                         + "set the JavaCC option STATIC to false\");");
-            ostr.println("      System.out.println(\"       during parser generation.\");");
-            ostr.println("      throw new Error();");
-            ostr.println("    }");
-            ostr.println("    jj_initialized_once = true;");
+            out.println("    if (jj_initialized_once) {");
+            out.println("      System.out.println(\"ERROR: Second call to constructor of static parser. \");");
+            out.println("      System.out.println(\"       You must either use ReInit() or "
+                        + "set the JavaCC option STATIC to false\");");
+            out.println("      System.out.println(\"       during parser generation.\");");
+            out.println("      throw new Error();");
+            out.println("    }");
+            out.println("    jj_initialized_once = true;");
           }
           if (Options.getJavaUnicodeEscape()) {
-            ostr.println("    jj_input_stream = new JavaCharStream(stream, 1, 1);");
+            out.println("    jj_input_stream = new JavaCharStream(stream, 1, 1);");
           } else {
-            ostr.println("    jj_input_stream = new SimpleCharStream(stream, 1, 1);");
+            out.println("    jj_input_stream = new SimpleCharStream(stream, 1, 1);");
           }
           if (Options.getTokenManagerUsesParser() && !Options.getStatic()) {
-            ostr.println("    token_source = new " + cu_name +
-                         "TokenManager(this, jj_input_stream);");
+            out.println("    token_source = new " + cu_name +
+                        "TokenManager(this, jj_input_stream);");
           } else {
-            ostr.println("    token_source = new " + cu_name + "TokenManager(jj_input_stream);");
+            out.println("    token_source = new " + cu_name + "TokenManager(jj_input_stream);");
           }
-          ostr.println("    token = new Token();");
+          out.println("    token = new Token();");
           if (Options.getCacheTokens()) {
-            ostr.println("    token.next = jj_nt = " + tsClassOrVar + ".getNextToken();");
+            out.println("    token.next = jj_nt = " + tsClassOrVar + ".getNextToken();");
           } else {
-            ostr.println("    jj_ntk = -1;");
+            out.println("    jj_ntk = -1;");
           }
           if (Options.getErrorReporting()) {
-            ostr.println("    jj_gen = 0;");
-            ostr.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
+            out.println("    jj_gen = 0;");
+            out.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
             if (jj2index != 0) {
-              ostr.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
+              out.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
             }
           }
-          ostr.println("  }");
-          ostr.println("");
-          ostr.println("  /** Reinitialize. */");
-          ostr.println("  " + staticOpt() + "public void ReInit(final java.io.Reader stream) {");
+          out.println("  }");
+          out.println("");
+          out.println("  /** Reinitialize. */");
+          out.println("  " + staticOpt() + "public void ReInit(final java.io.Reader stream) {");
           if (Options.getJavaUnicodeEscape()) {
-            ostr.println("    jj_input_stream.ReInit(stream, 1, 1);");
+            out.println("    jj_input_stream.ReInit(stream, 1, 1);");
           } else {
-            ostr.println("    jj_input_stream.ReInit(stream, 1, 1);");
+            out.println("    jj_input_stream.ReInit(stream, 1, 1);");
           }
-          ostr.println("    " + tsClassOrVar + ".ReInit(jj_input_stream);");
-          ostr.println("    token = new Token();");
+          out.println("    " + tsClassOrVar + ".ReInit(jj_input_stream);");
+          out.println("    token = new Token();");
           if (Options.getCacheTokens()) {
-            ostr.println("    token.next = jj_nt = " + tsClassOrVar + ".getNextToken();");
+            out.println("    token.next = jj_nt = " + tsClassOrVar + ".getNextToken();");
           } else {
-            ostr.println("    jj_ntk = -1;");
+            out.println("    jj_ntk = -1;");
           }
           if (jjtreeGenerated) {
-            ostr.println("    jjtree.reset();");
+            out.println("    jjtree.reset();");
           }
           if (Options.getErrorReporting()) {
-            ostr.println("    jj_gen = 0;");
-            ostr.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
+            out.println("    jj_gen = 0;");
+            out.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
             if (jj2index != 0) {
-              ostr.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
+              out.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
             }
           }
-          ostr.println("  }");
+          out.println("  }");
         }
       }
-      ostr.println("");
+      out.println("");
       if (Options.getUserTokenManager()) {
-        ostr.println("  /** Constructor with user supplied Token Manager. */");
-        ostr.println("  public " + cu_name + "(TokenManager tm) {");
+        out.println("  /** Constructor with user supplied Token Manager. */");
+        out.println("  public " + cu_name + "(TokenManager tm) {");
       } else {
-        ostr.println("  /** Constructor with generated Token Manager. */");
-        ostr.println("  public " + cu_name + "(" + cu_name + "TokenManager tm) {");
+        out.println("  /** Constructor with generated Token Manager. */");
+        out.println("  public " + cu_name + "(" + cu_name + "TokenManager tm) {");
       }
       if (Options.getStatic()) {
-        ostr.println("    if (jj_initialized_once) {");
-        ostr.println("      System.out.println(\"ERROR: Second call to constructor of static parser. \");");
-        ostr.println("      System.out.println(\"       You must either use ReInit() or "
-                     + "set the JavaCC option STATIC to false\");");
-        ostr.println("      System.out.println(\"       during parser generation.\");");
-        ostr.println("      throw new Error();");
-        ostr.println("    }");
-        ostr.println("    jj_initialized_once = true;");
+        out.println("    if (jj_initialized_once) {");
+        out.println("      System.out.println(\"ERROR: Second call to constructor of static parser. \");");
+        out.println("      System.out.println(\"       You must either use ReInit() or "
+                    + "set the JavaCC option STATIC to false\");");
+        out.println("      System.out.println(\"       during parser generation.\");");
+        out.println("      throw new Error();");
+        out.println("    }");
+        out.println("    jj_initialized_once = true;");
       }
-      ostr.println("    token_source = tm;");
-      ostr.println("    token = new Token();");
+      out.println("    token_source = tm;");
+      out.println("    token = new Token();");
       if (Options.getCacheTokens()) {
-        ostr.println("    token.next = jj_nt = " + tsClassOrVar + ".getNextToken();");
+        out.println("    token.next = jj_nt = " + tsClassOrVar + ".getNextToken();");
       } else {
-        ostr.println("    jj_ntk = -1;");
+        out.println("    jj_ntk = -1;");
       }
       if (Options.getErrorReporting()) {
-        ostr.println("    jj_gen = 0;");
-        ostr.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
+        out.println("    jj_gen = 0;");
+        out.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
         if (jj2index != 0) {
-          ostr.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
+          out.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
         }
       }
-      ostr.println("  }");
-      ostr.println("");
+      out.println("  }");
+      out.println("");
       if (Options.getUserTokenManager()) {
-        ostr.println("  /** Reinitialize. */");
-        ostr.println("  public void ReInit(final TokenManager tm) {");
+        out.println("  /** Reinitialize. */");
+        out.println("  public void ReInit(final TokenManager tm) {");
       } else {
-        ostr.println("  /** Reinitialize. */");
-        ostr.println("  public void ReInit(final " + cu_name + "TokenManager tm) {");
+        out.println("  /** Reinitialize. */");
+        out.println("  public void ReInit(final " + cu_name + "TokenManager tm) {");
       }
-      ostr.println("    token_source = tm;");
-      ostr.println("    token = new Token();");
+      out.println("    token_source = tm;");
+      out.println("    token = new Token();");
       if (Options.getCacheTokens()) {
-        ostr.println("    token.next = jj_nt = " + tsClassOrVar + ".getNextToken();");
+        out.println("    token.next = jj_nt = " + tsClassOrVar + ".getNextToken();");
       } else {
-        ostr.println("    jj_ntk = -1;");
+        out.println("    jj_ntk = -1;");
       }
       if (jjtreeGenerated) {
-        ostr.println("    jjtree.reset();");
+        out.println("    jjtree.reset();");
       }
       if (Options.getErrorReporting()) {
-        ostr.println("    jj_gen = 0;");
-        ostr.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
+        out.println("    jj_gen = 0;");
+        out.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
         if (jj2index != 0) {
-          ostr.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
+          out.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
         }
       }
-      ostr.println("  }");
-      ostr.println("");
-      ostr.println("  " + staticOpt() +
-                   "private Token jj_consume_token(int kind) throws ParseException {");
+      out.println("  }");
+      out.println("");
+      out.println("  " + staticOpt() +
+                  "private Token jj_consume_token(int kind) throws ParseException {");
       if (Options.getCacheTokens()) {
-        ostr.println("    Token oldToken = token;");
-        ostr.println("    if ((token = jj_nt).next != null) jj_nt = jj_nt.next;");
-        ostr.println("    else jj_nt = jj_nt.next = " + tsClassOrVar + ".getNextToken();");
+        out.println("    Token oldToken = token;");
+        out.println("    if ((token = jj_nt).next != null) jj_nt = jj_nt.next;");
+        out.println("    else jj_nt = jj_nt.next = " + tsClassOrVar + ".getNextToken();");
       } else {
-        ostr.println("    Token oldToken;");
-        ostr.println("    if ((oldToken = token).next != null) token = token.next;");
-        ostr.println("    else token = token.next = " + tsClassOrVar + ".getNextToken();");
-        ostr.println("    jj_ntk = -1;");
+        out.println("    Token oldToken;");
+        out.println("    if ((oldToken = token).next != null) token = token.next;");
+        out.println("    else token = token.next = " + tsClassOrVar + ".getNextToken();");
+        out.println("    jj_ntk = -1;");
       }
-      ostr.println("    if (token.kind == kind) {");
+      out.println("    if (token.kind == kind) {");
       if (Options.getErrorReporting()) {
-        ostr.println("      jj_gen++;");
+        out.println("      jj_gen++;");
         if (jj2index != 0) {
-          ostr.println("      if (++jj_gc > 100) {");
-          ostr.println("        jj_gc = 0;");
-          ostr.println("        for (int i = 0; i < jj_2_rtns.length; i++) {");
-          ostr.println("          JJCalls c = jj_2_rtns[i];");
-          ostr.println("          while (c != null) {");
-          ostr.println("            if (c.gen < jj_gen) c.first = null;");
-          ostr.println("            c = c.next;");
-          ostr.println("          }");
-          ostr.println("        }");
-          ostr.println("      }");
+          out.println("      if (++jj_gc > 100) {");
+          out.println("        jj_gc = 0;");
+          out.println("        for (int i = 0; i < jj_2_rtns.length; i++) {");
+          out.println("          JJCalls c = jj_2_rtns[i];");
+          out.println("          while (c != null) {");
+          out.println("            if (c.gen < jj_gen) c.first = null;");
+          out.println("            c = c.next;");
+          out.println("          }");
+          out.println("        }");
+          out.println("      }");
         }
       }
       if (Options.getDebugParser()) {
-        ostr.println("      trace_token(token, \"\");");
+        out.println("      trace_token(token, \"\");");
       }
-      ostr.println("      return token;");
-      ostr.println("    }");
+      out.println("      return token;");
+      out.println("    }");
       if (Options.getCacheTokens()) {
-        ostr.println("    jj_nt = token;");
+        out.println("    jj_nt = token;");
       }
-      ostr.println("    token = oldToken;");
+      out.println("    token = oldToken;");
       if (Options.getErrorReporting()) {
-        ostr.println("    jj_kind = kind;");
+        out.println("    jj_kind = kind;");
       }
-      ostr.println("    throw generateParseException();");
-      ostr.println("  }");
-      ostr.println("");
+      out.println("    throw generateParseException();");
+      out.println("  }");
+      out.println("");
       if (jj2index != 0) {
-        ostr.println("  static private final class LookaheadSuccess extends java.lang.Error { }");
-        ostr.println("  " + staticOpt() +
-                     "final private LookaheadSuccess jj_ls = new LookaheadSuccess();");
-        ostr.println("  " + staticOpt() + "private boolean jj_scan_token(int kind) {");
-        ostr.println("    if (jj_scanpos == jj_lastpos) {");
-        ostr.println("      jj_la--;");
-        ostr.println("      if (jj_scanpos.next == null) {");
-        ostr.println("        jj_lastpos = jj_scanpos = jj_scanpos.next = " + tsClassOrVar +
-                     ".getNextToken();");
-        ostr.println("      } else {");
-        ostr.println("        jj_lastpos = jj_scanpos = jj_scanpos.next;");
-        ostr.println("      }");
-        ostr.println("    } else {");
-        ostr.println("      jj_scanpos = jj_scanpos.next;");
-        ostr.println("    }");
+        out.println("  static private final class LookaheadSuccess extends java.lang.Error { }");
+        out.println("  " + staticOpt() +
+                    "final private LookaheadSuccess jj_ls = new LookaheadSuccess();");
+        out.println("  " + staticOpt() + "private boolean jj_scan_token(int kind) {");
+        out.println("    if (jj_scanpos == jj_lastpos) {");
+        out.println("      jj_la--;");
+        out.println("      if (jj_scanpos.next == null) {");
+        out.println("        jj_lastpos = jj_scanpos = jj_scanpos.next = " + tsClassOrVar +
+                    ".getNextToken();");
+        out.println("      } else {");
+        out.println("        jj_lastpos = jj_scanpos = jj_scanpos.next;");
+        out.println("      }");
+        out.println("    } else {");
+        out.println("      jj_scanpos = jj_scanpos.next;");
+        out.println("    }");
         if (Options.getErrorReporting()) {
-          ostr.println("    if (jj_rescan) {");
-          ostr.println("      int i = 0; Token tok = token;");
-          ostr.println("      while (tok != null && tok != jj_scanpos) { i++; tok = tok.next; }");
-          ostr.println("      if (tok != null) jj_add_error_token(kind, i);");
+          out.println("    if (jj_rescan) {");
+          out.println("      int i = 0; Token tok = token;");
+          out.println("      while (tok != null && tok != jj_scanpos) { i++; tok = tok.next; }");
+          out.println("      if (tok != null) jj_add_error_token(kind, i);");
           if (Options.getDebugLookahead()) {
-            ostr.println("    } else {");
-            ostr.println("      trace_scan(jj_scanpos, kind);");
+            out.println("    } else {");
+            out.println("      trace_scan(jj_scanpos, kind);");
           }
-          ostr.println("    }");
+          out.println("    }");
         } else if (Options.getDebugLookahead()) {
-          ostr.println("    trace_scan(jj_scanpos, kind);");
+          out.println("    trace_scan(jj_scanpos, kind);");
         }
-        ostr.println("    if (jj_scanpos.kind != kind) return true;");
-        ostr.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;");
-        ostr.println("    return false;");
-        ostr.println("  }");
-        ostr.println("");
+        out.println("    if (jj_scanpos.kind != kind) return true;");
+        out.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;");
+        out.println("    return false;");
+        out.println("  }");
+        out.println("");
       }
-      ostr.println("");
-      ostr.println("/** Get the next Token. */");
-      ostr.println("  " + staticOpt() + "final public Token getNextToken() {");
+      out.println("");
+      out.println("/** Get the next Token. */");
+      out.println("  " + staticOpt() + "final public Token getNextToken() {");
       if (Options.getCacheTokens()) {
-        ostr.println("    if ((token = jj_nt).next != null) jj_nt = jj_nt.next;");
-        ostr.println("    else jj_nt = jj_nt.next = " + tsClassOrVar + ".getNextToken();");
+        out.println("    if ((token = jj_nt).next != null) jj_nt = jj_nt.next;");
+        out.println("    else jj_nt = jj_nt.next = " + tsClassOrVar + ".getNextToken();");
       } else {
-        ostr.println("    if (token.next != null) token = token.next;");
-        ostr.println("    else token = token.next = " + tsClassOrVar + ".getNextToken();");
-        ostr.println("    jj_ntk = -1;");
+        out.println("    if (token.next != null) token = token.next;");
+        out.println("    else token = token.next = " + tsClassOrVar + ".getNextToken();");
+        out.println("    jj_ntk = -1;");
       }
       if (Options.getErrorReporting()) {
-        ostr.println("    jj_gen++;");
+        out.println("    jj_gen++;");
       }
       if (Options.getDebugParser()) {
-        ostr.println("      trace_token(token, \" (in getNextToken)\");");
+        out.println("      trace_token(token, \" (in getNextToken)\");");
       }
-      ostr.println("    return token;");
-      ostr.println("  }");
-      ostr.println("");
-      ostr.println("/** Get the specific Token. */");
-      ostr.println("  " + staticOpt() + "final public Token getToken(int index) {");
+      out.println("    return token;");
+      out.println("  }");
+      out.println("");
+      out.println("/** Get the specific Token. */");
+      out.println("  " + staticOpt() + "final public Token getToken(int index) {");
       if (lookaheadNeeded) {
-        ostr.println("    Token t = jj_lookingAhead ? jj_scanpos : token;");
+        out.println("    Token t = jj_lookingAhead ? jj_scanpos : token;");
       } else {
-        ostr.println("    Token t = token;");
+        out.println("    Token t = token;");
       }
-      ostr.println("    for (int i = 0; i < index; i++) {");
-      ostr.println("      if (t.next != null) t = t.next;");
-      ostr.println("      else t = t.next = " + tsClassOrVar + ".getNextToken();");
-      ostr.println("    }");
-      ostr.println("    return t;");
-      ostr.println("  }");
-      ostr.println("");
+      out.println("    for (int i = 0; i < index; i++) {");
+      out.println("      if (t.next != null) t = t.next;");
+      out.println("      else t = t.next = " + tsClassOrVar + ".getNextToken();");
+      out.println("    }");
+      out.println("    return t;");
+      out.println("  }");
+      out.println("");
       if (!Options.getCacheTokens()) {
-        ostr.println("  " + staticOpt() + "private int jj_ntk() {");
-        ostr.println("    if ((jj_nt=token.next) == null)");
-        ostr.println("      return (jj_ntk = (token.next = " + tsClassOrVar +
-                     ".getNextToken()).kind);");
-        ostr.println("    else");
-        ostr.println("      return (jj_ntk = jj_nt.kind);");
-        ostr.println("  }");
-        ostr.println("");
+        out.println("  " + staticOpt() + "private int jj_ntk() {");
+        out.println("    if ((jj_nt=token.next) == null)");
+        out.println("      return (jj_ntk = (token.next = " + tsClassOrVar +
+                    ".getNextToken()).kind);");
+        out.println("    else");
+        out.println("      return (jj_ntk = jj_nt.kind);");
+        out.println("  }");
+        out.println("");
       }
       if (Options.getErrorReporting()) {
         if (!Options.getGenerateGenerics())
-          ostr.println("  " + staticOpt() +
-                       "private java.util.List jj_expentries = new java.util.ArrayList();");
+          out.println("  " + staticOpt() +
+                      "private java.util.List jj_expentries = new java.util.ArrayList();");
         else
-          ostr.println("  " + staticOpt() +
-                       "private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();");
-        ostr.println("  " + staticOpt() + "private int[] jj_expentry;");
-        ostr.println("  " + staticOpt() + "private int jj_kind = -1;");
+          out.println("  " + staticOpt() +
+                      "private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();");
+        out.println("  " + staticOpt() + "private int[] jj_expentry;");
+        out.println("  " + staticOpt() + "private int jj_kind = -1;");
         if (jj2index != 0) {
-          ostr.println("  " + staticOpt() + "private int[] jj_lasttokens = new int[100];");
-          ostr.println("  " + staticOpt() + "private int jj_endpos;");
-          ostr.println("");
-          ostr.println("  " + staticOpt() + "private void jj_add_error_token(int kind, int pos) {");
-          ostr.println("    if (pos >= 100) return;");
-          ostr.println("    if (pos == jj_endpos + 1) {");
-          ostr.println("      jj_lasttokens[jj_endpos++] = kind;");
-          ostr.println("    } else if (jj_endpos != 0) {");
-          ostr.println("      jj_expentry = new int[jj_endpos];");
-          ostr.println("      for (int i = 0; i < jj_endpos; i++) {");
-          ostr.println("        jj_expentry[i] = jj_lasttokens[i];");
-          ostr.println("      }");
-          ostr.println("      jj_entries_loop: for (java.util.Iterator<int[]>  it = jj_expentries.iterator(); it.hasNext();) {");
-          ostr.println("        int[] oldentry = (int[])(it.next());");
-          ostr.println("        if (oldentry.length == jj_expentry.length) {");
-          ostr.println("          for (int i = 0; i < jj_expentry.length; i++) {");
-          ostr.println("            if (oldentry[i] != jj_expentry[i]) {");
-          ostr.println("              continue jj_entries_loop;");
-          ostr.println("            }");
-          ostr.println("          }");
-          ostr.println("          jj_expentries.add(jj_expentry);");
-          ostr.println("          break jj_entries_loop;");
-          ostr.println("        }");
-          ostr.println("      }");
-          ostr.println("      if (pos != 0) jj_lasttokens[(jj_endpos = pos) - 1] = kind;");
-          ostr.println("    }");
-          ostr.println("  }");
+          out.println("  " + staticOpt() + "private int[] jj_lasttokens = new int[100];");
+          out.println("  " + staticOpt() + "private int jj_endpos;");
+          out.println("");
+          out.println("  " + staticOpt() + "private void jj_add_error_token(int kind, int pos) {");
+          out.println("    if (pos >= 100) return;");
+          out.println("    if (pos == jj_endpos + 1) {");
+          out.println("      jj_lasttokens[jj_endpos++] = kind;");
+          out.println("    } else if (jj_endpos != 0) {");
+          out.println("      jj_expentry = new int[jj_endpos];");
+          out.println("      for (int i = 0; i < jj_endpos; i++) {");
+          out.println("        jj_expentry[i] = jj_lasttokens[i];");
+          out.println("      }");
+          out.println("      jj_entries_loop: for (java.util.Iterator<int[]>  it = jj_expentries.iterator(); it.hasNext();) {");
+          out.println("        int[] oldentry = (int[])(it.next());");
+          out.println("        if (oldentry.length == jj_expentry.length) {");
+          out.println("          for (int i = 0; i < jj_expentry.length; i++) {");
+          out.println("            if (oldentry[i] != jj_expentry[i]) {");
+          out.println("              continue jj_entries_loop;");
+          out.println("            }");
+          out.println("          }");
+          out.println("          jj_expentries.add(jj_expentry);");
+          out.println("          break jj_entries_loop;");
+          out.println("        }");
+          out.println("      }");
+          out.println("      if (pos != 0) jj_lasttokens[(jj_endpos = pos) - 1] = kind;");
+          out.println("    }");
+          out.println("  }");
         }
-        ostr.println("");
-        ostr.println("  /** Generate ParseException. */");
-        ostr.println("  " + staticOpt() + "public ParseException generateParseException() {");
-        ostr.println("    jj_expentries.clear();");
-        ostr.println("    boolean[] la1tokens = new boolean[" + tokenCount + "];");
-        ostr.println("    if (jj_kind >= 0) {");
-        ostr.println("      la1tokens[jj_kind] = true;");
-        ostr.println("      jj_kind = -1;");
-        ostr.println("    }");
-        ostr.println("    for (int i = 0; i < " + maskindex + "; i++) {");
-        ostr.println("      if (jj_la1[i] == jj_gen) {");
-        ostr.println("        for (int j = 0; j < 32; j++) {");
+        out.println("");
+        out.println("  /** Generate ParseException. */");
+        out.println("  " + staticOpt() + "public ParseException generateParseException() {");
+        out.println("    jj_expentries.clear();");
+        out.println("    boolean[] la1tokens = new boolean[" + tokenCount + "];");
+        out.println("    if (jj_kind >= 0) {");
+        out.println("      la1tokens[jj_kind] = true;");
+        out.println("      jj_kind = -1;");
+        out.println("    }");
+        out.println("    for (int i = 0; i < " + maskindex + "; i++) {");
+        out.println("      if (jj_la1[i] == jj_gen) {");
+        out.println("        for (int j = 0; j < 32; j++) {");
         for (int i = 0; i < (tokenCount - 1) / 32 + 1; i++) {
-          ostr.println("          if ((jj_la1_" + i + "[i] & (1<<j)) != 0) {");
-          ostr.print("            la1tokens[");
+          out.println("          if ((jj_la1_" + i + "[i] & (1<<j)) != 0) {");
+          out.print("            la1tokens[");
           if (i != 0) {
-            ostr.print((32 * i) + "+");
+            out.print((32 * i) + "+");
           }
-          ostr.println("j] = true;");
-          ostr.println("          }");
+          out.println("j] = true;");
+          out.println("          }");
         }
-        ostr.println("        }");
-        ostr.println("      }");
-        ostr.println("    }");
-        ostr.println("    for (int i = 0; i < " + tokenCount + "; i++) {");
-        ostr.println("      if (la1tokens[i]) {");
-        ostr.println("        jj_expentry = new int[1];");
-        ostr.println("        jj_expentry[0] = i;");
-        ostr.println("        jj_expentries.add(jj_expentry);");
-        ostr.println("      }");
-        ostr.println("    }");
+        out.println("        }");
+        out.println("      }");
+        out.println("    }");
+        out.println("    for (int i = 0; i < " + tokenCount + "; i++) {");
+        out.println("      if (la1tokens[i]) {");
+        out.println("        jj_expentry = new int[1];");
+        out.println("        jj_expentry[0] = i;");
+        out.println("        jj_expentries.add(jj_expentry);");
+        out.println("      }");
+        out.println("    }");
         if (jj2index != 0) {
-          ostr.println("    jj_endpos = 0;");
-          ostr.println("    jj_rescan_token();");
-          ostr.println("    jj_add_error_token(0, 0);");
+          out.println("    jj_endpos = 0;");
+          out.println("    jj_rescan_token();");
+          out.println("    jj_add_error_token(0, 0);");
         }
-        ostr.println("    int[][] exptokseq = new int[jj_expentries.size()][];");
-        ostr.println("    for (int i = 0; i < jj_expentries.size(); i++) {");
+        out.println("    int[][] exptokseq = new int[jj_expentries.size()][];");
+        out.println("    for (int i = 0; i < jj_expentries.size(); i++) {");
         if (!Options.getGenerateGenerics())
-          ostr.println("      exptokseq[i] = (int[])jj_expentries.get(i);");
+          out.println("      exptokseq[i] = (int[])jj_expentries.get(i);");
         else
-          ostr.println("      exptokseq[i] = jj_expentries.get(i);");
-        ostr.println("    }");
-        ostr.println("    return new ParseException(token, exptokseq, tokenImage);");
-        ostr.println("  }");
+          out.println("      exptokseq[i] = jj_expentries.get(i);");
+        out.println("    }");
+        out.println("    return new ParseException(token, exptokseq, tokenImage);");
+        out.println("  }");
       } else {
-        ostr.println("  /** Generate ParseException. */");
-        ostr.println("  " + staticOpt() + "public ParseException generateParseException() {");
-        ostr.println("    Token errortok = token.next;");
+        out.println("  /** Generate ParseException. */");
+        out.println("  " + staticOpt() + "public ParseException generateParseException() {");
+        out.println("    Token errortok = token.next;");
         if (Options.getKeepLineColumn())
-          ostr.println("    int line = errortok.beginLine, column = errortok.beginColumn;");
-        ostr.println("    String mess = (errortok.kind == 0) ? tokenImage[0] : errortok.image;");
+          out.println("    int line = errortok.beginLine, column = errortok.beginColumn;");
+        out.println("    String mess = (errortok.kind == 0) ? tokenImage[0] : errortok.image;");
         if (Options.getKeepLineColumn())
-          ostr.println("    return new ParseException("
-                       + "\"Parse error at line \" + line + \", column \" + column + \".  "
-                       + "Encountered: \" + mess);");
+          out.println("    return new ParseException("
+                      + "\"Parse error at line \" + line + \", column \" + column + \".  "
+                      + "Encountered: \" + mess);");
         else
-          ostr.println("    return new ParseException(\"Parse error at <unknown location>.  "
-                       + "Encountered: \" + mess);");
-        ostr.println("  }");
+          out.println("    return new ParseException(\"Parse error at <unknown location>.  "
+                      + "Encountered: \" + mess);");
+        out.println("  }");
       }
-      ostr.println("");
+      out.println("");
       if (Options.getDebugParser()) {
-        ostr.println("  " + staticOpt() + "private int trace_indent = 0;");
-        ostr.println("  " + staticOpt() + "private boolean trace_enabled = true;");
-        ostr.println("");
-        ostr.println("/** Enable tracing. */");
-        ostr.println("  " + staticOpt() + "final public void enable_tracing() {");
-        ostr.println("    trace_enabled = true;");
-        ostr.println("  }");
-        ostr.println("");
-        ostr.println("/** Disable tracing. */");
-        ostr.println("  " + staticOpt() + "final public void disable_tracing() {");
-        ostr.println("    trace_enabled = false;");
-        ostr.println("  }");
-        ostr.println("");
-        ostr.println("  " + staticOpt() + "private void trace_call(String s) {");
-        ostr.println("    if (trace_enabled) {");
-        ostr.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
-        ostr.println("      System.out.println(\"Call:   \" + s);");
-        ostr.println("    }");
-        ostr.println("    trace_indent = trace_indent + 2;");
-        ostr.println("  }");
-        ostr.println("");
-        ostr.println("  " + staticOpt() + "private void trace_return(String s) {");
-        ostr.println("    trace_indent = trace_indent - 2;");
-        ostr.println("    if (trace_enabled) {");
-        ostr.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
-        ostr.println("      System.out.println(\"Return: \" + s);");
-        ostr.println("    }");
-        ostr.println("  }");
-        ostr.println("");
-        ostr.println("  " + staticOpt() + "private void trace_token(Token t, String where) {");
-        ostr.println("    if (trace_enabled) {");
-        ostr.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
-        ostr.println("      System.out.print(\"Consumed token: <\" + tokenImage[t.kind]);");
-        ostr.println("      if (t.kind != 0 && !tokenImage[t.kind].equals(\"\\\"\" + t.image + \"\\\"\")) {");
-        ostr.println("        System.out.print(\": \\\"\" + t.image + \"\\\"\");");
-        ostr.println("      }");
-        ostr.println("      System.out.println(\" at line \" + t.beginLine + "
-                     + "\" column \" + t.beginColumn + \">\" + where);");
-        ostr.println("    }");
-        ostr.println("  }");
-        ostr.println("");
-        ostr.println("  " + staticOpt() + "private void trace_scan(Token t1, int t2) {");
-        ostr.println("    if (trace_enabled) {");
-        ostr.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
-        ostr.println("      System.out.print(\"Visited token: <\" + tokenImage[t1.kind]);");
-        ostr.println("      if (t1.kind != 0 && !tokenImage[t1.kind].equals(\"\\\"\" + t1.image + \"\\\"\")) {");
-        ostr.println("        System.out.print(\": \\\"\" + t1.image + \"\\\"\");");
-        ostr.println("      }");
-        ostr.println("      System.out.println(\" at line \" + t1.beginLine + \""
-                     + " column \" + t1.beginColumn + \">; Expected token: <\" + tokenImage[t2] + \">\");");
-        ostr.println("    }");
-        ostr.println("  }");
-        ostr.println("");
+        out.println("  " + staticOpt() + "private int trace_indent = 0;");
+        out.println("  " + staticOpt() + "private boolean trace_enabled = true;");
+        out.println("");
+        out.println("/** Enable tracing. */");
+        out.println("  " + staticOpt() + "final public void enable_tracing() {");
+        out.println("    trace_enabled = true;");
+        out.println("  }");
+        out.println("");
+        out.println("/** Disable tracing. */");
+        out.println("  " + staticOpt() + "final public void disable_tracing() {");
+        out.println("    trace_enabled = false;");
+        out.println("  }");
+        out.println("");
+        out.println("  " + staticOpt() + "private void trace_call(String s) {");
+        out.println("    if (trace_enabled) {");
+        out.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
+        out.println("      System.out.println(\"Call:   \" + s);");
+        out.println("    }");
+        out.println("    trace_indent = trace_indent + 2;");
+        out.println("  }");
+        out.println("");
+        out.println("  " + staticOpt() + "private void trace_return(String s) {");
+        out.println("    trace_indent = trace_indent - 2;");
+        out.println("    if (trace_enabled) {");
+        out.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
+        out.println("      System.out.println(\"Return: \" + s);");
+        out.println("    }");
+        out.println("  }");
+        out.println("");
+        out.println("  " + staticOpt() + "private void trace_token(Token t, String where) {");
+        out.println("    if (trace_enabled) {");
+        out.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
+        out.println("      System.out.print(\"Consumed token: <\" + tokenImage[t.kind]);");
+        out.println("      if (t.kind != 0 && !tokenImage[t.kind].equals(\"\\\"\" + t.image + \"\\\"\")) {");
+        out.println("        System.out.print(\": \\\"\" + t.image + \"\\\"\");");
+        out.println("      }");
+        out.println("      System.out.println(\" at line \" + t.beginLine + "
+                    + "\" column \" + t.beginColumn + \">\" + where);");
+        out.println("    }");
+        out.println("  }");
+        out.println("");
+        out.println("  " + staticOpt() + "private void trace_scan(Token t1, int t2) {");
+        out.println("    if (trace_enabled) {");
+        out.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
+        out.println("      System.out.print(\"Visited token: <\" + tokenImage[t1.kind]);");
+        out.println("      if (t1.kind != 0 && !tokenImage[t1.kind].equals(\"\\\"\" + t1.image + \"\\\"\")) {");
+        out.println("        System.out.print(\": \\\"\" + t1.image + \"\\\"\");");
+        out.println("      }");
+        out.println("      System.out.println(\" at line \" + t1.beginLine + \""
+                    + " column \" + t1.beginColumn + \">; Expected token: <\" + tokenImage[t2] + \">\");");
+        out.println("    }");
+        out.println("  }");
+        out.println("");
       } else {
-        ostr.println("  /** Enable tracing. */");
-        ostr.println("  " + staticOpt() + "final public void enable_tracing() {");
-        ostr.println("  }");
-        ostr.println("");
-        ostr.println("  /** Disable tracing. */");
-        ostr.println("  " + staticOpt() + "final public void disable_tracing() {");
-        ostr.println("  }");
-        ostr.println("");
+        out.println("  /** Enable tracing. */");
+        out.println("  " + staticOpt() + "final public void enable_tracing() {");
+        out.println("  }");
+        out.println("");
+        out.println("  /** Disable tracing. */");
+        out.println("  " + staticOpt() + "final public void disable_tracing() {");
+        out.println("  }");
+        out.println("");
       }
       if (jj2index != 0 && Options.getErrorReporting()) {
-        ostr.println("  " + staticOpt() + "private void jj_rescan_token() {");
-        ostr.println("    jj_rescan = true;");
-        ostr.println("    for (int i = 0; i < " + jj2index + "; i++) {");
-        ostr.println("    try {");
-        ostr.println("      JJCalls p = jj_2_rtns[i];");
-        ostr.println("      do {");
-        ostr.println("        if (p.gen > jj_gen) {");
-        ostr.println("          jj_la = p.arg; jj_lastpos = jj_scanpos = p.first;");
-        ostr.println("          switch (i) {");
+        out.println("  " + staticOpt() + "private void jj_rescan_token() {");
+        out.println("    jj_rescan = true;");
+        out.println("    for (int i = 0; i < " + jj2index + "; i++) {");
+        out.println("    try {");
+        out.println("      JJCalls p = jj_2_rtns[i];");
+        out.println("      do {");
+        out.println("        if (p.gen > jj_gen) {");
+        out.println("          jj_la = p.arg; jj_lastpos = jj_scanpos = p.first;");
+        out.println("          switch (i) {");
         for (int i = 0; i < jj2index; i++) {
-          ostr.println("            case " + i + ": jj_3_" + (i + 1) + "(); break;");
+          out.println("            case " + i + ": jj_3_" + (i + 1) + "(); break;");
         }
-        ostr.println("          }");
-        ostr.println("        }");
-        ostr.println("        p = p.next;");
-        ostr.println("      } while (p != null);");
-        ostr.println("      } catch(LookaheadSuccess ls) { }");
-        ostr.println("    }");
-        ostr.println("    jj_rescan = false;");
-        ostr.println("  }");
-        ostr.println("");
-        ostr.println("  " + staticOpt() + "private void jj_save(int index, int xla) {");
-        ostr.println("    JJCalls p = jj_2_rtns[index];");
-        ostr.println("    while (p.gen > jj_gen) {");
-        ostr.println("      if (p.next == null) { p = p.next = new JJCalls(); break; }");
-        ostr.println("      p = p.next;");
-        ostr.println("    }");
-        ostr.println("    p.gen = jj_gen + xla - jj_la; p.first = token; p.arg = xla;");
-        ostr.println("  }");
-        ostr.println("");
+        out.println("          }");
+        out.println("        }");
+        out.println("        p = p.next;");
+        out.println("      } while (p != null);");
+        out.println("      } catch(LookaheadSuccess ls) { }");
+        out.println("    }");
+        out.println("    jj_rescan = false;");
+        out.println("  }");
+        out.println("");
+        out.println("  " + staticOpt() + "private void jj_save(int index, int xla) {");
+        out.println("    JJCalls p = jj_2_rtns[index];");
+        out.println("    while (p.gen > jj_gen) {");
+        out.println("      if (p.next == null) { p = p.next = new JJCalls(); break; }");
+        out.println("      p = p.next;");
+        out.println("    }");
+        out.println("    p.gen = jj_gen + xla - jj_la; p.first = token; p.arg = xla;");
+        out.println("  }");
+        out.println("");
       }
       if (jj2index != 0 && Options.getErrorReporting()) {
-        ostr.println("  static final class JJCalls {");
-        ostr.println("    int gen;");
-        ostr.println("    Token first;");
-        ostr.println("    int arg;");
-        ostr.println("    JJCalls next;");
-        ostr.println("  }");
-        ostr.println("");
+        out.println("  static final class JJCalls {");
+        out.println("    int gen;");
+        out.println("    Token first;");
+        out.println("    int arg;");
+        out.println("    JJCalls next;");
+        out.println("  }");
+        out.println("");
       }
       if (cu_from_insertion_point_2.size() != 0) {
         printTokenSetup((cu_from_insertion_point_2.get(0)));
         ccol = 1;
         for (final Iterator<Token> it = cu_from_insertion_point_2.iterator(); it.hasNext();) {
           t = it.next();
-          printToken(t, ostr);
+          printToken(t, out);
         }
-        printTrailingComments(t, ostr);
+        printTrailingComments(t, out);
       }
-      ostr.println("");
-      ostr.close();
+      out.println("");
+      out.close();
     } // matches "if (Options.getBuildParser())"
     // ModMMa : added for Token.template with GTToken
     return cu_name;
   }
 
-  static private PrintWriter ostr;
-
+  /** Reinitializes */
   public static void reInit() {
-    ostr = null;
+    out = null;
     lookaheadNeeded = false;
   }
 }

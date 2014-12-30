@@ -78,111 +78,115 @@ public class Globals {
    */
 
   /** Turns on / off debugging class comment printing */
-  public static final boolean PRINT_CLASS_COMMENT   = false;
+  public static final boolean DEBUG_CLASS_COMMENTS         = false;
+  /** Turns on / off debugging class comment printing */
+  public static final boolean DEBUG_FIELD_AND_SUB_COMMENTS = false;
   /** The program version */
-  public static final String  VERSION               = "1.4.7";
+  public static final String  VERSION                      = "1.4.9";
   /** The serial uid version */
-  public static final long    SERIAL_UID            = 147L;
+  public static final long    SERIAL_UID                   = 149;
   /** The java program name */
-  public static final String  PROG_NAME             = "JTB";
+  public static final String  PROG_NAME                    = "JTB";
   /** The shell script name */
-  public static final String  SCRIPT_NAME           = "jtb";
+  public static final String  SCRIPT_NAME                  = "jtb";
   /** Some of the authors */
-  public static final String  AUTHORS               = "Jens Palsberg, Wanjun Wang, Kevin Tao, Vids Samanta,"
-                                                      + " Marc Mazas, Francis Andre";
+  public static final String  AUTHORS                      = "Jens Palsberg, Wanjun Wang, Kevin Tao, Vids Samanta,"
+                                                             + " Marc Mazas, Francis Andre";
   /** An indication in case of JTB internal errors */
-  public static final String  SUPPORT               = "support";
+  public static final String  SUPPORT                      = "JTB support (https://java.net/projects/jtb/)";
   /** The indentation default number of characters */
-  public static final int     INDENT_AMT            = 2;
+  public static final int     INDENT_AMT                   = 2;
   /** The OS line separator string */
-  public static final String  LS                    = System.getProperty("line.separator");
+  public static final String  LS                           = System.getProperty("line.separator");
+  /** The OS line separator first character */
+  public static final char    LS0                          = LS.charAt(0);
   /** The OS line separator string length */
-  public static final int     LSLEN                 = LS.length();
+  public static final int     LSLEN                        = LS.length();
   /** The javadoc break */
-  public static final String  BR                    = "<br>";
+  public static final String  BR                           = "<br>";
   /** The javadoc break plus string length */
-  public static final int     BRLEN                 = BR.length();
+  public static final int     BRLEN                        = BR.length();
   /** The javadoc break plus the OS line separator */
-  public static final String  BRLS                  = BR + LS;
+  public static final String  BRLS                         = BR + LS;
   /** The javadoc break plus the OS line separator string length */
-  public static final int     BRLSLEN               = BRLS.length();
+  public static final int     BRLSLEN                      = BRLS.length();
 
   /*
    * Classes / interfaces / variables names (constants)
    */
 
   /** Name of the node interface that all tree nodes implement */
-  public static final String  iNode                 = INode.class.getSimpleName();
+  public static final String  iNode                        = INode.class.getSimpleName();
   /** Name of the list interface that NodeList, NodeListOptional and NodeSequence implement */
-  public static final String  iNodeList             = INodeList.class.getSimpleName();
+  public static final String  iNodeList                    = INodeList.class.getSimpleName();
 
   /** Name of the node class representing a grammar choice such as ( A | B ) */
-  public static final String  nodeChoice            = NodeChoice.class.getSimpleName();
+  public static final String  nodeChoice                   = NodeChoice.class.getSimpleName();
   /** Name of the node class representing a list such as ( A )+ */
-  public static final String  nodeList              = NodeList.class.getSimpleName();
+  public static final String  nodeList                     = NodeList.class.getSimpleName();
   /** Name of the node class representing an optional list such as (A )* */
-  public static final String  nodeListOpt           = NodeListOptional.class.getSimpleName();
+  public static final String  nodeListOpt                  = NodeListOptional.class.getSimpleName();
   /** Name of the node class representing an optional such as [ A ] or ( A )? */
-  public static final String  nodeOpt               = NodeOptional.class.getSimpleName();
+  public static final String  nodeOpt                      = NodeOptional.class.getSimpleName();
   /** Name of the node class representing a nested sequence of nodes */
-  public static final String  nodeSeq               = NodeSequence.class.getSimpleName();
+  public static final String  nodeSeq                      = NodeSequence.class.getSimpleName();
   /** Name of the node class representing a token string such as "package" */
-  public static final String  nodeToken             = NodeToken.class.getSimpleName();
+  public static final String  nodeToken                    = NodeToken.class.getSimpleName();
   /** Name of the (generated by JavaCC) class representing a token */
-  public static final String  jjToken               = Token.class.getSimpleName();
+  public static final String  jjToken                      = Token.class.getSimpleName();
   /**
    * Name of the node class representing a token string in an ExpansionUnit type 3:<br>
    * "try", "{", "}", "catch", "(", ")", "finally"
    */
-  public static final String  nodeTCF               = NodeTCF.class.getSimpleName();
+  public static final String  nodeTCF                      = NodeTCF.class.getSimpleName();
 
   /** "RetArgu" visitor interface name (with return type and a user object argument) */
-  public static final String  iRetArguVisitor       = "IRetArguVisitor";
+  public static final String  iRetArguVisitor              = "IRetArguVisitor";
   /** Depth First "RetArgu" visitor class name (with return type and a user object argument) */
-  public static final String  dFRetArguVisitor      = "DepthFirstRetArguVisitor";
+  public static final String  dFRetArguVisitor             = "DepthFirstRetArguVisitor";
   /** Javadoc comment fragment for "RetArgu" visitor */
-  public static final String  retArguVisitorCmt     = "RetArgu";
+  public static final String  retArguVisitorCmt            = "RetArgu";
 
   /** "Ret" visitor interface name (with return type and no user object argument) */
-  public static final String  iRetVisitor           = "IRetVisitor";
+  public static final String  iRetVisitor                  = "IRetVisitor";
   /** Depth First "Ret" visitor class name (with return type and no user object argument) */
-  public static final String  dFRetVisitor          = "DepthFirstRetVisitor";
+  public static final String  dFRetVisitor                 = "DepthFirstRetVisitor";
   /** Javadoc comment fragment for "Ret" visitor */
-  public static final String  retVisitorCmt         = "Ret";
+  public static final String  retVisitorCmt                = "Ret";
 
   /** "VoidArgu" visitor interface name (with no return type and a user object argument) */
-  public static final String  iVoidArguVisitor      = "IVoidArguVisitor";
+  public static final String  iVoidArguVisitor             = "IVoidArguVisitor";
   /** Depth First "VoidArgu" visitor class name (with no return type and a user object argument) */
-  public static final String  dFVoidArguVisitor     = "DepthFirstVoidArguVisitor";
+  public static final String  dFVoidArguVisitor            = "DepthFirstVoidArguVisitor";
   /** Javadoc comment fragment for "VoidArgu" visitor */
-  public static final String  voidArguVisitorCmt    = "VoidArgu";
+  public static final String  voidArguVisitorCmt           = "VoidArgu";
 
   /** "Void" visitor interface name (with no return type and no user object argument)) */
-  public static final String  iVoidVisitor          = "IVoidVisitor";
+  public static final String  iVoidVisitor                 = "IVoidVisitor";
   /** Depth First "Void" visitor class name (with no return type and no user object argument) */
-  public static final String  dFVoidVisitor         = "DepthFirstVoidVisitor";
+  public static final String  dFVoidVisitor                = "DepthFirstVoidVisitor";
   /** Javadoc comment fragment for "Void" visitor */
-  public static final String  voidVisitorCmt        = "Void";
+  public static final String  voidVisitorCmt               = "Void";
 
   /** Visitor methods return type */
-  public static final String  genRetType            = "R";
+  public static final String  genRetType                   = "R";
   /** Visitor methods user argument (second argument) type */
-  public static final String  genArguType           = "A";
+  public static final String  genArguType                  = "A";
   /** Visitor methods user argument (second argument) varargs type */
-  public static final String  genArgusType          = "A...";
+  public static final String  genArgusType                 = "A...";
   /** Visitor methods return variable */
-  public static final String  genRetVar             = "nRes";
+  public static final String  genRetVar                    = "nRes";
   /** Visitor methods node argument (first argument) variable */
-  public static final String  genNodeVar            = "n";
+  public static final String  genNodeVar                   = "n";
   /** Visitor methods node argument (first argument) variable plus dot */
-  public static final String  genNodeVarDot         = genNodeVar + ".";
+  public static final String  genNodeVarDot                = genNodeVar + ".";
   /** Visitor methods user argument (second argument) variable */
-  public static final String  genArguVar            = "argu";
+  public static final String  genArguVar                   = "argu";
   /** Visitor methods depth level local variable */
-  public static final String  genDepthLevelVar      = "depthLevel";
+  public static final String  genDepthLevelVar             = "depthLevel";
 
   /** The JTB result type variables prefix */
-  public static final String  jtbRtPrefix           = "jtbrt_";
+  public static final String  jtbRtPrefix                  = "jtbrt_";
 
   /*
    * Changeable flags (command line options)
@@ -191,78 +195,78 @@ public class Globals {
   /**
    * -cl option which prints the generated classes list to System.out
    */
-  public static boolean       printClassList        = false;
+  public static boolean       printClassList               = false;
   /**
    * -w options which prevents JTB from overwriting existing files
    */
-  public static boolean       noOverwrite           = false;
+  public static boolean       noOverwrite                  = false;
   /**
    * -e option which suppresses JTB semantic error checking
    */
-  public static boolean       noSemanticCheck       = false;
+  public static boolean       noSemanticCheck              = false;
   /**
    * -jd option which generates JavaDoc-friendly comments in generated visitors and syntax tree
    * classes
    */
-  public static boolean       javaDocComments       = false;
+  public static boolean       javaDocComments              = false;
   /**
    * -f option which generates descriptive node class child field names such as whileStatement,
    * nodeToken2, ... rather than f0, f1, ...
    */
-  public static boolean       descriptiveFieldNames = false;
+  public static boolean       descriptiveFieldNames        = false;
   /**
    * -pp option which generates parent pointer and getParent() and setParent() methods in all node
    * classes
    */
-  public static boolean       parentPointer         = false;
+  public static boolean       parentPointer                = false;
   /**
    * -dl option which generates depthLevel field in all visitor classes
    */
-  public static boolean       depthLevel            = false;
+  public static boolean       depthLevel                   = false;
   /**
    * -tk option which stores special tokens in the parse tree
    */
-  public static boolean       keepSpecialTokens     = false;
+  public static boolean       keepSpecialTokens            = false;
   /**
    * -ia option which "inlines" the visitors accept methods on base classes
    */
-  public static boolean       inlineAcceptMethods   = false;
+  public static boolean       inlineAcceptMethods          = false;
   /**
    * -va option which generates a return/argument visitor with a variable number of argument
    */
-  public static boolean       varargs               = false;
+  public static boolean       varargs                      = false;
   /**
    * -scheme option which generates the Scheme programming language record definitions file
    * records.scm and the SchemeTreeBuilder visitor
    */
-  public static boolean       schemeToolkit         = false;
+  public static boolean       schemeToolkit                = false;
   /**
    * -printer option which generates TreeDumper and TreeFormatter visitors
    */
-  public static boolean       printerToolkit        = false;
+  public static boolean       printerToolkit               = false;
   /**
    * static or not option that comes from JavaCC
    */
-  public static boolean       staticFlag            = false;
+  public static boolean       staticFlag                   = false;
 
   /*
    * Default names
    */
 
   /** Default nodes prefix */
-  public static final String  DEF_ND_PREFIX         = "";
+  public static final String  DEF_ND_PREFIX                = "";
   /** Default nodes suffix */
-  public static final String  DEF_ND_SUFFIX         = "";
+  public static final String  DEF_ND_SUFFIX                = "";
   /** Default nodes package name */
-  public static final String  DEF_ND_PKG_NAME       = "syntaxtree";
+  public static final String  DEF_ND_PKG_NAME              = "syntaxtree";
   /** Default nodes package name */
-  public static final String  DEF_VIS_PKG_NAME      = "visitor";
+  public static final String  DEF_VIS_PKG_NAME             = "visitor";
   /** Default nodes package name */
-  public static final String  DEF_ND_DIR_NAME       = "syntaxtree";
+  public static final String  DEF_ND_DIR_NAME              = "syntaxtree";
   /** Default nodes package name */
-  public static final String  DEF_VIS_DIR_NAME      = "visitor";
+  public static final String  DEF_VIS_DIR_NAME             = "visitor";
   /** Default nodes package name */
-  public static final String  DEF_OUT_FILE_NAME     = "jtb.out.jj";
+  public static final String  DEF_OUT_FILE_NAME            = "jtb.out.jj";
 
   /*
    * Changeable names
@@ -271,31 +275,31 @@ public class Globals {
   /**
    * -npfx & -nsfx options which defines the node' prefix
    */
-  public static String        nodePrefix            = DEF_ND_PREFIX;
+  public static String        nodePrefix                   = DEF_ND_PREFIX;
   /**
    * -npfx & -nsfx options which defines the node' suffix
    */
-  public static String        nodeSuffix            = DEF_ND_SUFFIX;
+  public static String        nodeSuffix                   = DEF_ND_SUFFIX;
   /**
    * -np & -p options which defines the nodes package name (default is syntaxtree)
    */
-  public static String        nodesPackageName      = DEF_ND_PKG_NAME;
+  public static String        nodesPackageName             = DEF_ND_PKG_NAME;
   /**
    * -vp & -p options which defines the visitors package name (default is visitor)
    */
-  public static String        visitorsPackageName   = DEF_VIS_PKG_NAME;
+  public static String        visitorsPackageName          = DEF_VIS_PKG_NAME;
   /**
    * -nd & -d options which defines the nodes directory name (default is syntaxtree)
    */
-  public static String        nodesDirName          = DEF_ND_DIR_NAME;
+  public static String        nodesDirName                 = DEF_ND_DIR_NAME;
   /**
    * -vd & -d options which defines the visitors directory name (default is visitor)
    */
-  public static String        visitorsDirName       = DEF_VIS_DIR_NAME;
+  public static String        visitorsDirName              = DEF_VIS_DIR_NAME;
   /**
    * -ns option which defines the nodes superclass
    */
-  public static String        nodesSuperclass       = null;
+  public static String        nodesSuperclass              = null;
   /**
    * the input (jtb) file name (must be set in main)
    */
@@ -303,7 +307,7 @@ public class Globals {
   /**
    * -o option which defines the output (generated) file name (default is jtb.out.jj)
    */
-  public static String        jtbOutputFileName     = DEF_OUT_FILE_NAME;
+  public static String        jtbOutputFileName            = DEF_OUT_FILE_NAME;
 
   /*
    * Convenience methods

@@ -34,6 +34,7 @@ import java.util.Set;
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public class ZeroOrMore extends Expansion_ {
 
@@ -42,10 +43,17 @@ public class ZeroOrMore extends Expansion_ {
    */
   public Expansion_ expansion;
 
+  /** Standard constructor */
   public ZeroOrMore() {
     expType = EXP_TYPE.ZERO_OR_MORE;
   }
 
+  /**
+   * Constructor with parameters
+   * 
+   * @param token - the token
+   * @param exp - the node
+   */
   public ZeroOrMore(final Token token, final Expansion_ exp) {
     this();
     setLine(token.beginLine);
@@ -61,7 +69,7 @@ public class ZeroOrMore extends Expansion_ {
     if (alreadyDumped.contains(this))
       return sb;
     alreadyDumped.add(this);
-    sb.append(eol).append(expansion.dump(indent + 1, alreadyDumped));
+    sb.append(EOL).append(expansion.dump(indent + 1, alreadyDumped));
     return sb;
   }
 }

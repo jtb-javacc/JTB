@@ -37,14 +37,15 @@ import java.util.Map;
  * Only very basic template processing is supplied - if we need something more sophisticated I
  * suggest we use a third-party library.
  * 
- * @author Paul Cager
- * @since 4.2
- * @author Marc Mazas
+ * @author Paul Cager, Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public class JavaFileGenerator {
 
   /**
+   * Constructor with parameters
+   * 
    * @param tn - the name of the template. E.g. "/templates/Token.template".
    * @param opt - the processing options in force, such as "STATIC=yes"
    */
@@ -61,7 +62,7 @@ public class JavaFileGenerator {
   private String                    currentLine;
 
   /**
-   * Generate the output file.
+   * Generates the output file.
    * 
    * @param out - the PrintWriter to output into
    * @throws IOException - if the template file name is invalid
@@ -241,6 +242,8 @@ public class JavaFileGenerator {
   }
 
   /**
+   * Processes the template.
+   * 
    * @param in - the BufferedReader to read from
    * @param out - the PrintWriter to write to
    * @param ignoring - true if line must not be output, false otherwise

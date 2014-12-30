@@ -33,6 +33,7 @@ package EDU.purdue.jtb.parser;
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public class ROneOrMore extends RegularExpression_ {
 
@@ -45,22 +46,29 @@ public class ROneOrMore extends RegularExpression_ {
   @Override
   public Nfa GenerateNfa(final boolean ignoreCase) {
     final Nfa retVal = new Nfa();
-    final NfaState startState = retVal.start;
-    final NfaState finalState = retVal.end;
+    final NfaState startState = retVal.startNfaState;
+    final NfaState finalState = retVal.endNfaState;
 
     final Nfa temp = regexpr.GenerateNfa(ignoreCase);
 
-    startState.AddMove(temp.start);
-    temp.end.AddMove(temp.start);
-    temp.end.AddMove(finalState);
+    startState.AddMove(temp.startNfaState);
+    temp.endNfaState.AddMove(temp.startNfaState);
+    temp.endNfaState.AddMove(finalState);
 
     return retVal;
   }
 
+  /** Standard constructor */
   public ROneOrMore() {
     expType = EXP_TYPE.R_ONE_OR_MORE;
   }
 
+  /**
+   * Constructor with parameters
+   * 
+   * @param t - the token
+   * @param re - the regular expression
+   */
   public ROneOrMore(final Token t, final RegularExpression_ re) {
     this();
     this.setLine(t.beginLine);

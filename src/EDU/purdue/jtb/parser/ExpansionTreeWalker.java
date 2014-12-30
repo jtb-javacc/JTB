@@ -36,17 +36,23 @@ import EDU.purdue.jtb.parser.Expansion_.EXP_TYPE;
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public final class ExpansionTreeWalker {
 
+  /** Standard constructor */
   private ExpansionTreeWalker() {
   }
 
   /**
-   * Visits the nodes of the tree rooted at "node" in pre-order. i.e., it executes opObj.action
-   * first and then visits the children.
+   * Visits the nodes of the tree rooted at the first parameter in pre-order. i.e., it executes
+   * {@link ITreeWalkerOp#action(Expansion_)} on the second parameter first and then visits the
+   * children.
+   * 
+   * @param node - the {@link Expansion_} node
+   * @param opObj - the {@link ITreeWalkerOp} object
    */
-  static void preOrderWalk(final Expansion_ node, final TreeWalkerOp opObj) {
+  static void preOrderWalk(final Expansion_ node, final ITreeWalkerOp opObj) {
     opObj.action(node);
     if (opObj.goDeeper(node)) {
       if (node.expType == EXP_TYPE.CHOICE) {
@@ -91,10 +97,14 @@ public final class ExpansionTreeWalker {
   }
 
   /**
-   * Visits the nodes of the tree rooted at "node" in post-order. i.e., it visits the children first
-   * and then executes opObj.action.
+   * Visits the nodes of the tree rooted at the first parameter in post-order. i.e., it visits the
+   * children first and then executes {@link ITreeWalkerOp#action(Expansion_)} on the second
+   * parameter.
+   * 
+   * @param node - the {@link Expansion_} node
+   * @param opObj - the {@link ITreeWalkerOp} object
    */
-  static void postOrderWalk(final Expansion_ node, final TreeWalkerOp opObj) {
+  static void postOrderWalk(final Expansion_ node, final ITreeWalkerOp opObj) {
     if (opObj.goDeeper(node)) {
       if (node.expType == EXP_TYPE.CHOICE) {
         for (final Iterator<Expansion_> it = ((Choice) node).getChoices().iterator(); it.hasNext();) {

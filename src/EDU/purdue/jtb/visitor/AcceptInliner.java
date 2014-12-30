@@ -6,17 +6,14 @@ import java.util.Iterator;
 
 import EDU.purdue.jtb.misc.ClassInfo;
 import EDU.purdue.jtb.misc.DepthFirstVisitorsGenerator;
-import EDU.purdue.jtb.misc.FieldNameGenerator;
 import EDU.purdue.jtb.misc.JavaBranchPrinter;
 import EDU.purdue.jtb.misc.Messages;
 import EDU.purdue.jtb.misc.Spacing;
-import EDU.purdue.jtb.misc.UnicodeConverter;
 import EDU.purdue.jtb.syntaxtree.Expansion;
 import EDU.purdue.jtb.syntaxtree.ExpansionChoices;
 import EDU.purdue.jtb.syntaxtree.ExpansionUnit;
 import EDU.purdue.jtb.syntaxtree.ExpansionUnitTCF;
 import EDU.purdue.jtb.syntaxtree.INode;
-import EDU.purdue.jtb.syntaxtree.IdentifierAsString;
 import EDU.purdue.jtb.syntaxtree.NodeChoice;
 import EDU.purdue.jtb.syntaxtree.NodeList;
 import EDU.purdue.jtb.syntaxtree.NodeListOptional;
@@ -29,76 +26,105 @@ import EDU.purdue.jtb.syntaxtree.NodeToken;
  * {@link DepthFirstVisitorsGenerator} (which calls
  * {@link #genAcceptMethods(StringBuilder, Spacing, ClassInfo, boolean, boolean)} to "inline" the
  * accept methods on the base classes nodes (in order to facilitate the user customization work by
- * preparing all the lines of code he wants to keep or to modify).
+ * preparing all the lines of code the user wants to keep or to modify).
  * <p>
  * Intermediate variables are generated within the visit methods to walk into the syntax tree of the
  * production each method visits. They are of the proper type (always for the {@link NodeList},
  * {@link NodeListOptional}, {@link NodeOptional}, {@link NodeSequence}, {@link NodeToken} types, or
  * the production type if at the first level), or of the {@link INode} type for a production type
- * below the first level.
+ * below the first level. They are generated (through the {@link AcceptInliner#LONGNAMES} build
+ * constant flag) in a long format (reflecting all the types and levels of the parent variables) or
+ * in a short one (reflecting only their types).
  * <p>
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : creation
- * @version 1.4.2 : 20/02/2010 : MMa : fixed inlining issue in visit ExpansionChoices
- * @version 1.4.3.1 : 20/04/2010 : MMa : fixed descriptive field name issues in visit
- *          ExpansionChoices and Expansion
- * @version 1.4.3.2 : 26/04/2010 : MMa : fixed index issue in visit Expansion
- * @version 1.4.7 : xx/05/2012 : MMa : fixed issues in visit ExpansionUnitTCF<br>
+ * @version 1.4.2 : 20/02/2010 : MMa : fixed inlining issue in {@link #visit(ExpansionChoices)}
+ * @version 1.4.3.1 : 20/04/2010 : MMa : fixed descriptive field name issues in
+ *          {@link #visit(ExpansionChoices)} and {@link #visit(Expansion)}
+ * @version 1.4.3.2 : 26/04/2010 : MMa : fixed index issue in {@link #visit (Expansion)}
+ * @version 1.4.7 : xx/05/2012 : MMa : fixed issues in {@link #visit(ExpansionUnitTCF)}<br>
  *          1.4.7 : 07/2012 : MMa : followed changes in jtbgram.jtb (IndentifierAsString())<br>
  *          1.4.7 : 08-09/2012 : MMa : fixed generation problems on variables for ExpansionUnitTCF
  *          and ExpansionUnit (bug JTB-2), generated sub comments, extracted constants ; added the
  *          reference to the {@link GlobalDataBuilder}
+ * @version 1.4.8 : 10/2012 : MMa : added JavaCodeProduction class generation if requested<br>
+ *          1.4.8 : 12/2014 : MMa : added variables short names generation ;<br>
+ *          commented visit(IdentifierAsString) as it seems not used ; improved some debug printing
  */
 public class AcceptInliner extends JavaCCPrinter {
 
-  /** The reference to the global data builder visitor */
-  final GlobalDataBuilder  gdbv;
-  /** The processed ClassInfo */
-  ClassInfo                ci;
-  /** The ClassInfo field number */
-  int                      fn;
+  /** The processed {@link ClassInfo} */
+  ClassInfo            ci;
+  /** The {@link ClassInfo} field number */
+  int                  fn;
   /** The sub comment number */
-  int                      scn;
+  int                  scn;
   /** The user return type flag */
-  boolean                  ret;
+  boolean              ret;
   /** The user argument flag */
-  boolean                  argu;
+  boolean              argu;
+  /** The JTB node reference type (e.g. NodeChoice, INode, ...) */
+  String               type;
+  /** The variable (e.g. nF0, nF0Ch, ...) to refer to the JTB node reference with proper cast */
+  String               var;
   /**
    * The JTB node reference (e.g. n.f0, nF0.choice, ...) (the previous level 'var' variable
    * qualified with one field)
    */
-  String                   ref;
-  /** The JTB node reference type (e.g. NodeChoice, INode, ...) */
-  String                   type;
-  /** The variable (e.g. nF0, nF0Ch, ...) to refer to the JTB node reference with proper cast */
-  String                   var;
+  String               ref;
   /**
    * The number of the current ExpansionUnit (not a LocalLookahead nor Block) in the list of
    * ExpansionUnits
    */
-  int                      nbEu    = 0;
-  /** The loop variables (depth) index (0, 1, 2 ... -> i, i1, i2, ...) */
-  int                      loopIx;
-  /** The node sequence variables index (0, 1, 2 ... -> S0, S1, S2, ...) */
-  int                      seqIx;
-  /** The node list variables index (0, 1, 2 ... -> L, L1, L2, ...) */
-  int                      listIx;
-  /** The node list optional variables index (0, 1, 2 ... -> T, T1, T2, ...) */
-  int                      liopIx;
-  /** The node optional variables index (0, 1, 2 ... -> P, P1, P2, ...) */
-  int                      optIx;
-  /** The case index (-1 for none, or 0, 1, 2 ... */
-  int                      caseIx;
-  /** The field name generator */
-  final FieldNameGenerator nameGen = new FieldNameGenerator();
+  int                  nbEu      = 0;
+  /** The loop variables (depth) index : 0, 1, 2, ... -> i, i1, i2, ... */
+  int                  loopIx;
+  /** The cases index : -1 for none, or 0, 1, 2, ... */
+  int                  caseIx;
+  /**
+   * The flag to govern the variable names scheme : true for long names, false for short ones<br>
+   * (for the moment the choice is made by myself and not the user ; a new option would be needed)
+   */
+  final static boolean LONGNAMES = false;
+  /**
+   * The {@link NodeSequence} variables index : 0, 1, 2, ... -> S, S1, S2, ... for variables long
+   * names and seq, seq1, seq2, ... for variables short names
+   */
+  int                  seqIx;
+  /**
+   * The {@link NodeList} variables index : 0, 1, 2, ... -> L, L1, L2, ... for variables long names
+   * and lst, lst1, lst2, ... for variables short names
+   */
+  int                  listIx;
+  /**
+   * The {@link NodeListOptional} variables index : 0, 1, 2, ... -> T, T1, T2, ... for variables
+   * long names and nlo, nlo1, nlo2, ... for variables short names
+   */
+  int                  listOptIx;
+  /**
+   * The {@link NodeOptional} variables index : 0, 1, 2, ... -> P, P1, P2, ... for variables long
+   * names
+   */
+  int                  optIx;
+  /** The {@link NodeChoice} index 0, 1, 2, ... -> nch, nch1, nch2, ... for variables short names */
+  int                  nchJx;
+  /** The {@link INode} choice index 0, 1, 2, ... -> ich, ich1, ich2, ... for variables short names */
+  int                  ichJx;
+  /** The {@link NodeOptional} index 0, 1, 2, ... -> opt, opt1, opt2, ... for variables short names */
+  int                  optJx;
+  /**
+   * The {@link NodeListOptional} elementAt(i) variables index : 0, 1, 2, ... -> nloeai, nloeai1,
+   * nloeai2, ... for variables short names
+   */
+  int                  nloeaiJx;
   /**
    * The Expansion level we are in : 0, 1, ... : first, second, ... ; incremented at each level,
    * except in an ExpansionChoice with no choice and in ExpansionUnitTCF
    */
-  int                      expLvl;
+  int                  expLvl;
   /** The ExpansionUnitTCF level we are in : -1 : none; 0, 1, ... : first, second, ... */
-  int                      tcfLvl;
+  int                  tcfLvl;
 
   /**
    * Constructor which does nothing.
@@ -106,7 +132,7 @@ public class AcceptInliner extends JavaCCPrinter {
    * @param aGdbv - the global data builder visitor
    */
   public AcceptInliner(final GlobalDataBuilder aGdbv) {
-    gdbv = aGdbv;
+    super(aGdbv);
   }
 
   /**
@@ -123,7 +149,7 @@ public class AcceptInliner extends JavaCCPrinter {
     sb = aSb;
     spc = aSpc;
     expLvl = 0;
-    jbpv = new JavaBranchPrinter(spc);
+    jbp = new JavaBranchPrinter(spc);
     ci = aCI;
     fn = 0;
     scn = 0;
@@ -131,9 +157,9 @@ public class AcceptInliner extends JavaCCPrinter {
     argu = aArgu;
     type = "";
     var = ref = genNodeVar;
-    loopIx = seqIx = listIx = liopIx = optIx = 0;
+    loopIx = seqIx = listIx = listOptIx = optIx = 0;
+    nchJx = ichJx = optJx = 0;
     caseIx = -1;
-    nameGen.reset();
     tcfLvl = -1;
     aCI.astEcNode.accept(this);
   }
@@ -145,7 +171,7 @@ public class AcceptInliner extends JavaCCPrinter {
   /** {@inheritDoc} */
   @Override
   void oneNewLine(final INode n) {
-    if (PRINT_CLASS_COMMENT)
+    if (DEBUG_CLASS_COMMENTS)
       sb.append(nodeClassComment(n));
     sb.append(LS);
   }
@@ -153,7 +179,7 @@ public class AcceptInliner extends JavaCCPrinter {
   /** {@inheritDoc} */
   @Override
   void oneNewLine(final INode n, final String str) {
-    if (PRINT_CLASS_COMMENT)
+    if (DEBUG_CLASS_COMMENTS)
       sb.append(nodeClassComment(n, str));
     sb.append(LS);
   }
@@ -161,7 +187,7 @@ public class AcceptInliner extends JavaCCPrinter {
   /** {@inheritDoc} */
   @Override
   void oneNewLine(final INode n, final Object... str) {
-    if (PRINT_CLASS_COMMENT)
+    if (DEBUG_CLASS_COMMENTS)
       sb.append(nodeClassComment(n, str));
     sb.append(LS);
   }
@@ -188,8 +214,8 @@ public class AcceptInliner extends JavaCCPrinter {
    * @param n - the node for the node class comment
    * @return the node class comment
    */
-  String nodeClassComment(final INode n) {
-    if (PRINT_CLASS_COMMENT) {
+  private String nodeClassComment(final INode n) {
+    if (DEBUG_CLASS_COMMENTS) {
       final String s = n.toString();
       final int b = s.lastIndexOf('.') + 1;
       final int e = s.indexOf('@');
@@ -209,8 +235,8 @@ public class AcceptInliner extends JavaCCPrinter {
    * @param str - the extra comment
    * @return the node class comment
    */
-  String nodeClassComment(final INode n, final String str) {
-    if (PRINT_CLASS_COMMENT)
+  private String nodeClassComment(final INode n, final String str) {
+    if (DEBUG_CLASS_COMMENTS)
       return nodeClassComment(n).concat(" ").concat(str);
     else
       return null;
@@ -224,8 +250,8 @@ public class AcceptInliner extends JavaCCPrinter {
    * @param obj - the extra comments
    * @return the node class comment
    */
-  String nodeClassComment(final INode n, final Object... obj) {
-    if (PRINT_CLASS_COMMENT) {
+  private String nodeClassComment(final INode n, final Object... obj) {
+    if (DEBUG_CLASS_COMMENTS) {
       int len = 0;
       for (final Object o : obj)
         len += o.toString().length();
@@ -264,10 +290,10 @@ public class AcceptInliner extends JavaCCPrinter {
    * 
    * @param aStr - a label to output
    */
-  void outputFieldComment(@SuppressWarnings("unused") final String aStr) {
-    //    sb.append(spc.spc).append("/* field comment (").append(fn).append(") ").append(aStr)
+  void outputFieldComment(final String aStr) {
+    //    sb.append(spc.spc).append("/* printed field comment (").append(fn).append(") ").append(aStr)
     //      .append(" */").append(LS);
-    ci.fmt1JavacodeFieldCmt(sb, spc, fn);
+    ci.fmt1JavacodeFieldCmt(sb, spc, fn, aStr);
   }
 
   /**
@@ -275,10 +301,10 @@ public class AcceptInliner extends JavaCCPrinter {
    * 
    * @param aStr - a label to output
    */
-  void outputSubComment(@SuppressWarnings("unused") final String aStr) {
-    //    sb.append(spc.spc).append("/* sub comment (").append(scn).append(") ").append(aStr)
+  void outputSubComment(final String aStr) {
+    //    sb.append(spc.spc).append("/* printed sub comment (").append(scn).append(") ").append(aStr)
     //      .append(" */").append(LS);
-    ci.fmt1JavacodeSubCmt(sb, spc, scn);
+    ci.fmt1JavacodeSubCmt(sb, spc, scn, aStr);
     scn++;
   }
 
@@ -302,7 +328,7 @@ public class AcceptInliner extends JavaCCPrinter {
     String oldType = type;
     int oldCaseIx;
 
-    if (PRINT_CLASS_COMMENT) {
+    if (DEBUG_CLASS_COMMENTS) {
       sb.append(spc.spc).append("// expLvl = ").append(expLvl).append(", lvix = ").append(loopIx)
         .append(", fn = ").append(fn).append(", tcfLvl = ").append(tcfLvl);
       oneNewLine(n, "dbg");
@@ -310,7 +336,7 @@ public class AcceptInliner extends JavaCCPrinter {
 
     // only f0
     if (!n.f1.present()) {
-      if (PRINT_CLASS_COMMENT) {
+      if (DEBUG_CLASS_COMMENTS) {
         sb.append(spc.spc).append("// only f0");
         oneNewLine(n, "a");
       }
@@ -324,7 +350,7 @@ public class AcceptInliner extends JavaCCPrinter {
       type = oldType;
       caseIx = oldCaseIx;
 
-      if (PRINT_CLASS_COMMENT) {
+      if (DEBUG_CLASS_COMMENTS) {
         sb.append(spc.spc).append("// only f0");
         oneNewLine(n, "b");
       }
@@ -338,7 +364,14 @@ public class AcceptInliner extends JavaCCPrinter {
     String var1;
     if (expLvl == 0) {
       type = ci.fieldTypes.get(fn);
-      var = var.concat(String.valueOf(fn)).concat("C");
+      if (LONGNAMES)
+        var = var.concat(String.valueOf(fn)).concat("C");
+      else {
+        var = "nch";
+        if (nchJx > 0)
+          var += nchJx;
+        nchJx++;
+      }
       ref = ref.concat(".").concat(ci.fieldNames.get(fn));
       if (tcfLvl == -1)
         outputFieldComment("ExpansionChoices");
@@ -358,7 +391,14 @@ public class AcceptInliner extends JavaCCPrinter {
         ref = var1.concat(".choice");
       } else {
         // all other cases : not within TCF, or within TCF not at first level
-        var += "C";
+        if (LONGNAMES)
+          var += "C";
+        else {
+          var = "nch";
+          if (nchJx > 0)
+            var += nchJx;
+          nchJx++;
+        }
         sb.append(spc.spc).append("final ").append(nodeChoice).append(' ').append(var)
           .append(" = ");
         if (!nodeChoice.equals(type))
@@ -371,7 +411,14 @@ public class AcceptInliner extends JavaCCPrinter {
       }
     }
 
-    var += "H";
+    if (LONGNAMES)
+      var += "H";
+    else {
+      var = "ich";
+      if (ichJx > 0)
+        var += ichJx;
+      ichJx++;
+    }
     sb.append(spc.spc).append("final ").append(iNode).append(' ').append(var).append(" = ")
       .append(ref).append(';');
     oneNewLine(n, "choice, type (", type, ") --> ", iNode);
@@ -468,7 +515,7 @@ public class AcceptInliner extends JavaCCPrinter {
         nbEu++;
     }
 
-    if (PRINT_CLASS_COMMENT) {
+    if (DEBUG_CLASS_COMMENTS) {
       sb.append(spc.spc).append("// expLvl = ").append(expLvl).append(", nbEu = ").append(nbEu)
         .append(", lvix = ").append(loopIx).append(", fn = ").append(fn).append(", tcfLvl = ")
         .append(tcfLvl).append(", type = ").append(type);
@@ -476,8 +523,11 @@ public class AcceptInliner extends JavaCCPrinter {
     }
 
     if (tcfLvl == -1 && (expLvl > 0) && (nbEu > 1) && !nodeSeq.equals(type)) {
-      var += "S";
-      if (seqIx >= 0)
+      if (LONGNAMES)
+        var += "S";
+      else
+        var = "seq";
+      if (seqIx > 0)
         var += seqIx;
       seqIx++;
       sb.append(spc.spc).append("final ").append(nodeSeq).append(' ').append(var).append(" = (")
@@ -491,7 +541,7 @@ public class AcceptInliner extends JavaCCPrinter {
     final String oldVar = var;
     final String oldType = type;
     final int oldNbEu = nbEu;
-    int oldSeqIx = seqIx;
+    int oldNloeaiJx = nloeaiJx;
 
     int numEuOk = 0;
     final int sz = n.f1.size();
@@ -524,16 +574,22 @@ public class AcceptInliner extends JavaCCPrinter {
           } else {
             // cases not within TCF, or within TCF not at first level : at other Expansion levels ; INode type
             if (nbEu > 1) {
-              // here we are in a NodeSequence
               final String numEuOkStr = String.valueOf(numEuOk);
               if (nodeSeq.equals(type))
                 ref = var.concat(".elementAt(").concat(numEuOkStr).concat(")");
               else
                 ref = "((".concat(nodeSeq).concat(") ").concat(var).concat(").elementAt(")
                           .concat(numEuOkStr).concat(")");
-              if (caseIx >= 0)
-                var += caseIx;
-              var = var.concat("A").concat(numEuOkStr);
+              if (LONGNAMES) {
+                if (caseIx >= 0)
+                  var += caseIx;
+                var = var.concat("A").concat(numEuOkStr);
+              } else {
+                var = "seq";
+                if (seqIx > 0)
+                  var += seqIx;
+                seqIx++;
+              }
               outputSubComment("Sequence");
               sb.append(spc.spc).append("final ").append(iNode).append(' ').append(var)
                 .append(" = ").append(ref).append(';');
@@ -545,8 +601,8 @@ public class AcceptInliner extends JavaCCPrinter {
           }
         }
 
-        // visitExpansionUnit
-        oldSeqIx = seqIx;
+        // visit ExpansionUnit
+        oldNloeaiJx = nloeaiJx;
         ++expLvl;
         expUnit.accept(this);
         --expLvl;
@@ -554,7 +610,7 @@ public class AcceptInliner extends JavaCCPrinter {
         var = oldVar;
         type = oldType;
         nbEu = oldNbEu;
-        seqIx = oldSeqIx;
+        nloeaiJx = oldNloeaiJx;
 
         numEuOk++;
 
@@ -612,7 +668,7 @@ public class AcceptInliner extends JavaCCPrinter {
       case 2:
         // %2 #0 "[" #1 ExpansionChoices() #2 "]"
         // visit something within a node optional
-        if (PRINT_CLASS_COMMENT) {
+        if (DEBUG_CLASS_COMMENTS) {
           sb.append(spc.spc).append("// ExpansionUnit type 2");
           oneNewLine(n, "2_beg");
         }
@@ -626,11 +682,19 @@ public class AcceptInliner extends JavaCCPrinter {
           var = genNodeVarDot.concat(ci.fieldNames.get(fn));
           fn++;
         } else if (tcfLvl >= 0 || !nodeOpt.equals(type)) {
+          final String var1 = var;
+          if (LONGNAMES)
+            var += "P";
+          else {
+            var = "opt";
+            if (optJx > 0)
+              var += optJx;
+            optJx++;
+          }
           sb.append(spc.spc).append("final ").append(nodeOpt).append(' ').append(var)
-            .append("P = (").append(nodeOpt).append(") ").append(var).append(';');
+            .append(" = (").append(nodeOpt).append(") ").append(var1).append(';');
           oneNewLine(n, "tcf || type (", type, ") --> ", nodeOpt);
           type = nodeOpt;
-          var += "P";
         }
 
         sb.append(spc.spc).append("if (").append(var).append(".present()) {");
@@ -653,7 +717,7 @@ public class AcceptInliner extends JavaCCPrinter {
 
       case 3:
         // %3 ExpansionUnitTCF()
-        if (PRINT_CLASS_COMMENT) {
+        if (DEBUG_CLASS_COMMENTS) {
           sb.append(spc.spc).append("// ExpansionUnit type 3");
           oneNewLine(n, "3_beg");
         }
@@ -744,7 +808,7 @@ public class AcceptInliner extends JavaCCPrinter {
           ch = (NodeChoice) opt.node;
           if (ch.which == 0) {
             // &0 "+" modifier : visit something within a node list
-            if (PRINT_CLASS_COMMENT) {
+            if (DEBUG_CLASS_COMMENTS) {
               sb.append(spc.spc).append("// ExpansionUnit type 5 with '+' modifier");
               oneNewLine(n, "5_+, expLvl = ", expLvl);
             }
@@ -760,9 +824,13 @@ public class AcceptInliner extends JavaCCPrinter {
               var1 = ref;
             } else if (tcfLvl >= 0 || !"NodeList".equals(type)) {
               ref = var;
-              final String listIxStr = listIx == 0 ? "" : String.valueOf(listIx);
+              if (LONGNAMES)
+                var = var.concat("L");
+              else
+                var = "lst";
+              if (listIx > 0)
+                var += listIx;
               listIx++;
-              var = var.concat("L").concat(listIxStr);
               var1 = var;
               sb.append(spc.spc).append("final ").append(nodeList).append(' ').append(var)
                 .append(" = (").append(nodeList).append(") ").append(ref).append(';');
@@ -780,7 +848,10 @@ public class AcceptInliner extends JavaCCPrinter {
             spc.updateSpc(+1);
 
             ref = var1.concat(".elementAt(i").concat(String.valueOf(loopIxStr)).concat(")");
-            var = var.concat("Ei");
+            if (LONGNAMES)
+              var = var.concat("Ei");
+            else
+              var = "lsteai";
             sb.append(spc.spc).append("final ").append(iNode).append(' ').append(var).append(" = ")
               .append(ref).append(';');
             oneNewLine(n, "elem +");
@@ -802,7 +873,7 @@ public class AcceptInliner extends JavaCCPrinter {
 
           } else if (ch.which == 1) {
             // &1 "*" modifier : visit something within a node list optional
-            if (PRINT_CLASS_COMMENT) {
+            if (DEBUG_CLASS_COMMENTS) {
               sb.append(spc.spc).append("// ExpansionUnit type 5 with '*' modifier");
               oneNewLine(n, "5_*, expLvl = ", expLvl);
             }
@@ -815,9 +886,13 @@ public class AcceptInliner extends JavaCCPrinter {
               var = genNodeVarDot.concat(ci.fieldNames.get(fn));
               fn++;
             } else if (tcfLvl >= 0 || !nodeListOpt.equals(type)) {
-              final String liopIxStr = liopIx == 0 ? "" : String.valueOf(liopIx);
-              liopIx++;
-              var = var.concat("T").concat(liopIxStr);
+              if (LONGNAMES)
+                var = var.concat("T");
+              else
+                var = "nlo";
+              if (listOptIx > 0)
+                var += listOptIx;
+              listOptIx++;
               sb.append(spc.spc).append("final ").append(nodeListOpt).append(' ').append(var)
                 .append(" = (").append(nodeListOpt).append(") ").append(ref).append(';');
               oneNewLine(n, "tcf || type (", type, ") --> ", nodeListOpt);
@@ -838,7 +913,14 @@ public class AcceptInliner extends JavaCCPrinter {
             spc.updateSpc(+1);
 
             ref = var.concat(".elementAt(i").concat(String.valueOf(loopIxStr)).concat(")");
-            var = var.concat("Mi");
+            if (LONGNAMES)
+              var = var.concat("Mi");
+            else {
+              var = "nloeai";
+              if (nloeaiJx > 0)
+                var += nloeaiJx;
+              nloeaiJx++;
+            }
             if (var.startsWith(genNodeVarDot))
               var = var.substring(genNodeVarDot.length());
             sb.append(spc.spc).append("final ").append(iNode).append(' ').append(var).append(" = ")
@@ -865,7 +947,7 @@ public class AcceptInliner extends JavaCCPrinter {
 
           } else {
             // &2 "?" modifier : visit something within a node optional
-            if (PRINT_CLASS_COMMENT) {
+            if (DEBUG_CLASS_COMMENTS) {
               sb.append(spc.spc).append("// ExpansionUnit type 5 with '?' modifier");
               oneNewLine(n, "5_?, expLvl = ", expLvl);
             }
@@ -878,9 +960,17 @@ public class AcceptInliner extends JavaCCPrinter {
               var = genNodeVarDot.concat(ci.fieldNames.get(fn));
               fn++;
             } else if (tcfLvl >= 0 || !nodeOpt.equals(type)) {
-              final String optIxStr = optIx == 0 ? "" : String.valueOf(optIx);
-              optIx++;
-              var = var.concat("P").concat(optIxStr);
+              if (LONGNAMES) {
+                var = var.concat("P");
+                if (optIx > 0)
+                  var += optIx;
+                optIx++;
+              } else {
+                var = "opt";
+                if (optJx > 0)
+                  var += optJx;
+                optJx++;
+              }
               sb.append(spc.spc).append("final ").append(nodeOpt).append(' ').append(var)
                 .append(" = (").append(nodeOpt).append(") ").append(ref).append(';');
               oneNewLine(n, "type (", type, ") --> ", nodeOpt);
@@ -907,7 +997,7 @@ public class AcceptInliner extends JavaCCPrinter {
 
         } else {
           // no modifier : visit something with a node sequence
-          if (PRINT_CLASS_COMMENT) {
+          if (DEBUG_CLASS_COMMENTS) {
             sb.append(spc.spc).append("// ExpansionUnit type 5 with no modifiers");
             oneNewLine(n, "5_no, expLvl = ", expLvl, ", nbEu = ", nbEu);
           }
@@ -915,7 +1005,10 @@ public class AcceptInliner extends JavaCCPrinter {
           if (tcfLvl == 0 && expLvl == 2)
             outputTcfComment("eu type 5");
           if (tcfLvl >= 0 && "".equals(type) && !((ExpansionChoices) seq.elementAt(1)).f1.present()) {
-            var = var.concat("Tcf");
+            if (LONGNAMES)
+              var = var.concat("Tcf");
+            else
+              var = "tcf";
             if (fn != 0)
               var += fn;
             ref += ".".concat(ci.fieldNames.get(fn));
@@ -1017,16 +1110,16 @@ public class AcceptInliner extends JavaCCPrinter {
     tcfLvl--;
   }
 
-  /**
-   * Visits a {@link IdentifierAsString} node, whose children are the following :
-   * <p>
-   * f0 -> < IDENTIFIER ><br>
-   * 
-   * @param n - the node to visit
-   */
-  @Override
-  public void visit(final IdentifierAsString n) {
-    sb.append(UnicodeConverter.addUnicodeEscapes(n.f0.tokenImage));
-  }
+  //  /**
+  //   * Visits a {@link IdentifierAsString} node, whose children are the following :
+  //   * <p>
+  //   * f0 -> < IDENTIFIER ><br>
+  //   * 
+  //   * @param n - the node to visit
+  //   */
+  //  @Override
+  //  public void visit(final IdentifierAsString n) {
+  //    sb.append(UnicodeConverter.addUnicodeEscapes(n.f0.tokenImage));
+  //  }
 
 }

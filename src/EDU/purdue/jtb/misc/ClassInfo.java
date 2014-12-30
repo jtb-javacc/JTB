@@ -36,6 +36,7 @@ import static EDU.purdue.jtb.misc.Globals.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import EDU.purdue.jtb.syntaxtree.ExpansionChoices;
 import EDU.purdue.jtb.syntaxtree.INode;
@@ -44,8 +45,8 @@ import EDU.purdue.jtb.visitor.CommentsPrinter;
 import EDU.purdue.jtb.visitor.GlobalDataBuilder;
 
 /**
- * Class ClassInfo is used by the visitors to store and ask for information about a class including
- * its name, the list of field types, names and initializers.
+ * Class {@link ClassInfo} is used by the visitors to store and ask for information about a class
+ * including its name, the list of field types, names and initializers.
  * <p>
  * Uses class {@link CommentsPrinter} to find field javadoc comments and format them.<br>
  * 
@@ -54,37 +55,44 @@ import EDU.purdue.jtb.visitor.GlobalDataBuilder;
  * @version 1.4.6 : 01/2011 : FA/MMa : added -va and -npfx and -nsfx options
  * @version 1.4.7 : 09/2012 : MMa : refactored comment handling to add sub comments and optimization
  *          ; added the reference to the {@link GlobalDataBuilder}
+ * @version 1.4.8 : 10/2012 : MMa : added JavaCodeProduction class generation ;<br>
+ *          optimized common code 1.4.8 : 12/2014 : MMa : improved some debug printing
  */
 public class ClassInfo {
 
-  /** The reference to the global data builder visitor */
-  final GlobalDataBuilder        gdbv;
+  /** The {@link GlobalDataBuilder} visitor */
+  final GlobalDataBuilder   gdbv;
   /** The corresponding ExpansionChoices node */
-  public final INode             astEcNode;
+  public final INode        astEcNode;
   /** The class name (including optional prefix and suffix) */
-  public final String            className;
+  public final String       className;
   /** The list of the types of the class fields representing the node's children */
-  public final ArrayList<String> fieldTypes;
+  public final List<String> fieldTypes;
   /** The list of the names of the class fields representing the node's children */
-  public final ArrayList<String> fieldNames;
+  public final List<String> fieldNames;
   /** The list of the initializers of the class fields representing the node's children */
-  final ArrayList<String>        fieldInitializers;
-  /** True if the class allows specific initializing constructor(s) (without {@link NodeToken} nodes */
-  boolean                        needInitializingConstructor = false;
+  final List<String>        fieldInitializers;
+  /**
+   * True if the class allows specific initializing constructor(s) (without {@link NodeToken} nodes,
+   * false otherwise
+   */
+  boolean                   needInitializingConstructor = false;
   /** The list of the java code elements in an EUTCF */
-  final ArrayList<String>        fieldEUTCFCodes;
+  final List<String>        fieldEUTCFCodes;
   /** The list of the field comments data */
-  public ArrayList<CommentData>  fieldCmts                   = null;
+  public List<CommentData>  fieldCmts                   = null;
   /**
    * The list of the sub comments data (without field comments data).<br>
    * Built and used only when the "inline accept methods" option is on.
    */
-  public ArrayList<CommentData>  subCmts                     = null;
+  public List<CommentData>  subCmts                     = null;
   /**
    * The javadoc formatted field comments used by the visit methods (more than once, so that's why
    * they are stored as an optimization)
    */
-  public StringBuilder           visitFieldCmts              = null;
+  public StringBuilder      visitFieldCmts              = null;
+  /** The common code (that does not depend of the class) */
+  String                    commonCode                  = null;
 
   /**
    * Constructs an instance giving an ExpansionChoices node and a name.
@@ -96,11 +104,18 @@ public class ClassInfo {
   public ClassInfo(final ExpansionChoices aEC, final String aCN, final GlobalDataBuilder aGdbv) {
     astEcNode = aEC;
     className = getFixedName(aCN);
-    final int nb = (aEC.f1.present() ? aEC.f1.size() + 1 : 1);
-    fieldTypes = new ArrayList<String>(nb);
-    fieldNames = new ArrayList<String>(nb);
-    fieldInitializers = new ArrayList<String>(nb);
-    fieldEUTCFCodes = new ArrayList<String>(nb);
+    if (aEC != null) {
+      final int nb = (aEC.f1.present() ? aEC.f1.size() + 1 : 1);
+      fieldTypes = new ArrayList<String>(nb);
+      fieldNames = new ArrayList<String>(nb);
+      fieldInitializers = new ArrayList<String>(nb);
+      fieldEUTCFCodes = new ArrayList<String>(nb);
+    } else {
+      fieldTypes = null;
+      fieldNames = null;
+      fieldInitializers = null;
+      fieldEUTCFCodes = null;
+    }
     gdbv = aGdbv;
   }
 
@@ -189,19 +204,24 @@ public class ClassInfo {
 
   /**
    * Append to a given buffer a java code comment showing a BNF description of the current field.
-   * They do not include de debug comments even if they have been produced.
+   * They do not include the debug comments even if they have been produced.
    * 
    * @param aSb - the buffer to append the BNF description to
    * @param aSpc - the indentation
    * @param i - the field index
+   * @param aStr - an additional comment
    */
-  public void fmt1JavacodeFieldCmt(final StringBuilder aSb, final Spacing aSpc, final int i) {
+  @SuppressWarnings("unused")
+  public void fmt1JavacodeFieldCmt(final StringBuilder aSb, final Spacing aSpc, final int i,
+                                   final String aStr) {
     genCommentsData();
     if (fieldCmts == null)
       return;
     final CommentData fieldCmt = fieldCmts.get(i);
     for (final CommentLineData line : fieldCmt.lines) {
       aSb.append(aSpc.spc).append("// ").append(line.bare);
+      if (DEBUG_FIELD_AND_SUB_COMMENTS && aStr != null)
+        aSb.append(" ; ").append(aStr);
       aSb.append(LS);
     }
     return;
@@ -209,23 +229,31 @@ public class ClassInfo {
 
   /**
    * Append to a given buffer a java code comment showing a BNF description of the current part.
-   * They do not include de debug comments even if they have been produced.
+   * They do not include the debug comments even if they have been produced.
    * 
    * @param aSb - the buffer to append the BNF description to
    * @param aSpc - the indentation
    * @param i - the sub comment index
+   * @param aStr - an additional comment
    */
-  public void fmt1JavacodeSubCmt(final StringBuilder aSb, final Spacing aSpc, final int i) {
-    genCommentsData();
+  @SuppressWarnings("unused")
+  public void fmt1JavacodeSubCmt(final StringBuilder aSb, final Spacing aSpc, final int i,
+                                 final String aStr) {
+    //    genCommentsData();
     if (subCmts == null)
       return;
     if (i >= subCmts.size()) {
       aSb.append(aSpc.spc).append("// invalid sub comment index (").append(i).append("), size = ")
-         .append(subCmts.size()).append(LS);
+         .append(subCmts.size());
+      if (aStr != null)
+        aSb.append(" ; ").append(aStr);
+      aSb.append(LS);
     } else {
       final CommentData subCmt = subCmts.get(i);
       for (final CommentLineData line : subCmt.lines) {
         aSb.append(aSpc.spc).append("// ").append(line.bare);
+        if (DEBUG_FIELD_AND_SUB_COMMENTS && aStr != null)
+          aSb.append(" ; ").append(aStr);
         aSb.append(LS);
       }
     }
@@ -249,6 +277,23 @@ public class ClassInfo {
    * @return the buffer with the node class code
    */
   public StringBuilder genClassString(final Spacing aSpc) {
+    if (fieldTypes != null) {
+      // normal case, for BNFProductions
+      return genBNFProductionClassString(aSpc);
+    } else {
+      // specific case for JavaCodeProductions
+      return genJavaCodeProductionClassString(aSpc);
+    }
+  }
+
+  /**
+   * Generates the node class code for a BNFProduction into a newly allocated buffer.
+   * 
+   * @param aSpc - the current indentation
+   * @return the buffer with the node class code
+   */
+  StringBuilder genBNFProductionClassString(final Spacing aSpc) {
+
     Iterator<String> types = fieldTypes.iterator();
     Iterator<String> names = fieldNames.iterator();
     Iterator<String> inits;
@@ -412,6 +457,93 @@ public class ClassInfo {
     }
 
     /*
+     * Visit methods, parent methods, end class
+     */
+    sb.append(getCommonCode(aSpc));
+
+    return sb;
+
+  }
+
+  /**
+   * Generates the node class code for a JavaCodeProduction into a newly allocated buffer.
+   * 
+   * @param aSpc - the current indentation
+   * @return the buffer with the node class code
+   */
+  StringBuilder genJavaCodeProductionClassString(final Spacing aSpc) {
+
+    final StringBuilder sb = new StringBuilder(1024);
+
+    /*
+     * class declaration
+     */
+
+    sb.append(aSpc.spc).append("public class " + className);
+
+    if (nodesSuperclass != null)
+      sb.append(" extends ").append(nodesSuperclass);
+    sb.append(" implements ").append(iNode).append(" {").append(LS).append(LS);
+    aSpc.updateSpc(+1);
+
+    /*
+     * data fields declarations
+     */
+
+    if (parentPointer) {
+      if (javaDocComments)
+        sb.append(aSpc.spc).append("/** The parent pointer */").append(LS);
+      sb.append(aSpc.spc).append("private ").append(iNode).append(" parent;").append(LS).append(LS);
+    }
+
+    if (javaDocComments)
+      sb.append(aSpc.spc).append("/** The serial version UID */").append(LS);
+    sb.append(aSpc.spc).append("private static final long serialVersionUID = ")
+      .append(SERIAL_UID + "L;").append(LS).append(LS);
+
+    /*
+     * standard constructor
+     */
+
+    if (javaDocComments) {
+      sb.append(aSpc.spc).append("/**").append(LS);
+      sb.append(aSpc.spc).append(" * Constructs the node (which has no child).").append(LS);
+      sb.append(aSpc.spc).append(" */").append(LS);
+    }
+    sb.append(aSpc.spc).append("public ").append(className).append("() {").append(LS);
+    sb.append(aSpc.spc).append("}").append(LS);
+
+    /*
+     * Visit methods, parent methods, end class
+     */
+    sb.append(getCommonCode(aSpc));
+
+    return sb;
+  }
+
+  /**
+   * Gets the common code, generating it the first time (visit methods, parent methods, end class).
+   * 
+   * @param aSpc - the current indentation
+   * @return the common code
+   */
+  String getCommonCode(final Spacing aSpc) {
+    if (commonCode == null)
+      commonCode = genCommonCode(aSpc);
+    return commonCode;
+  }
+
+  /**
+   * Generates common code (visit methods, parent methods, end class).
+   * 
+   * @param aSpc - the current indentation
+   * @return the generated common code
+   */
+  String genCommonCode(final Spacing aSpc) {
+
+    final StringBuilder sb = new StringBuilder(1024);
+
+    /*
      * visit methods
      */
 
@@ -430,6 +562,7 @@ public class ClassInfo {
       sb.append(aSpc.spc).append(" * @return a user chosen return information").append(LS);
       sb.append(aSpc.spc).append(" */").append(LS);
     }
+    sb.append(aSpc.spc).append("@Override").append(LS);
     sb.append(aSpc.spc).append("public <").append(genRetType).append(", ").append(genArguType)
       .append("> " + genRetType).append(" accept(final ").append(iRetArguVisitor)
       .append("<" + genRetType).append(", ").append(genArguType)
@@ -452,6 +585,7 @@ public class ClassInfo {
       sb.append(aSpc.spc).append(" * @return a user chosen return information").append(LS);
       sb.append(aSpc.spc).append(" */").append(LS);
     }
+    sb.append(aSpc.spc).append("@Override").append(LS);
     sb.append(aSpc.spc).append("public <").append(genRetType).append("> ")
       .append(genRetType + " accept(final ").append(iRetVisitor).append("<").append(genRetType)
       .append("> vis) {").append(LS);
@@ -472,6 +606,7 @@ public class ClassInfo {
       sb.append(aSpc.spc).append(" * @param argu - a user chosen argument").append(LS);
       sb.append(aSpc.spc).append(" */").append(LS);
     }
+    sb.append(aSpc.spc).append("@Override").append(LS);
     sb.append(aSpc.spc).append("public <").append(genArguType)
       .append("> void accept(final " + iVoidArguVisitor).append("<").append(genArguType)
       .append("> vis, final " + (varargs ? genArgusType : genArguType)).append(" argu) {")
@@ -490,6 +625,7 @@ public class ClassInfo {
       sb.append(aSpc.spc).append(" * @param vis - the visitor").append(LS);
       sb.append(aSpc.spc).append(" */").append(LS);
     }
+    sb.append(aSpc.spc).append("@Override").append(LS);
     sb.append(aSpc.spc).append("public void accept(final ").append(iVoidVisitor).append(" vis) {")
       .append(LS);
     aSpc.updateSpc(+1);
@@ -539,7 +675,7 @@ public class ClassInfo {
     sb.append(aSpc.spc).append(LS);
     sb.append(aSpc.spc).append("}").append(LS);
 
-    return sb;
+    return sb.toString();
   }
 
   /**
@@ -548,7 +684,7 @@ public class ClassInfo {
   public class CommentData {
 
     /** The list of the lines */
-    public ArrayList<CommentLineData> lines = null;
+    public List<CommentLineData> lines = null;
 
   }
 

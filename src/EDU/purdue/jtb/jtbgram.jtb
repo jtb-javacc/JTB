@@ -90,38 +90,45 @@
  * JavaCC Grammar used by JTB.
  *
  * @author Marc Mazas
- * @version 1.4.x : 05-11/2009-2010-2011-2012 : MMa
+ * @version 1.4.x : 05-11/2009-2010-2011-2012-2013-2014 : MMa
  *  adapted from JavaCC v4.2 grammar (JavaCC.jj)
  *   to fit with JTB.java and 
  *   to use the try-ExpansionChoices-catch-finally syntax through the ExpansionUnitInTCF production
  */
-// MMa 06/2012 : modified AccessModifier(), BlockStatement(), LocalVariableDeclaration()
+// ModMMa 06/2012 : 1.4.7 : modified AccessModifier(), BlockStatement(), LocalVariableDeclaration()
 //                added VariableModifiers()
-// MMa 07/2012 : added assert, enum & strictfp java keywords
+// ModMMa 07/2012 : 1.4.7 : added assert, enum & strictfp java keywords
 //               fixed ForStatement() ; ForInit()
 //               renamed RSIGNEDSHIFT in RSignedShift and fixed it
 //               renamed RUNSIGNEDSHIFT in RUnsignedShift and fixed it
 //               modified RegularExpression (remove LANGLE & RANGLE definitions)
-//               TODO (JavaCC grammar) problems in TypeDeclaration(), ExplicitConstructorInvocation(),
-//                PrimaryPrefix()
 //               renamed ExpansionUnitInTCF into ExpansionUnitTCF
-// MMa 09/2012 : added "!" syntax in BNFProduction and RegExprSpec and ExpansionUnit for not generating
-//                the node creation in the callers ; fixed forbidding punctuation between productions
+// ModMMa 09/2012 : 1.4.7 : added "!" syntax in BNFProduction and RegExprSpec and ExpansionUnit
+//                for not generating the node creation in the callers ;
+//                fixed forbidding punctuation between productions
+// ModMMa 10/2012 : 1.4.8 : added "%" syntax in JavaCodeProduction
+// ModMMa 11/2014 : 1.4.8 : added AnnotationTypeDeclaration() in ClassOrInterfaceBodyDeclaration() ;
+//                added ReferenceType() in ExplicitConstructorInvocation() ;
+//               removed old invalid comments on missing node descriptors (they are in JJTree but not JTB)
+// ModMMa 12/2014 : 1.4.8 : added variables initialization code ;
+//                fixed the LOOKAHEAD in and modified ExplicitConstructorInvocation()
 
 options
 {
-// MMa : added (does not exist in JavaCC.jj nor in jtbgram.jj, but needed for Eclipse plugin)
+// ModMMa : added (does not exist in JavaCC.jj nor in jtbgram.jj, but needed for Eclipse plugin)
   OUTPUT_DIRECTORY = "parser";
 
-// MMa : kept (from JavaCC.jj and jtbgram.jj)
+// ModMMa : kept (from JavaCC.jj and jtbgram.jj)
   JAVA_UNICODE_ESCAPE = true;
 
-// MMa : kept (from JavaCC.jj, but it does not exist in jtbgram.jj)
+// ModMMa : kept (from JavaCC.jj, but it does not exist in jtbgram.jj)
   STATIC = false;
-  
-}
 
-// MMa : adapted from JavaCC.jj to fit to JTB parser name, package, imports
+// ModMMa : impossible to use it (too long, too big)
+//  DEBUG_LOOKAHEAD = true;
+  }
+
+// ModMMa : adapted from JavaCC.jj to fit to JTB parser name, package, imports
 PARSER_BEGIN(JTBParser)
 package EDU.purdue.jtb.parser;
 
@@ -133,7 +140,7 @@ import java.util.ArrayList;
  * This file contains the code for JavaCCParser generated
  * by JavaCCParser itself.
  */
-// MMa : adapted from JavaCC.jj to fit to JTB class name
+// ModMMa : adapted from JavaCC.jj to fit to JTB class name
 public class JTBParser extends JavaCCParserInternals
 {
   /**
@@ -266,7 +273,7 @@ public class JTBParser extends JavaCCParserInternals
   }
 }
 
-// MMa : adapted from JavaCC.jj to fit to JTB parser name
+// ModMMa : adapted from JavaCC.jj to fit to JTB parser name
 PARSER_END(JTBParser)
 
 TOKEN_MGR_DECLS :
@@ -584,12 +591,13 @@ TOKEN :
  * THE JAVACC GRAMMAR SPECIFICATION STARTS HERE *
  ************************************************/
 
-// MMa : changed all javacc_input into JavaCCInput to conform to class name convention
+// ModMMa : changed all javacc_input into JavaCCInput to conform to class name convention
 void JavaCCInput() :
 {
-  String id1, id2;
+  String id1 = null;
+  String id2 = null;
   initialize();
-// MMa : added to JavaCC as called in parser.Main in Javacc 4.2
+// ModMMa : added to JavaCC as called in parser.Main in Javacc 4.2
   Options.init();
 }
 {
@@ -600,11 +608,11 @@ void JavaCCInput() :
   { processing_cu = false; }
   "PARSER_END" "(" id2 = IdentifierAsString() { compare(getToken(0), id1, id2); } ")"
   ( Production() )+
-  // MMa 09/2012 : added to forbid punctuation between productions
+  // ModMMa 09/2012 : added to forbid punctuation between productions
   < EOF >
 }
 
-// MMa : changed all javacc_options into JavaCCOptions to conform to class name convention
+// ModMMa : changed all javacc_options into JavaCCOptions to conform to class name convention
 void JavaCCOptions() :
 {}
 {
@@ -621,13 +629,13 @@ void JavaCCOptions() :
   }
 }
 
-// MMa : changed all option_binding into OptionBinding to conform to class name convention
+// ModMMa : changed all option_binding into OptionBinding to conform to class name convention
 void OptionBinding() :
 {
-  String option_name;
-  int int_val;
-  boolean bool_val;
-  String string_val;
+  String option_name = null;
+  int int_val = 0;
+  boolean bool_val = false;
+  String string_val = null;
   Token t = getToken(1);
 }
 {
@@ -647,7 +655,7 @@ void OptionBinding() :
   ";"
 }
 
-// MMa : changed all production into Production to conform to class name convention
+// ModMMa : changed all production into Production to conform to class name convention
 void Production() :
 {}
 {
@@ -672,21 +680,20 @@ void Production() :
 | BNFProduction()
 }
 
-// MMa : changed all JavaCodeProduction into JavaCodeProduction_ (JavaCC specific class)
-// MMa : changed all javacode_production into JavaCodeProduction to conform to class name convention
+// ModMMa : changed all JavaCodeProduction into JavaCodeProduction_ (JavaCC specific class)
+// ModMMa : changed all javacode_production into JavaCodeProduction to conform to class name convention
 void JavaCodeProduction() :
 {
   JavaCodeProduction_ p = new JavaCodeProduction_();
-  String lhs;
+  String lhs = null;
   Token t = getToken(1);
   p.setFirstToken(t);
-  List<Token> excName;  p.setThrowsList(new ArrayList<List<Token>>());
+  List<Token> excName = null;  p.setThrowsList(new ArrayList<List<Token>>());
   p.setLine(t.beginLine);
   p.setColumn(t.beginColumn);
 }
 {
   "JAVACODE" AccessModifier(p)
-  // MMa 07/2012 : seems to lack [ TypeParameters() ] here
   ResultType(p.getReturnTypeTokens())
   lhs = IdentifierAsString() { p.setLhs(lhs); }
   FormalParameters(p.getParameterListTokens())
@@ -709,27 +716,25 @@ void JavaCodeProduction() :
       }
     )*
   ]
-  Block
-  // MMa 07/2012 : seems to lack ' | ";"' here
-  (
-    p.getCodeTokens()
-  )
+  // ModMMa 10/2012 : added for not generating the node creation within the callers (in JavaCodeProduction)
+  [ "%" ]
+  Block(p.getCodeTokens())
   {
     p.setLastToken(getToken(0));
     addproduction(p);
   }
 }
 
-// MMa : changed all BNFProduction into BNFProduction_ (JavaCC specific class)
-// MMa : changed all bnf_production into BNFProduction to conform to class name convention
+// ModMMa : changed all BNFProduction into BNFProduction_ (JavaCC specific class)
+// ModMMa : changed all bnf_production into BNFProduction to conform to class name convention
 void BNFProduction() :
 {
   BNFProduction_ p = new BNFProduction_();
   Container c = new Container();
   Token t = getToken(1);
   p.setFirstToken(t);
-  List<Token> excName;
-  String lhs;
+  List<Token> excName = null;
+  String lhs = null;
   p.setThrowsList(new ArrayList<List<Token> >());
   p.setLine(t.beginLine);
   p.setColumn(t.beginColumn);
@@ -758,9 +763,8 @@ void BNFProduction() :
       }
     )*
   ]
-  // MMa 09/2012 : added for not generating the node creation within the callers (in BNFProduction)
+  // ModMMa 09/2012 : added for not generating the node creation within the callers (in BNFProduction)
   [ "!" ]
-  // MMa 07/2012 : '[node_descriptor()]' is missing here
   ":" Block
   (
     p.getDeclarationTokens()
@@ -787,11 +791,11 @@ void AccessModifier(NormalProduction p) :
   }
 }
 
-// MMa : changed all regular_expr_production into RegularExprProduction to conform to class name convention
+// ModMMa : changed all regular_expr_production into RegularExprProduction to conform to class name convention
 void RegularExprProduction() :
 {
   TokenProduction p = new TokenProduction();
-  List<String> states;
+  List<String> states = null;
   Token t = p.firstToken = getToken(1);
   p.setLine(t.beginLine);
   p.setColumn(t.beginColumn);
@@ -847,17 +851,17 @@ void RegularExprProduction() :
     t = "}"    {      p.lastToken = t;      addregexpr(p);    }
   }
 
-// MMa : changed all token_manager_decls into TokenManagerDecls to conform to class name convention
+// ModMMa : changed all token_manager_decls into TokenManagerDecls to conform to class name convention
 void TokenManagerDecls() :
   {
     List<Token> decls = new ArrayList<Token>();
-    Token t;
+    Token t = null;
   }
   {
     t = "TOKEN_MGR_DECLS" ":" ClassOrInterfaceBody(false, decls)    {      add_token_manager_decls(t, decls);    }
   }
 
-// MMa : changed all regexpr_kind into RegExprKind to conform to class name convention
+// ModMMa : changed all regexpr_kind into RegExprKind to conform to class name convention
 void RegExprKind(TokenProduction p) :
 {}
   {
@@ -879,8 +883,8 @@ void RegExprKind(TokenProduction p) :
     }
   }
 
-// MMa : changed all RegExprSpec into RegExprSpec_ (JavaCC specific class)
-// MMa : changed all regexpr_spec into RegExprSpec to conform to class name convention
+// ModMMa : changed all RegExprSpec into RegExprSpec_ (JavaCC specific class)
+// ModMMa : changed all regexpr_spec into RegExprSpec to conform to class name convention
 void RegExprSpec(TokenProduction p) :
   {
     Container c = new Container();
@@ -890,7 +894,7 @@ void RegExprSpec(TokenProduction p) :
   }
   {
     RegularExpression(c)
-    // MMa 09/2012 : added for not generating the node creation within the callers (in RegExprSpec)    [ "!" ]
+    // ModMMa 09/2012 : added for not generating the node creation within the callers (in RegExprSpec)    [ "!" ]
     {
       res.rexp = (RegularExpression_) c.member;
       res.rexp.tpContext = p;
@@ -924,7 +928,7 @@ void RegExprSpec(TokenProduction p) :
     }
   }
 
-// MMa : changed all expansion_choices into ExpansionChoices to conform to class name convention
+// ModMMa : changed all expansion_choices into ExpansionChoices to conform to class name convention
 void ExpansionChoices(Container c1) :
   {
     boolean morethanone = false;
@@ -959,8 +963,8 @@ void ExpansionChoices(Container c1) :
     }
   }
 
-// MMa : changed all Expansion into Expansion_ (JavaCC specific class)
-// MMa : changed all expansion into Expansion to conform to class name convention
+// ModMMa : changed all Expansion into Expansion_ (JavaCC specific class)
+// ModMMa : changed all expansion into Expansion to conform to class name convention
 void Expansion(Container c1) :
   {
     Sequence seq = new Sequence();
@@ -994,7 +998,6 @@ void Expansion(Container c1) :
         ((Expansion_) c2.member).parent = seq;
         ((Expansion_) c2.member).ordinal = seq.units.size() - 1;
       }
-      // MMa 07/2012 : '[node_descriptor()]' is missing here
     )+
     {
       if (la.getLaExpansion() == null)
@@ -1005,7 +1008,7 @@ void Expansion(Container c1) :
     }
   }
 
-// MMa : changed all local_lookahead into LocalLookahead to conform to class name convention
+// ModMMa : changed all local_lookahead into LocalLookahead to conform to class name convention
 Lookahead LocalLookahead() :
   {
     Lookahead la = new Lookahead();
@@ -1016,7 +1019,7 @@ Lookahead LocalLookahead() :
     la.setLaExpansion(null);
     Container c = new Container();
     boolean commaAtEnd = false, emptyLA = true;
-    int laAmount;
+    int laAmount = 0;
     inLocalLA++;
   }
   {
@@ -1072,15 +1075,15 @@ Lookahead LocalLookahead() :
     }
   }
 
-// MMa : changed all expansion_unit into ExpansionUnit to conform to class name convention
+// ModMMa : changed all expansion_unit into ExpansionUnit to conform to class name convention
 void ExpansionUnit(Container c) :
   {
-    String name;
+    String name = null;
     List<Token> lhsTokens = new ArrayList<Token>();
-    NonTerminal nt;
-    Action act;
-    Token t;
-    Lookahead la;
+    NonTerminal nt = null;
+    Action act = null;
+    Token t = null;
+    Lookahead la = null;
   }
   {
     LOOKAHEAD(1)
@@ -1164,7 +1167,7 @@ void ExpansionUnit(Container c) :
       }
     ]
     (
-      // MMa 07/2012 : here inside we have IA | RE instead of RE | IA in JavaCC1.5.jjt
+      // ModMMa 07/2012 : here inside we have IA | RE instead of RE | IA in JavaCC1.5.jjt
       // and an extra LOOKAHEAD
       LOOKAHEAD(IdentifierAsString() "(")
       {
@@ -1179,7 +1182,7 @@ void ExpansionUnit(Container c) :
         nt.setName(name);
         c.member = nt;
       }
-      // MMa 09/2012 : added for not generating the node creation within the callers (in ExpansionUnit IdentifierAsString)
+      // ModMMa 09/2012 : added for not generating the node creation within the callers (in ExpansionUnit IdentifierAsString)
       [ "!" ]
     | RegularExpression(c)
       {
@@ -1192,7 +1195,7 @@ void ExpansionUnit(Container c) :
           ((RegularExpression_) (c.member)).rhsToken = t;
         }
       ]
-      // MMa 09/2012 : added for not generating the node creation within the callers (in ExpansionUnit RegularExpression)
+      // ModMMa 09/2012 : added for not generating the node creation within the callers (in ExpansionUnit RegularExpression)
       [ "!" ]
     )
   | t = "(" ExpansionChoices(c) ")"
@@ -1212,10 +1215,10 @@ void ExpansionUnit(Container c) :
     )?
   }
 
-// MMa : added to create a node ; renamed from ExpansionUnitInTCF
+// ModMMa : added to create a node ; renamed from ExpansionUnitInTCF
 void ExpansionUnitTCF(Container c) :
   {
-    Token t;
+    Token t = null;
   }
   {
     {
@@ -1225,7 +1228,7 @@ void ExpansionUnitTCF(Container c) :
       List<List<Token>> catchblks = new ArrayList<List<Token>>();
       List<Token> finallyblk = null;
       List<Token> vec = new ArrayList<Token>();
-      Token t0;
+      Token t0 = null;
     }
     t0 = "try" "{" ExpansionChoices(expch) "}"
     (
@@ -1258,12 +1261,12 @@ void ExpansionUnitTCF(Container c) :
     }
   }
 
-// MMa : changed all RegularExpression into RegularExpression_ (JavaCC specific class)
-// MMa : changed all regular_expression into RegularExpression to conform to class name convention
+// ModMMa : changed all RegularExpression into RegularExpression_ (JavaCC specific class)
+// ModMMa : changed all regular_expression into RegularExpression to conform to class name convention
 void RegularExpression(Container c) :
   {
-    REndOfFile ef;
-    String image;
+    REndOfFile ef = null;
+    String image = null;
     boolean private_rexp = false;
     Token t = getToken(1);
   }
@@ -1293,7 +1296,7 @@ void RegularExpression(Container c) :
     //    < RANGLE : ">" >
     ">"
     {
-      RegularExpression_ re;
+      RegularExpression_ re = null;
       if (c.member instanceof RJustName)
       {
         RSequence seq = new RSequence();
@@ -1327,7 +1330,7 @@ void RegularExpression(Container c) :
     }
   }
 
-// MMa : changed all complex_regular_expression_choices into ComplexRegularExpressionChoices to conform to class name convention
+// ModMMa : changed all complex_regular_expression_choices into ComplexRegularExpressionChoices to conform to class name convention
 void ComplexRegularExpressionChoices(Container c1) :
   {
     boolean morethanone = false;
@@ -1362,7 +1365,7 @@ void ComplexRegularExpressionChoices(Container c1) :
     }
   }
 
-// MMa : changed all complex_regular_expression into ComplexRegularExpression to conform to class name convention
+// ModMMa : changed all complex_regular_expression into ComplexRegularExpression to conform to class name convention
 void ComplexRegularExpression(Container c1) :
   {
     int count = 0;
@@ -1400,10 +1403,10 @@ void ComplexRegularExpression(Container c1) :
   }
 }
 
-// MMa : changed all complex_regular_expression_unit into ComplexRegularExpressionUnit to conform to class name convention
+// ModMMa : changed all complex_regular_expression_unit into ComplexRegularExpressionUnit to conform to class name convention
 void ComplexRegularExpressionUnit(Container c) :
 {
-  String image;
+  String image = null;
   Token t = getToken(1);
   int r1 = 0, r2 =-1;
   boolean hasMax = false;
@@ -1444,7 +1447,7 @@ void ComplexRegularExpressionUnit(Container c) :
   )?
 }
 
-// MMa : changed all character_list into CharacterList to conform to class name convention
+// ModMMa : changed all character_list into CharacterList to conform to class name convention
 void CharacterList(Container c1) :
 {
   RCharacterList chlist = new RCharacterList();
@@ -1479,12 +1482,14 @@ void CharacterList(Container c1) :
   }
 }
 
-// MMa : changed all character_descriptor into CharacterDescriptor to conform to class name convention
+// ModMMa : changed all character_descriptor into CharacterDescriptor to conform to class name convention
 void CharacterDescriptor(Container c) :
 {
-  char c1, c2 = ' '; // "unnecessary" initialization to make the Java compiler happy!
+  char c1 = ' ';
+  char c2 = ' ';
   boolean isrange = false;
-  String imageL, imageR;
+  String imageL = null;
+  String imageR = null;
   Token t = getToken(1);
 }
 {
@@ -1510,8 +1515,8 @@ void CharacterDescriptor(Container c) :
   }
 }
 
-// MMa : changed all identifier into Identifier to conform to class name convention
-// MMa 07/2012 : renamed from Identifier to IdentifierAsString
+// ModMMa : changed all identifier into Identifier to conform to class name convention
+// ModMMa 07/2012 : renamed from Identifier to IdentifierAsString
 String IdentifierAsString() :
 {  Token t = null;}{  t = < IDENTIFIER >  {    return t.image;  }}
 
@@ -1523,7 +1528,7 @@ String IdentifierAsString() :
  * (those that include "<<" and ">>")
  */
 /* Java identifiers and JavaCC reserved words */
-// MMa 07/2012 : is it useful to return a Token ? Seems not in Name() and BlockStatement()
+// ModMMa 07/2012 : is it useful to return a Token ? Seems not in Name() and BlockStatement()
 Token JavaIdentifier() :
 {}
 {
@@ -1558,7 +1563,7 @@ void CompilationUnit() :
 }
 {
   [
-    // MMa 07/2012 : fixed grammar
+    // ModMMa 07/2012 : fixed grammar
     // LOOKAHEAD((Annotation())* "package")
     PackageDeclaration()
   ]
@@ -1576,7 +1581,7 @@ void CompilationUnit() :
 void PackageDeclaration() :
 {}
 {
-  // MMa 07/2012 : fixed grammar : only at most one Annotation is permitted,
+  // ModMMa 07/2012 : fixed grammar : only at most one Annotation is permitted,
   // and must be in package-info.java, so we should not encounter it in the parsed file
   // Modifiers() "package" Name(null) ";"
   "package" Name(null) ";"
@@ -1656,7 +1661,7 @@ void TypeDeclaration() :
 {}
 {
   ";"
-// MMa 07/2012 : problem ! Modifiers include Annotation() which prevent from finding AnnotationTypeDeclaration()
+// ModMMa 07/2012 : problem ! Modifiers includes Annotation() which prevents from finding AnnotationTypeDeclaration()
 | Modifiers()
   (
     ClassOrInterfaceDeclaration()
@@ -1669,7 +1674,7 @@ void ClassOrInterfaceDeclaration() :
 {
   boolean isInterface = false;
   class_nesting++;
-  Token t;
+  Token t = null;
   boolean is_parser_class = false;
 }
 {
@@ -1781,7 +1786,8 @@ void TypeBound() :
 void ClassOrInterfaceBody(boolean isInterface, List<Token> tokens) :
 /* Parsing this fills "tokens" with all tokens of the block excluding the braces at each end */
 {
-  Token first, last;
+  Token first = null;
+  Token last = null;
   if (tokens == null) tokens = new ArrayList<Token>();
 }
 {
@@ -1824,6 +1830,8 @@ void ClassOrInterfaceBodyDeclaration(boolean isInterface) :
   (
     ClassOrInterfaceDeclaration()
   | EnumDeclaration()
+  // ModMMa 11/2014 : added
+  | AnnotationTypeDeclaration()
   | LOOKAHEAD([ TypeParameters() ] < IDENTIFIER > "(")
     ConstructorDeclaration()
   | LOOKAHEAD(Type() < IDENTIFIER > ("[" "]")* (","
@@ -1884,11 +1892,7 @@ void MethodDeclaration() :
 {
   // Modifiers already matched in the caller
   [ TypeParameters() ] ResultType(null) MethodDeclarator() [ "throws" NameList() ]
-  // MMa 07/2012 : '[node_descriptor()]' is missing here
-  (
-    Block(null)
-  | ";"
-  )
+  ( Block(null) | ";" )
 }
 
 void MethodDeclarator() :
@@ -1900,7 +1904,8 @@ void MethodDeclarator() :
 void FormalParameters(List<Token> tokens) :
 /* Parsing this fills "tokens" with all tokens of the formal parameters excluding the parentheses at each end */
 {
-  Token first, last;
+  Token first = null;
+  Token last = null;
   if (tokens == null) tokens = new ArrayList<Token>();
 }
 {
@@ -1957,15 +1962,22 @@ void ConstructorDeclaration() :
 void ExplicitConstructorInvocation() :
 {}
 {
-  // MMa 07/2012 : problem ! both lack optional NonWildTypeArguments (< ReferenceTypeList >)
-  LOOKAHEAD("this" Arguments(null) ";")
-  "this" Arguments(null) ";"
-|
-  [
-    LOOKAHEAD(2)
-    PrimaryExpression() "."
-  ]
-  "super" Arguments(null) ";"
+//  // ModMMa 11/2014 : added//  [ "<" ReferenceType() ("," ReferenceType())* ">" ]//  // ModMMa 12/2014 : to resolve the conflict with "this" alone in PrimaryPrefix()//  LOOKAHEAD(3)//  "this" Arguments(null) ";"//|//  [//    LOOKAHEAD(2)//    PrimaryExpression() "."//  ]//  "super" Arguments(null) ";"
+  // MMa 12/2014 : modified to resolve the conflict with "this" alone in PrimaryPrefix()
+  (
+    LOOKAHEAD(3)
+    // MMa 11/2014 : added
+    [ "<" ReferenceType() ("," ReferenceType())* ">" ]
+    (
+      "this" Arguments(null) ";"
+    |
+      "super" Arguments(null) ";"
+    )
+  | (
+      PrimaryExpression() "."
+      "super" Arguments(null) ";"
+    )
+  )
 }
 
 void Initializer() :
@@ -2250,9 +2262,9 @@ void ShiftExpression() :
   (
     (
       "<<"
-      // MMa 07/2012 : renamed from RUNSIGNEDSHIFT() and put before RSignedShift
+      // ModMMa 07/2012 : renamed from RUNSIGNEDSHIFT() and put before RSignedShift
     | RUnsignedShift()
-      // MMa 07/2012 : renamed from RSIGNEDSHIFT()
+      // ModMMa 07/2012 : renamed from RSIGNEDSHIFT()
     | RSignedShift()
     )
     AdditiveExpression()
@@ -2260,7 +2272,7 @@ void ShiftExpression() :
 }
 
 /* We use productions to match >>>, >> and > so that we can keep the type declaration syntax with generics clean */
-// MMa 07/2012 : moved from after TryStatement() and renamed from RSIGNEDSHIFT()
+// ModMMa 07/2012 : moved from after TryStatement() and renamed from RSIGNEDSHIFT()
 void RSignedShift() :
 {}
 {
@@ -2269,7 +2281,7 @@ void RSignedShift() :
   ">>"
 }
 
-// MMa 07/2012 : moved from after TryStatement() and renamed from RUNSIGNEDSHIFT()
+// ModMMa 07/2012 : moved from after TryStatement() and renamed from RUNSIGNEDSHIFT()
 void RUnsignedShift() :
 {}
 {
@@ -2407,7 +2419,6 @@ void PrimaryPrefix() :
   Literal()
 | "this"
 | "super" "." < IDENTIFIER >
-// MMa 07/2012 : problem ! does not seem to be found
 | "(" Expression(null) ")"
 | AllocationExpression()
 | LOOKAHEAD(ResultType(null) "." "class")
@@ -2444,7 +2455,8 @@ int IntegerLiteral() :{}{  < INTEGER_LITERAL >  {    try    {      return
 
 boolean BooleanLiteral() :{}{  "true"  {    return true;  }| "false"  {    return false;  }}
 
-String StringLiteral() :{  Token t;}{  t = < STRING_LITERAL >  {    return remove_escapes_and_quotes(t, t.image);  }}
+String StringLiteral() :{  Token t = null;
+  ;}{  t = < STRING_LITERAL >  {    return remove_escapes_and_quotes(t, t.image);  }}
 
 void NullLiteral() :
 {}
@@ -2455,7 +2467,8 @@ void NullLiteral() :
 void Arguments(List<Token> tokens) :
 /* Parsing this fills "tokens" with all tokens of the arguments excluding the parentheses at each end */
 {
-  Token first, last;
+  Token first = null;
+  Token last = null;
   if (tokens == null) tokens = new ArrayList<Token>();
 }
 {
@@ -2538,7 +2551,8 @@ void LabeledStatement() :
 void Block(List<Token> tokens) :
 /* Parsing this fills "tokens" with all tokens of the block excluding the braces at each end */
 {
-  Token first, last;
+  Token first = null;
+  Token last = null;
   if (tokens == null) tokens = new ArrayList<Token>();
 }
 {
@@ -2724,7 +2738,7 @@ void ContinueStatement() :
 
 void ReturnStatement() :
 {
-  Token t;
+  Token t = null;
 }
 {
   t = "return"  {
@@ -2746,7 +2760,7 @@ void ReturnStatement() :
 
 void ThrowStatement() :
 {
-  Token t;
+  Token t = null;
 }
 {
   t = "throw"  {
@@ -2786,7 +2800,7 @@ void TryStatement() :
 void Annotation() :
 {}
 {
-  // MMa 09/2012 : fixed (added parentheses)
+  // ModMMa 09/2012 : fixed (added parentheses)
   LOOKAHEAD("@" Name(null) "(" (< IDENTIFIER > "=" | ")"))
   NormalAnnotation()
 | LOOKAHEAD("@" Name(null) "(")

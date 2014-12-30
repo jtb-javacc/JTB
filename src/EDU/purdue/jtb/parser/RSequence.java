@@ -35,43 +35,50 @@ import java.util.List;
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public class RSequence extends RegularExpression_ {
 
   /**
    * The list of units in this regular expression sequence. Each list component will narrow to
-   * RegularExpression_.
+   * RegularExpression_
    */
   public List<RegularExpression_> units = new ArrayList<RegularExpression_>();
 
   /** {@inheritDoc} */
+  @SuppressWarnings("null")
+  // for "temp2.endNfaState.AddMove(finalState);"
   @Override
   public Nfa GenerateNfa(final boolean ignoreCase) {
     if (units.size() == 1)
       return (units.get(0)).GenerateNfa(ignoreCase);
     final Nfa retVal = new Nfa();
-    final NfaState startState = retVal.start;
-    final NfaState finalState = retVal.end;
+    final NfaState startState = retVal.startNfaState;
+    final NfaState finalState = retVal.endNfaState;
     Nfa temp1;
     Nfa temp2 = null;
     RegularExpression_ curRE;
     curRE = units.get(0);
     temp1 = curRE.GenerateNfa(ignoreCase);
-    startState.AddMove(temp1.start);
+    startState.AddMove(temp1.startNfaState);
     for (int i = 1; i < units.size(); i++) {
       curRE = units.get(i);
       temp2 = curRE.GenerateNfa(ignoreCase);
-      temp1.end.AddMove(temp2.start);
+      temp1.endNfaState.AddMove(temp2.startNfaState);
       temp1 = temp2;
     }
-    temp2.end.AddMove(finalState);
+    temp2.endNfaState.AddMove(finalState);
     return retVal;
   }
 
+  /** Standard constructor */
   public RSequence() {
     expType = EXP_TYPE.R_SEQUENCE;
   }
 
+  /**
+   * @param seq - the node
+   */
   public RSequence(final List<RegularExpression_> seq) {
     this();
     ordinal = Integer.MAX_VALUE;

@@ -25,7 +25,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package EDU.purdue.jtb.parser;
 
 /**
@@ -33,9 +32,10 @@ package EDU.purdue.jtb.parser;
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc ; changed versions from 4.2.j.m to 5.0
  */
 public interface Version {
 
-  // TODO see if it should be something like 5.0.mma
-  String version = "4.2.mma";
+  /** The JavaCC version from which has been derived JTB */
+  String version = "5.0";
 }
