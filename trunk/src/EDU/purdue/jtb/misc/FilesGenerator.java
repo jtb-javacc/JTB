@@ -60,8 +60,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Class FilesGenerator contains methods to generate the grammar (user) nodes java files, the base
@@ -73,23 +73,25 @@ import java.util.Iterator;
  *          1.4.0 : 11/2009 : MMa : fixed directories creation errors
  * @version 1.4.6 : 01/2011 : FA/MMa : added -va and -npfx and -nsfx options
  * @version 1.4.7 : 09/2012 : MMa : added missing generated visit methods (NodeChoice and NodeTCF)
+ * @version 1.4.8 : 10/2012 : MMa : tuned javadoc comments for nodes with no child<br>
+ *          1.4.8 : 10/2014 : MMa : fixed NPE on classes without fields
  */
 public class FilesGenerator {
 
   /** The classes list */
-  private final ArrayList<ClassInfo> classes;
+  private final List<ClassInfo> classes;
   /** The (generated) nodes directory */
-  private final File                 nodesDir;
+  private final File            nodesDir;
   /** The (generated) visitors directory */
-  private final File                 visitorsDir;
+  private final File            visitorsDir;
 
   /**
    * Constructor. Creates the nodes and visitors directories if they do not exist.
    * 
-   * @param classesList - the list of {@link ClassInfo} classes instances
+   * @param aClasses - the list of {@link ClassInfo} classes instances
    */
-  public FilesGenerator(final ArrayList<ClassInfo> classesList) {
-    classes = classesList;
+  public FilesGenerator(final List<ClassInfo> aClasses) {
+    classes = aClasses;
 
     nodesDir = new File(nodesDirName);
     visitorsDir = new File(visitorsDirName);
@@ -137,17 +139,19 @@ public class FilesGenerator {
       sb = new StringBuilder(classes.size() * 100);
 
     for (final Iterator<ClassInfo> e = classes.iterator(); e.hasNext();) {
-      final ClassInfo classInfo = e.next();
-      final String className = classInfo.className;
+      final ClassInfo ci = e.next();
+      final String className = ci.className;
 
       sb.append("class ").append(className).append(":").append(LS);
       spc.updateSpc(+1);
 
-      final Iterator<String> types = classInfo.fieldTypes.iterator();
-      final Iterator<String> names = classInfo.fieldNames.iterator();
+      if (ci.fieldTypes != null) {
+        final Iterator<String> types = ci.fieldTypes.iterator();
+        final Iterator<String> names = ci.fieldNames.iterator();
 
-      for (; types.hasNext();)
-        sb.append(spc.spc).append(types.next()).append(" ").append(names.next()).append(LS);
+        for (; types.hasNext();)
+          sb.append(spc.spc).append(types.next()).append(" ").append(names.next()).append(LS);
+      }
 
       sb.append(LS);
       spc.updateSpc(-1);
@@ -163,23 +167,22 @@ public class FilesGenerator {
   public void genNodesFiles() throws FileExistsException {
     try {
       boolean exists = false;
-
       for (final Iterator<ClassInfo> e = classes.iterator(); e.hasNext();) {
-        final ClassInfo classInfo = e.next();
-        final File file = new File(nodesDir, classInfo.className + ".java");
+        final ClassInfo ci = e.next();
+        final File file = new File(nodesDir, ci.className + ".java");
         if (noOverwrite && file.exists()) {
-          Messages.softErr(classInfo.className + " exists but no overwrite flag has been set");
+          Messages.softErr(ci.className + " exists but no overwrite flag has been set");
           exists = true;
           break;
         }
         final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 2048));
-        out.print(genNodeClass(null, classInfo));
+        out.print(genNodeClass(null, ci));
         out.close();
       }
       if (noOverwrite && exists)
         throw new FileExistsException("Some of the generated nodes classes files exist");
     }
-    catch (final IOException e) {
+    catch (final Exception e) {
       Messages.hardErr(e);
     }
   }
@@ -398,15 +401,20 @@ public class FilesGenerator {
       aSb.append(spc.spc).append(" */").append(LS).append(LS);
     }
     for (final Iterator<ClassInfo> e = classes.iterator(); e.hasNext();) {
-      final ClassInfo classInfo = e.next();
-      final String className = classInfo.className;
+      final ClassInfo ci = e.next();
+      final String className = ci.className;
       if (javaDocComments) {
         aSb.append(spc.spc).append("/**").append(LS);
-        aSb.append(spc.spc).append(" * Visits a {@link ").append(className)
-           .append("} node, whose children are the following :").append(LS);
+        aSb.append(spc.spc).append(" * Visits a {@link ").append(className).append("} node, ");
+        aSb.append(ci.astEcNode == null
+                                       ? "with no child :"
+                                       : ci.fieldNames.size() == 1
+                                                                  ? "whose child is the following :"
+                                                                  : "whose children are the following :")
+           .append(LS);
         aSb.append(spc.spc).append(" * <p>").append(LS);
         // generate the javadoc for the class fields, with indentation of 1
-        classInfo.fmtFieldsJavadocCmts(aSb, spc);
+        ci.fmtFieldsJavadocCmts(aSb, spc);
         aSb.append(spc.spc).append(" *").append(LS);
         aSb.append(spc.spc).append(" * @param n - the node to visit").append(LS);
         if (aArgu)

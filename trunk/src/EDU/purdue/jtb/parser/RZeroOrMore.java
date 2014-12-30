@@ -33,6 +33,7 @@ package EDU.purdue.jtb.parser;
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public class RZeroOrMore extends RegularExpression_ {
 
@@ -45,23 +46,30 @@ public class RZeroOrMore extends RegularExpression_ {
   @Override
   public Nfa GenerateNfa(final boolean ignoreCase) {
     final Nfa retVal = new Nfa();
-    final NfaState startState = retVal.start;
-    final NfaState finalState = retVal.end;
+    final NfaState startState = retVal.startNfaState;
+    final NfaState finalState = retVal.endNfaState;
 
     final Nfa temp = regexpr.GenerateNfa(ignoreCase);
 
-    startState.AddMove(temp.start);
+    startState.AddMove(temp.startNfaState);
     startState.AddMove(finalState);
-    temp.end.AddMove(finalState);
-    temp.end.AddMove(temp.start);
+    temp.endNfaState.AddMove(finalState);
+    temp.endNfaState.AddMove(temp.startNfaState);
 
     return retVal;
   }
 
+  /** Standard constructor */
   public RZeroOrMore() {
     expType = EXP_TYPE.R_ZERO_OR_MORE;
   }
 
+  /**
+   * Constructor with parameters
+   * 
+   * @param t - the token
+   * @param r - the node
+   */
   public RZeroOrMore(final Token t, final RegularExpression_ r) {
     this();
     this.setLine(t.beginLine);

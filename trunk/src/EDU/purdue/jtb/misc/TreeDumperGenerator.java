@@ -111,7 +111,7 @@ public class TreeDumperGenerator {
     }
   }
 
-  // TODO change the following methods with spc.spc
+  // TO DO change the following methods with spc.spc
 
   /**
    * Generates the tree dumper visitor source in its file.<br>

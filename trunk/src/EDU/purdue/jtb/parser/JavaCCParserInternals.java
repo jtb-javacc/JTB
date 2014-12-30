@@ -35,9 +35,11 @@ import java.util.List;
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public abstract class JavaCCParserInternals extends JavaCCGlobals {
 
+  /** Initializes */
   static protected void initialize() {
     final Integer i = new Integer(0);
     lexstate_S2I.put("DEFAULT", i);
@@ -46,10 +48,20 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
                             new Hashtable<String, Hashtable<String, RegularExpression_>>());
   }
 
+  /**
+   * @param id - the Compilation Unit name
+   */
   static protected void addcuname(final String id) {
     cu_name = id;
   }
 
+  /**
+   * Compares the second id with the first one and raises a parse error if not identical.
+   * 
+   * @param t - the token to pass to the error
+   * @param id1 - the first id to compare
+   * @param id2 - the second id to compare
+   */
   static protected void compare(final Token t, final String id1, final String id2) {
     if (!id2.equals(id1)) {
       JavaCCErrors.parse_error(t, "Name " + id2 +

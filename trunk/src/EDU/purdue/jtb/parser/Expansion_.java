@@ -27,6 +27,7 @@
  */
 package EDU.purdue.jtb.parser;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -35,24 +36,24 @@ import java.util.Set;
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc ; removed overriding hashCode() method
  */
 public class Expansion_ {
 
-  /**
-   * The line and column number of the construct that corresponds most closely to this node.
-   */
-  private int line;
-  private int column;
+  /** The column number of the construct that corresponds most closely to this node */
+  private int        column;
+  /** The line number of the construct that corresponds most closely to this node */
+  private int        line;
 
-  /**
-   * A reimplementing of Object.hashCode() to be deterministic. This uses the line and column fields
-   * to generate an arbitrary number - we assume that this method is called only after line and
-   * column are set to their actual values.
-   */
-  @Override
-  public int hashCode() {
-    return getLine() + getColumn();
-  }
+  //    /**
+  //     * A override of {@link Object#hashCode()} to be more deterministic. This uses the line and column
+  //     * fields to generate an arbitrary number - we assume that this method is called only after line
+  //     * and column are set to their actual values.
+  //     */
+  //    @Override
+  //    public int hashCode() {
+  //      return getLine() + getColumn();
+  //    }
 
   /**
    * An internal name for this expansion. This is used to generate parser routines.
@@ -77,21 +78,33 @@ public class Expansion_ {
   int                ordinal;
   /**
    * To avoid right-recursive loops when calculating follow sets, we use a generation number which
-   * indicates if this expansion was visited by LookaheadWalk.genFollowSet in the same generation.
-   * New generations are obtained by incrementing the static counter below, and the current
-   * generation is stored in the non-static variable below.
+   * indicates if this expansion was visited by
+   * {@link LookaheadWalk#genFollowSet(List, Expansion_, long)} in the same generation. New
+   * generations are obtained by incrementing the static counter {@link #nextGenerationIndex}, and
+   * the current generation is stored in the non-static variable {@link #myGeneration}.
    */
   public static long nextGenerationIndex = 1;
+  /**
+   * To avoid right-recursive loops when calculating follow sets, we use a generation number which
+   * indicates if this expansion was visited by
+   * {@link LookaheadWalk#genFollowSet(List, Expansion_, long)} in the same generation. New
+   * generations are obtained by incrementing the static counter {@link #nextGenerationIndex}, and
+   * the current generation is stored in the non-static variable {@link #myGeneration}.
+   */
   public long        myGeneration        = 0;
   /**
-   * This flag is used for bookkeeping by the minimumSize method in class ParseEngine.
+   * This flag is used for bookkeeping by the minimumSize method in class {@link ParseEngine}.
    */
   public boolean     inMinimumSize       = false;
 
+  /** Reinitializes */
   public static void reInit() {
     nextGenerationIndex = 1;
   }
 
+  /**
+   * @return the name of the class without the package part
+   */
   private String getSimpleName() {
     final String name = getClass().getName();
     return name.substring(name.lastIndexOf(".") + 1); // strip the package name
@@ -104,8 +117,13 @@ public class Expansion_ {
            getSimpleName() + "]";
   }
 
-  protected static final String eol = System.getProperty("line.separator", "\n");
+  /** The OS line separator */
+  protected static final String EOL = System.getProperty("line.separator", "\n");
 
+  /**
+   * @param indent - the number of indentation level
+   * @return a {@link StringBuilder} with twice the number of spaces given by the parameter
+   */
   protected StringBuilder dumpPrefix(final int indent) {
     final StringBuilder sb = new StringBuilder(128);
     for (int i = 0; i < indent; i++)
@@ -113,6 +131,11 @@ public class Expansion_ {
     return sb;
   }
 
+  /**
+   * @param indent - the number of spaces for indenting
+   * @param alreadyDumped - a Set of objects already dumped (unused)
+   * @return the formatted string dumping the class
+   */
   public StringBuilder dump(final int indent,
                             @SuppressWarnings("unused") final Set<Object> alreadyDumped) {
     final StringBuilder value = dumpPrefix(indent).append(System.identityHashCode(this))
@@ -121,7 +144,7 @@ public class Expansion_ {
   }
 
   /**
-   * @param column - the column to set
+   * @param cl - the column to set
    */
   final void setColumn(final int cl) {
     column = cl;
@@ -135,7 +158,7 @@ public class Expansion_ {
   }
 
   /**
-   * @param line - the line to set
+   * @param ln - the line to set
    */
   final void setLine(final int ln) {
     line = ln;
@@ -157,7 +180,19 @@ public class Expansion_ {
    * Subclasses enum type
    */
   public enum EXP_TYPE {
-    CHOICE, SEQUENCE, ONE_OR_MORE, ZERO_OR_MORE, ZERO_OR_ONE, LOOKAHEAD, TRY_BLOCK, R_CHOICE,
-    R_SEQUENCE, R_ONE_OR_MORE, R_ZERO_OR_MORE, R_ZERO_OR_ONE, R_REPETITION_RANGE
+    @SuppressWarnings("javadoc")
+    CHOICE, @SuppressWarnings("javadoc")
+    SEQUENCE, @SuppressWarnings("javadoc")
+    ONE_OR_MORE, @SuppressWarnings("javadoc")
+    ZERO_OR_MORE, @SuppressWarnings("javadoc")
+    ZERO_OR_ONE, @SuppressWarnings("javadoc")
+    LOOKAHEAD, @SuppressWarnings("javadoc")
+    TRY_BLOCK, @SuppressWarnings("javadoc")
+    R_CHOICE, @SuppressWarnings("javadoc")
+    R_SEQUENCE, @SuppressWarnings("javadoc")
+    R_ONE_OR_MORE, @SuppressWarnings("javadoc")
+    R_ZERO_OR_MORE, @SuppressWarnings("javadoc")
+    R_ZERO_OR_ONE, @SuppressWarnings("javadoc")
+    R_REPETITION_RANGE
   };
 }

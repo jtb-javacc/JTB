@@ -32,30 +32,33 @@ package EDU.purdue.jtb.parser;
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public class SingleCharacter {
 
-  /**
-   * The line and column number of the construct that corresponds most closely to this node.
-   */
+  /** The column number of the construct that corresponds most closely to this node */
   private int column;
-
+  /** The line number of the construct that corresponds most closely to this node */
   private int line;
 
-  /**
-   * The character of this descriptor.
-   */
+  /** The character of this descriptor */
   public char ch;
 
+  /** Standard constructor */
   SingleCharacter() {
   }
 
+  /**
+   * Constructor with parameter
+   * 
+   * @param c - the character
+   */
   SingleCharacter(final char c) {
     ch = c;
   }
 
   /**
-   * @param line - the line to set
+   * @param ln - the line to set
    */
   final void setLine(final int ln) {
     line = ln;
@@ -69,7 +72,7 @@ public class SingleCharacter {
   }
 
   /**
-   * @param column - the column to set
+   * @param cl - the column to set
    */
   final void setColumn(final int cl) {
     column = cl;

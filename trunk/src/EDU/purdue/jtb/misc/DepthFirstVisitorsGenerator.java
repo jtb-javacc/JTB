@@ -59,8 +59,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import EDU.purdue.jtb.syntaxtree.NodeChoice;
 import EDU.purdue.jtb.syntaxtree.NodeList;
@@ -73,8 +73,8 @@ import EDU.purdue.jtb.visitor.AcceptInliner;
 import EDU.purdue.jtb.visitor.GlobalDataBuilder;
 
 /**
- * Class DepthFirstVisitorsGenerator contains methods to generate the different DepthFirstXXXVisitor
- * visitors classes files.<br>
+ * Class {@link DepthFirstVisitorsGenerator} contains methods to generate the different
+ * DepthFirstXXXVisitor visitors classes files.<br>
  * It must be constructed with the list of the grammar {@link ClassInfo} classes.<br>
  * 
  * @author Marc Mazas
@@ -85,37 +85,39 @@ import EDU.purdue.jtb.visitor.GlobalDataBuilder;
  * @version 1.4.6 : 01/2011 : FA : added -va and -npfx and -nsfx options
  * @version 1.4.7 : 09/2012 : MMa : extracted constants and methods ; added the reference to the
  *          {@link GlobalDataBuilder}
+ * @version 1.4.8 : 10/2012 : MMa : tuned javadoc comments for nodes with no child<br>
+ *          1.4.8 : 11/2014 : MMa : added @Override on generated visit methods,<br>
+ *          and @SuppressWarnings("unused") on unused parameters
  */
 public class DepthFirstVisitorsGenerator {
 
-  /** The reference to the global data builder visitor */
-  final GlobalDataBuilder            gdbv;
+  /** The {@link GlobalDataBuilder} visitor */
+  final GlobalDataBuilder       gdbv;
   /** The classes list */
-  private final ArrayList<ClassInfo> classesList;
+  private final List<ClassInfo> classesList;
   /** The (generated) visitors directory */
-  private final File                 visitorDir;
+  private final File            visitorDir;
   /** The BufferedReaders buffer size */
-  public static final int            BR_BUF_SZ = 16 * 1024;
+  public static final int       BR_BUF_SZ = 16 * 1024;
   /** The (reused) buffer for reformatting javadoc comments into single line ones */
-  final static StringBuilder         cb        = new StringBuilder(512);
+  final static StringBuilder    cb        = new StringBuilder(512);
   /** The accept methods inliner visitor */
-  static AcceptInliner               accInl    = null;
+  static AcceptInliner          accInl    = null;
   /** The indentation object */
-  final Spacing                      spc       = new Spacing(INDENT_AMT);
+  final Spacing                 spc       = new Spacing(INDENT_AMT);
   /** The buffer to write to */
-  StringBuilder                      sb        = null;
+  StringBuilder                 sb        = null;
   /** An auxiliary buffer */
-  StringBuilder                      buf       = new StringBuilder(128);
+  StringBuilder                 buf       = new StringBuilder(128);
 
   /**
    * Constructor. Creates the visitor directory if it does not exist.
    * 
-   * @param aClassesList - the classes list
+   * @param classes - the classes list
    * @param aGdbv - the global data builder visitor
    */
-  public DepthFirstVisitorsGenerator(final ArrayList<ClassInfo> aClassesList,
-                                     final GlobalDataBuilder aGdbv) {
-    classesList = aClassesList;
+  public DepthFirstVisitorsGenerator(final List<ClassInfo> classes, final GlobalDataBuilder aGdbv) {
+    classesList = classes;
     gdbv = aGdbv;
     sb = new StringBuilder(sbBufferSize());
 
@@ -339,8 +341,8 @@ public class DepthFirstVisitorsGenerator {
         .append(LS);
       sb.append(spc.spc).append(" */").append(LS).append(LS);
     }
-    for (final ClassInfo classInfo : classesList) {
-      userNodeVisitMethod(classInfo, aConsBeg, aConsEnd, aRet, aArgu);
+    for (final ClassInfo ci : classesList) {
+      userNodeVisitMethod(ci, aConsBeg, aConsEnd, aRet, aArgu);
     }
 
     // end of (visitor) class
@@ -361,15 +363,21 @@ public class DepthFirstVisitorsGenerator {
    */
   void userNodeVisitMethod(final ClassInfo aClassInfo, final String aConsBeg,
                            final String aConsEnd, final boolean aRet, final boolean aArgu) {
-    final String className = aClassInfo.className;
+    final ClassInfo ci = aClassInfo;
+    final String className = ci.className;
 
     if (javaDocComments) {
       sb.append(spc.spc).append("/**").append(LS);
-      sb.append(spc.spc).append(" * Visits a {@link ").append(className)
-        .append("} node, whose children are the following :").append(LS);
+      sb.append(spc.spc).append(" * Visits a {@link ").append(className).append("} node, ");
+      sb.append(ci.astEcNode == null
+                                    ? "with no child :"
+                                    : ci.fieldNames.size() == 1
+                                                               ? "whose child is the following :"
+                                                               : "whose children are the following :")
+        .append(LS);
       sb.append(spc.spc).append(" * <p>").append(LS);
       // generate the javadoc for the class fields, with indentation of 1
-      aClassInfo.fmtFieldsJavadocCmts(sb, spc);
+      ci.fmtFieldsJavadocCmts(sb, spc);
       sb.append(spc.spc).append(" *").append(LS);
       sb.append(spc.spc).append(" * @param ").append(genNodeVar).append(" - the node to visit")
         .append(LS);
@@ -381,6 +389,7 @@ public class DepthFirstVisitorsGenerator {
       sb.append(spc.spc).append(" */").append(LS);
     }
 
+    sb.append(spc.spc).append("@Override").append(LS);
     sb.append(spc.spc).append("public ").append(aConsBeg).append(className).append(aConsEnd)
       .append(" {").append(LS);
 
@@ -389,15 +398,21 @@ public class DepthFirstVisitorsGenerator {
     if (aRet)
       sb.append(spc.spc).append(genRetType).append(' ').append(genRetVar).append(" = null;")
         .append(LS);
+    if (ci.astEcNode == null) {
+      // empty node, just print comments
+      sb.append(spc.spc).append("/* empty node, nothing that can be generated so far */")
+        .append(LS);
+    } else
+    // non empty node, generate the code to visit it
     if (inlineAcceptMethods) {
       // inline, call visitor
-      accInl.genAcceptMethods(sb, spc, aClassInfo, aRet, aArgu);
+      accInl.genAcceptMethods(sb, spc, ci, aRet, aArgu);
     } else {
       // no inlining, just direct accept calls
-      final Iterator<String> fni = aClassInfo.fieldNames.iterator();
-      final Iterator<String> fti = aClassInfo.fieldTypes.iterator();
-      final Iterator<String> fii = aClassInfo.fieldInitializers.iterator();
-      final Iterator<String> fei = aClassInfo.fieldEUTCFCodes.iterator();
+      final Iterator<String> fni = ci.fieldNames.iterator();
+      final Iterator<String> fti = ci.fieldTypes.iterator();
+      final Iterator<String> fii = ci.fieldInitializers.iterator();
+      final Iterator<String> fei = ci.fieldEUTCFCodes.iterator();
       // 0 = not in catch condition, 1 = at the beginning, 2 = inside
       int inCatch = 0;
       int k = 0;
@@ -446,7 +461,7 @@ public class DepthFirstVisitorsGenerator {
           k++;
         } else {
           // not a TCF
-          aClassInfo.fmt1JavacodeFieldCmt(sb, spc, k++);
+          ci.fmt1JavacodeFieldCmt(sb, spc, k++, null);
           if (depthLevel)
             increaseDepthLevel(sb, spc);
           sb.append(spc.spc).append(genNodeVar).append(".").append(fn);
@@ -521,7 +536,7 @@ public class DepthFirstVisitorsGenerator {
     if (sb == null)
       sb = new StringBuilder(900);
 
-    baseNodeVisitMethodBegin(sb, aSpc, aRet, aArgu, nodeChoice);
+    baseNodeVisitMethodBegin(sb, aSpc, aRet, aArgu, false, nodeChoice);
     if (depthLevel)
       increaseDepthLevel(sb, aSpc);
     sb.append(aSpc.spc);
@@ -557,7 +572,7 @@ public class DepthFirstVisitorsGenerator {
     if (sb == null)
       sb = new StringBuilder(900);
 
-    baseNodeVisitMethodBegin(sb, aSpc, aRet, aArgu, nodeList);
+    baseNodeVisitMethodBegin(sb, aSpc, aRet, aArgu, false, nodeList);
     if (aRet)
       sb.append(aSpc.spc).append(genRetType).append(' ').append(genRetVar).append(" = null;")
         .append(LS);
@@ -602,7 +617,7 @@ public class DepthFirstVisitorsGenerator {
     if (sb == null)
       sb = new StringBuilder(1100);
 
-    baseNodeVisitMethodBegin(sb, aSpc, aRet, aArgu, nodeListOpt);
+    baseNodeVisitMethodBegin(sb, aSpc, aRet, aArgu, false, nodeListOpt);
     sb.append(aSpc.spc).append("if (").append(genNodeVar).append(".present()) {").append(LS);
     aSpc.updateSpc(+1);
     if (aRet)
@@ -655,7 +670,7 @@ public class DepthFirstVisitorsGenerator {
     if (sb == null)
       sb = new StringBuilder(720);
 
-    baseNodeVisitMethodBegin(sb, aSpc, aRet, aArgu, nodeOpt);
+    baseNodeVisitMethodBegin(sb, aSpc, aRet, aArgu, false, nodeOpt);
     sb.append(aSpc.spc).append("if (").append(genNodeVar).append(".present()) {").append(LS);
     aSpc.updateSpc(+1);
     if (depthLevel)
@@ -698,7 +713,7 @@ public class DepthFirstVisitorsGenerator {
     if (sb == null)
       sb = new StringBuilder(920);
 
-    baseNodeVisitMethodBegin(sb, aSpc, aRet, aArgu, nodeSeq);
+    baseNodeVisitMethodBegin(sb, aSpc, aRet, aArgu, false, nodeSeq);
     if (aRet)
       sb.append(aSpc.spc).append(genRetType).append(' ').append(genRetVar).append(" = null;")
         .append(LS);
@@ -743,7 +758,7 @@ public class DepthFirstVisitorsGenerator {
     if (sb == null)
       sb = new StringBuilder(680);
 
-    baseNodeVisitMethodBegin(sb, aSpc, aRet, aArgu, nodeToken);
+    baseNodeVisitMethodBegin(sb, aSpc, aRet, aArgu, true, nodeToken);
     if (aRet)
       sb.append(aSpc.spc).append(genRetType).append(' ').append(genRetVar).append(" = null;")
         .append(LS);
@@ -774,7 +789,7 @@ public class DepthFirstVisitorsGenerator {
     if (sb == null)
       sb = new StringBuilder(680);
 
-    baseNodeVisitMethodBegin(sb, aSpc, aRet, aArgu, nodeTCF);
+    baseNodeVisitMethodBegin(sb, aSpc, aRet, aArgu, true, nodeTCF);
     if (aRet)
       sb.append(aSpc.spc).append(genRetType).append(' ').append(genRetVar).append(" = null;")
         .append(LS);
@@ -797,19 +812,25 @@ public class DepthFirstVisitorsGenerator {
    * @param aSpc - the indentation
    * @param aRet - true if there is a user return parameter type, false otherwise
    * @param aArgu - true if there is a user argument parameter type, false otherwise
+   * @param aSuppress - true to add the suppress warning annotation, false otherwise
    * @param aNodeName - the node name
    */
   static void baseNodeVisitMethodBegin(final StringBuilder aSb, final Spacing aSpc,
                                        final boolean aRet, final boolean aArgu,
-                                       final String aNodeName) {
+                                       final boolean aSuppress, final String aNodeName) {
     if (javaDocComments) {
       baseNodeVisitMethodJavadoc(aSb, aSpc, aRet, aArgu, aNodeName);
     }
+    aSb.append(aSpc.spc).append("@Override").append(LS);
     aSb.append(aSpc.spc).append("public ").append(aRet ? genRetType : "void")
        .append(" visit(final ").append(aNodeName).append(' ').append(genNodeVar);
-    if (aArgu)
-      aSb.append(", final ").append(varargs ? genArgusType : genArguType).append(' ')
+    if (aArgu) {
+      aSb.append(", ");
+      if (aSuppress)
+        aSb.append("@SuppressWarnings(\"unused\") ");
+      aSb.append("final ").append(varargs ? genArgusType : genArguType).append(' ')
          .append(genArguVar);
+    }
     aSb.append(") {").append(LS);
     aSpc.updateSpc(+1);
     if (aRet) {

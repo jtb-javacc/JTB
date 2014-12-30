@@ -65,7 +65,7 @@ public class NonTerminal extends Expansion_ {
   }
 
   /**
-   * @param lhsTokens - the lhsTokens to set
+   * @param lt - the lhsTokens to set
    */
   public final void setLhsTokens(final List<Token> lt) {
     lhsTokens = lt;
@@ -79,7 +79,7 @@ public class NonTerminal extends Expansion_ {
   }
 
   /**
-   * @param ref - the name to set
+   * @param nm - the name to set
    */
   public final void setName(final String nm) {
     name = nm;
@@ -93,7 +93,7 @@ public class NonTerminal extends Expansion_ {
   }
 
   /**
-   * @param argument_tokens - the argument_tokens to set
+   * @param tk - the argument_tokens to set
    */
   public final void setArgumentTokens(final List<Token> tk) {
     argument_tokens = tk;
@@ -107,10 +107,10 @@ public class NonTerminal extends Expansion_ {
   }
 
   /**
-   * @param prod - the prod to set
+   * @param pr - the prod to set
    */
-  public final NormalProduction setProd(final NormalProduction pr) {
-    return prod = pr;
+  public final void setProd(final NormalProduction pr) {
+    prod = pr;
   }
 
   /**

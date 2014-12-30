@@ -33,10 +33,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Describes expansions where one of many choices is taken (c1|c2|...).
+ * Describes expansions where one of many choices is taken (c1 | c2 | ...).
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public class Choice extends Expansion_ {
 
@@ -45,10 +46,14 @@ public class Choice extends Expansion_ {
    */
   private List<Expansion_> choices = new ArrayList<Expansion_>();
 
+  /** Standard constructor */
   public Choice() {
     expType = EXP_TYPE.CHOICE;
   }
 
+  /**
+   * @param token - the {@link Token}
+   */
   public Choice(final Token token) {
     this();
     this.setLine(token.beginLine);
@@ -56,6 +61,9 @@ public class Choice extends Expansion_ {
 
   }
 
+  /**
+   * @param expansion - the {@link Expansion_}
+   */
   public Choice(final Expansion_ expansion) {
     this();
     this.setLine(expansion.getLine());
@@ -65,7 +73,7 @@ public class Choice extends Expansion_ {
   }
 
   /**
-   * @param choices - the choices to set
+   * @param ch - the choices to set
    */
   public final void setChoices(final List<Expansion_> ch) {
     choices = ch;
@@ -87,7 +95,7 @@ public class Choice extends Expansion_ {
     alreadyDumped.add(this);
     for (final Iterator<Expansion_> it = getChoices().iterator(); it.hasNext();) {
       final Expansion_ next = it.next();
-      sb.append(eol).append(next.dump(indent + 1, alreadyDumped));
+      sb.append(EOL).append(next.dump(indent + 1, alreadyDumped));
     }
     return sb;
   }

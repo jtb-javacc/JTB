@@ -59,6 +59,7 @@ import static EDU.purdue.jtb.misc.Globals.nodeListOpt;
 import static EDU.purdue.jtb.misc.Globals.nodeOpt;
 
 import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Class FieldNameGenerator generates the names of the fields of node classes depending on whether
@@ -80,14 +81,14 @@ import java.util.Hashtable;
 public class FieldNameGenerator {
 
   /** The field number */
-  private int                        fieldNum = 0;
+  private int                  fieldNum = 0;
 
   /**
    * nameTable is used for the "-f" option (Descriptive field names).<br>
    * Key = field names in use in current production<br>
    * Value = int value of the last suffix used
    */
-  private Hashtable<String, Integer> nameTable;
+  private Map<String, Integer> nameTable;
 
   /**
    * Constructor. Creates an Hashtable of descriptive field names if the corresponding option flag

@@ -59,8 +59,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Class TreeFormatterBuilder generates the TreeFormatter visitor which is a skeleton
@@ -78,19 +78,20 @@ import java.util.Iterator;
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  * @version 1.4.3 : 03/2010 : MMa : fixed output of constructor
+ * @version 1.4.8 : 10/2014 : MMa : fixed NPE on classes without fields
  */
 public class TreeFormatterGenerator {
 
   /** The visitor class name */
-  public static final String         visitorName = "TreeFormatter";
+  public static final String    visitorName = "TreeFormatter";
   /** The visitor source file name */
-  public static final String         outFilename = visitorName + ".java";
+  public static final String    outFilename = visitorName + ".java";
   /** The visitors directory */
-  private final File                 visitorDir;
+  private final File            visitorDir;
   /** The classes list */
-  private final ArrayList<ClassInfo> classList;
+  private final List<ClassInfo> classList;
   /** The buffer to print into */
-  protected StringBuilder            sb;
+  protected StringBuilder       sb;
 
   /**
    * Constructor with a given list of classes. Will create the visitors directory if it does not
@@ -98,7 +99,7 @@ public class TreeFormatterGenerator {
    * 
    * @param classes - the list of classes
    */
-  public TreeFormatterGenerator(final ArrayList<ClassInfo> classes) {
+  public TreeFormatterGenerator(final List<ClassInfo> classes) {
     classList = classes;
     sb = new StringBuilder(500 * classes.size());
     visitorDir = new File(visitorsDirName);
@@ -130,7 +131,7 @@ public class TreeFormatterGenerator {
     }
   }
 
-  // TODO change the following methods with spc.spc
+  // TO DO change the following methods with spc.spc
 
   /**
    * Generates the tree formatter visitor source in its file.<br>
@@ -442,31 +443,33 @@ public class TreeFormatterGenerator {
 
       spc.updateSpc(+1);
 
-      final Iterator<String> names = cur.fieldNames.iterator();
-      final Iterator<String> types = cur.fieldTypes.iterator();
+      if (cur.fieldTypes != null) {
+        final Iterator<String> names = cur.fieldNames.iterator();
+        final Iterator<String> types = cur.fieldTypes.iterator();
 
-      while (names.hasNext() && types.hasNext()) {
-        final String name = names.next();
-        final String type = types.next();
+        while (names.hasNext() && types.hasNext()) {
+          final String name = names.next();
+          final String type = types.next();
 
-        if (name != null)
-          if (type.equals(nodeList))
-            sb.append(spc.spc).append("processList(n.").append(name).append(");").append(LS);
-          else if (type.equals(nodeListOpt)) {
-            sb.append(spc.spc).append("if (n.").append(name).append(".present()) {").append(LS);
-            spc.updateSpc(+1);
-            sb.append(spc.spc).append("processList(n.").append(name).append(");").append(LS);
-            spc.updateSpc(-1);
-            sb.append(spc.spc).append("}").append(LS);
-          } else if (type.equals(nodeOpt)) {
-            sb.append(spc.spc).append("if (n.").append(name).append(".present()) {").append(LS);
-            spc.updateSpc(+1);
-            sb.append(spc.spc).append("n.").append(name).append(".accept(this);").append(LS);
+          if (name != null)
+            if (type.equals(nodeList))
+              sb.append(spc.spc).append("processList(n.").append(name).append(");").append(LS);
+            else if (type.equals(nodeListOpt)) {
+              sb.append(spc.spc).append("if (n.").append(name).append(".present()) {").append(LS);
+              spc.updateSpc(+1);
+              sb.append(spc.spc).append("processList(n.").append(name).append(");").append(LS);
+              spc.updateSpc(-1);
+              sb.append(spc.spc).append("}").append(LS);
+            } else if (type.equals(nodeOpt)) {
+              sb.append(spc.spc).append("if (n.").append(name).append(".present()) {").append(LS);
+              spc.updateSpc(+1);
+              sb.append(spc.spc).append("n.").append(name).append(".accept(this);").append(LS);
 
-            spc.updateSpc(-1);
-            sb.append(spc.spc).append("}").append(LS);
-          } else
-            sb.append(spc.spc).append("n.").append(name).append(".accept(this);").append(LS);
+              spc.updateSpc(-1);
+              sb.append(spc.spc).append("}").append(LS);
+            } else
+              sb.append(spc.spc).append("n.").append(name).append(".accept(this);").append(LS);
+        }
       }
 
       spc.updateSpc(-1);

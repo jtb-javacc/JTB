@@ -35,6 +35,7 @@ import java.util.List;
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public class RChoice extends RegularExpression_ {
 
@@ -44,12 +45,13 @@ public class RChoice extends RegularExpression_ {
    */
   private List<RegularExpression_> choices = new ArrayList<RegularExpression_>();
 
+  /** Standard constructor */
   public RChoice() {
     expType = EXP_TYPE.R_CHOICE;
   }
 
   /**
-   * @param choices - the choices to set
+   * @param ch - the choices to set
    */
   public final void setChoices(final List<RegularExpression_> ch) {
     choices = ch;
@@ -69,18 +71,21 @@ public class RChoice extends RegularExpression_ {
     if (getChoices().size() == 1)
       return getChoices().get(0).GenerateNfa(ignoreCase);
     final Nfa retVal = new Nfa();
-    final NfaState startState = retVal.start;
-    final NfaState finalState = retVal.end;
+    final NfaState startState = retVal.startNfaState;
+    final NfaState finalState = retVal.endNfaState;
     for (int i = 0; i < getChoices().size(); i++) {
       Nfa temp;
       final RegularExpression_ curRE = getChoices().get(i);
       temp = curRE.GenerateNfa(ignoreCase);
-      startState.AddMove(temp.start);
-      temp.end.AddMove(finalState);
+      startState.AddMove(temp.startNfaState);
+      temp.endNfaState.AddMove(finalState);
     }
     return retVal;
   }
 
+  /**
+   * Compresses the choices and the character lists.
+   */
   void CompressCharLists() {
     CompressChoices(); // Unroll nested choices
     RegularExpression_ curRE;
@@ -105,6 +110,9 @@ public class RChoice extends RegularExpression_ {
     }
   }
 
+  /**
+   * Compresses (unrolls) the choices.
+   */
   void CompressChoices() {
     RegularExpression_ curRE;
     for (int i = 0; i < getChoices().size(); i++) {
@@ -119,8 +127,12 @@ public class RChoice extends RegularExpression_ {
     }
   }
 
+  /**
+   * Checks whether Regular Expression Choices can be matched.
+   */
   public void CheckUnmatchability() {
     RegularExpression_ curRE;
+    @SuppressWarnings("unused")
     int numStrings = 0;
     for (int i = 0; i < getChoices().size(); i++) {
       if (!(curRE = getChoices().get(i)).private_rexp &&

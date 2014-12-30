@@ -36,6 +36,8 @@ import java.util.Set;
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc ; remove local variable ordinal hiding
+ *          superclass's one
  */
 public abstract class RegularExpression_ extends Expansion_ {
 
@@ -43,12 +45,12 @@ public abstract class RegularExpression_ extends Expansion_ {
    * The label of the regular expression (if any). If no label is present, this is set to "".
    */
   public String          label        = "";
-  /**
-   * The ordinal value assigned to the regular expression. It is used for internal processing and
-   * passing information between the parser and the lexical analyzer.
-   */
-  // hides Expansion_.ordinal !!!
-  int                    ordinal;
+  //  /**
+  //   * The ordinal value assigned to the regular expression. It is used for internal processing and
+  //   * passing information between the parser and the lexical analyzer.
+  //   */
+  //  // hides Expansion_.ordinal !!!
+  //  int                    ordinal;
   /**
    * The LHS to which the token value of the regular expression is assigned. In case there is no
    * LHS, then the list remains empty.
@@ -70,8 +72,15 @@ public abstract class RegularExpression_ extends Expansion_ {
    */
   public TokenProduction tpContext    = null;
 
+  /**
+   * @param ignoreCase - true to ignore case
+   * @return the generated NFA
+   */
   public abstract Nfa GenerateNfa(boolean ignoreCase);
 
+  /**
+   * @return always false
+   */
   public boolean CanMatchAnyChar() {
     return false;
   }

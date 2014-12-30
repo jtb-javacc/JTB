@@ -50,9 +50,9 @@ import java.security.NoSuchAlgorithmException;
  * <li></li>
  * </ul>
  * 
- * @author Paul Cager
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public class OutputFile {
 
@@ -70,11 +70,11 @@ public class OutputFile {
   /**
    * Create a new OutputFile.
    * 
-   * @param file the file to write to.
-   * @param compatibleVersion the minimum compatible JavaCC version.
-   * @param options if the file already exists, and cannot be overwritten, this is a list of options
+   * @param fl the file to write to.
+   * @param compVers the minimum compatible JavaCC version.
+   * @param opt if the file already exists, and cannot be overwritten, this is a list of options
    *          (such s STATIC=false) to check for changes.
-   * @throws IOException
+   * @throws IOException - if problem
    */
   public OutputFile(final File fl, final String compVers, final String[] opt) throws IOException {
     file = fl;
@@ -136,8 +136,8 @@ public class OutputFile {
   /**
    * Output a warning if the file was created with an incompatible version of JavaCC.
    * 
-   * @param fileName
-   * @param versionId
+   * @param fl - the file
+   * @param versionId - the version
    */
   private void checkVersion(final File fl, final String versionId) {
     final String firstLine = "/* " + JavaCCGlobals.getIdString(toolName, fl.getName()) +
@@ -171,8 +171,8 @@ public class OutputFile {
    * Read the options line from the file and compare to the options currently in use. Output a
    * warning if they are different.
    * 
-   * @param fileName
-   * @param options
+   * @param fl - the file
+   * @param opt - the options
    */
   private void checkOptions(final File fl, final String[] opt) {
     try {
@@ -201,11 +201,9 @@ public class OutputFile {
   }
 
   /**
-   * Return a PrintWriter object that may be used to write to this file. Any necessary header
-   * information is written by this method.
-   * 
-   * @return
-   * @throws IOException
+   * @return a PrintWriter object that may be used to write to this file. Any necessary header
+   *         information is written by this method
+   * @throws IOException - if problem
    */
   public PrintWriter getPrintWriter() throws IOException {
     if (pw == null) {
@@ -237,8 +235,6 @@ public class OutputFile {
 
   /**
    * Close the OutputFile, writing any necessary trailer information (such as a checksum).
-   * 
-   * @throws IOException
    */
   public void close() {
     // Write the trailer (checksum).

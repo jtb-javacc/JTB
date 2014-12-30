@@ -32,10 +32,13 @@
 package EDU.purdue.jtb.visitor;
 
 import static EDU.purdue.jtb.misc.Globals.*;
-import static EDU.purdue.jtb.visitor.GlobalDataBuilder.DONT_CREATE_NODE_STR;
+import static EDU.purdue.jtb.visitor.GlobalDataBuilder.BNF_IND;
+import static EDU.purdue.jtb.visitor.GlobalDataBuilder.DONT_CREATE;
+import static EDU.purdue.jtb.visitor.GlobalDataBuilder.JC_IND;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import EDU.purdue.jtb.misc.ClassInfo;
 import EDU.purdue.jtb.misc.FieldNameGenerator;
@@ -72,33 +75,32 @@ import EDU.purdue.jtb.syntaxtree.TokenManagerDecls;
  * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  * @version 1.4.6 : 01/2011 : FA : add -va and -npfx and -nsfx options
- * @version 1.4.7 : 12/2011-05/2012 : MMa : fixed problem in fmtJavaNodeCode<br>
- *          added bareJavaNodeCode and fixed problems in visiting ExpansionUnitTCF<br>
+ * @version 1.4.7 : 12/2011-05/2012 : MMa : fixed problem in {@link #fmtJavaNodeCode}<br>
+ *          added {@link #bareJavaNodeCode} and fixed problems in {@link #visit(ExpansionUnitTCF)}<br>
  *          1.4.7 : 07/2012 : MMa : followed changes in jtbgram.jtb (IndentifierAsString())<br>
- *          1.4.7 : 09/2012 : MMa : changed some comments and removed one JavaBranchPrinter visitor
- *          ; removed printToken and regExpr as of no use ; added non node creation and the
+ *          1.4.7 : 09/2012 : MMa : changed some comments and removed one {@link JavaBranchPrinter}
+ *          visitor ; removed printToken and regExpr as of no use ; added non node creation and the
  *          reference to the {@link GlobalDataBuilder}
+ * @version 1.4.8 : 10/2012 : MMa : added {@link JavaCodeProduction} class generation ; changed
+ *          {@link BNFProduction} class generation to unless not requested
  */
 public class ClassesFinder extends DepthFirstVoidVisitor {
 
-  /** The reference to the global data builder visitor */
-  final GlobalDataBuilder            gdbv;
-  /** Visitor to print a java node and its subtree with default indentation */
-  final JavaBranchPrinter            jbpv   = new JavaBranchPrinter(null);
-  /** The current generated class */
-  private ClassInfo                  ci;
+  /** The {@link GlobalDataBuilder} visitor */
+  final GlobalDataBuilder          gdbv;
+  /**
+   * The {@link JavaBranchPrinter} printer to print a java node and its subtree with default
+   * indentation
+   */
+  final JavaBranchPrinter          jbp    = new JavaBranchPrinter(null);
+  /** The {@link ClassInfo} for the current generated class */
+  private ClassInfo                ci;
   /** The list of generated classes */
-  private final ArrayList<ClassInfo> ciList = new ArrayList<ClassInfo>();
+  private final List<ClassInfo>    ciList = new ArrayList<ClassInfo>();
   /** The field names generator (descriptive or not, depending on -f option) */
-  private final FieldNameGenerator   gen    = new FieldNameGenerator();
-  /** Global variable to pass IdentifierAsString info between methods (as they are recursive) */
-  String                             ident  = "";
-  /** The OS line separator as a string */
-  public static final String         LS     = System.getProperty("line.separator");
-  /** The OS line separator string length */
-  public static final int            LS_LEN = LS.length();
-  /** The OS line separator first character */
-  public static final char           LS0    = LS.charAt(0);
+  private final FieldNameGenerator gen    = new FieldNameGenerator();
+  /** The global variable to pass IdentifierAsString info between methods (as they are recursive) */
+  String                           ident  = "";
 
   /**
    * Constructor.
@@ -114,7 +116,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    * 
    * @return the class list
    */
-  public ArrayList<ClassInfo> getClassList() {
+  public List<ClassInfo> getClassList() {
     return ciList;
   }
 
@@ -157,13 +159,20 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    * f4 -> FormalParameters()<br>
    * f5 -> [ #0 "throws" #1 Name()<br>
    * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
-   * f6 -> Block()<br>
+   * f6 -> [ "%" ]<br>
+   * f7 -> Block()<br>
    * 
    * @param n - the node to visit
    */
   @Override
-  public void visit(@SuppressWarnings("unused") final JavaCodeProduction n) {
-    // Don't visit
+  public void visit(final JavaCodeProduction n) {
+    // generate the class only if the node creation is requested
+    if (n.f6.present()) {
+      gen.reset();
+      // f6 -> [ "%" ]
+      ci = new ClassInfo(null, n.f3.f0.tokenImage, gdbv);
+      ciList.add(ci);
+    }
   }
 
   /**
@@ -186,13 +195,15 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    */
   @Override
   public void visit(final BNFProduction n) {
-    gen.reset();
+    // generate the class unless the node creation is not requested
     // f5 -> [ "!" ]
-    // generate the class even if the node generation is not requested
-    ci = new ClassInfo(n.f9, n.f2.f0.tokenImage, gdbv);
-    ciList.add(ci);
-    // f9 -> ExpansionChoices()
-    n.f9.accept(this);
+    if (!n.f5.present()) {
+      gen.reset();
+      ci = new ClassInfo(n.f9, n.f2.f0.tokenImage, gdbv);
+      ciList.add(ci);
+      // f9 -> ExpansionChoices()
+      n.f9.accept(this);
+    }
   }
 
 /**
@@ -344,8 +355,10 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
           // &0 $0 IdentifierAsString() $1 Arguments() $2 [ "!" ]
           // ident will be set further down the tree
           seq1.elementAt(0).accept(this);
-          // add field only if node creation is not requested not to be generated
-          if (!gdbv.getNcnHT().containsKey(ident) && !((NodeOptional) seq1.elementAt(2)).present()) {
+          // add field only if ...
+          final String indNsn = gdbv.getNsnHT().get(ident);
+          final boolean createField = !BNF_IND.equals(indNsn) || JC_IND.equals(indNsn);
+          if (createField && !((NodeOptional) seq1.elementAt(2)).present()) {
             ci.addField(getFixedName(ident), gen.genFieldName(ident));
           }
         } else {
@@ -501,7 +514,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
                            ident_nt.beginColumn);
           regExpr = "";
           ident = "";
-        } else if (DONT_CREATE_NODE_STR.equals(regExpr)) {
+        } else if (DONT_CREATE.equals(regExpr)) {
           // requested not to create the node
           return;
         }
@@ -539,7 +552,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    * @return the formatted string
    */
   String fmtJavaNodeCode(final INode javaNode) {
-    final StringBuilder sb = jbpv.genJavaBranch(javaNode, true);
+    final StringBuilder sb = jbp.genJavaBranch(javaNode, true);
     final StringBuilder res = new StringBuilder(2 * sb.length());
     final int len = sb.length();
     for (int i = 0; i < len; i++) {
@@ -547,7 +560,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
       if (c == '"') {
         res.append("\\\"");
       } else if (c == LS0) {
-        if (LS_LEN > 1) {
+        if (LSLEN > 1) {
           if (i < len) {
             i++;
             if (LS.charAt(1) != sb.charAt(i))
@@ -570,7 +583,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    * @return the bare string
    */
   String bareJavaNodeCode(final INode javaNode) {
-    return jbpv.genJavaBranch(javaNode, true).toString();
+    return jbp.genJavaBranch(javaNode, true).toString();
   }
 
   /** NewLine, EndOfString (escaped double quotes), Plus */

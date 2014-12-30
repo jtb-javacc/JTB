@@ -64,8 +64,8 @@
 //
 package EDU.purdue.jtb.visitor;
 
+import static EDU.purdue.jtb.misc.Globals.DEBUG_CLASS_COMMENTS;
 import static EDU.purdue.jtb.misc.Globals.INDENT_AMT;
-import static EDU.purdue.jtb.misc.Globals.PRINT_CLASS_COMMENT;
 import static EDU.purdue.jtb.misc.Globals.keepSpecialTokens;
 import static EDU.purdue.jtb.misc.Globals.noOverwrite;
 
@@ -83,8 +83,10 @@ import EDU.purdue.jtb.misc.UnicodeConverter;
 import EDU.purdue.jtb.syntaxtree.*;
 
 /**
- * The JavaPrinter visitor reprints (with indentation) JavaCC grammar Java specific productions.<br>
- * (The JavaCC grammar JavaCC productions are handled by the JavaCCPrinter visitor superclass.)
+ * The {@link JavaPrinter} visitor reprints (with indentation) JavaCC grammar Java specific
+ * productions.<br>
+ * (The JavaCC grammar JavaCC productions are handled by the {@link JavaCCPrinter} visitor
+ * superclass.)
  * <p>
  * Notes :
  * <ul>
@@ -101,14 +103,16 @@ import EDU.purdue.jtb.syntaxtree.*;
  * @version 1.4.3 : 03/2010 : MMa : fixed output of else in IfStatement
  * @version 1.4.4 : 07/2010 : MMa : fixed output after throws in MethodDeclaration,
  *          ConstructorDeclaration, and wrong index in TypeArguments
- * @version 1.4.7 : 07/2012 : MMa : followed changes in jtbgram.jtb (PackageDeclaration(),
+ * @version 1.4.7 : 07/2012 : MMa : followed changes in jtbgram.jtb (on PackageDeclaration(),
  *          VariableModifiers() IndentifierAsString())
+ * @version 1.4.8 : 11/2014 : MMa : followed changes in jtbgram.jtb (on
+ *          ClassOrInterfaceBodyDeclaration(), ExplicitConstructorInvocation())
  */
 public class JavaPrinter extends DepthFirstVoidVisitor {
 
   /** The buffer to print into */
   protected StringBuilder    sb;
-  /** Indentation object */
+  /** The indentation object */
   protected Spacing          spc;
   /** The OS line separator */
   public static final String LS              = System.getProperty("line.separator");
@@ -257,8 +261,9 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to process
    * @return the comment
    */
+  @SuppressWarnings("unused")
   private String nodeClassComment(final INode n) {
-    if (!noDebugComments && PRINT_CLASS_COMMENT) {
+    if (!noDebugComments && DEBUG_CLASS_COMMENTS) {
       final String s = n.toString();
       final int b = s.lastIndexOf('.') + 1;
       final int e = s.indexOf('@');
@@ -278,8 +283,9 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param str - the string to add to the comment
    * @return the comment
    */
+  @SuppressWarnings("unused")
   private String nodeClassComment(final INode n, final String str) {
-    if (!noDebugComments && PRINT_CLASS_COMMENT)
+    if (!noDebugComments && DEBUG_CLASS_COMMENTS)
       return nodeClassComment(n) + " " + str;
     else
       return "";
@@ -769,17 +775,34 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * .. .. . .. .. | &4 MethodDeclaration() )<br>
    * .. .. | %2 ";"<br>
    */
+  /**
+   * Visits a {@link ClassOrInterfaceBodyDeclaration} node, whose child is the following :
+   * <p>
+   * f0 -> . %0 Initializer()<br>
+   * .. .. | %1 #0 Modifiers()<br>
+   * .. .. . .. #1 ( &0 ClassOrInterfaceDeclaration()<br>
+   * .. .. . .. .. | &1 EnumDeclaration()<br>
+   * .. .. . .. .. | &2 AnnotationTypeDeclaration()<br>
+   * .. .. . .. .. | &3 ConstructorDeclaration()<br>
+   * .. .. . .. .. | &4 FieldDeclaration()<br>
+   * .. .. . .. .. | &5 MethodDeclaration() )<br>
+   * .. .. | %2 ";"<br>
+   * 
+   * @param n - the node to visit
+   */
   @Override
   public void visit(final ClassOrInterfaceBodyDeclaration n) {
     if (n.f0.which != 1) {
-      // %0 Initializer() OR %2  ";"
+      // %0 Initializer() | %2  ";"
       n.f0.choice.accept(this);
     } else {
-      // %1 #0 Modifiers() #1 ( &0 ClassOrInterfaceDeclaration() | &1 EnumDeclaration() | &2 ConstructorDeclaration() | &3 FieldDeclaration() | &4 MethodDeclaration() )
+      // %1 #0 Modifiers() #1 ( &0 ClassOrInterfaceDeclaration() | &1 EnumDeclaration() | &2 AnnotationTypeDeclaration()
+      //                      | &3 ConstructorDeclaration() | &4 FieldDeclaration() | &5 MethodDeclaration() )
       final NodeSequence seq = (NodeSequence) n.f0.choice;
       // #0 Modifiers print the last space if not empty
       seq.elementAt(0).accept(this);
-      // #1 ( &0 ClassOrInterfaceDeclaration() | &1 EnumDeclaration() | &2 ConstructorDeclaration() | &3 FieldDeclaration() | &4 MethodDeclaration() )
+      // #1 ( &0 ClassOrInterfaceDeclaration() | &1 EnumDeclaration() | &2 AnnotationTypeDeclaration()
+      //    | &3 ConstructorDeclaration() | &4 FieldDeclaration() | &5 MethodDeclaration() )
       ((NodeChoice) seq.elementAt(1)).accept(this);
     }
   }
@@ -1089,40 +1112,178 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
     n.f7.accept(this);
   }
 
-  /**
-   * Visits a {@link ExplicitConstructorInvocation} node, whose children are the following :
+/**
+   * Visits a {@link ExplicitConstructorInvocation} node, whose child is the following :
    * <p>
-   * f0 -> . %0 #0 "this" #1 Arguments() #2 ";"<br>
-   * .. .. | %1 #0 [ $0 PrimaryExpression() $1 "." ] #1 "super" #2 Arguments() #3 ";"<br>
-   * 
+   * f0 -> ( %0 #0 [ $0 "<" $1 ReferenceType()<br>
+   * .. .. . .. .. . $2 ( ?0 "," ?1 ReferenceType() )*<br>
+   * .. .. . .. .. . $3 ">" ]<br>
+   * .. .. . .. #1 ( &0 $0 "this" $1 Arguments() $2 ";"<br>
+   * .. .. . .. .. | &1 $0 "super" $1 Arguments() $2 ";" )<br>
+   * .. .. | %1 ( #0 PrimaryExpression() #1 "." #2 "super" #3 Arguments() #4 ";" ) )<br>
+   *
    * @param n - the node to visit
    */
   @Override
   public void visit(final ExplicitConstructorInvocation n) {
-    final NodeSequence seq = (NodeSequence) n.f0.choice;
-    if (n.f0.which == 0) {
-      // %0 #0 "this" #1 Arguments() #2 ";"
-      seq.elementAt(0).accept(this);
-      sb.append(" ");
-      seq.elementAt(1).accept(this);
-      seq.elementAt(2).accept(this);
-    } else {
-      // %1 #0 [ $0 PrimaryExpression() $1 "." ] #1 "super" #2 Arguments() #3 ";"
-      final NodeOptional opt = (NodeOptional) seq.elementAt(0);
-      // #0 [ $0 PrimaryExpression() $1 "." ]
-      if (opt.present()) {
-        // $0 PrimaryExpression()
-        ((NodeSequence) opt.node).elementAt(0).accept(this);
-        // $1 "."
-        ((NodeSequence) opt.node).elementAt(1).accept(this);
-      }
-      // #1 "super"
-      seq.elementAt(1).accept(this);
-      // #2 Arguments()
-      seq.elementAt(2).accept(this);
-      // #3 ";"
-      seq.elementAt(3).accept(this);
+    // f0 -> ( %0 #0 [ $0 "<" $1 ReferenceType()
+    // .. .. . .. .. . $2 ( ?0 "," ?1 ReferenceType() )*
+    // .. .. . .. .. . $3 ">" ]
+    // .. .. . .. #1 ( &0 $0 "this" $1 Arguments() $2 ";"
+    // .. .. . .. .. | &1 $0 "super" $1 Arguments() $2 ";" )
+    // .. .. | %1 ( #0 PrimaryExpression() #1 "." #2 "super" #3 Arguments() #4 ";" ) )
+    final NodeChoice n0 = n.f0;
+    final NodeChoice nch = n0;
+    final INode ich = nch.choice;
+    switch (nch.which) {
+      case 0:
+        // %0 #0 [ $0 "<" $1 ReferenceType()
+        // .. .. . $2 ( ?0 "," ?1 ReferenceType() )*
+        // .. .. . $3 ">" ]
+        // .. #1 ( &0 $0 "this" $1 Arguments() $2 ";"
+        // .. .. | &1 $0 "super" $1 Arguments() $2 ";" )
+        final NodeSequence seq = (NodeSequence) ich;
+        // #0 [ $0 "<" $1 ReferenceType()
+        // .. . $2 ( ?0 "," ?1 ReferenceType() )*
+        // .. . $3 ">" ]
+        final NodeOptional opt = (NodeOptional) seq.elementAt(0);
+        if (opt.present()) {
+          final NodeSequence seq1 = (NodeSequence) opt.node;
+          // $0 "<"
+          seq1.elementAt(0).accept(this);
+          sb.append(" ");
+          // $1 ReferenceType()
+          seq1.elementAt(1).accept(this);
+          // $2 ( ?0 "," ?1 ReferenceType() )*
+          final NodeListOptional nlo = (NodeListOptional) seq1.elementAt(2);
+          if (nlo.present()) {
+            for (int i = 0; i < nlo.size(); i++) {
+              final INode nloeai = nlo.elementAt(i);
+              final NodeSequence seq2 = (NodeSequence) nloeai;
+              // ?0 ","
+              seq2.elementAt(0).accept(this);
+              sb.append(" ");
+              // ?1 ReferenceType()
+              seq2.elementAt(1).accept(this);
+            }
+          }
+          // $3 ">"
+          sb.append(" ");
+          seq1.elementAt(3).accept(this);
+          sb.append(" ");
+        }
+        // #1 ( &0 $0 "this" $1 Arguments() $2 ";"
+        // .. | &1 $0 "super" $1 Arguments() $2 ";" )
+        final NodeChoice nch1 = (NodeChoice) seq.elementAt(1);
+        final INode ich1 = nch1.choice;
+        switch (nch1.which) {
+          case 0:
+            // $0 "this" $1 Arguments() $2 ";"
+            final NodeSequence seq1 = (NodeSequence) ich1;
+            // $0 "this"
+            seq1.elementAt(0).accept(this);
+            sb.append(" ");
+            // $1 Arguments()
+            seq1.elementAt(1).accept(this);
+            // $2 ";"
+            sb.append(" ");
+            seq1.elementAt(2).accept(this);
+            sb.append(" ");
+            break;
+          case 1:
+            // $0 "super" $1 Arguments() $2 ";" 
+            final NodeSequence seq2 = (NodeSequence) ich1;
+            seq2.elementAt(0).accept(this);
+            sb.append(" ");
+            // $1 Arguments()
+            seq2.elementAt(1).accept(this);
+            // $2 ";"
+            sb.append(" ");
+            seq2.elementAt(2).accept(this);
+            sb.append(" ");
+            break;
+          default:
+            // should not occur !!!
+            break;
+        }
+        break;
+      case 1:
+        // #0 PrimaryExpression() #1 "." #2 "super" #3 Arguments() #4 ";"
+        final NodeSequence seq1 = (NodeSequence) ich;
+        // #0 PrimaryExpression()
+        seq1.elementAt(0).accept(this);
+        // #1 "."
+        seq1.elementAt(1).accept(this);
+        // "super" 
+        seq1.elementAt(2).accept(this);
+        // #3 Arguments()
+        seq1.elementAt(3).accept(this);
+        // #4 ";"
+        seq1.elementAt(4).accept(this);
+        break;
+      default:
+        // should not occur !!!
+        break;
     }
+
+    // old
+    //    * f0 -> . %0 #0 [ $0 "<" $1 ReferenceType()<br>
+    //    * .. .. . .. .. . $2 ( ?0 "," ?1 ReferenceType() )*<br>
+    //    * .. .. . .. .. . $3 ">" ]<br>
+    //    * .. .. . .. #1 "this" #2 Arguments() #3 ";"<br>
+    //    * .. .. | %1 #0 [ $0 PrimaryExpression() $1 "." ]<br>
+    //    * .. .. . .. #1 "super" #2 Arguments() #3 ";"<br>
+    //    *
+    //    final NodeSequence seq = (NodeSequence) n.f0.choice;
+    //    if (n.f0.which == 0) {
+    //      // %0 #0 [ $0 "<" $1 ReferenceType() $2 ( ?0 "," ?1 ReferenceType() )* $3 ">" ] #1 "this" #2 Arguments() #3 ";"
+    //      final NodeOptional opt = (NodeOptional) seq.elementAt(0);
+    //      if (opt.present()) {
+    //        // $0 "<" $1 ReferenceType() $2 ( ?0 "," ?1 ReferenceType() )* $3 ">"
+    //        final NodeSequence seq1 = (NodeSequence) opt.node;
+    //        // $0 "<"
+    //        seq1.elementAt(0).accept(this);
+    //        sb.append(" ");
+    //        // $1 ReferenceType()
+    //        seq1.elementAt(1).accept(this);
+    //        // $2 ( ?0 "," ?1 ReferenceType() )*
+    //        final NodeListOptional nlo1 = (NodeListOptional) seq1.elementAt(2);
+    //        if (nlo1.present())
+    //          for (final Iterator<INode> e1 = nlo1.elements(); e1.hasNext();) {
+    //            final NodeSequence seq2 = (NodeSequence) e1.next();
+    //            // ?0 ","
+    //            seq2.elementAt(0).accept(this);
+    //            sb.append(" ");
+    //            // ?1 ReferenceType()
+    //            seq2.elementAt(1).accept(this);
+    //          }
+    //        // $3 ">"
+    //        sb.append(" ");
+    //        seq1.elementAt(3).accept(this);
+    //      }
+    //      // #1 "this"
+    //      seq.elementAt(1).accept(this);
+    //      // #2 Arguments()
+    //      seq.elementAt(2).accept(this);
+    //      // #3 ";"
+    //      seq.elementAt(3).accept(this);
+    //    } else {
+    //      // %1 #0 [ $0 PrimaryExpression() $1 "." ] #1 "super" #2 Arguments() #3 ";"
+    //      final NodeOptional opt = (NodeOptional) seq.elementAt(0);
+    //      // #0 [ $0 PrimaryExpression() $1 "." ]
+    //      if (opt.present()) {
+    //        // $0 PrimaryExpression()
+    //        ((NodeSequence) opt.node).elementAt(0).accept(this);
+    //        // $1 "."
+    //        ((NodeSequence) opt.node).elementAt(1).accept(this);
+    //      }
+    //      // #1 "super"
+    //      seq.elementAt(1).accept(this);
+    //      // #2 Arguments()
+    //      seq.elementAt(2).accept(this);
+    //      // #3 ";"
+    //      seq.elementAt(3).accept(this);
+    //    }
   }
 
   /**
@@ -1302,7 +1463,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
   @Override
   public void visit(final WildcardBounds n) {
     final NodeSequence seq = (NodeSequence) n.f0.choice;
-    // #0 "extends" OR #0 "super"
+    // #0 "extends" | #0 "super"
     seq.elementAt(0).accept(this);
     sb.append(" ");
     // #1 ReferenceType()
@@ -1899,7 +2060,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
     seq.elementAt(1).accept(this);
     // #2 ")"
     seq.elementAt(2).accept(this);
-    // #3 UnaryExpression() OR #3 UnaryExpressionNotPlusMinus()
+    // #3 UnaryExpression() | #3 UnaryExpressionNotPlusMinus()
     seq.elementAt(3).accept(this);
   }
 
@@ -1958,15 +2119,15 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
   @Override
   public void visit(final PrimaryPrefix n) {
     if (n.f0.which == 2 || n.f0.which == 3 || n.f0.which == 5) {
-      // #0 "super" #1 "." #2 < IDENTIFIER > OR %3 #0 "(" #1 Expression() #2 ")" OR #0 ResultType() #1 "." #2 "class"
-      // #0 "super" OR #0 "(" OR #0 ResultType()
+      // #0 "super" #1 "." #2 < IDENTIFIER > | %3 #0 "(" #1 Expression() #2 ")" | #0 ResultType() #1 "." #2 "class"
+      // #0 "super" | #0 "(" | #0 ResultType()
       (((NodeSequence) n.f0.choice).elementAt(0)).accept(this);
-      // #1 "." OR #1 Expression() OR #1 "."
+      // #1 "." | #1 Expression() | #1 "."
       (((NodeSequence) n.f0.choice).elementAt(1)).accept(this);
-      // #2 < IDENTIFIER > OR #2 ")" OR #2 "class"
+      // #2 < IDENTIFIER > | #2 ")" | #2 "class"
       (((NodeSequence) n.f0.choice).elementAt(2)).accept(this);
     } else
-      // %0 Literal() OR %1 "this" OR %4 AllocationExpression() OR %6 Name()
+      // %0 Literal() | %1 "this" | %4 AllocationExpression() | %6 Name()
       n.f0.choice.accept(this);
   }
 
@@ -1985,10 +2146,10 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
   @Override
   public void visit(final PrimarySuffix n) {
     if (n.f0.which == 0 || n.f0.which == 1 || n.f0.which == 4) {
-      // %0 #0 "." #1 "this" OR %1 #0 "." #1 AllocationExpression() OR %4 #0 "." #1 < IDENTIFIER >
+      // %0 #0 "." #1 "this" | %1 #0 "." #1 AllocationExpression() | %4 #0 "." #1 < IDENTIFIER >
       // #0 "."
       ((NodeSequence) n.f0.choice).elementAt(0).accept(this);
-      // #1 "this" OR #1 AllocationExpression() OR #1 < IDENTIFIER >
+      // #1 "this" | #1 AllocationExpression() | #1 < IDENTIFIER >
       ((NodeSequence) n.f0.choice).elementAt(1).accept(this);
     } else if (n.f0.which == 3) {
       // %3 #0 "[" #1 Expression() #2 "]"
@@ -2142,7 +2303,8 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
       seq.elementAt(1).accept(this);
       seq.elementAt(2).accept(this);
     } else {
-      // %1 #0 "new" #1 ClassOrInterfaceType() #2 [ TypeArguments() ] #3 ( &0 ArrayDimsAndInits() | &1 $0 Arguments() $1 [ ClassOrInterfaceBody() ] )
+      // %1 #0 "new" #1 ClassOrInterfaceType() #2 [ TypeArguments() ]
+      //    #3 ( &0 ArrayDimsAndInits() | &1 $0 Arguments() $1 [ ClassOrInterfaceBody() ] )
       // #0 "new"
       seq.elementAt(0).accept(this);
       sb.append(" ");
@@ -2437,7 +2599,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
   @Override
   public void visit(final StatementExpression n) {
     if (n.f0.which < 2)
-      // %0 PreIncrementExpression() OR %1 PreDecrementExpression()
+      // %0 PreIncrementExpression() | %1 PreDecrementExpression()
       n.f0.accept(this);
     else {
       //%2 #0 PrimaryExpression() #1 [ &0 "++" | &1 "--" | &2 $0 AssignmentOperator() $1 Expression() ]
@@ -2700,7 +2862,8 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
     sb.append(" ");
     // f1 -> "("
     n.f1.accept(this);
-    // f2 -> ( %0 #0 VariableModifiers() #1 Type() #2 < IDENTIFIER > #3 ":" #4 Expression() | %1 #0 [ ForInit() ] #1 ";" #2 [ Expression() ] #3 ";" #4 [ ForUpdate() ] )
+    // f2 -> ( %0 #0 VariableModifiers() #1 Type() #2 < IDENTIFIER > #3 ":" #4 Expression()
+    //       | %1 #0 [ ForInit() ] #1 ";" #2 [ Expression() ] #3 ";" #4 [ ForUpdate() ] )
     final NodeSequence seq = (NodeSequence) n.f2.choice;
     if (n.f2.which == 0) {
       //%0 #0 VariableModifiers() #1 Type() #2 < IDENTIFIER > #3 ":" #4 Expression(
@@ -3286,11 +3449,15 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
   @Override
   public void visit(final AnnotationTypeMemberDeclaration n) {
     if (n.f0.which == 0) {
-      // %0 #0 Modifiers() #1 ( &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"$4 [ DefaultValue() ] $5 ";" | &1 ClassOrInterfaceDeclaration()| &2 EnumDeclaration()| &3 AnnotationTypeDeclaration()| &4 FieldDeclaration() )
+      // %0 #0 Modifiers() #1 ( &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"$4 [ DefaultValue() ] $5 ";"
+      //                      | &1 ClassOrInterfaceDeclaration() | &2 EnumDeclaration()
+      //                      | &3 AnnotationTypeDeclaration()| &4 FieldDeclaration() )
       final NodeSequence seq = (NodeSequence) n.f0.choice;
       // #0 Modifiers print the last space if not empty
       seq.elementAt(0).accept(this);
-      // #1 ( &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"$4 [ DefaultValue() ] $5 ";" | &1 ClassOrInterfaceDeclaration()| &2 EnumDeclaration()| &3 AnnotationTypeDeclaration()| &4 FieldDeclaration() )
+      // #1 ( &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"$4 [ DefaultValue() ] $5 ";"
+      //    | &1 ClassOrInterfaceDeclaration()| &2 EnumDeclaration() | &3 AnnotationTypeDeclaration()
+      //    | &4 FieldDeclaration() )
       final NodeChoice ch = (NodeChoice) seq.elementAt(1);
       if (ch.which == 0) {
         // &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"$4 [ DefaultValue() ] $5 ";"

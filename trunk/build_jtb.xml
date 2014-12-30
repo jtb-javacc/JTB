@@ -26,7 +26,7 @@
 	<!-- import JavaCC / JJTree properties -->
 	<!-- property name="javacc_imp_dir" value="D:/Devs/javaCC-4.2-src" / -->
 	<!-- import file="${javacc_imp_dir}/build_javacc_props.xml" / -->
-	<property name="javacc_ok_jar" value="Z:\DEV\COB\javacc~svn\target\javacc.jar" />
+	<property name="javacc_ok_jar" value="D:\Devs\Parsers-workspace\sf.eclipse.javacc/jars/javacc.jar" />
 	<property name="javacc_main" value="org.javacc.parser.Main" />
 
 	<!-- Build new jar and test regenerate files with new jtb jar and compile -->
@@ -155,14 +155,19 @@
 		<copy file="${jtb_src_dir}/utils/Token.java.save" tofile="${jtb_src_dir}/parser/Token.java" overwrite="true" />
 	</target>
 
-	<!-- Copy saved NodeTCF.java file for 1.4.5 -> 1.4.6 ; to be removed later -->
-	<target name="copy_saved_nodetcf">
-		<copy file="${jtb_src_dir}/utils/NodeTCF.java.save" tofile="${jtb_src_dir}/syntaxtree/NodeTCF.java" overwrite="false" />
-	</target>
+  <!-- Copy saved NodeTCF.java file for 1.4.5 -> 1.4.6 ; removed -->
+  <target name="copy_saved_nodetcf">
+    <copy file="${jtb_src_dir}/utils/NodeTCF.java.save" tofile="${jtb_src_dir}/syntaxtree/NodeTCF.java" overwrite="false" />
+  </target>
+
+  <!-- Copy saved NodeToken.java file for 1.4.7 -> 1.4.8 ; removed -->
+  <target name="copy_saved_nodetoken">
+    <copy file="${jtb_src_dir}/utils/NodeToken.java.save" tofile="${jtb_src_dir}/syntaxtree/NodeToken.java" overwrite="true" />
+  </target>
 
 	<!-- Compile Java classes -->
 	<target name="compile_java">
-		<antcall target="copy_saved_nodetcf" />
+		<!-- antcall target="copy_saved_nodetoken" / -->
 		<javac srcdir="${jtb_src_dir}" destdir="${jtb_bin_dir}" debug="true" source="${jdk_version}" target="${jdk_version}" classpath="${jtb_bin_dir}">
 			<!-- compilerarg value="-Xlint:unchecked" / -->
 		</javac>

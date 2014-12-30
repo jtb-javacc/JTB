@@ -32,66 +32,52 @@ import java.util.List;
 
 /**
  * Describes the various regular expression productions.
- *
+ * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public class TokenProduction {
 
-  /**
-   * Definitions of constants that identify the kind of regular
-   * expression production this is.
-   */
+  /** Definitions of constants that identify the kind of regular expression production this is */
+  @SuppressWarnings("javadoc")
   public static final int      TOKEN      = 0, SKIP = 1, MORE = 2, SPECIAL = 3;
-
-  /**
-   * The image of the above constants.
-   */
+  /** The image of the above constants */
   public static final String[] kindImage  = {
       "TOKEN", "SKIP", "MORE", "SPECIAL" };
-
-  /**
-   * The starting line and column of this token production.
-   */
+  /** The starting column of this token production */
   private int                  column;
+  /** The starting line of this token production */
   private int                  line;
   /**
-   * The states in which this regular expression production exists.  If
-   * this array is null, then "<*>" has been specified and this regular
-   * expression exists in all states.  However, this null value is
-   * replaced by a String array that includes all lexical state names
-   * during the semanticization phase.
+   * The states in which this regular expression production exists. If this array is null, then
+   * "<*>" has been specified and this regular expression exists in all states. However, this null
+   * value is replaced by a String array that includes all lexical state names during the
+   * semanticization phase
    */
   public String[]              lexStates;
-  /**
-   * The kind of this token production - TOKEN, SKIP, MORE, or SPECIAL.
-   */
+  /** The kind of this token production - TOKEN, SKIP, MORE, or SPECIAL */
   public int                   kind;
   /**
-   * The list of regular expression specifications that comprise this
-   * production.  Each entry is a "RegExprSpec".
+   * The list of regular expression specifications that comprise this production. Each entry is a
+   * "RegExprSpec"
    */
-  public List<RegExprSpec_>     respecs    = new ArrayList<RegExprSpec_>();
+  public List<RegExprSpec_>    respecs    = new ArrayList<RegExprSpec_>();
   /**
-   * This is true if this corresponds to a production that actually
-   * appears in the input grammar.  Otherwise (if this is created to
-   * describe a regular expression that is part of the BNF) this is set
-   * to false.
+   * This is true if this corresponds to a production that actually appears in the input grammar.
+   * Otherwise (if this is created to describe a regular expression that is part of the BNF) this is
+   * set to false
    */
   public boolean               isExplicit = true;
-  /**
-   * This is true if case is to be ignored within the regular expressions
-   * of this token production.
-   */
+  /** This is true if case is to be ignored within the regular expressions of this token production */
   public boolean               ignoreCase = false;
-  /**
-   * The first and last tokens from the input stream that represent this
-   * production.
-   */
-  public Token                 firstToken, lastToken;
+  /** The first token from the input stream that represent this production */
+  public Token                 firstToken;
+  /** The last token from the input stream that represent this production */
+  public Token                 lastToken;
 
   /**
-   * @param line - the line to set
+   * @param ln - the line to set
    */
   public final void setLine(final int ln) {
     line = ln;
@@ -105,7 +91,7 @@ public class TokenProduction {
   }
 
   /**
-   * @param column - the column to set
+   * @param cl - the column to set
    */
   public final void setColumn(final int cl) {
     column = cl;
