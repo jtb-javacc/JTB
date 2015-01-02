@@ -143,6 +143,7 @@ import EDU.purdue.jtb.syntaxtree.WhileStatement;
  *          GlobalDataFinder to {@link GlobalDataBuilder}
  * @version 1.4.8 : 10/2012 : MMa : added JavaCodeProduction class generation if requested ;<br>
  *          fixed visit LocalVariableDeclaration ; improved specials printing
+ * @version 1.4.9 : 01/2015 : MMa : fixed regression in {@link #bnfFinalActions(VarInfo)}
  */
 public class Annotator extends JavaCCPrinter {
 
@@ -760,6 +761,7 @@ public class Annotator extends JavaCCPrinter {
       outerVars.add(varInfo);
     else {
       parentVar = varInfo;
+      annotateNode = true;
     }
   }
 
@@ -851,7 +853,7 @@ public class Annotator extends JavaCCPrinter {
     // extra parenthesis needed !
     sb.append(")");
     oneNewLine(n, "genExpChWithChoices e");
-    //    sb.append(spc.spc);
+    sb.append(spc.spc);
   }
 
   /**
@@ -1683,7 +1685,7 @@ public class Annotator extends JavaCCPrinter {
     } else {
       // %3 #0 "<" #1 "EOF" #2 ">"
       if (creThisNode) {
-        sb.append(reTokenName).append(" /*eo*/ = ");
+        sb.append(reTokenName).append(" = ");
         jccpv.gvaStr = null;
       }
       sb.append("< EOF >");
