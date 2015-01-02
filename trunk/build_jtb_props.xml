@@ -20,7 +20,7 @@
   <property name="jtb_tool" value="EDU.purdue.jtb.JTB" />
 
 	  <!-- JTB versions -->
-	  <property name="jtb_last_version" value="1.4.8" />
+	  <property name="jtb_last_version" value="1.4.8.fix_a" />
 	  <property name="jtb_curr_version" value="1.4.9" />
 
 	  <!-- JDK version -->

@@ -65,24 +65,24 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
   CommentsPrinter                   cpv;
 
   /**
-   * The table of JavaCodeProductions whose nodes must be created ("%" syntax) and of BNFProductions
-   * whose nodes must not be created ("!" syntax)<br>
+   * The table of non standard nodes : JavaCodeProductions whose nodes must be created ("%" syntax)
+   * and BNFProductions whose nodes must not be created ("!" syntax)<br>
    * key = identifier, value = {@link #JC_IND} for JavaCodeProductions or {@link #BNF_IND} for
    * BNFProduction
    */
   Map<String, String>               nsnHT       = new Hashtable<String, String>();
 
-  /** The indicator for JavaCodeProduction */
-  public static final String        JC_IND      = "µ";
-
-  /** The indicator for BNFProduction */
-  public static final String        BNF_IND     = "£";
-
   /**
-   * The table of all JavaCodeProductions and BNFProductions<br>
+   * The table of all nodes : JavaCodeProductions and BNFProductions<br>
    * key = identifier, value = {@link #JC_IND} or {@link #BNF_IND} + ResultType
    */
   Map<String, String>               prodHT      = new Hashtable<String, String>(100);
+
+  /** The indicator for JavaCodeProduction in the {@link #nsnHT} and {@link #prodHT} tables */
+  public static final String        JC_IND      = "µ";
+
+  /** The indicator for BNFProduction in the {@link #nsnHT} and {@link #prodHT} tables */
+  public static final String        BNF_IND     = "£";
 
   /**
    * The list of all return variables pairs of comments and declarations (for all non "void"
