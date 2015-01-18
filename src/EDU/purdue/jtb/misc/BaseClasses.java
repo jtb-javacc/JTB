@@ -78,7 +78,6 @@ import EDU.purdue.jtb.syntaxtree.NodeToken;
  * @version 1.4.8 : 10/2014 : MMa : minor fix<br>
  *          1.4.8 : 12/2014 : MMa : added printing override annotations ;<br>
  *          improved specials printing in {@link NodeToken}
- * @version 1.4.9 : 12/2014 : MMa : fixed generated code NodeToken.withSpecials
  */
 class BaseClasses {
 
@@ -874,7 +873,7 @@ class BaseClasses {
       sb.append("   * @param s - the token string").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(nodeToken).append("(final String s) {").append(LS);
+    sb.append("  public ").append(nodeToken).append("(String s) {").append(LS);
     sb.append("    this(s, -1, -1, -1, -1, -1);").append(LS);
     sb.append("  }").append(LS).append(LS);
 
@@ -892,7 +891,7 @@ class BaseClasses {
       sb.append("   */").append(LS);
     }
     sb.append("  public ").append(nodeToken)
-      .append("(final String s, final int kn, final int bl, final int bc, ")
+      .append("(String s, final int kn, final int bl, final int bc, ")
       .append("final int el, final int ec) {").append(LS);
     sb.append("    tokenImage = s;").append(LS);
     sb.append("    specialTokens = null;").append(LS);
@@ -1060,7 +1059,8 @@ class BaseClasses {
     sb.append("    if (var != null)").append(LS);
     sb.append("      len += var.length();").append(LS);
     sb.append("    StringBuilder buf = new StringBuilder(len + tokenImage.length());").append(LS);
-    sb.append("    buf.append(specials);").append(LS);
+    sb.append("    buf.append(specials).append(var == null ? \"\" : var).append(tokenImage);")
+      .append(LS);
     sb.append("  // see if needed to add a space").append(LS);
     sb.append("  int stLastLine = -1;").append(LS);
     sb.append("  for (final Iterator<NodeToken> e = specialTokens.iterator(); e.hasNext();) {")

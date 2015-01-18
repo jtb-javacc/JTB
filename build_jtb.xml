@@ -4,8 +4,7 @@
      Uses build.jtb_props.xml to import (and share) JTB properties
      (no more uses build.javacc_props.xml to import JavaCC / JJTree properties)
      Marc Mazas - Sopra Group - 05/2009 -->
-<project name="jtb" default="build_new_jtb_jar+test_generate_all+compile_java+make_new_jtb_jar"
-   basedir="src/EDU/purdue/jtb">
+<project name="jtb" default="build_new_jtb_jar+test_generate_all+compile_java+make_new_jtb_jar" basedir="src/EDU/purdue/jtb">
 	<!--
    Here is how to use targets, to build and test a new version :
    - in jtb_props.xml, set jtb_last_version to the stable version (the one using jtb-xxx.jar)
@@ -31,8 +30,7 @@
 	<property name="javacc_main" value="org.javacc.parser.Main" />
 
 	<!-- Build new jar and test regenerate files with new jtb jar and compile -->
-	<target name="build_new_jtb_jar+test_generate_all+compile_java+make_new_jtb_jar"
-	   depends="build_new_jtb_jar,test_generate_all,compile_java">
+	<target name="build_new_jtb_jar+test_generate_all+compile_java+make_new_jtb_jar" depends="build_new_jtb_jar,test_generate_all,compile_java">
 		<antcall target="make_new_jtb_jar" />
 	</target>
 
@@ -41,10 +39,8 @@
 		<antcall target="test_generate_all" />
 	</target>
 
-	<!-- Process JavaCC file with ${jtb_ok_jar}, compile java classes, make the new jar
-	 and test regenerate files with new jtb jar -->
-	<target name="generate_all+compile_java+make_new_jtb_jar+test_generate_jtb_files"
-	   depends="generate_all+compile_java, compile_java, make_new_jtb_jar">
+	<!-- Process JavaCC file with ${jtb_ok_jar}, compile java classes, make the new jar and test regenerate files with new jtb jar -->
+	<target name="generate_all+compile_java+make_new_jtb_jar+test_generate_jtb_files" depends="generate_all+compile_java, compile_java, make_new_jtb_jar">
 		<antcall target="test_generate_all" />
 	</target>
 
@@ -156,27 +152,23 @@
 
 	<!-- Copy specific Token.java file for JTBParser -->
 	<target name="copy_specific_token_for_jtb">
-		<copy file="${jtb_src_dir}/utils/Token.java.save"
-		   tofile="${jtb_src_dir}/parser/Token.java" overwrite="true" />
+		<copy file="${jtb_src_dir}/utils/Token.java.save" tofile="${jtb_src_dir}/parser/Token.java" overwrite="true" />
 	</target>
 
   <!-- Copy saved NodeTCF.java file for 1.4.5 -> 1.4.6 ; removed -->
   <target name="copy_saved_nodetcf">
-    <copy file="${jtb_src_dir}/utils/NodeTCF.java.save"
-       tofile="${jtb_src_dir}/syntaxtree/NodeTCF.java" overwrite="false" />
+    <copy file="${jtb_src_dir}/utils/NodeTCF.java.save" tofile="${jtb_src_dir}/syntaxtree/NodeTCF.java" overwrite="false" />
   </target>
 
-  <!-- Copy saved NodeToken.java file for 1.4.7 -> 1.4.9 ; removed -->
+  <!-- Copy saved NodeToken.java file for 1.4.7 -> 1.4.8 ; removed -->
   <target name="copy_saved_nodetoken">
-    <copy file="${jtb_src_dir}/utils/NodeToken.java.save"
-     tofile="${jtb_src_dir}/syntaxtree/NodeToken.java" overwrite="true" />
+    <copy file="${jtb_src_dir}/utils/NodeToken.java.save" tofile="${jtb_src_dir}/syntaxtree/NodeToken.java" overwrite="true" />
   </target>
 
 	<!-- Compile Java classes -->
 	<target name="compile_java">
 		<!-- antcall target="copy_saved_nodetoken" / -->
-		<javac srcdir="${jtb_src_dir}" destdir="${jtb_bin_dir}"
-		   debug="true" source="${jdk_version}" target="${jdk_version}" classpath="${jtb_bin_dir}">
+		<javac srcdir="${jtb_src_dir}" destdir="${jtb_bin_dir}" debug="true" source="${jdk_version}" target="${jdk_version}" classpath="${jtb_bin_dir}">
 			<!-- compilerarg value="-Xlint:unchecked" / -->
 		</javac>
 	</target>
@@ -185,14 +177,13 @@
 	<target name="make_new_jtb_jar" depends="check_jtb_jar" unless="jtb_jar.uptodate">
 		<jar destfile="${jtb_new_jar}" compress="true" manifest="${jtb_proj_dir}/META-INF/MANIFEST.MF">
 			<fileset dir="${jtb_bin_dir}">
-	        <exclude name="LICENSE" />
-	        <exclude name="${jtb_out}.jj" />
-	        <exclude name="${jtb_gram}.jtb" />
+				<exclude name="*${jtb_out}.jj*" />
 			</fileset>
 			<fileset dir="${jtb_proj_dir}/src" />
 			<fileset dir="${jtb_proj_dir}/doc" />
 			<fileset dir="${jtb_proj_dir}">
-				<include name="build*.xml" />
+				<include name="Build*.xml" />
+				<include name="Releases*.txt" />
 			</fileset>
 		</jar>
 	</target>
