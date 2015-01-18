@@ -1,0 +1,64 @@
+- vérifier la bonne prise en compte des modifs jtbgram.jtb
+fait
+//               renamed RSIGNEDSHIFT in RSignedShift and fixed it
+//               renamed RUNSIGNEDSHIFT in RUnsignedShift and fixed it
+//               fixed ForStatement() ; ForInit()
+//               modified RegularExpression (remove LANGLE & RANGLE definitions)
+à faire
+//               TODO found problems in TypeDeclaration(), ExplicitConstructorInvocation(), PrimaryPrefix()
+
+Fait sur JTB
+- reporter les commentaires formatés de la javadoc vers les commentaires dans le code
+- tirets dans les paramètres
+- quelques {@inheritDoc}
+- faire les tests ATestTCFProduction
+- revoir le CommentsPrinter
+- voir l'exception dans les commentaires dans le code en cas de PRINT_CLASS_COMMENT
+- optimisation Spacing
+- bug JTB-1 (soft errors Empty NodeChoices)
+- revoir CommentPrinter et autres pour générer les commentaires javadoc et java en listes distinctes
+- mauvaise génération du code et des commentaires dans ATestEmpty et ASimpleTestTCFProduction sur Identifier
+- NPE sur récupération des commentaires de classe vide ATestEmpty
+- duplicate variables dans les case d'un switch
+- voir pb f2 & f3 dans javadoc ASimpleTestTCFProduction et code java
+- voir null dans ASimpleTestEmptyChoiceProduction
+- optimiser les types des membres de CommentData
+- voir commentaires dans RegularExprProduction
+- voir les TODOs pour JTB, ajouter les tests qui vont bien
+- depthLevel dans TCF sans IA
+- sortir une erreur si n = prod() et void prod()
+- vérifier le depthLevel dans AcceptInliner
+- voir le problème de la non génération de code pour un return; sans expression
+- syntaxe ! ou JTB_DONT_BUILD pour ne pas générer l'arbre
+- numéros de colonne en plus des numéros de ligne dans les messages
+- corrigé le <EOF> manquant en fin de JavaCCInput
+
+A faire sur JTB
+- regénérer sans les commentaires de debug
+- vérifier avec et sans inline
+
+Fait pour le plugin
+- libellé Show Caller / Callee Hierarchy non en français
+- voir l'affichage de plusieurs messages d'erreur sur une même ligne
+- ajouté la couleur du ! (syntaxe JTB)
+
+A faire pour le plugin
+- NLS
+- tester sur les différentes versions d'Eclipse
+- voir l'affichage d'une squiggly line pour les markers : voir si utile pour JavaCC / JJTree / JTB
+- voir l'affichage des messages sur le fichier .jj après compilation .jtb
+- voir l'effacement de la console JavaCC après compilation JJTree
+- voir à synchroniser ou non la vue Outline avec l'éditeur
+- voir pour l'autocomplétion à trier les productions et à ajouter les Tokens
+- voir les TODOs pour le plugin, ajouter les tests qui vont bien
+- problème de remontée des erreurs JTB qui ne sont pas affichées : faire comme pour les .jj, en ligne 1
+ex : TCF sans {} pour le try
+>java -jar D:\Devs\Parsers-workspace\JTB-svn_java.net\lib\new_jtb-1.4.7.jar -ia -jd -tk java1_5.jtb 
+JTB version 1.4.7
+JTB:  Reading jtb input file java1_5.jtb...
+Encountered " "(" "( "" at line 1122, column 11.
+Was expecting:
+    "{" ...
+JTB:  Encountered error(s) during parsing.
+
+
