@@ -1,0 +1,32 @@
+A faire sur JTB
+- voir les warnings dans parser
+- voir les ajouts faits par FA ou à faire pour JavaCC 6.x
+- regénérer sans les commentaires de debug
+- regénérer avec les noms longs pour les variables
+- vérifier avec et sans inline
+
+Fait sur JTB en 1.4.8
+- null choice for an empty choice
+- contrôler qu'un Javacode n'est pas déclaré 2 fois
+- voir bug 3164860
+- syntaxe "%" sur Javacode
+- corriger préfixe / suffixe dans lookahead
+- changé dans NodeToken.java  public ArrayList<NodeToken> specialTokens; ->   public List<NodeToken> specialTokens;
+- ajouté AnnotationTypeDeclaration() dans ClassOrInterfaceBodyDeclaration()
+- ajouté ReferenceType() dans ExplicitConstructorInvocation()
+- ajouté des annotations @Override et @SuppressWarnings("unused") dans la génération des visiteurs
+- ajouté node_descriptor() et node_descriptor_expression() et modifié JavaCodeProduction, BNFProduction,
+   Expansion & MethodDeclaration pour autoriser un node descriptor
+- corrigé la non mise en commentaires des specials dans les options JTB à la génération
+- ajouté la génération de noms courts pour les variables intermédiaires
+- modifié le message de warning sur les LOOKAHEAD ignorés (car ils peuvent ne pas être ignorés en fait)
+- corrigé la génération des blocs java (Annotator visit LocalVariableDeclaration)
+- corrigé le LOOKAHEAD dans ExplicitConstructorInvocation
+- ajouté la génération des annotations override
+- amélioré la gestion des specials
+- passé les versions de 4.2.j.m à 5.0
+- passé d'implements constantes à import static
+- renommé TreeWalkerOp en ITreeWalkerOp
+- enlevé le membre ordinal de RegularExpression qui cachait celui de la superclasse Expansion_
+- supprimé les warnings partout sauf dans certaines grosses classes de parser
+
