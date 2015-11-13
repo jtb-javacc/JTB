@@ -106,18 +106,60 @@ public class JTB {
   /** The input file options */
   private static Map<String, Object> jtbOpt     = null;
 
+  /** No error */
+  public static final int            OK         = 0;
+  /** Command line error */
+  public static final int            CL_ERR     = -1;
+  /** {@link GlobalDataBuilder} error */
+  public static final int            GDB_ERR    = -2;
+  /** {@link SemanticChecker} error */
+  public static final int            SC_ERR     = -4;
+  /** {@link ClassesFinder} error */
+  public static final int            CF_ERR     = -8;
+  /** {@link Annotator} error */
+  public static final int            ANN_ERR    = -16;
+  /** {@link FilesGenerator} error */
+  public static final int            FG_ERR     = -32;
+  /** {@link InvalCmdLineException} exception */
+  public static final int            CL_EX      = -1024;
+  /** {@link ParseException} exception */
+  public static final int            PARSE_EX   = -2046;
+  /** Other exception */
+  public static final int            OTHER_EX   = -4096;
+
   /**
    * Standard main method.
    * 
    * @param args - the command line arguments
    */
   public static void main(final String args[]) {
+    do_main(args);
+  }
+
+  /**
+   * Non standard main method returning an error code.
+   * 
+   * @param args - the command line arguments
+   * @return the error code: <li>
+   *         <ul>
+   *         for specific types of errors: {@link #CL_ERR}, {@link #GDB_ERR}, {@link #SC_ERR},
+   *         {@link #CF_ERR}, {@link #ANN_ERR}, {@link #FG_ERR}, {@link #CL_EX}, {@link #PARSE_EX},
+   *         {@link #OTHER_EX}) or
+   *         </ul>
+   *         <ul>
+   *         0 if no error or
+   *         </ul>
+   *         <ul>
+   *         the number of errors
+   *         </ul>
+   */
+  public static int do_main(final String args[]) {
 
     try {
       // Get the command line arguments
       jtbOpt = Options.getOptions();
       if (!processCommandLine(args))
-        return;
+        return CL_ERR;
 
       // parse the input file
       System.err.println(progName + " version " + version);
@@ -140,7 +182,7 @@ public class JTB {
       root.accept(gdbv);
       if (Messages.errorCount() > 0) {
         Messages.printSummary();
-        return;
+        return GDB_ERR;
       }
 
       final ClassesFinder cfv = new ClassesFinder(gdbv);
@@ -154,7 +196,7 @@ public class JTB {
 
         if (Messages.errorCount() > 0) {
           Messages.printSummary();
-          return;
+          return SC_ERR;
         }
       }
       // create the classes list
@@ -163,7 +205,7 @@ public class JTB {
 
       if (Messages.errorCount() > 0) {
         Messages.printSummary();
-        return;
+        return CF_ERR;
       }
 
       if (printClassList) {
@@ -180,7 +222,7 @@ public class JTB {
 
         if (Messages.errorCount() > 0) {
           Messages.printSummary();
-          return;
+          return ANN_ERR;
         }
 
         System.err.println(progName + ":  jj output file \"" + jtbOutputFileName + "\" generated.");
@@ -196,12 +238,12 @@ public class JTB {
 
         if (Messages.errorCount() > 0) {
           Messages.printSummary();
-          return;
+          return FG_ERR;
         }
       }
 
       try {
-        fg.genBaseNodesFiles();
+        FilesGenerator.genBaseNodesFiles();
         System.err.println(progName + ":  base node class files " + "generated into directory \"" +
                            nodesDirName + "\".");
       }
@@ -334,18 +376,21 @@ public class JTB {
       }
       if (Messages.errorCount() > 0 || Messages.warningCount() > 0)
         Messages.printSummary();
+      return Messages.errorCount();
     }
     catch (final InvalCmdLineException e) {
       System.err.println(progName + ":  " + e.getMessage());
-      return;
+      return CL_EX;
     }
     catch (final ParseException e) {
       System.err.println("\n" + e.getMessage() + "\n");
       System.err.println(progName + ":  Encountered error(s) during parsing.");
+      return PARSE_EX;
     }
     catch (final Exception e) {
       e.printStackTrace(System.err);
       Messages.hardErr(e);
+      return OTHER_EX;
     }
   }
 

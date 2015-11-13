@@ -174,7 +174,7 @@ public class OutputFile {
    * @param fl - the file
    * @param opt - the options
    */
-  private void checkOptions(final File fl, final String[] opt) {
+  private static void checkOptions(final File fl, final String[] opt) {
     try {
       final BufferedReader reader = new BufferedReader(new FileReader(fl));
       String line;

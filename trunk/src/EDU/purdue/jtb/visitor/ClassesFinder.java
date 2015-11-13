@@ -390,8 +390,9 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
         return;
 
       default:
-        Messages.hardErr("n.f0.which = " + String.valueOf(n.f0.which));
-        return;
+        final String msg = "Invalid n.f0.which = " + String.valueOf(n.f0.which);
+        Messages.hardErr(msg);
+        throw new InternalError(msg);
     }
   }
 
@@ -462,7 +463,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    * @param mod - the modifier
    * @return the corresponding base node name
    */
-  private String getNodeNameForMod(final int mod) {
+  private static String getNodeNameForMod(final int mod) {
     if (mod == 0)
       return nodeList;
     else if (mod == 1)
@@ -470,8 +471,9 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
     else if (mod == 2)
       return nodeOpt;
     else {
-      Messages.hardErr("Illegal EBNF modifier in " + "ExpansionUnit: mod = " + mod);
-      return "";
+      final String msg = "Illegal EBNF modifier in " + "ExpansionUnit: mod = " + mod;
+      Messages.hardErr(msg);
+      throw new InternalError(msg);
     }
   }
 
@@ -525,8 +527,12 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
         //        assert false : "case 3 RegularExpression";
         //        throw new AssertionError("CG RE 3");
         break;
+
       default:
-        Messages.hardErr("Unreachable code executed!");
+        final String msg = "Unreachable code executed!";
+        Messages.hardErr(msg);
+        throw new InternalError(msg);
+
     }
     ci.addField(nodeToken, gen.genFieldName(nodeToken));
   }

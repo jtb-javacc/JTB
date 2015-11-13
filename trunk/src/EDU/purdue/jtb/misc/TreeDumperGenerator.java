@@ -94,8 +94,9 @@ public class TreeDumperGenerator {
    * Saves the current buffer in the output file (global variable).
    * 
    * @throws FileExistsException - if the file exists and the noOverwrite flag is set
+   * @throws IOException if IO problem
    */
-  public void saveToFile() throws FileExistsException {
+  public void saveToFile() throws FileExistsException, IOException {
     try {
       final File file = new File(visitorDir, outFilename);
 
@@ -108,6 +109,7 @@ public class TreeDumperGenerator {
     }
     catch (final IOException e) {
       Messages.hardErr(e);
+      throw e;
     }
   }
 

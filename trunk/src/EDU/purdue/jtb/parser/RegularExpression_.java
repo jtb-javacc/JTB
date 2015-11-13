@@ -81,6 +81,7 @@ public abstract class RegularExpression_ extends Expansion_ {
   /**
    * @return always false
    */
+  @SuppressWarnings("static-method")
   public boolean CanMatchAnyChar() {
     return false;
   }

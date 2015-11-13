@@ -114,8 +114,9 @@ public class TreeFormatterGenerator {
    * the file if it exists, regardless of the global no overwrite flag.
    * 
    * @throws FileExistsException - if the file exists
+   * @throws IOException if IO problem
    */
-  public void saveToFile() throws FileExistsException {
+  public void saveToFile() throws FileExistsException, IOException {
     try {
       final File file = new File(visitorDir, outFilename);
 
@@ -128,6 +129,7 @@ public class TreeFormatterGenerator {
     }
     catch (final IOException e) {
       Messages.hardErr(e);
+      throw e;
     }
   }
 

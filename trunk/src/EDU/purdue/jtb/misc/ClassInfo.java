@@ -539,7 +539,7 @@ public class ClassInfo {
    * @param aSpc - the current indentation
    * @return the generated common code
    */
-  String genCommonCode(final Spacing aSpc) {
+  static String genCommonCode(final Spacing aSpc) {
 
     final StringBuilder sb = new StringBuilder(1024);
 
