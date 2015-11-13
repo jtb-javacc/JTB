@@ -140,7 +140,7 @@ public class FieldNameGenerator {
    * @param className - the class name
    * @return the variable name
    */
-  public String varNameForClass(final String className) {
+  public static String varNameForClass(final String className) {
     final StringBuilder buf = new StringBuilder(className);
     buf.setCharAt(0, Character.toLowerCase(className.charAt(0)));
     return buf.toString();
@@ -152,7 +152,7 @@ public class FieldNameGenerator {
    * @param mod - the modifier
    * @return the node type
    */
-  public String getNameForMod(final String mod) {
+  public static String getNameForMod(final String mod) {
     if (mod.equals("+"))
       return nodeList;
     else if (mod.equals("*"))
@@ -160,8 +160,9 @@ public class FieldNameGenerator {
     else if (mod.equals("?"))
       return nodeOpt;
     else {
-      Messages.hardErr("Illegal EBNF modifier in " + "ExpansionUnit: mod = " + mod);
-      return "";
+      final String msg = "Illegal EBNF modifier in " + "ExpansionUnit: mod = " + mod;
+      Messages.hardErr(msg);
+      throw new InternalError(msg);
     }
   }
 }

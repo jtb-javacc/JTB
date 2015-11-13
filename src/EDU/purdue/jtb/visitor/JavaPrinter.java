@@ -174,8 +174,9 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * 
    * @param outFile - the output file
    * @throws FileExistsException - if the file exists and the noOverwrite flag is set
+   * @throws IOException if IO problem
    */
-  public void saveToFile(final String outFile) throws FileExistsException {
+  public void saveToFile(final String outFile) throws FileExistsException, IOException {
     try {
       final File file = new File(outFile);
       if (noOverwrite && file.exists())
@@ -189,6 +190,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
     }
     catch (final IOException e) {
       Messages.hardErr(e);
+      throw e;
     }
   }
 

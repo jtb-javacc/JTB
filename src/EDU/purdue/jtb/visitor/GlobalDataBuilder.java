@@ -352,7 +352,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
    * @param rt - the node to process
    * @return the result type token image
    */
-  String getResultType(final ResultType rt) {
+  static String getResultType(final ResultType rt) {
     NodeToken tk;
     final INode n = rt.f0.choice;
     if (rt.f0.which == 0) {

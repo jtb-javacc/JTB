@@ -423,7 +423,7 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * @param n - the node to process
    * @return the result type token image
    */
-  String getResultType(final ResultType n) {
+  static String getResultType(final ResultType n) {
     NodeToken tk;
     if (n.f0.which == 0) {
       // "void"
@@ -928,7 +928,7 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
         return;
 
       default:
-        Messages.hardErr("invalid n.f0.which = " + String.valueOf(n.f0.which));
+        Messages.hardErr("Invalid n.f0.which = " + String.valueOf(n.f0.which));
         return;
     }
   }

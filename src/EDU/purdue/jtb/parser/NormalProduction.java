@@ -86,7 +86,7 @@ public class NormalProduction {
    * @param indent - the level of indentation
    * @return a number of spaces twice the level of indentation
    */
-  protected StringBuilder dumpPrefix(final int indent) {
+  protected static StringBuilder dumpPrefix(final int indent) {
     final StringBuilder sb = new StringBuilder(2 * indent);
     for (int i = 0; i < indent; i++)
       sb.append("  ");

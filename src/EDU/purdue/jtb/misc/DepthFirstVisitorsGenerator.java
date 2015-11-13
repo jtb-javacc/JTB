@@ -137,9 +137,10 @@ public class DepthFirstVisitorsGenerator {
   /**
    * Generates the DepthFirstRetArguVisitor file.
    * 
-   * @throws FileExistsException - if the file already exists and the no overwrite flag has been set
+   * @throws FileExistsException if file exists and no overwrite option set
+   * @throws IOException if IO problem
    */
-  public void genDepthFirstRetArguVisitorFile() throws FileExistsException {
+  public void genDepthFirstRetArguVisitorFile() throws FileExistsException, IOException {
     final String outFilename = dFRetArguVisitor + ".java";
     try {
       final File file = new File(visitorDir, outFilename);
@@ -150,16 +151,19 @@ public class DepthFirstVisitorsGenerator {
       out.close();
     }
     catch (final IOException e) {
-      Messages.hardErr("Could not generate " + outFilename);
+      final String msg = "Could not generate " + outFilename;
+      Messages.hardErr(msg);
+      throw new IOException(msg, e);
     }
   }
 
   /**
    * Generates the DepthFirstRetVisitor file.
    * 
-   * @throws FileExistsException - if the file already exists and the no overwrite flag has been set
+   * @throws FileExistsException if file exists and no overwrite option set
+   * @throws IOException if IO problem
    */
-  public void genDepthFirstRetVisitorFile() throws FileExistsException {
+  public void genDepthFirstRetVisitorFile() throws FileExistsException, IOException {
     final String outFilename = dFRetVisitor + ".java";
     try {
       final File file = new File(visitorDir, outFilename);
@@ -170,16 +174,19 @@ public class DepthFirstVisitorsGenerator {
       out.close();
     }
     catch (final IOException e) {
-      Messages.hardErr("Could not generate " + outFilename);
+      final String msg = "Could not generate " + outFilename;
+      Messages.hardErr(msg);
+      throw new IOException(msg, e);
     }
   }
 
   /**
    * Generates the DepthFirstVoidArguVisitor file.
    * 
-   * @throws FileExistsException - if the file already exists and the no overwrite flag has been set
+   * @throws FileExistsException if file exists and no overwrite option set
+   * @throws IOException if IO problem
    */
-  public void genDepthFirstVoidArguVisitorFile() throws FileExistsException {
+  public void genDepthFirstVoidArguVisitorFile() throws FileExistsException, IOException {
     final String outFilename = dFVoidArguVisitor + ".java";
     try {
       final File file = new File(visitorDir, outFilename);
@@ -190,16 +197,19 @@ public class DepthFirstVisitorsGenerator {
       out.close();
     }
     catch (final IOException e) {
-      Messages.hardErr("Could not generate " + outFilename);
+      final String msg = "Could not generate " + outFilename;
+      Messages.hardErr(msg);
+      throw new IOException(msg, e);
     }
   }
 
   /**
    * Generates the DepthFirstVoidVisitor file.
    * 
-   * @throws FileExistsException - if the file already exists and the no overwrite flag has been set
+   * @throws FileExistsException if file exists and no overwrite option set
+   * @throws IOException if IO problem
    */
-  public void genDepthFirstVoidVisitorFile() throws FileExistsException {
+  public void genDepthFirstVoidVisitorFile() throws FileExistsException, IOException {
     final String outFilename = dFVoidVisitor + ".java";
     try {
       final File file = new File(visitorDir, outFilename);
@@ -210,7 +220,9 @@ public class DepthFirstVisitorsGenerator {
       out.close();
     }
     catch (final IOException e) {
-      Messages.hardErr("Could not generate " + outFilename);
+      final String msg = "Could not generate " + outFilename;
+      Messages.hardErr(msg);
+      throw new IOException(msg, e);
     }
   }
 

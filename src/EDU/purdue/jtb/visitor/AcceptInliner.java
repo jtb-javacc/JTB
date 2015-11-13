@@ -214,7 +214,7 @@ public class AcceptInliner extends JavaCCPrinter {
    * @param n - the node for the node class comment
    * @return the node class comment
    */
-  private String nodeClassComment(final INode n) {
+  private static String nodeClassComment(final INode n) {
     if (DEBUG_CLASS_COMMENTS) {
       final String s = n.toString();
       final int b = s.lastIndexOf('.') + 1;
@@ -235,7 +235,7 @@ public class AcceptInliner extends JavaCCPrinter {
    * @param str - the extra comment
    * @return the node class comment
    */
-  private String nodeClassComment(final INode n, final String str) {
+  private static String nodeClassComment(final INode n, final String str) {
     if (DEBUG_CLASS_COMMENTS)
       return nodeClassComment(n).concat(" ").concat(str);
     else
@@ -250,7 +250,7 @@ public class AcceptInliner extends JavaCCPrinter {
    * @param obj - the extra comments
    * @return the node class comment
    */
-  private String nodeClassComment(final INode n, final Object... obj) {
+  private static String nodeClassComment(final INode n, final Object... obj) {
     if (DEBUG_CLASS_COMMENTS) {
       int len = 0;
       for (final Object o : obj)
@@ -656,14 +656,16 @@ public class AcceptInliner extends JavaCCPrinter {
       case 0:
         // %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"
         // should not be called !
-        Messages.hardErr("visit ExpansionUnit type 0 should not occur !");
-        break;
+        String msg = "visit ExpansionUnit type 0 should not occur !";
+        Messages.hardErr(msg);
+        throw new InternalError(msg);
 
       case 1:
         // %1 Block()
         // should not be called !
-        Messages.hardErr("visit ExpansionUnit type 1 should not occur !");
-        break;
+        msg = "visit ExpansionUnit type 1 should not occur !";
+        Messages.hardErr(msg);
+        throw new InternalError(msg);
 
       case 2:
         // %2 #0 "[" #1 ExpansionChoices() #2 "]"
@@ -1031,8 +1033,9 @@ public class AcceptInliner extends JavaCCPrinter {
         break;
 
       default:
-        Messages.hardErr("unknow n.f0.which = " + String.valueOf(n.f0.which));
-        break;
+        msg = "Invalid n.f0.which = " + String.valueOf(n.f0.which);
+        Messages.hardErr(msg);
+        throw new InternalError(msg);
 
     }
 

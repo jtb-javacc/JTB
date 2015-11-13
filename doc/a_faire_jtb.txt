@@ -2,9 +2,15 @@ A faire sur JTB
 - séparer les packages nécessaires à la grammaire de ceux nécessaires pour le générateur (misc / utils / parser / xxx)
 - voir les warnings dans parser
 - voir les ajouts faits par FA ou à faire pour JavaCC 6.x
-- regénérer sans les commentaires de debug
-- regénérer avec les noms longs pour les variables
+- vérifier avec et sans les commentaires de debug
+- vérifier avec les noms longs et les noms courts pour les variables intermédiaires (dans AcceptInliner)
 - vérifier avec et sans inline
+
+Fait sur JTB en 1.4.10
+- ajouté la méthode JTB.do_main() et modifié les méthodes Messages.hardErr() pour ne plus appeler System.exit()
+
+Fait sur JTB en 1.4.9
+- rien
 
 Fait sur JTB en 1.4.8.fix_a
 - corrigé régression (Annotator#bnfFinalActions())

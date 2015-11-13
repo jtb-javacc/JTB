@@ -1,4 +1,22 @@
 ---------------
+Version 1.4.10
+---------------
+-> 13/04/2015
+- JTB#main() returns error codes
+
+---------------
+Version 1.4.9
+---------------
+-> ??/??/2015
+same as 1.4.8.fix_a
+
+---------------
+Version 1.4.8.fix_a
+---------------
+-> ??/01/2015
+- fixed regression (Annotator#bnfFinalActions())
+
+---------------
 Version 1.4.8
 ---------------
 -> 30/12/2014

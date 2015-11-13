@@ -336,7 +336,7 @@ public class CommentsPrinter extends JavaCCPrinter {
    * @param n - the node for the node class comment
    * @return the node class comment or null
    */
-  String nodeClassComment(final INode n) {
+  static String nodeClassComment(final INode n) {
     if (DEBUG_CLASS_COMMENTS) {
       final String s = n.toString();
       final int b = s.lastIndexOf('.') + 1;
@@ -357,7 +357,7 @@ public class CommentsPrinter extends JavaCCPrinter {
    * @param str - the extra comment
    * @return the node class comment or null
    */
-  String nodeClassComment(final INode n, final String str) {
+  static String nodeClassComment(final INode n, final String str) {
     if (DEBUG_CLASS_COMMENTS)
       return nodeClassComment(n).concat(" ").concat(str);
     else
@@ -759,8 +759,9 @@ public class CommentsPrinter extends JavaCCPrinter {
         break;
 
       default:
-        Messages.hardErr("n.f0.which = " + String.valueOf(n.f0.which));
-        break;
+        final String msg = "Invalid n.f0.which = " + String.valueOf(n.f0.which);
+        Messages.hardErr(msg);
+        throw new InternalError(msg);
 
     }
 
@@ -1031,7 +1032,7 @@ public class CommentsPrinter extends JavaCCPrinter {
    * @param aBigTag - true when more than 9 cases, false otherwise
    * @return the tag
    */
-  String compTcfTag(final String aChar, final int aIx, final boolean aBigTag) {
+  static String compTcfTag(final String aChar, final int aIx, final boolean aBigTag) {
     return aChar.concat(aIx < 10 && aBigTag ? "0" + String.valueOf(aIx) : String.valueOf(aIx))
                 .concat(" ");
   }

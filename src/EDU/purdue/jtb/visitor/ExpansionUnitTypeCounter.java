@@ -175,7 +175,9 @@ public class ExpansionUnitTypeCounter extends DepthFirstVoidVisitor {
         ++numModifiers;
         break;
       default:
-        Messages.hardErr("which = " + String.valueOf(n.f0.which));
+        final String msg = "Invalid n.f0.which = " + String.valueOf(n.f0.which);
+        Messages.hardErr(msg);
+        throw new InternalError(msg);
     }
   }
 

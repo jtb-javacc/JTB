@@ -124,7 +124,7 @@ public class Expansion_ {
    * @param indent - the number of indentation level
    * @return a {@link StringBuilder} with twice the number of spaces given by the parameter
    */
-  protected StringBuilder dumpPrefix(final int indent) {
+  protected static StringBuilder dumpPrefix(final int indent) {
     final StringBuilder sb = new StringBuilder(128);
     for (int i = 0; i < indent; i++)
       sb.append("  ");

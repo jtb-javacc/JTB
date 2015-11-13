@@ -248,7 +248,7 @@ public class Annotator extends JavaCCPrinter {
    * @param str the extra comment
    * @param aSb the buffer to print into
    */
-  void oneNewLine(final INode n, final String str, final StringBuilder aSb) {
+  static void oneNewLine(final INode n, final String str, final StringBuilder aSb) {
     aSb.append(nodeClassComment(n, str)).append(LS);
   }
 
@@ -266,7 +266,7 @@ public class Annotator extends JavaCCPrinter {
    * @param n - the node for the node class comment
    * @return the node class comment
    */
-  private String nodeClassComment(final INode n) {
+  private static String nodeClassComment(final INode n) {
     if (DEBUG_CLASS_COMMENTS) {
       final String s = n.toString();
       final int b = s.lastIndexOf('.') + 1;
@@ -287,7 +287,7 @@ public class Annotator extends JavaCCPrinter {
    * @param str - the extra comment
    * @return the node class comment
    */
-  private String nodeClassComment(final INode n, final String str) {
+  private static String nodeClassComment(final INode n, final String str) {
     if (DEBUG_CLASS_COMMENTS)
       return nodeClassComment(n).concat(" ").concat(str);
     else
@@ -989,7 +989,7 @@ public class Annotator extends JavaCCPrinter {
    * @param varName - the node's variable name
    * @return the java block
    */
-  final String addNodeToParent(final String parentName, final String varName) {
+  final static String addNodeToParent(final String parentName, final String varName) {
     return "{ ".concat(parentName).concat(".addNode(").concat(varName).concat("); }");
   }
 
@@ -1183,8 +1183,10 @@ public class Annotator extends JavaCCPrinter {
         return;
 
       default:
-        Messages.hardErr("n.f0.which = " + String.valueOf(n.f0.which));
-        return;
+        final String msg = "Invalid n.f0.which = " + String.valueOf(n.f0.which);
+        Messages.hardErr(msg);
+        throw new InternalError(msg);
+
     }
   }
 
@@ -1530,7 +1532,7 @@ public class Annotator extends JavaCCPrinter {
    * @param aSb - the buffer to print into
    * @param aVarInfo - the VarInfo variable
    */
-  void genNewNodeOptOrListOrListOptVarDecl(final StringBuilder aSb, final VarInfo aVarInfo) {
+  static void genNewNodeOptOrListOrListOptVarDecl(final StringBuilder aSb, final VarInfo aVarInfo) {
     aSb.append("{ ").append(aVarInfo.getName()).append(" = new ").append(aVarInfo.getType())
        .append("(); }");
   }
@@ -1543,8 +1545,8 @@ public class Annotator extends JavaCCPrinter {
    * @param initialize - the need to initialize flag
    * @return the new VarInfo object
    */
-  VarInfo creNewVarInfoForMod(final NodeChoice modifier, final String varName,
-                              final boolean initialize) {
+  static VarInfo creNewVarInfoForMod(final NodeChoice modifier, final String varName,
+                                     final boolean initialize) {
     if (initialize) {
       if (modifier.which == 0) // "+"
         return new VarInfo(nodeList, varName, "new ".concat(nodeList).concat("()"));
@@ -1552,8 +1554,11 @@ public class Annotator extends JavaCCPrinter {
         return new VarInfo(nodeListOpt, varName, "new ".concat(nodeListOpt).concat("()"));
       else if (modifier.which == 2) // "?"
         return new VarInfo(nodeOpt, varName, "new ".concat(nodeOpt).concat("()"));
-      else
-        Messages.hardErr("Illegal BNF modifier: '" + modifier.choice.toString() + "'.");
+      else {
+        final String msg = "Illegal EBNF modifier: '" + modifier.choice.toString() + "'.";
+        Messages.hardErr(msg);
+        throw new InternalError(msg);
+      }
     } else {
       if (modifier.which == 0) // "+"
         return new VarInfo(nodeList, varName);
@@ -1561,10 +1566,12 @@ public class Annotator extends JavaCCPrinter {
         return new VarInfo(nodeListOpt, varName);
       else if (modifier.which == 2) // "?"
         return new VarInfo(nodeOpt, varName);
-      else
-        Messages.hardErr("Illegal BNF modifier: '" + modifier.choice.toString() + "'.");
+      else {
+        final String msg = "Illegal EBNF modifier: '" + modifier.choice.toString() + "'.";
+        Messages.hardErr(msg);
+        throw new InternalError(msg);
+      }
     }
-    return null; // shouldn't happen
   }
 
   /**
@@ -1574,7 +1581,7 @@ public class Annotator extends JavaCCPrinter {
    * @param initializer - the initializer presence flag
    * @return the new VarInfo object
    */
-  VarInfo creNewVarInfoForBracket(final String varName, final boolean initializer) {
+  static VarInfo creNewVarInfoForBracket(final String varName, final boolean initializer) {
     if (initializer) {
       return new VarInfo(nodeOpt, varName, "new ".concat(nodeOpt).concat("()"));
     } else {
@@ -2447,8 +2454,10 @@ public class Annotator extends JavaCCPrinter {
           return;
 
         default:
-          Messages.hardErr("n.f0.which = " + String.valueOf(n.f0.which));
-          return;
+          final String msg = "Invalid n.f0.which = " + String.valueOf(n.f0.which);
+          Messages.hardErr(msg);
+          throw new InternalError(msg);
+
       }
     }
 

@@ -162,29 +162,25 @@ public class FilesGenerator {
   /**
    * Generates nodes (classes source) files.
    * 
-   * @throws FileExistsException - if one or more files exist and no overwrite flag has been set
+   * @throws FileExistsException if file exists
+   * @throws IOException if IO problem
    */
-  public void genNodesFiles() throws FileExistsException {
-    try {
-      boolean exists = false;
-      for (final Iterator<ClassInfo> e = classes.iterator(); e.hasNext();) {
-        final ClassInfo ci = e.next();
-        final File file = new File(nodesDir, ci.className + ".java");
-        if (noOverwrite && file.exists()) {
-          Messages.softErr(ci.className + " exists but no overwrite flag has been set");
-          exists = true;
-          break;
-        }
-        final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 2048));
-        out.print(genNodeClass(null, ci));
-        out.close();
+  public void genNodesFiles() throws FileExistsException, IOException {
+    boolean exists = false;
+    for (final Iterator<ClassInfo> e = classes.iterator(); e.hasNext();) {
+      final ClassInfo ci = e.next();
+      final File file = new File(nodesDir, ci.className + ".java");
+      if (noOverwrite && file.exists()) {
+        Messages.softErr(ci.className + " exists but no overwrite flag has been set");
+        exists = true;
+        break;
       }
-      if (noOverwrite && exists)
-        throw new FileExistsException("Some of the generated nodes classes files exist");
+      final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 2048));
+      out.print(genNodeClass(null, ci));
+      out.close();
     }
-    catch (final Exception e) {
-      Messages.hardErr(e);
-    }
+    if (noOverwrite && exists)
+      throw new FileExistsException("Some of the generated nodes classes files exist");
   }
 
   /**
@@ -195,7 +191,7 @@ public class FilesGenerator {
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the node class source
    */
-  public StringBuilder genNodeClass(final StringBuilder aSb, final ClassInfo aClassInfo) {
+  public static StringBuilder genNodeClass(final StringBuilder aSb, final ClassInfo aClassInfo) {
     final Spacing spc = new Spacing(INDENT_AMT);
     StringBuilder sb = aSb;
     if (sb == null)
@@ -221,8 +217,9 @@ public class FilesGenerator {
    * Generates the base nodes source files.
    * 
    * @throws FileExistsException - if one or more files exist and no overwrite flag has been set
+   * @throws IOException if IO problem
    */
-  public void genBaseNodesFiles() throws FileExistsException {
+  public static void genBaseNodesFiles() throws FileExistsException, IOException {
     try {
       boolean b = true;
 
@@ -241,6 +238,7 @@ public class FilesGenerator {
     }
     catch (final IOException e) {
       Messages.hardErr(e);
+      throw e;
     }
   }
 
@@ -253,8 +251,8 @@ public class FilesGenerator {
    * @throws IOException - if any IO Exception
    * @return false if the file exists and the no overwrite flag is set, true otherwise
    */
-  public boolean fillFile(final String fileName, final StringBuilder classSource)
-                                                                                 throws IOException {
+  public static boolean fillFile(final String fileName, final StringBuilder classSource)
+                                                                                        throws IOException {
     final File file = new File(nodesDirName, fileName);
 
     if (noOverwrite && file.exists())
@@ -363,8 +361,8 @@ public class FilesGenerator {
    * @param aRet - true if there is a user return parameter type, false otherwise
    * @param aArgu - true if there is a user argument parameter type, false otherwise
    */
-  void genAnyIVisitorBeg(final StringBuilder aSb, final String aComment, final String aIntf,
-                         final boolean aRet, final boolean aArgu) {
+  static void genAnyIVisitorBeg(final StringBuilder aSb, final String aComment, final String aIntf,
+                                final boolean aRet, final boolean aArgu) {
     aSb.append(genFileHeaderComment()).append(LS);
     aSb.append("package ").append(visitorsPackageName).append(";").append(LS).append(LS);
     if (!visitorsPackageName.equals(nodesPackageName))
@@ -434,8 +432,9 @@ public class FilesGenerator {
    * Generates the "RetArgu" IVisitor (interface source) file.
    * 
    * @throws FileExistsException - if the file already exists and the no overwrite flag has been set
+   * @throws IOException if IO problem
    */
-  public void genRetArguIVisitorFile() throws FileExistsException {
+  public void genRetArguIVisitorFile() throws FileExistsException, IOException {
     try {
       final File file = new File(visitorsDir, iRetArguVisitor + ".java");
 
@@ -448,6 +447,7 @@ public class FilesGenerator {
     }
     catch (final IOException e) {
       Messages.hardErr(e);
+      throw e;
     }
   }
 
@@ -455,8 +455,9 @@ public class FilesGenerator {
    * Generates the "Ret" IVisitor (interface source) file.
    * 
    * @throws FileExistsException - if the file already exists and the no overwrite flag has been set
+   * @throws IOException if IO problem
    */
-  public void genRetIVisitorFile() throws FileExistsException {
+  public void genRetIVisitorFile() throws FileExistsException, IOException {
     try {
       final File file = new File(visitorsDir, iRetVisitor + ".java");
 
@@ -469,6 +470,7 @@ public class FilesGenerator {
     }
     catch (final IOException e) {
       Messages.hardErr(e);
+      throw e;
     }
   }
 
@@ -476,8 +478,9 @@ public class FilesGenerator {
    * Generates the "VoidArgu" IVisitor (interface source) file.
    * 
    * @throws FileExistsException - if the file already exists and the no overwrite flag has been set
+   * @throws IOException if IO problem
    */
-  public void genVoidArguIVisitorFile() throws FileExistsException {
+  public void genVoidArguIVisitorFile() throws FileExistsException, IOException {
     try {
       final File file = new File(visitorsDir, iVoidArguVisitor + ".java");
 
@@ -490,6 +493,7 @@ public class FilesGenerator {
     }
     catch (final IOException e) {
       Messages.hardErr(e);
+      throw e;
     }
   }
 
@@ -497,8 +501,9 @@ public class FilesGenerator {
    * Generates the "Void" IVisitor (interface source) file.
    * 
    * @throws FileExistsException - if the file already exists and the no overwrite flag has been set
+   * @throws IOException if IO problem
    */
-  public void genVoidIVisitorFile() throws FileExistsException {
+  public void genVoidIVisitorFile() throws FileExistsException, IOException {
     try {
       final File file = new File(visitorsDir, iVoidVisitor + ".java");
 
@@ -511,6 +516,7 @@ public class FilesGenerator {
     }
     catch (final IOException e) {
       Messages.hardErr(e);
+      throw e;
     }
   }
 
@@ -521,7 +527,7 @@ public class FilesGenerator {
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the base visitor methods source
    */
-  StringBuilder genBaseRetArguVisitMethods(final StringBuilder aSb) {
+  static StringBuilder genBaseRetArguVisitMethods(final StringBuilder aSb) {
     StringBuilder sb = aSb;
     if (sb == null)
       sb = new StringBuilder(100);
@@ -555,7 +561,7 @@ public class FilesGenerator {
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the base visitor methods source
    */
-  StringBuilder genBaseRetVisitMethods(final StringBuilder aSb) {
+  static StringBuilder genBaseRetVisitMethods(final StringBuilder aSb) {
     StringBuilder sb = aSb;
     if (sb == null)
       sb = new StringBuilder(100);
@@ -589,7 +595,7 @@ public class FilesGenerator {
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the base visitor methods source
    */
-  StringBuilder genBaseVoidArguVisitMethods(final StringBuilder aSb) {
+  static StringBuilder genBaseVoidArguVisitMethods(final StringBuilder aSb) {
     StringBuilder sb = aSb;
     if (sb == null)
       sb = new StringBuilder(100);
@@ -623,7 +629,7 @@ public class FilesGenerator {
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the base visitor methods source
    */
-  StringBuilder genBaseVoidVisitMethods(final StringBuilder aSb) {
+  static StringBuilder genBaseVoidVisitMethods(final StringBuilder aSb) {
     StringBuilder sb = aSb;
     if (sb == null)
       sb = new StringBuilder(100);

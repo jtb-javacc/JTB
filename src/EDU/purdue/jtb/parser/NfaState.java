@@ -379,7 +379,7 @@ public class NfaState {
     isFinal |= other.isFinal;
   }
 
-  NfaState CreateEquivState(final List<NfaState> states) {
+  static NfaState CreateEquivState(final List<NfaState> states) {
     final NfaState newState = (states.get(0)).CreateClone();
     newState.next = new NfaState();
 
