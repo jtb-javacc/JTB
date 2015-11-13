@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>JTB 1.4.10</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <style>@import url("web/site.css");</style>
+<STYLE type="text/css">
+BODY { font-family:Arial,Helvetica,sans-serif; font-size:10pt; color:#006666; }
+h1 { font-size:14pt; }
+h2 { font-size:12pt; }
+table { font-size:10pt; }
+</STYLE>
+</head>
+<body>
+<h1><font color="red">Java Tree Builder (JTB) 1.4.10</font></h1>
+
+<h2>Last update : nov 13th, 2015 - version <font color="red">1.4.10</font></h2>
+
+<h2>Overview</h2>
+<font color="red">JTB</font> (Java Tree Builder) is a syntax tree builder and visitors generator to be used
+ in front of <a href="http://javacc.dev.java.net">JavaCC (Java Compiler Compiler)</a>.<br>
+
+It takes a JavaCC grammar file as input (you just have to change the extension from
+ "<font color="red">.jj</font>" to "<font color="red">.jtb</font>" and add a few options) and it automatically
+ generates the following:
+<ul>
+<li>a set of syntax tree classes based on the productions in the grammar,
+ utilizing the Visitor design pattern;</li>
+<li>four interfaces: <font color="red">IVoidVisitor</font>, <font color="red">IVoidArguVisitor</font>,
+ <font color="red">IRetVisitor</font>, <font color="red">IRetArguVisitor</font>;</li>
+<li>four depth-first visitors: <font color="red">DepthFirstVoidVisitor</font>,
+ <font color="red">DepthFirstVoidArguVisitor</font>,
+ <font color="red">DepthFirstRetVisitor</font>, <font color="red">DepthFirstRetArguVisitor</font>,
+ whose default methods simply visit the children of the current node;</li>
+<li>a JavaCC grammar "<font color="red">.jj</font>" file (<font color="red">jtb.out.jj</font> by default),
+ with the proper annotations to build the syntax tree during parsing (which then must be compiled with JavaCC).</li>
+</ul>
+
+New visitors, which subclass any generated one, can then override the default methods and perform various
+ operations on and manipulate the generated syntax tree.<p>
+ 
+JTB can be compared to JJTree in the following way:<ul>
+<li>in JJTree you explicitly define the nodes you want to build ; in JTB it builds by default all of them
+ (but you can tell not to build some of them),</li>
+<li>JJTree generates only interfaces for visitors and you have to code the visitors, so you "fill" them ;
+ JTB generates interfaces and "full" visitors (i.e. with all the code to visit the tree), so you just
+ "modify" them, sometimes just "reducing" them (for not visiting branches), so in a sense it is faster to
+ develop on an already generated - bullet proof - code,</li>
+<li>in JJTree, you are tempted to tune the tree, i.e. define only the nodes you need, but if you want to
+ develop different visitors, you have to think about all the nodes you want to traverse for the different
+ purposes and so you may find yourself sometimes having to enrich the grammar and  defeat what you have
+ previously done ; in JTB you have all the tree right from the beginning so adding a new visitor is not
+ disruptive,</li>
+ <li>JTB can "inline" the accept methods, i.e. it generates for a node the code to work directly on its
+ children, which is usually the right place to take decisions and to reduce the control logic (otherwise
+ you usually have to access the fathers and check their types),</li>
+<li>JJTree may be more adequate when only small trees and few visitors are needed ; JTB may be more adequate
+ when you have to work on the entire tree and build many visitors.</li>
+</ul>
+
+<h2>History</h2>
+11/2015 - 1.4.10 : added JTB.do_main() returning an int return code<p>
+08/2015 - 1.4.9 : same as 1.4.8.fix_a<p>
+01/2015 - 1.4.8.fix_a : fixed regression in jtb.out.jj generation<p>
+10/2012-12/2014 - 1.4.8 : added generation of JavaCodeProductions ('%' syntax) ; fixed bug #3164860 ; fixed
+ some messages ; fixed some problems (null choice for an empty choice, prefix / suffix management in
+ lookahead) ; checked duplicated Javacode production names ; fixed the Java grammar
+ (in ExplicitConstructorInvocation & ClassOrInterfaceBodyDeclaration) ; added annotations in the generated
+ classes ; fixed some cases and improved printing specials (comments) ; improved short names generation for
+ generated intermediate variables ; modified the warning message on ignored LOOKAHEAD (as it can actually be
+ not ignored) ; fixed java blocs generation ; some internals improvements
+ <p>
+09/2012 - 1.4.7 : added sub comments in the generated visitors java code ; did some optimizations ; fixed
+ bugs JTB-1 & JTB-2 ; fixed some generation errors ; added a check when 'n = prod()' and 'void prod()' ;
+ added the '!' syntax for not generating a node creation (in a BNFProduction, RegExprSpec and ExpansionUnit)
+ ; fixed some Java grammar issues and did some refactoring ; added column numbers in messages ; performed
+ tests on more limit cases ; fixed missing <EOF> in JavaCCInput() and missing parentheses in Annotation()<p>
+01/2011 - 1.4.6 : JTB hosted at http://java.net/projects/jtb ; new contributor (Francis Andre Kampbell) ;
+ added -va and -npfx and -nsfx options<p>
+12/2010 - 1.4.5 : Convert nodes and visitors output directories to absolute paths<p>
+7/2010 - 1.4.4 : Fixed missing space after throws issue in visiting MethodDeclaration & ConstructorDeclaration
+ of JavaPrinter; Fixed index issue in visiting TypeArguments of JavaPrinter<p>
+04/2010 - 1.4.3.2 : bug #2991455<p>
+04/2010 - 1.4.3.1 : bugs #2990962 and #2989497<p>
+03/2010 - 1.4.3 : Fixed wrong conditionals generation and TreeFormatter generation issues;
+ added node declarations initialization<p>
+02/2010 - 1.4.2 : Fixed missing java.util package in generated JTBToolkit class,
+ fixed accept inlining issue in visiting ExpansionChoices<p>
+02/2010 - 1.4.1 : Fixed wrong conditionals generation and missing static modifier for generated return types
+ issues (bug 2945965), fixed hard error in semantic checker, fixed command line options overwrite issue<p>
+11/2009 - 1.4.0 : New version delivered / integrated under the
+ <a href="http://sourceforge.net/projects/eclipse-javacc">JavaCC Eclipse Plug-in</a><p>
+xx/2005 - 1.3.2 : Last (known) version from UCLA Compilers Group 
+: see <a href="http://compilers.cs.ucla.edu/jtb/">JTB 1.3.2 home page</a><p>
+
+<h2>New Features in version 1.4.0+ / 1.4.7</h2>
+Here are the following enhancements that have been added to JTB 1.3.2:
+<ul>
+<li>Internal code</li>
+<ul>
+<li>Internal Java code extensively refactored (performances, namings, JDK 1.5 syntax, numerous fixes, ...)</li>
+<li>Internal Java code Javadoc fully revised</li>
+<li>Internal parser upgraded to version 4.2 of JavaCC, with performance enhancements</li>
+<li>Added Ant build files</li>
+</ul>
+<li>Generated code</li>
+<ul>
+<li>Renamed syntax tree and visitors interfaces and classes</li>
+<li>Generated Java code extensively refactored (performances, namings, JDK 1.5 syntax, numerous fixes, ...)</li>
+<li>Generated Java code Javadoc fully revised, specially with more detailed fields comments</li>
+<li>Special tokens fully printed in the output file (with the -tk option)</li>
+</ul>
+<li>User enhancements</li>
+<ul>
+<li>Removed "only void BNFProduction result type" limitation</li>
+<li>Removed "only non void JavaCodeProduction" limitation</li>
+<li>Added proper handling of "PrimaryExpression() = Identifier() ... | RegularExpression() ..." syntax</li>
+<li>Added a <font color="red">-ia</font> option for inlining visitor accept methods on base nodes</li>
+<li>Changed behavior of option <font color="red">-jd</font>: now turns on printing classes,
+ methods and fields javadoc comments</li>
+<li>Added a <font color="red">-dl</font> option for depth level management generation</li>
+<li>Added <font color="red">-d</font>, <font color="red">-nd</font> & <font color="red">-vd</font> options,
+ modified <font color="red">-p</font>, <font color="red">-pd</font> & <font color="red">-vp</font> options
+  (to separate directories from packages)</li>
+<li>Added input file options "<font color="red">JTB_XX</font>" (in the "options" section of the
+ "<font color="red">.jtb</font> grammar file)
+ corresponding to the command line options "<font color="red">-xx</font>"<br>
+i.e: <font color="red">JTB_O = "myout.jj"</font> <-> <font color="red">-o myout.jj</font>,
+ <font color="red">JTB_TK = true</font> <-> <font color="red">-tk</font>
+</li>
+<li>(1.4.7) Added ability to not generate a (JTB) node creation, with the '!' special character:<ul>
+<li>either in the BNFProduction declaration : e.g. :
+ void MyProd() <font color="red">!</font> : { ... }</li>
+<li>or in the RegExprSpec declaration : e.g. :
+ TOKEN : { < MyToken : "foo" > <font color="red">!</font> ... }</li>
+<li>or in ExpansionUnits where a BNFProduction or a RegExprSpec is used : e.g. :
+ void MyProd() : { ... MyProd() <font color="red">!</font> ... < MyToken> <font color="red">!</font> ...}</li>
+</ul>
+</li>
+</ul>
+</ul>
+<p>
+
+<h2>How to use</h2>
+Environment:<p>
+JTB 1.4.7 is meant to be used as a front end for JavaCC 5.0, with a 1.6.0 JDK, and so is command line by nature.<br>
+But it has been integrated within the <a href="index.html">JavaCC Eclipse Plugin<a>, which embeds the latest
+ JTB version each time is is released, and avoids running the tool on the command line.<p>
+
+On the command line:<p>
+<font color="red"><code>java -jar jtb-1.4.x.jar -h</code></font> : to view all available options<br>
+<font color="red"><code>java -jar jtb-1.4.x.jar [CL_Option] -si</code></font> : to use system.in as the input file<br>
+<font color="red"><code>java -jar jtb-1.4.x.jar [CL_Option] [input-file]</code></font> : to use input-file as the input file<br>
+<br>
+In the input file options section:<p>
+<font color="red"><code>options {(JTB_BOOL_OPT=(true|false); | JTB_STR_OPT="str";)*}</code></font><br>
+<br>
+Options are the following:<p>
+<table>
+<tr><td><font color="red">CL_Option</font></td><td><font color="red">JTB_Option</font></td><td><font color="red">Description</font></td></tr>
+<tr><td>-cl      </td><td>JTB_CL=(true|false)</td><td>Print a list of the classes generated to standard out</td></tr>
+<tr><td>-d dir   </td><td>JTB_D="dir"        </td><td>Short for (and overwrites) "-nd dir/syntaxtree -vd dir/visitor"</td></tr>
+<tr><td>-dl      </td><td>JTB_DL=(true|false)</td><td>Generate depth level info</td></tr>
+<tr><td>-e       </td><td>JTB_E=(true|false) </td><td>Suppress JTB semantic error checking</td></tr>
+<tr><td>-f       </td><td>JTB_F=(true|false) </td><td>Use descriptive node class field names</td></tr>
+<tr><td>-h       </td><td>N/A                </td><td>Display this help message and quit</td></tr>
+<tr><td>-ia      </td><td>JTB_IA=(true|false)</td><td>Inline visitors accept methods on base classes</td></tr>
+<tr><td>-jd      </td><td>JTB_JD=(true|false)</td><td>Generate JavaDoc-friendly comments in the nodes and visitor</td></tr>
+<tr><td>-nd dir  </td><td>JTB_ND="dir"       </td><td>Use dir as the package for the syntax tree nodes</td></tr>
+<tr><td>-np pkg  </td><td>JTB_NP="pkg"       </td><td>Use pkg as the package for the syntax tree nodes</td></tr>
+<tr><td>-ns class</td><td>JTB_NS="class"     </td><td>Use class as the class which all node classes will extend</td></tr>
+<tr><td>-o file  </td><td>JTB_o="file"       </td><td>Use file as the filename for the annotated output grammar</td></tr>
+<tr><td>-p pkg   </td><td>JTB_P="pkg"        </td><td>Short for (and overwrites) "-np pkg.syntaxtree -vp pkg.visitor"</td></tr>
+<tr><td>-pp      </td><td>JTB_PP=(true|false)</td><td>Generate parent pointers in all node classes</td></tr>
+<tr><td>-printer </td><td>JTB_PRINTER        </td><td>Generate a syntax tree dumping visitor</td></tr>
+<tr><td>-si      </td><td>N/A                </td><td>Read from standard input rather than a file</td></tr>
+<tr><td>-scheme  </td><td>JTB_SCHEME         </td><td>Generate Scheme records representing the grammar and a Scheme tree building visitor</td></tr>
+<tr><td>-tk      </td><td>JTB_TK=(true|false)</td><td>Generate special tokens into the tree</td></tr>
+<tr><td>-vd dir  </td><td>JTB_VD="dir"       </td><td>Use dir as the package for the default visitor classes</td></tr>
+<tr><td>-vp pkg  </td><td>JTB_VP="pkg"       </td><td>Use pkg as the package for the default visitor classes</td></tr>
+<tr><td>-w       </td><td>JTB_W=(true|false )</td><td>Do not overwrite existing files</td></tr>
+</table>
+
+<h2>Support</h2>
+Feel free to report any bug or suggest enhancement at the
+ <a href="http://sourceforge.net/tracker/?group_id=56876">JavaCC Eclipse Plug-in Sourceforge site</a>.<p>
+
+<h2>Download</h2>
+<a href="https://java.net/projects/jtb/downloads">JTB download page</a>.<p>
+
+
+<h2>License</h2>
+JTB 1.3.2 is licensed under the <a href="http://compilers.cs.ucla.edu/jtb/license.html">BSD license</a>.<br>
+JTB 1.4.x adds the <a href="http://www.gnu.org/licenses/gpl.html">GPL license</a> and the <a href="http://www.cecill.info/">CECILL license</a>.
+
+</body>
+</html>
