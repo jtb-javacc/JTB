@@ -1846,7 +1846,7 @@ ExpansionUnit ExpansionUnit(Container c) :
     { n17.addNode(n18); }
     (
       (
-        // ModMMa 07/2012 : here inside we have IA | RE instead of RE | IA in JavaCC1.5.jjt
+        // ModMMa 07/2012 : here inside we have IAS | RE instead of RE | IAS in JavaCC1.5.jjt
         // and an extra LOOKAHEAD
         LOOKAHEAD( IdentifierAsString() "(" )
         {

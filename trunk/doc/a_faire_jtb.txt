@@ -1,10 +1,18 @@
 A faire sur JTB
+- générer un visiteur de comptage (ou avec un pre et post hook)
+- voir indentation ) en toute fin de lookahead
+- dans JavaCCPrinter.saveToFile(), tester et créer les répertoires intermédiaires si l'open se plante en FNFE
 - séparer les packages nécessaires à la grammaire de ceux nécessaires pour le générateur (misc / utils / parser / xxx)
 - voir les warnings dans parser
 - voir les ajouts faits par FA ou à faire pour JavaCC 6.x
 - vérifier avec et sans les commentaires de debug
 - vérifier avec les noms longs et les noms courts pour les variables intermédiaires (dans AcceptInliner)
 - vérifier avec et sans inline
+
+Fait sur JTB en 1.4.11
+- mis des espaces entre les '<' et '>' et les noms des tokens pour qu'ils s'affichent correctement dans les javadoc (< AMONG > au lieu de <AMONG>)
+- corrigé les conditions d'apparition du "warning:  Empty choice : a NodeChoice with a 'null' choice member ..."
+- corrigé les numéros de colonne dans les messages
 
 Fait sur JTB en 1.4.10
 - ajouté la méthode JTB.do_main() et modifié les méthodes Messages.hardErr() pour ne plus appeler System.exit()

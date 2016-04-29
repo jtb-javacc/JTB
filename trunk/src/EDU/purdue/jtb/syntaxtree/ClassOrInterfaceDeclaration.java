@@ -8,7 +8,7 @@ import EDU.purdue.jtb.visitor.*;
  * Corresponding grammar:<br>
  * f0 -> ( %0 "class"<br>
  * .. .. | %1 "interface" )<br>
- * f1 -> <IDENTIFIER><br>
+ * f1 -> < IDENTIFIER ><br>
  * f2 -> [ TypeParameters() ]<br>
  * f3 -> [ ExtendsList() ]<br>
  * f4 -> [ ImplementsList() ]<br>

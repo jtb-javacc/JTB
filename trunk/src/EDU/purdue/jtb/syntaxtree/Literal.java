@@ -6,10 +6,10 @@ import EDU.purdue.jtb.visitor.*;
 /**
  * JTB node class for the production Literal:<br>
  * Corresponding grammar:<br>
- * f0 -> . %0 <INTEGER_LITERAL><br>
- * .. .. | %1 <FLOATING_POINT_LITERAL><br>
- * .. .. | %2 <CHARACTER_LITERAL><br>
- * .. .. | %3 <STRING_LITERAL><br>
+ * f0 -> . %0 < INTEGER_LITERAL ><br>
+ * .. .. | %1 < FLOATING_POINT_LITERAL ><br>
+ * .. .. | %2 < CHARACTER_LITERAL ><br>
+ * .. .. | %3 < STRING_LITERAL ><br>
  * .. .. | %4 BooleanLiteral()<br>
  * .. .. | %5 NullLiteral()<br>
  */

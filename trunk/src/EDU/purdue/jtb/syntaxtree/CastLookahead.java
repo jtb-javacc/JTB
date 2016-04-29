@@ -12,7 +12,7 @@ import EDU.purdue.jtb.visitor.*;
  * .. .. . .. #3 ( &0 "~"<br>
  * .. .. . .. .. | &1 "!"<br>
  * .. .. . .. .. | &2 "("<br>
- * .. .. . .. .. | &3 <IDENTIFIER><br>
+ * .. .. . .. .. | &3 < IDENTIFIER ><br>
  * .. .. . .. .. | &4 "this"<br>
  * .. .. . .. .. | &5 "super"<br>
  * .. .. . .. .. | &6 "new"<br>

@@ -14,7 +14,7 @@ import EDU.purdue.jtb.visitor.*;
  * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
  * .. .. . .. .. . .. $2 [ "!" ]<br>
  * .. .. . .. .. | &1 $0 RegularExpression()<br>
- * .. .. . .. .. . .. $1 [ ?0 "." ?1 <IDENTIFIER> ]<br>
+ * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ]<br>
  * .. .. . .. .. . .. $2 [ "!" ] )<br>
  * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
  * .. .. . .. #3 ( &0 "+"<br>

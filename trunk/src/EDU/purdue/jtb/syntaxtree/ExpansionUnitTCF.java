@@ -10,7 +10,7 @@ import EDU.purdue.jtb.visitor.*;
  * f1 -> "{"<br>
  * f2 -> ExpansionChoices()<br>
  * f3 -> "}"<br>
- * f4 -> ( #0 "catch" #1 "(" #2 Name() #3 <IDENTIFIER> #4 ")" #5 Block() )*<br>
+ * f4 -> ( #0 "catch" #1 "(" #2 Name() #3 < IDENTIFIER > #4 ")" #5 Block() )*<br>
  * f5 -> [ #0 "finally" #1 Block() ]<br>
  */
 public class ExpansionUnitTCF implements INode {

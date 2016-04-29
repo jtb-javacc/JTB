@@ -6,9 +6,9 @@ import EDU.purdue.jtb.visitor.*;
 /**
  * JTB node class for the production ClassOrInterfaceType:<br>
  * Corresponding grammar:<br>
- * f0 -> <IDENTIFIER><br>
+ * f0 -> < IDENTIFIER ><br>
  * f1 -> [ TypeArguments() ]<br>
- * f2 -> ( #0 "." #1 <IDENTIFIER><br>
+ * f2 -> ( #0 "." #1 < IDENTIFIER ><br>
  * .. .. . #2 [ TypeArguments() ] )*<br>
  */
 public class ClassOrInterfaceType implements INode {
