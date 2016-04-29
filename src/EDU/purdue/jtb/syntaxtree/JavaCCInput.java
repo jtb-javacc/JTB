@@ -17,7 +17,7 @@ import EDU.purdue.jtb.visitor.*;
  * f8 -> IdentifierAsString()<br>
  * f9 -> ")"<br>
  * f10 -> ( Production() )+<br>
- * f11 -> <EOF><br>
+ * f11 -> < EOF ><br>
  */
 public class JavaCCInput implements INode {
 

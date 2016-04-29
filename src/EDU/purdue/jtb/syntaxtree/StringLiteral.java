@@ -6,7 +6,7 @@ import EDU.purdue.jtb.visitor.*;
 /**
  * JTB node class for the production StringLiteral:<br>
  * Corresponding grammar:<br>
- * f0 -> <STRING_LITERAL><br>
+ * f0 -> < STRING_LITERAL ><br>
  */
 public class StringLiteral implements INode {
 

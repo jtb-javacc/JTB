@@ -193,6 +193,8 @@ import EDU.purdue.jtb.syntaxtree.StringLiteral;
  *          1.4.8 : 11/2014 : MMa : fixed IOOBE & NPE issues around TCF handling<br>
  *          1.4.8 : 11/2014 : MMa : updated for NodeDescriptor in {@link #visit(Expansion)} 1.4.8 :
  *          12/2014 : MMa : improved some debug printing ; added some finals
+ * @version 1.4.11 : 03/2016 : MMa : fixed spaces between brackets and identifiers in generated
+ *          comments
  */
 public class CommentsPrinter extends JavaCCPrinter {
 
@@ -376,22 +378,14 @@ public class CommentsPrinter extends JavaCCPrinter {
     for (int i = 0; i < len; ++i) {
       final char c = n.tokenImage.charAt(i);
       if (c == '<') {
-        i++;
-        if (i < len) {
-          final char d = n.tokenImage.charAt(i);
-          curCtn.addId("< ");
-          if (d != ' ') {
-            curCtn.addId(d);
-          }
-        } else {
-          curCtn.addId('<');
-        }
+        // tokenImage is single character, add space !
+        curCtn.addId("< ");
+
       } else if (c == '>') {
-        if (i != 0 && ' ' != n.tokenImage.charAt(i - 1)) {
-          curCtn.addId(' ');
-        }
-        curCtn.addId('>');
+        // tokenImage is single character, add space !
+        curCtn.addId(" >");
       } else {
+        // there should be no '<' nor '>'
         curCtn.addId(c);
       }
     }

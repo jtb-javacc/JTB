@@ -156,7 +156,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
    * f8 -> IdentifierAsString()<br>
    * f9 -> ")"<br>
    * f10 -> ( Production() )+<br>
-   * f11 -> <EOF><br>
+   * f11 -> < EOF ><br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -201,7 +201,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
       final INode lsteai = n10.elementAt(i);
       nRes = lsteai.accept(this, argu);
     }
-    // f11 -> <EOF>
+    // f11 -> < EOF >
     final NodeToken n11 = n.f11;
     nRes = n11.accept(this, argu);
     return nRes;
@@ -252,7 +252,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   /**
    * Visits a {@link OptionBinding} node, whose children are the following :
    * <p>
-   * f0 -> ( %0 <IDENTIFIER><br>
+   * f0 -> ( %0 < IDENTIFIER ><br>
    * .. .. | %1 "LOOKAHEAD"<br>
    * .. .. | %2 "IGNORE_CASE"<br>
    * .. .. | %3 "static" )<br>
@@ -269,7 +269,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   @Override
   public R visit(final OptionBinding n, final A argu) {
     R nRes = null;
-    // f0 -> ( %0 <IDENTIFIER>
+    // f0 -> ( %0 < IDENTIFIER >
     // .. .. | %1 "LOOKAHEAD"
     // .. .. | %2 "IGNORE_CASE"
     // .. .. | %3 "static" )
@@ -278,7 +278,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
     final INode ich = nch.choice;
     switch (nch.which) {
       case 0:
-        // %0 <IDENTIFIER>
+        // %0 < IDENTIFIER >
         nRes = ich.accept(this, argu);
         break;
       case 1:
@@ -587,8 +587,8 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
    * Visits a {@link RegularExprProduction} node, whose children are the following :
    * <p>
    * f0 -> [ %0 #0 "<" #1 "*" #2 ">"<br>
-   * .. .. | %1 #0 "<" #1 <IDENTIFIER><br>
-   * .. .. . .. #2 ( $0 "," $1 <IDENTIFIER> )*<br>
+   * .. .. | %1 #0 "<" #1 < IDENTIFIER ><br>
+   * .. .. . .. #2 ( $0 "," $1 < IDENTIFIER > )*<br>
    * .. .. . .. #3 ">" ]<br>
    * f1 -> RegExprKind()<br>
    * f2 -> [ #0 "[" #1 "IGNORE_CASE" #2 "]" ]<br>
@@ -606,8 +606,8 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final RegularExprProduction n, final A argu) {
     R nRes = null;
     // f0 -> [ %0 #0 "<" #1 "*" #2 ">"
-    // .. .. | %1 #0 "<" #1 <IDENTIFIER>
-    // .. .. . .. #2 ( $0 "," $1 <IDENTIFIER> )*
+    // .. .. | %1 #0 "<" #1 < IDENTIFIER >
+    // .. .. . .. #2 ( $0 "," $1 < IDENTIFIER > )*
     // .. .. . .. #3 ">" ]
     final NodeOptional n0 = n.f0;
     if (n0.present()) {
@@ -628,17 +628,17 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
           nRes = seq3.accept(this, argu);
           break;
         case 1:
-          // %1 #0 "<" #1 <IDENTIFIER>
-          // .. #2 ( $0 "," $1 <IDENTIFIER> )*
+          // %1 #0 "<" #1 < IDENTIFIER >
+          // .. #2 ( $0 "," $1 < IDENTIFIER > )*
           // .. #3 ">"
           final NodeSequence seq4 = (NodeSequence) ich;
           // #0 "<"
           final INode seq5 = seq4.elementAt(0);
           nRes = seq5.accept(this, argu);
-          // #1 <IDENTIFIER>
+          // #1 < IDENTIFIER >
           final INode seq6 = seq4.elementAt(1);
           nRes = seq6.accept(this, argu);
-          // #2 ( $0 "," $1 <IDENTIFIER> )*
+          // #2 ( $0 "," $1 < IDENTIFIER > )*
           final INode seq7 = seq4.elementAt(2);
           final NodeListOptional nlo = (NodeListOptional) seq7;
           if (nlo.present()) {
@@ -648,7 +648,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
               // $0 ","
               final INode seq9 = seq8.elementAt(0);
               nRes = seq9.accept(this, argu);
-              // $1 <IDENTIFIER>
+              // $1 < IDENTIFIER >
               final INode seq10 = seq8.elementAt(1);
               nRes = seq10.accept(this, argu);
             }
@@ -785,7 +785,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
    * f0 -> RegularExpression()<br>
    * f1 -> [ "!" ]<br>
    * f2 -> [ Block() ]<br>
-   * f3 -> [ #0 ":" #1 <IDENTIFIER> ]<br>
+   * f3 -> [ #0 ":" #1 < IDENTIFIER > ]<br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -807,14 +807,14 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
     if (n2.present()) {
       nRes = n2.accept(this, argu);
     }
-    // f3 -> [ #0 ":" #1 <IDENTIFIER> ]
+    // f3 -> [ #0 ":" #1 < IDENTIFIER > ]
     final NodeOptional n3 = n.f3;
     if (n3.present()) {
       final NodeSequence seq = (NodeSequence) n3.node;
       // #0 ":"
       final INode seq1 = seq.elementAt(0);
       nRes = seq1.accept(this, argu);
-      // #1 <IDENTIFIER>
+      // #1 < IDENTIFIER >
       final INode seq2 = seq.elementAt(1);
       nRes = seq2.accept(this, argu);
     }
@@ -957,7 +957,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
    * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
    * .. .. . .. .. . .. $2 [ "!" ]<br>
    * .. .. . .. .. | &1 $0 RegularExpression()<br>
-   * .. .. . .. .. . .. $1 [ ?0 "." ?1 <IDENTIFIER> ]<br>
+   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ]<br>
    * .. .. . .. .. . .. $2 [ "!" ] )<br>
    * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
    * .. .. . .. #3 ( &0 "+"<br>
@@ -979,7 +979,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
     // .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()
     // .. .. . .. .. . .. $2 [ "!" ]
     // .. .. . .. .. | &1 $0 RegularExpression()
-    // .. .. . .. .. . .. $1 [ ?0 "." ?1 <IDENTIFIER> ]
+    // .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
     // .. .. . .. .. . .. $2 [ "!" ] )
     // .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"
     // .. .. . .. #3 ( &0 "+"
@@ -1030,7 +1030,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
         // .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()
         // .. .. .. $2 [ "!" ]
         // .. .. | &1 $0 RegularExpression()
-        // .. .. .. $1 [ ?0 "." ?1 <IDENTIFIER> ]
+        // .. .. .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
         // .. .. .. $2 [ "!" ] )
         final NodeSequence seq9 = (NodeSequence) ich;
         // #0 [ $0 PrimaryExpression() $1 "=" ]
@@ -1048,7 +1048,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
         // #1 ( &0 $0 IdentifierAsString() $1 Arguments()
         // .. .. $2 [ "!" ]
         // .. | &1 $0 RegularExpression()
-        // .. .. $1 [ ?0 "." ?1 <IDENTIFIER> ]
+        // .. .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
         // .. .. $2 [ "!" ] )
         final INode seq14 = seq9.elementAt(1);
         final NodeChoice nch1 = (NodeChoice) seq14;
@@ -1073,13 +1073,13 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
             break;
           case 1:
             // &1 $0 RegularExpression()
-            // .. $1 [ ?0 "." ?1 <IDENTIFIER> ]
+            // .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
             // .. $2 [ "!" ]
             final NodeSequence seq19 = (NodeSequence) ich1;
             // $0 RegularExpression()
             final INode seq20 = seq19.elementAt(0);
             nRes = seq20.accept(this, argu);
-            // $1 [ ?0 "." ?1 <IDENTIFIER> ]
+            // $1 [ ?0 "." ?1 < IDENTIFIER > ]
             final INode seq21 = seq19.elementAt(1);
             final NodeOptional opt2 = (NodeOptional) seq21;
             if (opt2.present()) {
@@ -1087,7 +1087,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
               // ?0 "."
               final INode seq23 = seq22.elementAt(0);
               nRes = seq23.accept(this, argu);
-              // ?1 <IDENTIFIER>
+              // ?1 < IDENTIFIER >
               final INode seq24 = seq22.elementAt(1);
               nRes = seq24.accept(this, argu);
             }
@@ -1159,7 +1159,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
    * f1 -> "{"<br>
    * f2 -> ExpansionChoices()<br>
    * f3 -> "}"<br>
-   * f4 -> ( #0 "catch" #1 "(" #2 Name() #3 <IDENTIFIER> #4 ")" #5 Block() )*<br>
+   * f4 -> ( #0 "catch" #1 "(" #2 Name() #3 < IDENTIFIER > #4 ")" #5 Block() )*<br>
    * f5 -> [ #0 "finally" #1 Block() ]<br>
    *
    * @param n - the node to visit
@@ -1181,7 +1181,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
     // f3 -> "}"
     final NodeToken n3 = n.f3;
     nRes = n3.accept(this, argu);
-    // f4 -> ( #0 "catch" #1 "(" #2 Name() #3 <IDENTIFIER> #4 ")" #5 Block() )*
+    // f4 -> ( #0 "catch" #1 "(" #2 Name() #3 < IDENTIFIER > #4 ")" #5 Block() )*
     final NodeListOptional n4 = n.f4;
     if (n4.present()) {
       for (int i = 0; i < n4.size(); i++) {
@@ -1196,7 +1196,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
         // #2 Name()
         final INode seq3 = seq.elementAt(2);
         nRes = seq3.accept(this, argu);
-        // #3 <IDENTIFIER>
+        // #3 < IDENTIFIER >
         final INode seq4 = seq.elementAt(3);
         nRes = seq4.accept(this, argu);
         // #4 ")"
@@ -1608,7 +1608,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   /**
    * Visits a {@link IdentifierAsString} node, whose child is the following :
    * <p>
-   * f0 -> <IDENTIFIER><br>
+   * f0 -> < IDENTIFIER ><br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -1617,7 +1617,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   @Override
   public R visit(final IdentifierAsString n, final A argu) {
     R nRes = null;
-    // f0 -> <IDENTIFIER>
+    // f0 -> < IDENTIFIER >
     final NodeToken n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
@@ -1626,7 +1626,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   /**
    * Visits a {@link JavaIdentifier} node, whose child is the following :
    * <p>
-   * f0 -> ( %00 <IDENTIFIER><br>
+   * f0 -> ( %00 < IDENTIFIER ><br>
    * .. .. | %01 "LOOKAHEAD"<br>
    * .. .. | %02 "IGNORE_CASE"<br>
    * .. .. | %03 "PARSER_BEGIN"<br>
@@ -1646,7 +1646,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   @Override
   public R visit(final JavaIdentifier n, final A argu) {
     R nRes = null;
-    // f0 -> ( %00 <IDENTIFIER>
+    // f0 -> ( %00 < IDENTIFIER >
     // .. .. | %01 "LOOKAHEAD"
     // .. .. | %02 "IGNORE_CASE"
     // .. .. | %03 "PARSER_BEGIN"
@@ -1663,7 +1663,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
     final INode ich = nch.choice;
     switch (nch.which) {
       case 0:
-        // %00 <IDENTIFIER>
+        // %00 < IDENTIFIER >
         nRes = ich.accept(this, argu);
         break;
       case 1:
@@ -1997,7 +1997,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
    * <p>
    * f0 -> ( %0 "class"<br>
    * .. .. | %1 "interface" )<br>
-   * f1 -> <IDENTIFIER><br>
+   * f1 -> < IDENTIFIER ><br>
    * f2 -> [ TypeParameters() ]<br>
    * f3 -> [ ExtendsList() ]<br>
    * f4 -> [ ImplementsList() ]<br>
@@ -2028,7 +2028,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
         // should not occur !!!
         break;
     }
-    // f1 -> <IDENTIFIER>
+    // f1 -> < IDENTIFIER >
     final NodeToken n1 = n.f1;
     nRes = n1.accept(this, argu);
     // f2 -> [ TypeParameters() ]
@@ -2130,7 +2130,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
    * Visits a {@link EnumDeclaration} node, whose children are the following :
    * <p>
    * f0 -> "enum"<br>
-   * f1 -> <IDENTIFIER><br>
+   * f1 -> < IDENTIFIER ><br>
    * f2 -> [ ImplementsList() ]<br>
    * f3 -> EnumBody()<br>
    *
@@ -2144,7 +2144,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
     // f0 -> "enum"
     final NodeToken n0 = n.f0;
     nRes = n0.accept(this, argu);
-    // f1 -> <IDENTIFIER>
+    // f1 -> < IDENTIFIER >
     final NodeToken n1 = n.f1;
     nRes = n1.accept(this, argu);
     // f2 -> [ ImplementsList() ]
@@ -2236,7 +2236,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
    * Visits a {@link EnumConstant} node, whose children are the following :
    * <p>
    * f0 -> Modifiers()<br>
-   * f1 -> <IDENTIFIER><br>
+   * f1 -> < IDENTIFIER ><br>
    * f2 -> [ Arguments() ]<br>
    * f3 -> [ ClassOrInterfaceBody() ]<br>
    *
@@ -2250,7 +2250,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
     // f0 -> Modifiers()
     final Modifiers n0 = n.f0;
     nRes = n0.accept(this, argu);
-    // f1 -> <IDENTIFIER>
+    // f1 -> < IDENTIFIER >
     final NodeToken n1 = n.f1;
     nRes = n1.accept(this, argu);
     // f2 -> [ Arguments() ]
@@ -2310,7 +2310,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   /**
    * Visits a {@link TypeParameter} node, whose children are the following :
    * <p>
-   * f0 -> <IDENTIFIER><br>
+   * f0 -> < IDENTIFIER ><br>
    * f1 -> [ TypeBound() ]<br>
    *
    * @param n - the node to visit
@@ -2320,7 +2320,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   @Override
   public R visit(final TypeParameter n, final A argu) {
     R nRes = null;
-    // f0 -> <IDENTIFIER>
+    // f0 -> < IDENTIFIER >
     final NodeToken n0 = n.f0;
     nRes = n0.accept(this, argu);
     // f1 -> [ TypeBound() ]
@@ -2571,7 +2571,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   /**
    * Visits a {@link VariableDeclaratorId} node, whose children are the following :
    * <p>
-   * f0 -> <IDENTIFIER><br>
+   * f0 -> < IDENTIFIER ><br>
    * f1 -> ( #0 "[" #1 "]" )*<br>
    *
    * @param n - the node to visit
@@ -2581,7 +2581,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   @Override
   public R visit(final VariableDeclaratorId n, final A argu) {
     R nRes = null;
-    // f0 -> <IDENTIFIER>
+    // f0 -> < IDENTIFIER >
     final NodeToken n0 = n.f0;
     nRes = n0.accept(this, argu);
     // f1 -> ( #0 "[" #1 "]" )*
@@ -2751,7 +2751,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   /**
    * Visits a {@link MethodDeclarator} node, whose children are the following :
    * <p>
-   * f0 -> <IDENTIFIER><br>
+   * f0 -> < IDENTIFIER ><br>
    * f1 -> FormalParameters()<br>
    * f2 -> ( #0 "[" #1 "]" )*<br>
    *
@@ -2762,7 +2762,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   @Override
   public R visit(final MethodDeclarator n, final A argu) {
     R nRes = null;
-    // f0 -> <IDENTIFIER>
+    // f0 -> < IDENTIFIER >
     final NodeToken n0 = n.f0;
     nRes = n0.accept(this, argu);
     // f1 -> FormalParameters()
@@ -2869,7 +2869,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
    * Visits a {@link ConstructorDeclaration} node, whose children are the following :
    * <p>
    * f0 -> [ TypeParameters() ]<br>
-   * f1 -> <IDENTIFIER><br>
+   * f1 -> < IDENTIFIER ><br>
    * f2 -> FormalParameters()<br>
    * f3 -> [ #0 "throws" #1 NameList() ]<br>
    * f4 -> "{"<br>
@@ -2889,7 +2889,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
     if (n0.present()) {
       nRes = n0.accept(this, argu);
     }
-    // f1 -> <IDENTIFIER>
+    // f1 -> < IDENTIFIER >
     final NodeToken n1 = n.f1;
     nRes = n1.accept(this, argu);
     // f2 -> FormalParameters()
@@ -3190,9 +3190,9 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   /**
    * Visits a {@link ClassOrInterfaceType} node, whose children are the following :
    * <p>
-   * f0 -> <IDENTIFIER><br>
+   * f0 -> < IDENTIFIER ><br>
    * f1 -> [ TypeArguments() ]<br>
-   * f2 -> ( #0 "." #1 <IDENTIFIER><br>
+   * f2 -> ( #0 "." #1 < IDENTIFIER ><br>
    * .. .. . #2 [ TypeArguments() ] )*<br>
    *
    * @param n - the node to visit
@@ -3202,7 +3202,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   @Override
   public R visit(final ClassOrInterfaceType n, final A argu) {
     R nRes = null;
-    // f0 -> <IDENTIFIER>
+    // f0 -> < IDENTIFIER >
     final NodeToken n0 = n.f0;
     nRes = n0.accept(this, argu);
     // f1 -> [ TypeArguments() ]
@@ -3210,7 +3210,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
     if (n1.present()) {
       nRes = n1.accept(this, argu);
     }
-    // f2 -> ( #0 "." #1 <IDENTIFIER>
+    // f2 -> ( #0 "." #1 < IDENTIFIER >
     // .. .. . #2 [ TypeArguments() ] )*
     final NodeListOptional n2 = n.f2;
     if (n2.present()) {
@@ -3220,7 +3220,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
         // #0 "."
         final INode seq1 = seq.elementAt(0);
         nRes = seq1.accept(this, argu);
-        // #1 <IDENTIFIER>
+        // #1 < IDENTIFIER >
         final INode seq2 = seq.elementAt(1);
         nRes = seq2.accept(this, argu);
         // #2 [ TypeArguments() ]
@@ -4403,7 +4403,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
    * .. .. . .. #3 ( &0 "~"<br>
    * .. .. . .. .. | &1 "!"<br>
    * .. .. . .. .. | &2 "("<br>
-   * .. .. . .. .. | &3 <IDENTIFIER><br>
+   * .. .. . .. .. | &3 < IDENTIFIER ><br>
    * .. .. . .. .. | &4 "this"<br>
    * .. .. . .. .. | &5 "super"<br>
    * .. .. . .. .. | &6 "new"<br>
@@ -4422,7 +4422,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
     // .. .. . .. #3 ( &0 "~"
     // .. .. . .. .. | &1 "!"
     // .. .. . .. .. | &2 "("
-    // .. .. . .. .. | &3 <IDENTIFIER>
+    // .. .. . .. .. | &3 < IDENTIFIER >
     // .. .. . .. .. | &4 "this"
     // .. .. . .. .. | &5 "super"
     // .. .. . .. .. | &6 "new"
@@ -4461,7 +4461,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
         // .. #3 ( &0 "~"
         // .. .. | &1 "!"
         // .. .. | &2 "("
-        // .. .. | &3 <IDENTIFIER>
+        // .. .. | &3 < IDENTIFIER >
         // .. .. | &4 "this"
         // .. .. | &5 "super"
         // .. .. | &6 "new"
@@ -4479,7 +4479,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
         // #3 ( &0 "~"
         // .. | &1 "!"
         // .. | &2 "("
-        // .. | &3 <IDENTIFIER>
+        // .. | &3 < IDENTIFIER >
         // .. | &4 "this"
         // .. | &5 "super"
         // .. | &6 "new"
@@ -4501,7 +4501,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
             nRes = ich1.accept(this, argu);
             break;
           case 3:
-            // &3 <IDENTIFIER>
+            // &3 < IDENTIFIER >
             nRes = ich1.accept(this, argu);
             break;
           case 4:
@@ -4661,7 +4661,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
    * <p>
    * f0 -> "."<br>
    * f1 -> TypeArguments()<br>
-   * f2 -> <IDENTIFIER><br>
+   * f2 -> < IDENTIFIER ><br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -4676,7 +4676,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
     // f1 -> TypeArguments()
     final TypeArguments n1 = n.f1;
     nRes = n1.accept(this, argu);
-    // f2 -> <IDENTIFIER>
+    // f2 -> < IDENTIFIER >
     final NodeToken n2 = n.f2;
     nRes = n2.accept(this, argu);
     return nRes;
@@ -4687,7 +4687,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
    * <p>
    * f0 -> . %0 Literal()<br>
    * .. .. | %1 "this"<br>
-   * .. .. | %2 #0 "super" #1 "." #2 <IDENTIFIER><br>
+   * .. .. | %2 #0 "super" #1 "." #2 < IDENTIFIER ><br>
    * .. .. | %3 #0 "(" #1 Expression() #2 ")"<br>
    * .. .. | %4 AllocationExpression()<br>
    * .. .. | %5 #0 ResultType() #1 "." #2 "class"<br>
@@ -4702,7 +4702,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
     R nRes = null;
     // f0 -> . %0 Literal()
     // .. .. | %1 "this"
-    // .. .. | %2 #0 "super" #1 "." #2 <IDENTIFIER>
+    // .. .. | %2 #0 "super" #1 "." #2 < IDENTIFIER >
     // .. .. | %3 #0 "(" #1 Expression() #2 ")"
     // .. .. | %4 AllocationExpression()
     // .. .. | %5 #0 ResultType() #1 "." #2 "class"
@@ -4719,7 +4719,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
         nRes = ich.accept(this, argu);
         break;
       case 2:
-        // %2 #0 "super" #1 "." #2 <IDENTIFIER>
+        // %2 #0 "super" #1 "." #2 < IDENTIFIER >
         final NodeSequence seq = (NodeSequence) ich;
         // #0 "super"
         final INode seq1 = seq.elementAt(0);
@@ -4727,7 +4727,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
         // #1 "."
         final INode seq2 = seq.elementAt(1);
         nRes = seq2.accept(this, argu);
-        // #2 <IDENTIFIER>
+        // #2 < IDENTIFIER >
         final INode seq3 = seq.elementAt(2);
         nRes = seq3.accept(this, argu);
         break;
@@ -4779,7 +4779,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
    * .. .. | %1 #0 "." #1 AllocationExpression()<br>
    * .. .. | %2 MemberSelector()<br>
    * .. .. | %3 #0 "[" #1 Expression() #2 "]"<br>
-   * .. .. | %4 #0 "." #1 <IDENTIFIER><br>
+   * .. .. | %4 #0 "." #1 < IDENTIFIER ><br>
    * .. .. | %5 Arguments()<br>
    *
    * @param n - the node to visit
@@ -4793,7 +4793,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
     // .. .. | %1 #0 "." #1 AllocationExpression()
     // .. .. | %2 MemberSelector()
     // .. .. | %3 #0 "[" #1 Expression() #2 "]"
-    // .. .. | %4 #0 "." #1 <IDENTIFIER>
+    // .. .. | %4 #0 "." #1 < IDENTIFIER >
     // .. .. | %5 Arguments()
     final NodeChoice nch = n.f0;
     final INode ich = nch.choice;
@@ -4836,12 +4836,12 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
         nRes = seq9.accept(this, argu);
         break;
       case 4:
-        // %4 #0 "." #1 <IDENTIFIER>
+        // %4 #0 "." #1 < IDENTIFIER >
         final NodeSequence seq10 = (NodeSequence) ich;
         // #0 "."
         final INode seq11 = seq10.elementAt(0);
         nRes = seq11.accept(this, argu);
-        // #1 <IDENTIFIER>
+        // #1 < IDENTIFIER >
         final INode seq12 = seq10.elementAt(1);
         nRes = seq12.accept(this, argu);
         break;
@@ -4859,10 +4859,10 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   /**
    * Visits a {@link Literal} node, whose child is the following :
    * <p>
-   * f0 -> . %0 <INTEGER_LITERAL><br>
-   * .. .. | %1 <FLOATING_POINT_LITERAL><br>
-   * .. .. | %2 <CHARACTER_LITERAL><br>
-   * .. .. | %3 <STRING_LITERAL><br>
+   * f0 -> . %0 < INTEGER_LITERAL ><br>
+   * .. .. | %1 < FLOATING_POINT_LITERAL ><br>
+   * .. .. | %2 < CHARACTER_LITERAL ><br>
+   * .. .. | %3 < STRING_LITERAL ><br>
    * .. .. | %4 BooleanLiteral()<br>
    * .. .. | %5 NullLiteral()<br>
    *
@@ -4873,29 +4873,29 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   @Override
   public R visit(final Literal n, final A argu) {
     R nRes = null;
-    // f0 -> . %0 <INTEGER_LITERAL>
-    // .. .. | %1 <FLOATING_POINT_LITERAL>
-    // .. .. | %2 <CHARACTER_LITERAL>
-    // .. .. | %3 <STRING_LITERAL>
+    // f0 -> . %0 < INTEGER_LITERAL >
+    // .. .. | %1 < FLOATING_POINT_LITERAL >
+    // .. .. | %2 < CHARACTER_LITERAL >
+    // .. .. | %3 < STRING_LITERAL >
     // .. .. | %4 BooleanLiteral()
     // .. .. | %5 NullLiteral()
     final NodeChoice nch = n.f0;
     final INode ich = nch.choice;
     switch (nch.which) {
       case 0:
-        // %0 <INTEGER_LITERAL>
+        // %0 < INTEGER_LITERAL >
         nRes = ich.accept(this, argu);
         break;
       case 1:
-        // %1 <FLOATING_POINT_LITERAL>
+        // %1 < FLOATING_POINT_LITERAL >
         nRes = ich.accept(this, argu);
         break;
       case 2:
-        // %2 <CHARACTER_LITERAL>
+        // %2 < CHARACTER_LITERAL >
         nRes = ich.accept(this, argu);
         break;
       case 3:
-        // %3 <STRING_LITERAL>
+        // %3 < STRING_LITERAL >
         nRes = ich.accept(this, argu);
         break;
       case 4:
@@ -4916,7 +4916,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   /**
    * Visits a {@link IntegerLiteral} node, whose child is the following :
    * <p>
-   * f0 -> <INTEGER_LITERAL><br>
+   * f0 -> < INTEGER_LITERAL ><br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -4925,7 +4925,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   @Override
   public R visit(final IntegerLiteral n, final A argu) {
     R nRes = null;
-    // f0 -> <INTEGER_LITERAL>
+    // f0 -> < INTEGER_LITERAL >
     final NodeToken n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
@@ -4967,7 +4967,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   /**
    * Visits a {@link StringLiteral} node, whose child is the following :
    * <p>
-   * f0 -> <STRING_LITERAL><br>
+   * f0 -> < STRING_LITERAL ><br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -4976,7 +4976,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   @Override
   public R visit(final StringLiteral n, final A argu) {
     R nRes = null;
-    // f0 -> <STRING_LITERAL>
+    // f0 -> < STRING_LITERAL >
     final NodeToken n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
@@ -5406,7 +5406,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   /**
    * Visits a {@link LabeledStatement} node, whose children are the following :
    * <p>
-   * f0 -> <IDENTIFIER><br>
+   * f0 -> < IDENTIFIER ><br>
    * f1 -> ":"<br>
    * f2 -> Statement()<br>
    *
@@ -5417,7 +5417,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   @Override
   public R visit(final LabeledStatement n, final A argu) {
     R nRes = null;
-    // f0 -> <IDENTIFIER>
+    // f0 -> < IDENTIFIER >
     final NodeToken n0 = n.f0;
     nRes = n0.accept(this, argu);
     // f1 -> ":"
@@ -5922,7 +5922,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
    * <p>
    * f0 -> "for"<br>
    * f1 -> "("<br>
-   * f2 -> ( %0 #0 VariableModifiers() #1 Type() #2 <IDENTIFIER> #3 ":" #4 Expression()<br>
+   * f2 -> ( %0 #0 VariableModifiers() #1 Type() #2 < IDENTIFIER > #3 ":" #4 Expression()<br>
    * .. .. | %1 #0 [ ForInit() ]<br>
    * .. .. . .. #1 ";"<br>
    * .. .. . .. #2 [ Expression() ]<br>
@@ -5944,7 +5944,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
     // f1 -> "("
     final NodeToken n1 = n.f1;
     nRes = n1.accept(this, argu);
-    // f2 -> ( %0 #0 VariableModifiers() #1 Type() #2 <IDENTIFIER> #3 ":" #4 Expression()
+    // f2 -> ( %0 #0 VariableModifiers() #1 Type() #2 < IDENTIFIER > #3 ":" #4 Expression()
     // .. .. | %1 #0 [ ForInit() ]
     // .. .. . .. #1 ";"
     // .. .. . .. #2 [ Expression() ]
@@ -5955,7 +5955,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
     final INode ich = nch.choice;
     switch (nch.which) {
       case 0:
-        // %0 #0 VariableModifiers() #1 Type() #2 <IDENTIFIER> #3 ":" #4 Expression()
+        // %0 #0 VariableModifiers() #1 Type() #2 < IDENTIFIER > #3 ":" #4 Expression()
         final NodeSequence seq = (NodeSequence) ich;
         // #0 VariableModifiers()
         final INode seq1 = seq.elementAt(0);
@@ -5963,7 +5963,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
         // #1 Type()
         final INode seq2 = seq.elementAt(1);
         nRes = seq2.accept(this, argu);
-        // #2 <IDENTIFIER>
+        // #2 < IDENTIFIER >
         final INode seq3 = seq.elementAt(2);
         nRes = seq3.accept(this, argu);
         // #3 ":"
@@ -6106,7 +6106,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
    * Visits a {@link BreakStatement} node, whose children are the following :
    * <p>
    * f0 -> "break"<br>
-   * f1 -> [ <IDENTIFIER> ]<br>
+   * f1 -> [ < IDENTIFIER > ]<br>
    * f2 -> ";"<br>
    *
    * @param n - the node to visit
@@ -6119,7 +6119,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
     // f0 -> "break"
     final NodeToken n0 = n.f0;
     nRes = n0.accept(this, argu);
-    // f1 -> [ <IDENTIFIER> ]
+    // f1 -> [ < IDENTIFIER > ]
     final NodeOptional n1 = n.f1;
     if (n1.present()) {
       nRes = n1.accept(this, argu);
@@ -6134,7 +6134,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
    * Visits a {@link ContinueStatement} node, whose children are the following :
    * <p>
    * f0 -> "continue"<br>
-   * f1 -> [ <IDENTIFIER> ]<br>
+   * f1 -> [ < IDENTIFIER > ]<br>
    * f2 -> ";"<br>
    *
    * @param n - the node to visit
@@ -6147,7 +6147,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
     // f0 -> "continue"
     final NodeToken n0 = n.f0;
     nRes = n0.accept(this, argu);
-    // f1 -> [ <IDENTIFIER> ]
+    // f1 -> [ < IDENTIFIER > ]
     final NodeOptional n1 = n.f1;
     if (n1.present()) {
       nRes = n1.accept(this, argu);
@@ -6471,7 +6471,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   /**
    * Visits a {@link MemberValuePair} node, whose children are the following :
    * <p>
-   * f0 -> <IDENTIFIER><br>
+   * f0 -> < IDENTIFIER ><br>
    * f1 -> "="<br>
    * f2 -> MemberValue()<br>
    *
@@ -6482,7 +6482,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   @Override
   public R visit(final MemberValuePair n, final A argu) {
     R nRes = null;
-    // f0 -> <IDENTIFIER>
+    // f0 -> < IDENTIFIER >
     final NodeToken n0 = n.f0;
     nRes = n0.accept(this, argu);
     // f1 -> "="
@@ -6585,7 +6585,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
    * <p>
    * f0 -> "@"<br>
    * f1 -> "interface"<br>
-   * f2 -> <IDENTIFIER><br>
+   * f2 -> < IDENTIFIER ><br>
    * f3 -> AnnotationTypeBody()<br>
    *
    * @param n - the node to visit
@@ -6601,7 +6601,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
     // f1 -> "interface"
     final NodeToken n1 = n.f1;
     nRes = n1.accept(this, argu);
-    // f2 -> <IDENTIFIER>
+    // f2 -> < IDENTIFIER >
     final NodeToken n2 = n.f2;
     nRes = n2.accept(this, argu);
     // f3 -> AnnotationTypeBody()
@@ -6645,7 +6645,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
    * Visits a {@link AnnotationTypeMemberDeclaration} node, whose child is the following :
    * <p>
    * f0 -> . %0 #0 Modifiers()<br>
-   * .. .. . .. #1 ( &0 $0 Type() $1 <IDENTIFIER> $2 "(" $3 ")"<br>
+   * .. .. . .. #1 ( &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"<br>
    * .. .. . .. .. . .. $4 [ DefaultValue() ]<br>
    * .. .. . .. .. . .. $5 ";"<br>
    * .. .. . .. .. | &1 ClassOrInterfaceDeclaration()<br>
@@ -6662,7 +6662,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final AnnotationTypeMemberDeclaration n, final A argu) {
     R nRes = null;
     // f0 -> . %0 #0 Modifiers()
-    // .. .. . .. #1 ( &0 $0 Type() $1 <IDENTIFIER> $2 "(" $3 ")"
+    // .. .. . .. #1 ( &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"
     // .. .. . .. .. . .. $4 [ DefaultValue() ]
     // .. .. . .. .. . .. $5 ";"
     // .. .. . .. .. | &1 ClassOrInterfaceDeclaration()
@@ -6675,7 +6675,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
     switch (nch.which) {
       case 0:
         // %0 #0 Modifiers()
-        // .. #1 ( &0 $0 Type() $1 <IDENTIFIER> $2 "(" $3 ")"
+        // .. #1 ( &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"
         // .. .. .. $4 [ DefaultValue() ]
         // .. .. .. $5 ";"
         // .. .. | &1 ClassOrInterfaceDeclaration()
@@ -6686,7 +6686,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
         // #0 Modifiers()
         final INode seq1 = seq.elementAt(0);
         nRes = seq1.accept(this, argu);
-        // #1 ( &0 $0 Type() $1 <IDENTIFIER> $2 "(" $3 ")"
+        // #1 ( &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"
         // .. .. $4 [ DefaultValue() ]
         // .. .. $5 ";"
         // .. | &1 ClassOrInterfaceDeclaration()
@@ -6698,14 +6698,14 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
         final INode ich1 = nch1.choice;
         switch (nch1.which) {
           case 0:
-            // &0 $0 Type() $1 <IDENTIFIER> $2 "(" $3 ")"
+            // &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"
             // .. $4 [ DefaultValue() ]
             // .. $5 ";"
             final NodeSequence seq3 = (NodeSequence) ich1;
             // $0 Type()
             final INode seq4 = seq3.elementAt(0);
             nRes = seq4.accept(this, argu);
-            // $1 <IDENTIFIER>
+            // $1 < IDENTIFIER >
             final INode seq5 = seq3.elementAt(1);
             nRes = seq5.accept(this, argu);
             // $2 "("

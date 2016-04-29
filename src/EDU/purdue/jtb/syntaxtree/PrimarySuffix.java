@@ -10,7 +10,7 @@ import EDU.purdue.jtb.visitor.*;
  * .. .. | %1 #0 "." #1 AllocationExpression()<br>
  * .. .. | %2 MemberSelector()<br>
  * .. .. | %3 #0 "[" #1 Expression() #2 "]"<br>
- * .. .. | %4 #0 "." #1 <IDENTIFIER><br>
+ * .. .. | %4 #0 "." #1 < IDENTIFIER ><br>
  * .. .. | %5 Arguments()<br>
  */
 public class PrimarySuffix implements INode {

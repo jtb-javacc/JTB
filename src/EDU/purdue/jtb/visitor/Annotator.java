@@ -144,6 +144,8 @@ import EDU.purdue.jtb.syntaxtree.WhileStatement;
  * @version 1.4.8 : 10/2012 : MMa : added JavaCodeProduction class generation if requested ;<br>
  *          fixed visit LocalVariableDeclaration ; improved specials printing
  * @version 1.4.9 : 01/2015 : MMa : fixed regression in {@link #bnfFinalActions(VarInfo)}
+ * @version 1.4.11 : 03/2016 : MMa : fixed column numbers in warnings, and conditions for warning
+ *          "Empty choice : a NodeChoice with a 'null' choice member ..."
  */
 public class Annotator extends JavaCCPrinter {
 
@@ -810,7 +812,7 @@ public class Annotator extends JavaCCPrinter {
     n.f0.accept(this);
     --bnfLvl;
     final int totalVal = n.f1.size() + 1;
-    if (!annotateNode || parentVar == null) {
+    if (!annotateNode && parentVar == null) {
       lnftfv.reset();
       n.f0.accept(lnftfv);
       Messages.warning("Empty choice : a NodeChoice with a 'null' choice member will be " +
@@ -836,7 +838,7 @@ public class Annotator extends JavaCCPrinter {
       ++bnfLvl;
       seq.elementAt(1).accept(this);
       --bnfLvl;
-      if (!annotateNode || parentVar == null) {
+      if (!annotateNode && parentVar == null) {
         lnft = ((NodeToken) seq.elementAt(0)).beginLine;
         cnft = ((NodeToken) seq.elementAt(0)).beginColumn;
         Messages.warning("Empty choice : a NodeChoice with a 'null' choice member will be " +
@@ -2327,6 +2329,7 @@ public class Annotator extends JavaCCPrinter {
      */
     public void reset() {
       lnft = 0;
+      cnft = 0;
     }
 
     /**
@@ -2422,15 +2425,15 @@ public class Annotator extends JavaCCPrinter {
           // .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
           // .. .. . .. $2 [ "!" ] )
           seq = (NodeSequence) n.f0.choice;
-          final NodeOptional opt1 = (NodeOptional) seq.elementAt(0);
-          if (opt1.present()) {
-            // $0 PrimaryExpression() $1 "="
-            // here we take a shortcut : we do not implement and go down PrimaryExpression
-            tk = (NodeToken) ((NodeSequence) opt1.node).elementAt(1);
-            lnft = tk.beginLine;
-            cnft = tk.beginColumn;
-            return;
-          }
+          //          final NodeOptional opt1 = (NodeOptional) seq.elementAt(0);
+          //          if (opt1.present()) {
+          //            // $0 PrimaryExpression() $1 "="
+          //            // here we take a shortcut : we do not implement and go down PrimaryExpression
+          //            tk = (NodeToken) ((NodeSequence) opt1.node).elementAt(1);
+          //            lnft = tk.beginLine;
+          //            cnft = tk.beginColumn;
+          //            return;
+          //          }
           final NodeChoice ch = (NodeChoice) seq.elementAt(1);
           final NodeSequence seq1 = (NodeSequence) ch.choice;
           if (ch.which == 0) {
@@ -2474,6 +2477,7 @@ public class Annotator extends JavaCCPrinter {
     public void visit(final Block n) {
       // f0 -> "{"
       lnft = n.f0.beginLine;
+      cnft = n.f0.beginColumn;
     }
 
     /**
@@ -2492,6 +2496,7 @@ public class Annotator extends JavaCCPrinter {
     public void visit(final ExpansionUnitTCF n) {
       // f0 -> "try"
       lnft = n.f0.beginLine;
+      cnft = n.f0.beginColumn;
     }
 
 /**
@@ -2512,12 +2517,14 @@ public class Annotator extends JavaCCPrinter {
       if (n.f0.which == 0) {
         // %0 StringLiteral()
         lnft = ((StringLiteral) n.f0.choice).f0.beginLine;
+        cnft = ((StringLiteral) n.f0.choice).f0.beginColumn;
       } else {
         // %1 #0 "<" #1 [ $0 [ "#" ] $1 IdentifierAsString() $2 ":" ] #2 ComplexRegularExpressionChoices() #3 ">"
         // %2 #0 "<" #1 IdentifierAsString() #2 ">"
         // %3 #0 "<" #1 "EOF" #2 ">"
         final NodeSequence seq = (NodeSequence) n.f0.choice;
         lnft = ((NodeToken) seq.elementAt(0)).beginLine;
+        cnft = ((NodeToken) seq.elementAt(0)).beginColumn;
       }
     }
 

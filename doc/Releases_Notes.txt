@@ -1,4 +1,12 @@
 ---------------
+Version 1.4.11
+---------------
+-> xx/04/2016
+- fixed (added) spaces between the '<' and '>' and the token labels in the generated javadoc comments
+- fixed the conditions on displaying the "warning:  Empty choice : a NodeChoice with a 'null' choice member ..."
+- fixed column numbers in messages
+
+---------------
 Version 1.4.10
 ---------------
 -> 13/04/2015

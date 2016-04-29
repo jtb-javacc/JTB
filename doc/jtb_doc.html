@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-  <title>JTB 1.4.10</title>
+  <title>JTB 1.4.11</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <style>@import url("web/site.css");</style>
 <STYLE type="text/css">
@@ -12,9 +12,9 @@ table { font-size:10pt; }
 </STYLE>
 </head>
 <body>
-<h1><font color="red">Java Tree Builder (JTB) 1.4.10</font></h1>
+<h1><font color="red">Java Tree Builder (JTB) 1.4.11</font></h1>
 
-<h2>Last update : nov 13th, 2015 - version <font color="red">1.4.10</font></h2>
+<h2>Last update : apr xxth, 2016 - version <font color="red">1.4.11</font></h2>
 
 <h2>Overview</h2>
 <font color="red">JTB</font> (Java Tree Builder) is a syntax tree builder and visitors generator to be used
@@ -40,42 +40,45 @@ New visitors, which subclass any generated one, can then override the default me
  operations on and manipulate the generated syntax tree.<p>
  
 JTB can be compared to JJTree in the following way:<ul>
-<li>in JJTree you explicitly define the nodes you want to build ; in JTB it builds by default all of them
+<li>in JJTree you explicitly define the nodes you want to build; in JTB it builds by default all of them
  (but you can tell not to build some of them),</li>
-<li>JJTree generates only interfaces for visitors and you have to code the visitors, so you "fill" them ;
+<li>JJTree generates only interfaces for visitors and you have to code the visitors, so you "fill" them;
  JTB generates interfaces and "full" visitors (i.e. with all the code to visit the tree), so you just
  "modify" them, sometimes just "reducing" them (for not visiting branches), so in a sense it is faster to
  develop on an already generated - bullet proof - code,</li>
 <li>in JJTree, you are tempted to tune the tree, i.e. define only the nodes you need, but if you want to
  develop different visitors, you have to think about all the nodes you want to traverse for the different
  purposes and so you may find yourself sometimes having to enrich the grammar and  defeat what you have
- previously done ; in JTB you have all the tree right from the beginning so adding a new visitor is not
+ previously done; in JTB you have all the tree right from the beginning so adding a new visitor is not
  disruptive,</li>
  <li>JTB can "inline" the accept methods, i.e. it generates for a node the code to work directly on its
  children, which is usually the right place to take decisions and to reduce the control logic (otherwise
  you usually have to access the fathers and check their types),</li>
-<li>JJTree may be more adequate when only small trees and few visitors are needed ; JTB may be more adequate
+<li>JJTree may be more adequate when only small trees and few visitors are needed; JTB may be more adequate
  when you have to work on the entire tree and build many visitors.</li>
 </ul>
 
 <h2>History</h2>
+04/2016 - 1.4.11 : fixed (added) spaces between the '<' and '>' and the token labels in the generated javadoc comments;
+ fixed the conditions on displaying the "warning:  Empty choice : a NodeChoice with a 'null' choice member ...";
+ fixed column numbers in messages<p>
 11/2015 - 1.4.10 : added JTB.do_main() returning an int return code<p>
 08/2015 - 1.4.9 : same as 1.4.8.fix_a<p>
 01/2015 - 1.4.8.fix_a : fixed regression in jtb.out.jj generation<p>
-10/2012-12/2014 - 1.4.8 : added generation of JavaCodeProductions ('%' syntax) ; fixed bug #3164860 ; fixed
- some messages ; fixed some problems (null choice for an empty choice, prefix / suffix management in
- lookahead) ; checked duplicated Javacode production names ; fixed the Java grammar
- (in ExplicitConstructorInvocation & ClassOrInterfaceBodyDeclaration) ; added annotations in the generated
- classes ; fixed some cases and improved printing specials (comments) ; improved short names generation for
- generated intermediate variables ; modified the warning message on ignored LOOKAHEAD (as it can actually be
- not ignored) ; fixed java blocs generation ; some internals improvements
+10/2012-12/2014 - 1.4.8 : added generation of JavaCodeProductions ('%' syntax); fixed bug #3164860; fixed
+ some messages; fixed some problems (null choice for an empty choice, prefix / suffix management in
+ lookahead); checked duplicated Javacode production names; fixed the Java grammar
+ (in ExplicitConstructorInvocation & ClassOrInterfaceBodyDeclaration); added annotations in the generated
+ classes; fixed some cases and improved printing specials (comments); improved short names generation for
+ generated intermediate variables; modified the warning message on ignored LOOKAHEAD (as it can actually be
+ not ignored); fixed java blocs generation; some internals improvements
  <p>
-09/2012 - 1.4.7 : added sub comments in the generated visitors java code ; did some optimizations ; fixed
- bugs JTB-1 & JTB-2 ; fixed some generation errors ; added a check when 'n = prod()' and 'void prod()' ;
+09/2012 - 1.4.7 : added sub comments in the generated visitors java code; did some optimizations; fixed
+ bugs JTB-1 & JTB-2; fixed some generation errors; added a check when 'n = prod()' and 'void prod()';
  added the '!' syntax for not generating a node creation (in a BNFProduction, RegExprSpec and ExpansionUnit)
- ; fixed some Java grammar issues and did some refactoring ; added column numbers in messages ; performed
- tests on more limit cases ; fixed missing <EOF> in JavaCCInput() and missing parentheses in Annotation()<p>
-01/2011 - 1.4.6 : JTB hosted at http://java.net/projects/jtb ; new contributor (Francis Andre Kampbell) ;
+; fixed some Java grammar issues and did some refactoring; added column numbers in messages; performed
+ tests on more limit cases; fixed missing <EOF> in JavaCCInput() and missing parentheses in Annotation()<p>
+01/2011 - 1.4.6 : JTB hosted at http://java.net/projects/jtb; new contributor (Francis Andre Kampbell);
  added -va and -npfx and -nsfx options<p>
 12/2010 - 1.4.5 : Convert nodes and visitors output directories to absolute paths<p>
 7/2010 - 1.4.4 : Fixed missing space after throws issue in visiting MethodDeclaration & ConstructorDeclaration

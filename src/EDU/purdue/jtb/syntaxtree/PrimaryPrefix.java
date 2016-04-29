@@ -8,7 +8,7 @@ import EDU.purdue.jtb.visitor.*;
  * Corresponding grammar:<br>
  * f0 -> . %0 Literal()<br>
  * .. .. | %1 "this"<br>
- * .. .. | %2 #0 "super" #1 "." #2 <IDENTIFIER><br>
+ * .. .. | %2 #0 "super" #1 "." #2 < IDENTIFIER ><br>
  * .. .. | %3 #0 "(" #1 Expression() #2 ")"<br>
  * .. .. | %4 AllocationExpression()<br>
  * .. .. | %5 #0 ResultType() #1 "." #2 "class"<br>

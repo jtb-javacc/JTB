@@ -7,7 +7,7 @@ import EDU.purdue.jtb.visitor.*;
  * JTB node class for the production AnnotationTypeMemberDeclaration:<br>
  * Corresponding grammar:<br>
  * f0 -> . %0 #0 Modifiers()<br>
- * .. .. . .. #1 ( &0 $0 Type() $1 <IDENTIFIER> $2 "(" $3 ")"<br>
+ * .. .. . .. #1 ( &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"<br>
  * .. .. . .. .. . .. $4 [ DefaultValue() ]<br>
  * .. .. . .. .. . .. $5 ";"<br>
  * .. .. . .. .. | &1 ClassOrInterfaceDeclaration()<br>

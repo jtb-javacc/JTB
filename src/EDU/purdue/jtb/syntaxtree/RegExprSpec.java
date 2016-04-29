@@ -9,7 +9,7 @@ import EDU.purdue.jtb.visitor.*;
  * f0 -> RegularExpression()<br>
  * f1 -> [ "!" ]<br>
  * f2 -> [ Block() ]<br>
- * f3 -> [ #0 ":" #1 <IDENTIFIER> ]<br>
+ * f3 -> [ #0 ":" #1 < IDENTIFIER > ]<br>
  */
 public class RegExprSpec implements INode {
 
