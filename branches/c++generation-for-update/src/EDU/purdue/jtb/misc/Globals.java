@@ -73,33 +73,39 @@ public class Globals {
 
   /** Turns on / off debugging class comment printing */
   public static final boolean       PRINT_CLASS_COMMENT   = false;
+
+  public static final boolean DEBUG_CLASS_COMMENTS         = false;
+  /** Turns on / off debugging class comment printing */
+  public static final boolean DEBUG_FIELD_AND_SUB_COMMENTS = false;
   /** The program version */
-  public static final String        VERSION               = "1.4.8";
+  public static final String  VERSION                      = "1.4.11";
   /** The serial uid version */
-  public static final long          SERIAL_UID            = 148;
+  public static final long    SERIAL_UID                   = 1411;
   /** The java program name */
-  public static final String        PROG_NAME             = "JTB";
+  public static final String  PROG_NAME                    = "JTB";
   /** The shell script name */
-  public static final String        SCRIPT_NAME           = "jtb";
+  public static final String  SCRIPT_NAME                  = "jtb";
   /** Some of the authors */
-  public static final String        AUTHORS               = "Jens Palsberg, Wanjun Wang, Kevin Tao, Vids Samanta,"
-                                                            + " Marc Mazas, Francis Andre";
+  public static final String  AUTHORS                      = "Jens Palsberg, Wanjun Wang, Kevin Tao, Vids Samanta,"
+                                                             + " Marc Mazas, Francis Andre";
   /** An indication in case of JTB internal errors */
-  public static final String        SUPPORT               = "support";
+  public static final String  SUPPORT                      = "JTB support (https://java.net/projects/jtb/)";
   /** The indentation default number of characters */
-  public static final int           INDENT_AMT            = 2;
+  public static final int     INDENT_AMT                   = 2;
   /** The OS line separator string */
-  public static final String        LS                    = System.getProperty("line.separator");
+  public static final String  LS                           = System.getProperty("line.separator");
+  /** The OS line separator first character */
+  public static final char    LS0                          = LS.charAt(0);
   /** The OS line separator string length */
-  public static final int           LSLEN                 = LS.length();
+  public static final int     LSLEN                        = LS.length();
   /** The javadoc break */
-  public static final String        BR                    = "<br>";
+  public static final String  BR                           = "<br>";
   /** The javadoc break plus string length */
-  public static final int           BRLEN                 = BR.length();
+  public static final int     BRLEN                        = BR.length();
   /** The javadoc break plus the OS line separator */
-  public static final String        BRLS                  = BR + LS;
+  public static final String  BRLS                         = BR + LS;
   /** The javadoc break plus the OS line separator string length */
-  public static final int           BRLSLEN               = BRLS.length();
+  public static final int     BRLSLEN                      = BRLS.length();
 
   /*
    * Classes / interfaces / variables names (constants)
@@ -152,7 +158,8 @@ public class Globals {
   /** "Ret" visitor interface name (with return type and a user object argument) */
   public static VisitorClass        retVisitor;
   /** "Ret" visitor interface name (with return type and no user object argument) */
-  public static final IVisitorClass iRetVisitor           = new IRetVisitorForJava();
+
+public static final IVisitorClass iRetVisitor           = new IRetVisitorForJava();
 //  /** Depth First "Ret" visitor class name (with return type and no user object argument) */
 //  public static final String        dFRetVisitor          = "DepthFirstRetVisitor";
   /** Javadoc comment fragment for "Ret" visitor */
@@ -161,7 +168,8 @@ public class Globals {
   /** "VoidArgu" visitor interface name (with return type and a user object argument) */
   public static VisitorClass        voidArguVisitor;
   /** "VoidArgu" visitor interface name (with no return type and a user object argument) */
-  public static final IVisitorClass iVoidArguVisitor      = new IVoidArguVisitorForJava();
+
+public static final IVisitorClass iVoidArguVisitor      = new IVoidArguVisitorForJava();
 //  /** Depth First "VoidArgu" visitor class name (with no return type and a user object argument) */
 //  public static final String        dFVoidArguVisitor     = "DepthFirstVoidArguVisitor";
   /** Javadoc comment fragment for "VoidArgu" visitor */

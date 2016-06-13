@@ -1,7 +1,5 @@
 package EDU.purdue.jtb.misc;
-
 import java.io.PrintWriter;
-
 
 @SuppressWarnings("javadoc")
 public interface FilesGenerator {

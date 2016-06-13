@@ -33,103 +33,94 @@ import java.util.Set;
 
 /**
  * Describes JavaCC productions.
- *
+ * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public class NormalProduction {
-  /**
-   * The line and column number of the construct that corresponds
-   * most closely to this node.
-   */
-  private int                column;
-  private int                line;
-  /**
-   * The NonTerminal nodes which refer to this production.
-   */
-  private List<Object>       parents               = new ArrayList<Object>();
-  /**
-   * The access modifier of this production.
-   */
-  private String             accessMod;
-  /**
-   * The name of the non-terminal of this production.
-   */
-  private String             lhs;
-  /**
-   * The tokens that make up the return type of this production.
-   */
-  private final List<Token>  return_type_tokens    = new ArrayList<Token>();
-  /**
-   * The tokens that make up the parameters of this production.
-   */
-  private final List<Token>  parameter_list_tokens = new ArrayList<Token>();
-  /**
-   * Each entry in this list is a list of tokens that represents an
-   * exception in the throws list of this production.  This list does not
-   * include ParseException which is always thrown.
-   */
-  private List<List<Token>>  throws_list           = new ArrayList<List<Token>>();
-  /**
-   * The RHS of this production. Not used for JavaCodeProduction.
-   */
-  private Expansion_          expansion;
-  /**
-   * This boolean flag is true if this production can expand to empty.
-   */
-  private boolean            emptyPossible         = false;
-  /**
-   * A list of all non-terminals that this one can expand to without
-   * having to consume any tokens.  Also an index that shows how many
-   * pointers exist.
-   */
-  private NormalProduction[] leftExpansions        = new NormalProduction[10];
-  int                        leIndex               = 0;
-  /**
-   * The following variable is used to maintain state information for the
-   * left-recursion determination algorithm:  It is initialized to 0, and
-   * set to -1 if this node has been visited in a pre-order walk, and then
-   * it is set to 1 if the pre-order walk of the whole graph from this
-   * node has been traversed.  i.e., -1 indicates partially processed,
-   * and 1 indicates fully processed.
-   */
-  private int                walkStatus            = 0;
-  /**
-   * The first and last tokens from the input stream that represent this
-   * production.
-   */
-  private Token              lastToken;
-  private Token              firstToken;
-  protected String           eol                   = System.getProperty("line.separator", "\n");
 
-  protected StringBuilder dumpPrefix(final int indent) {
-    final StringBuilder sb = new StringBuilder(128);
+  /** The number of the construct that corresponds most closely to this node */
+  private int                   column;
+  /** The line number of the construct that corresponds most closely to this node */
+  private int                   line;
+  /** The NonTerminal nodes which refer to this production */
+  private List<Object>          parents               = new ArrayList<Object>();
+  /** The access modifier of this production */
+  private String                accessMod;
+  /** The name of the non-terminal of this production */
+  private String                lhs;
+  /** The tokens that make up the return type of this production */
+  private final List<Token>     return_type_tokens    = new ArrayList<Token>();
+  /** The tokens that make up the parameters of this production */
+  private final List<Token>     parameter_list_tokens = new ArrayList<Token>();
+  /**
+   * Each entry in this list is a list of tokens that represents an exception in the throws list of
+   * this production. This list does not include ParseException which is always thrown.
+   */
+  private List<List<Token>>     throws_list           = new ArrayList<List<Token>>();
+  /** The RHS of this production. Not used for JavaCodeProduction */
+  private Expansion_            expansion;
+  /** This boolean flag is true if this production can expand to empty */
+  private boolean               emptyPossible         = false;
+  /** A list of all non-terminals that this one can expand to without having to consume any tokens */
+  private NormalProduction[]    leftExpansions        = new NormalProduction[10];
+  /** An index that shows how many pointers exist */
+  int                           leIndex               = 0;
+  /**
+   * The following variable is used to maintain state information for the left-recursion
+   * determination algorithm: It is initialized to 0, and set to -1 if this node has been visited in
+   * a pre-order walk, and then it is set to 1 if the pre-order walk of the whole graph from this
+   * node has been traversed. i.e., -1 indicates partially processed, and 1 indicates fully
+   * processed.
+   */
+  private int                   walkStatus            = 0;
+  /** The first token from the input stream that represent this production */
+  private Token                 lastToken;
+  /** The last token from the input stream that represent this production */
+  private Token                 firstToken;
+  /** The OS line separator */
+  protected static final String EOL                   = System.getProperty("line.separator", "\n");
+
+  /**
+   * @param indent - the level of indentation
+   * @return a number of spaces twice the level of indentation
+   */
+  protected static StringBuilder dumpPrefix(final int indent) {
+    final StringBuilder sb = new StringBuilder(2 * indent);
     for (int i = 0; i < indent; i++)
       sb.append("  ");
     return sb;
   }
 
+  /**
+   * @return the class name without the package name
+   */
   protected String getSimpleName() {
     final String name = getClass().getName();
     return name.substring(name.lastIndexOf(".") + 1); // strip the package name
   }
 
+  /**
+   * @param indent - the level of indentation
+   * @param alreadyDumped - a collection of already dumped classes
+   * @return the formatted dump (indentation, class, lhs, expansion)
+   */
   public StringBuilder dump(final int indent, final Set<Object> alreadyDumped) {
-    final StringBuilder sb = dumpPrefix(indent).append(System.identityHashCode(this)).append(' ').append(
-                                                                                                        getSimpleName()).append(
-                                                                                                                                ' ').append(
-                                                                                                                                            getLhs());
+    final StringBuilder sb = dumpPrefix(indent).append(System.identityHashCode(this)).append(' ')
+                                               .append(getSimpleName()).append(' ')
+                                               .append(getLhs());
     if (!alreadyDumped.contains(this)) {
       alreadyDumped.add(this);
       if (getExpansion() != null) {
-        sb.append(eol).append(getExpansion().dump(indent + 1, alreadyDumped));
+        sb.append(EOL).append(getExpansion().dump(indent + 1, alreadyDumped));
       }
     }
     return sb;
   }
 
   /**
-   * @param line - the line to set
+   * @param ln - the line to set
    */
   public final void setLine(final int ln) {
     line = ln;
@@ -143,7 +134,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param column - the column to set
+   * @param cl - the column to set
    */
   public final void setColumn(final int cl) {
     column = cl;
@@ -157,7 +148,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param parents - the parents to set
+   * @param pa - the parents to set
    */
   final void setParents(final List<Object> pa) {
     parents = pa;
@@ -171,7 +162,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param accessMod - the accessMod to set
+   * @param am - the accessMod to set
    */
   public final void setAccessMod(final String am) {
     accessMod = am;
@@ -185,7 +176,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param lhs - the lhs to set
+   * @param l - the lhs to set
    */
   public final void setLhs(final String l) {
     lhs = l;
@@ -213,7 +204,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param throws_list - the throws_list to set
+   * @param tl - the throws_list to set
    */
   public final void setThrowsList(final List<List<Token>> tl) {
     throws_list = tl;
@@ -227,7 +218,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param expansion - the expansion to set
+   * @param ex - the expansion to set
    */
   public final void setExpansion(final Expansion_ ex) {
     expansion = ex;
@@ -241,7 +232,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param emptyPossible - the emptyPossible to set
+   * @param ep - the emptyPossible to set
    */
   final void setEmptyPossible(final boolean ep) {
     emptyPossible = ep;
@@ -255,7 +246,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param leftExpansions - the leftExpansions to set
+   * @param le - the leftExpansions to set
    */
   final void setLeftExpansions(final NormalProduction[] le) {
     leftExpansions = le;
@@ -269,7 +260,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param walkStatus - the walkStatus to set
+   * @param ws - the walkStatus to set
    */
   final void setWalkStatus(final int ws) {
     walkStatus = ws;
@@ -283,7 +274,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param firstToken - the firstToken to set
+   * @param ft - the firstToken to set
    */
   public final void setFirstToken(final Token ft) {
     firstToken = ft;
@@ -297,7 +288,7 @@ public class NormalProduction {
   }
 
   /**
-   * @param lastToken - the lastToken to set
+   * @param lt - the lastToken to set
    */
   public final void setLastToken(final Token lt) {
     lastToken = lt;

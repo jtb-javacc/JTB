@@ -29,16 +29,22 @@ package EDU.purdue.jtb.parser;
 
 /**
  * Describes a match, within a given lookahead.
- *
+ * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public class MatchInfo {
+
+  /** The lookahead maximum depth reached */
   public static int laLimit;
-  int[] match = new int[laLimit];
-  int firstFreeLoc;
-  public static void reInit()
-  {
+  /** The table of lookahead matches for each depth */
+  int[]             match = new int[laLimit];
+  /** The index of the first free line in the above table {@link #match} */
+  int               firstFreeLoc;
+
+  /** Reinitializes */
+  public static void reInit() {
     laLimit = 0;
   }
 }

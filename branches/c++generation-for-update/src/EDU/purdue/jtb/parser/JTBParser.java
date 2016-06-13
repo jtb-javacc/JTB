@@ -103,6 +103,7 @@ public class JTBParser extends JavaCCParserInternals implements JTBParserConstan
   static public final class ModifierSet {
 
     /* Definitions of the bits in the modifiers field */
+
     public static final int M_PUBLIC = 0x0001;
 
     public static final int M_PROTECTED = 0x0002;
@@ -126,6 +127,7 @@ public class JTBParser extends JavaCCParserInternals implements JTBParserConstan
     public static final int M_STRICTFP = 0x1000;
 
     /* A set of accessors that indicate whether the specified modifier is in the set */
+
     public boolean isPublic(int modifiers) {
       return (modifiers & M_PUBLIC) != 0;
     }
@@ -171,6 +173,7 @@ public class JTBParser extends JavaCCParserInternals implements JTBParserConstan
     }
 
     /* Removes the given modifier */
+
     static int removeModifier(int modifiers, int mod) {
       return modifiers & ~mod;
     }
@@ -8748,24 +8751,6 @@ n0 = JTBToolkit.makeNodeToken(n1);
     finally { jj_save(47, xla); }
   }
 
-  private boolean jj_3R_395()
- {
-    if (jj_scan_token(ELSE)) return true;
-    if (jj_3R_237()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_123()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_14()) jj_scanpos = xsp;
-    if (jj_scan_token(SUPER)) return true;
-    if (jj_3R_87()) return true;
-    if (jj_scan_token(SEMICOLON)) return true;
-    return false;
-  }
-
   private boolean jj_3_15()
  {
     if (jj_scan_token(THIS)) return true;
@@ -10564,15 +10549,15 @@ n0 = JTBToolkit.makeNodeToken(n1);
     return false;
   }
 
-  private boolean jj_3R_137()
- {
-    if (jj_scan_token(_SKIP)) return true;
-    return false;
-  }
-
   private boolean jj_3R_260()
  {
     if (jj_3R_282()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_137()
+ {
+    if (jj_scan_token(_SKIP)) return true;
     return false;
   }
 
@@ -12309,6 +12294,24 @@ n0 = JTBToolkit.makeNodeToken(n1);
  {
     if (jj_3R_61()) return true;
     if (jj_scan_token(DOT)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_395()
+ {
+    if (jj_scan_token(ELSE)) return true;
+    if (jj_3R_237()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_123()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_14()) jj_scanpos = xsp;
+    if (jj_scan_token(SUPER)) return true;
+    if (jj_3R_87()) return true;
+    if (jj_scan_token(SEMICOLON)) return true;
     return false;
   }
 

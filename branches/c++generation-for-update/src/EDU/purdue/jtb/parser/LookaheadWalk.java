@@ -31,14 +31,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public final class LookaheadWalk {
-  public static boolean              considerSemanticLA;
-  public static ArrayList<MatchInfo> sizeLimitedMatches;
 
+  public static boolean         considerSemanticLA;
+  public static List<MatchInfo> sizeLimitedMatches;
+
+  /** Standard constructor */
   private LookaheadWalk() {
   }
 
@@ -48,7 +50,8 @@ public final class LookaheadWalk {
     }
   }
 
-  public static List<MatchInfo> genFirstSet(final List<MatchInfo> partialMatches, final Expansion_ exp) {
+  public static List<MatchInfo> genFirstSet(final List<MatchInfo> partialMatches,
+                                            final Expansion_ exp) {
     if (exp instanceof RegularExpression_) {
       final List<MatchInfo> retval = new ArrayList<MatchInfo>();
       for (int i = 0; i < partialMatches.size(); i++) {
@@ -143,8 +146,8 @@ public final class LookaheadWalk {
     }
   }
 
-  public static List<MatchInfo> genFollowSet(final List<MatchInfo> partialMatches, final Expansion_ exp,
-                                             final long generation) {
+  public static List<MatchInfo> genFollowSet(final List<MatchInfo> partialMatches,
+                                             final Expansion_ exp, final long generation) {
     if (exp.myGeneration == generation) {
       return new ArrayList<MatchInfo>();
     }
@@ -159,7 +162,8 @@ public final class LookaheadWalk {
       final List<MatchInfo> retval = new ArrayList<MatchInfo>();
       // System.out.println("1; gen: " + generation + "; exp: " + exp);
       for (int i = 0; i < parents.size(); i++) {
-        final List<MatchInfo> v = genFollowSet(partialMatches, (Expansion_) parents.get(i), generation);
+        final List<MatchInfo> v = genFollowSet(partialMatches, (Expansion_) parents.get(i),
+                                               generation);
         listAppend(retval, v);
       }
       return retval;

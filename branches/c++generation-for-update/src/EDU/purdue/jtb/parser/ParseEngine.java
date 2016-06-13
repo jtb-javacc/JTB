@@ -27,6 +27,7 @@
  */
 package EDU.purdue.jtb.parser;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -37,10 +38,11 @@ import java.util.List;
 /**
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public class ParseEngine extends JavaCCGlobals {
 
-  static private java.io.PrintWriter               ostr;
+  static private java.io.PrintWriter               out;
   static private int                               gensymindex = 0;
   static private int                               indentamt;
   static private boolean                           jj2LA;
@@ -72,8 +74,9 @@ public class ParseEngine extends JavaCCGlobals {
    */
 
   /**
-   * Returns true if there is a JAVACODE production that the argument expansion may directly expand
-   * to (without consuming tokens or encountering lookahead).
+   * @param exp - the expansion node
+   * @return true if there is a JAVACODE production that the argument expansion may directly expand
+   *         to (without consuming tokens or encountering lookahead)
    */
   static private boolean javaCodeCheck(final Expansion_ exp) {
     if (exp instanceof RegularExpression_) {
@@ -135,6 +138,8 @@ public class ParseEngine extends JavaCCGlobals {
   /**
    * Sets up the array "firstSet" above based on the Expansion_ argument passed to it. Since this is
    * a recursive function, it assumes that "firstSet" has been reset before the first call.
+   * 
+   * @param exp - the expansion node
    */
   static private void genFirstSet(final Expansion_ exp) {
     if (exp instanceof RegularExpression_) {
@@ -205,12 +210,18 @@ public class ParseEngine extends JavaCCGlobals {
 
   /**
    * This method takes two parameters - an array of Lookahead's "conds", and an array of String's
-   * "actions". "actions" contains exactly one element more than "conds". "actions" are Java source
-   * code, and "conds" translate to conditions - so lets say "f(conds[i])" is true if the lookahead
-   * required by "conds[i]" is indeed the case. This method returns a string corresponding to the
-   * Java code for: if (f(conds[0]) actions[0] else if (f(conds[1]) actions[1] . . . else
-   * actions[action.length-1] A particular action entry ("actions[i]") can be null, in which case, a
-   * noop is generated for that action.
+   * "actions".<br>
+   * "actions" contains exactly one element more than "conds". "actions" are Java source code, and
+   * "conds" translate to conditions - so lets say "f(conds[i])" is true if the lookahead required
+   * by "conds[i]" is indeed the case.<br>
+   * This method returns a string corresponding to the Java code for: if (f(conds[0]) actions[0]
+   * else if (f(conds[1]) actions[1] . . . else actions[action.length-1].<br>
+   * A particular action entry ("actions[i]") can be null, in which case, a noop is generated for
+   * that action.
+   * 
+   * @param conds - the lookahead conditions
+   * @param actions - the lookahead actions
+   * @return the corresponding java code
    */
   @SuppressWarnings("fallthrough")
   // for           case NOOPENSTM:
@@ -442,7 +453,7 @@ public class ParseEngine extends JavaCCGlobals {
         if (indentOn) {
           phase1NewLine();
         } else {
-          ostr.println("");
+          out.println("");
         }
       } else if (ch == '\u0001') {
         indentamt += 2;
@@ -453,7 +464,7 @@ public class ParseEngine extends JavaCCGlobals {
       } else if (ch == '\u0004') {
         indentOn = true;
       } else {
-        ostr.print(ch);
+        out.print(ch);
       }
     }
   }
@@ -467,41 +478,41 @@ public class ParseEngine extends JavaCCGlobals {
     }
     printTokenSetup(t);
     ccol = 1;
-    printLeadingComments(t, ostr);
-    ostr.print("  " + staticOpt() + "final " +
-               (p.getAccessMod() != null ? p.getAccessMod() : "public") + " ");
+    printLeadingComments(t, out);
+    out.print("  " + staticOpt() + "final " +
+              (p.getAccessMod() != null ? p.getAccessMod() : "public") + " ");
     cline = t.beginLine;
     ccol = t.beginColumn;
-    printTokenOnly(t, ostr);
+    printTokenOnly(t, out);
     for (int i = 1; i < p.getReturnTypeTokens().size(); i++) {
       t = (p.getReturnTypeTokens().get(i));
-      printToken(t, ostr);
+      printToken(t, out);
     }
-    printTrailingComments(t, ostr);
-    ostr.print(" " + p.getLhs() + "(");
+    printTrailingComments(t, out);
+    out.print(" " + p.getLhs() + "(");
     if (p.getParameterListTokens().size() != 0) {
       printTokenSetup((p.getParameterListTokens().get(0)));
       for (final Iterator<Token> it = p.getParameterListTokens().iterator(); it.hasNext();) {
         t = it.next();
-        printToken(t, ostr);
+        printToken(t, out);
       }
-      printTrailingComments(t, ostr);
+      printTrailingComments(t, out);
     }
-    ostr.print(") throws ParseException");
+    out.print(") throws ParseException");
     for (final Iterator<List<Token>> it = p.getThrowsList().iterator(); it.hasNext();) {
-      ostr.print(", ");
+      out.print(", ");
       final List<Token> name = it.next();
       for (final Iterator<Token> it2 = name.iterator(); it2.hasNext();) {
         t = it2.next();
-        ostr.print(t.image);
+        out.print(t.image);
       }
     }
-    ostr.print(" {");
+    out.print(" {");
     indentamt = 4;
     if (Options.getDebugParser()) {
-      ostr.println("");
-      ostr.println("    trace_call(\"" + p.getLhs() + "\");");
-      ostr.print("    try {");
+      out.println("");
+      out.println("    trace_call(\"" + p.getLhs() + "\");");
+      out.print("    try {");
       indentamt = 6;
     }
     if (p.getDeclarationTokens().size() != 0) {
@@ -509,30 +520,30 @@ public class ParseEngine extends JavaCCGlobals {
       cline--;
       for (final Iterator<Token> it = p.getDeclarationTokens().iterator(); it.hasNext();) {
         t = it.next();
-        ostr.print("  ");
-        printToken(t, ostr);
+        out.print("  ");
+        printToken(t, out);
       }
-      printTrailingComments(t, ostr);
+      printTrailingComments(t, out);
     }
     final String code = phase1ExpansionGen(p.getExpansion());
     dumpFormattedString(code);
-    ostr.println("");
+    out.println("");
     if (p.isJumpPatched() && !voidReturn) {
-      ostr.println("    throw new Error(\"Missing return statement in function\");");
+      out.println("    throw new Error(\"Missing return statement in function\");");
     }
     if (Options.getDebugParser()) {
-      ostr.println("    } finally {");
-      ostr.println("      trace_return(\"" + p.getLhs() + "\");");
-      ostr.println("    }");
+      out.println("    } finally {");
+      out.println("      trace_return(\"" + p.getLhs() + "\");");
+      out.println("    }");
     }
-    ostr.println("  }");
-    ostr.println("");
+    out.println("  }");
+    out.println("");
   }
 
   static void phase1NewLine() {
-    ostr.println("");
+    out.println("");
     for (int i = 0; i < indentamt; i++) {
-      ostr.print(" ");
+      out.print(" ");
     }
   }
 
@@ -741,15 +752,15 @@ public class ParseEngine extends JavaCCGlobals {
 
   static void buildPhase2Routine(final Lookahead la) {
     final Expansion_ e = la.getLaExpansion();
-    ostr.println("  " + staticOpt() + "private boolean jj_2" + e.internal_name + "(int xla) {");
-    ostr.println("    jj_la = xla; jj_lastpos = jj_scanpos = token;");
-    ostr.println("    try { return !jj_3" + e.internal_name + "(); }");
-    ostr.println("    catch(LookaheadSuccess ls) { return true; }");
+    out.println("  " + staticOpt() + "private boolean jj_2" + e.internal_name + "(int xla) {");
+    out.println("    jj_la = xla; jj_lastpos = jj_scanpos = token;");
+    out.println("    try { return !jj_3" + e.internal_name + "(); }");
+    out.println("    catch(LookaheadSuccess ls) { return true; }");
     if (Options.getErrorReporting())
-      ostr.println("    finally { jj_save(" + (Integer.parseInt(e.internal_name.substring(1)) - 1) +
-                   ", xla); }");
-    ostr.println("  }");
-    ostr.println("");
+      out.println("    finally { jj_save(" + (Integer.parseInt(e.internal_name.substring(1)) - 1) +
+                  ", xla); }");
+    out.println("  }");
+    out.println("");
     final Phase3Data p3d = new Phase3Data(e, la.getAmount());
     phase3list.add(p3d);
     phase3table.put(e, p3d);
@@ -875,15 +886,15 @@ public class ParseEngine extends JavaCCGlobals {
       return;
 
     if (!recursive_call) {
-      ostr.println("  " + staticOpt() + "private boolean jj_3" + e.internal_name + "() {");
+      out.println("  " + staticOpt() + "private boolean jj_3" + e.internal_name + "() {");
       xsp_declared = false;
       if (Options.getDebugLookahead() && e.parent instanceof NormalProduction) {
-        ostr.print("    ");
+        out.print("    ");
         if (Options.getErrorReporting()) {
-          ostr.print("if (!jj_rescan) ");
+          out.print("if (!jj_rescan) ");
         }
-        ostr.println("trace_call(\"" + ((NormalProduction) e.parent).getLhs() +
-                     "(LOOKING AHEAD...)\");");
+        out.println("trace_call(\"" + ((NormalProduction) e.parent).getLhs() +
+                    "(LOOKING AHEAD...)\");");
         jj3_expansion = e;
       } else {
         jj3_expansion = null;
@@ -894,14 +905,14 @@ public class ParseEngine extends JavaCCGlobals {
       if (e_nrw.label.equals("")) {
         final Object label = names_of_tokens.get(new Integer(e_nrw.ordinal));
         if (label != null) {
-          ostr.println("    if (jj_scan_token(" + (String) label + ")) " + genReturn(true));
+          out.println("    if (jj_scan_token(" + (String) label + ")) " + genReturn(true));
         } else {
-          ostr.println("    if (jj_scan_token(" + e_nrw.ordinal + ")) " + genReturn(true));
+          out.println("    if (jj_scan_token(" + e_nrw.ordinal + ")) " + genReturn(true));
         }
       } else {
-        ostr.println("    if (jj_scan_token(" + e_nrw.label + ")) " + genReturn(true));
+        out.println("    if (jj_scan_token(" + e_nrw.label + ")) " + genReturn(true));
       }
-      //ostr.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+      //out.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
     } else if (e instanceof NonTerminal) {
       // All expansions of non-terminals have the "name" fields set.  So
       // there's no need to check it below for "e_nrw" and "ntexp".  In
@@ -910,13 +921,12 @@ public class ParseEngine extends JavaCCGlobals {
       final NonTerminal e_nrw = (NonTerminal) e;
       final NormalProduction ntprod = (production_table.get(e_nrw.getName()));
       if (ntprod instanceof JavaCodeProduction_) {
-        ostr.println("    if (true) { jj_la = 0; jj_scanpos = jj_lastpos; " + genReturn(false) +
-                     "}");
+        out.println("    if (true) { jj_la = 0; jj_scanpos = jj_lastpos; " + genReturn(false) + "}");
       } else {
         final Expansion_ ntexp = ntprod.getExpansion();
-        //ostr.println("    if (jj_3" + ntexp.internal_name + "()) " + genReturn(true));
-        ostr.println("    if (" + genjj_3Call(ntexp) + ") " + genReturn(true));
-        //ostr.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+        //out.println("    if (jj_3" + ntexp.internal_name + "()) " + genReturn(true));
+        out.println("    if (" + genjj_3Call(ntexp) + ") " + genReturn(true));
+        //out.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
       }
     } else if (e instanceof Choice) {
       Sequence nested_seq;
@@ -924,9 +934,9 @@ public class ParseEngine extends JavaCCGlobals {
       if (e_nrw.getChoices().size() != 1) {
         if (!xsp_declared) {
           xsp_declared = true;
-          ostr.println("    Token xsp;");
+          out.println("    Token xsp;");
         }
-        ostr.println("    xsp = jj_scanpos;");
+        out.println("    xsp = jj_scanpos;");
       }
       for (int i = 0; i < e_nrw.getChoices().size(); i++) {
         nested_seq = (Sequence) (e_nrw.getChoices().get(i));
@@ -934,34 +944,34 @@ public class ParseEngine extends JavaCCGlobals {
         if (la.getActionTokens().size() != 0) {
           // We have semantic lookahead that must be evaluated.
           lookaheadNeeded = true;
-          ostr.println("    jj_lookingAhead = true;");
-          ostr.print("    jj_semLA = ");
+          out.println("    jj_lookingAhead = true;");
+          out.print("    jj_semLA = ");
           printTokenSetup((la.getActionTokens().get(0)));
           for (final Iterator<Token> it = la.getActionTokens().iterator(); it.hasNext();) {
             t = it.next();
-            printToken(t, ostr);
+            printToken(t, out);
           }
-          printTrailingComments(t, ostr);
-          ostr.println(";");
-          ostr.println("    jj_lookingAhead = false;");
+          printTrailingComments(t, out);
+          out.println(";");
+          out.println("    jj_lookingAhead = false;");
         }
-        ostr.print("    if (");
+        out.print("    if (");
         if (la.getActionTokens().size() != 0) {
-          ostr.print("!jj_semLA || ");
+          out.print("!jj_semLA || ");
         }
         if (i != e_nrw.getChoices().size() - 1) {
-          //ostr.println("jj_3" + nested_seq.internal_name + "()) {");
-          ostr.println(genjj_3Call(nested_seq) + ") {");
-          ostr.println("    jj_scanpos = xsp;");
+          //out.println("jj_3" + nested_seq.internal_name + "()) {");
+          out.println(genjj_3Call(nested_seq) + ") {");
+          out.println("    jj_scanpos = xsp;");
         } else {
-          //ostr.println("jj_3" + nested_seq.internal_name + "()) " + genReturn(true));
-          ostr.println(genjj_3Call(nested_seq) + ") " + genReturn(true));
-          //ostr.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+          //out.println("jj_3" + nested_seq.internal_name + "()) " + genReturn(true));
+          out.println(genjj_3Call(nested_seq) + ") " + genReturn(true));
+          //out.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
         }
       }
       for (int i = 1; i < e_nrw.getChoices().size(); i++) {
-        //ostr.println("    } else if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
-        ostr.println("    }");
+        //out.println("    } else if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+        out.println("    }");
       }
     } else if (e instanceof Sequence) {
       final Sequence e_nrw = (Sequence) e;
@@ -985,48 +995,48 @@ public class ParseEngine extends JavaCCGlobals {
     } else if (e instanceof OneOrMore) {
       if (!xsp_declared) {
         xsp_declared = true;
-        ostr.println("    Token xsp;");
+        out.println("    Token xsp;");
       }
       final OneOrMore e_nrw = (OneOrMore) e;
       final Expansion_ nested_e = e_nrw.expansion;
-      //ostr.println("    if (jj_3" + nested_e.internal_name + "()) " + genReturn(true));
-      ostr.println("    if (" + genjj_3Call(nested_e) + ") " + genReturn(true));
-      //ostr.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
-      ostr.println("    while (true) {");
-      ostr.println("      xsp = jj_scanpos;");
-      //ostr.println("      if (jj_3" + nested_e.internal_name + "()) { jj_scanpos = xsp; break; }");
-      ostr.println("      if (" + genjj_3Call(nested_e) + ") { jj_scanpos = xsp; break; }");
-      //ostr.println("      if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
-      ostr.println("    }");
+      //out.println("    if (jj_3" + nested_e.internal_name + "()) " + genReturn(true));
+      out.println("    if (" + genjj_3Call(nested_e) + ") " + genReturn(true));
+      //out.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+      out.println("    while (true) {");
+      out.println("      xsp = jj_scanpos;");
+      //out.println("      if (jj_3" + nested_e.internal_name + "()) { jj_scanpos = xsp; break; }");
+      out.println("      if (" + genjj_3Call(nested_e) + ") { jj_scanpos = xsp; break; }");
+      //out.println("      if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+      out.println("    }");
     } else if (e instanceof ZeroOrMore) {
       if (!xsp_declared) {
         xsp_declared = true;
-        ostr.println("    Token xsp;");
+        out.println("    Token xsp;");
       }
       final ZeroOrMore e_nrw = (ZeroOrMore) e;
       final Expansion_ nested_e = e_nrw.expansion;
-      ostr.println("    while (true) {");
-      ostr.println("      xsp = jj_scanpos;");
-      //ostr.println("      if (jj_3" + nested_e.internal_name + "()) { jj_scanpos = xsp; break; }");
-      ostr.println("      if (" + genjj_3Call(nested_e) + ") { jj_scanpos = xsp; break; }");
-      //ostr.println("      if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
-      ostr.println("    }");
+      out.println("    while (true) {");
+      out.println("      xsp = jj_scanpos;");
+      //out.println("      if (jj_3" + nested_e.internal_name + "()) { jj_scanpos = xsp; break; }");
+      out.println("      if (" + genjj_3Call(nested_e) + ") { jj_scanpos = xsp; break; }");
+      //out.println("      if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+      out.println("    }");
     } else if (e instanceof ZeroOrOne) {
       if (!xsp_declared) {
         xsp_declared = true;
-        ostr.println("    Token xsp;");
+        out.println("    Token xsp;");
       }
       final ZeroOrOne e_nrw = (ZeroOrOne) e;
       final Expansion_ nested_e = e_nrw.expansion;
-      ostr.println("    xsp = jj_scanpos;");
-      //ostr.println("    if (jj_3" + nested_e.internal_name + "()) jj_scanpos = xsp;");
-      ostr.println("    if (" + genjj_3Call(nested_e) + ") jj_scanpos = xsp;");
-      //ostr.println("    else if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+      out.println("    xsp = jj_scanpos;");
+      //out.println("    if (jj_3" + nested_e.internal_name + "()) jj_scanpos = xsp;");
+      out.println("    if (" + genjj_3Call(nested_e) + ") jj_scanpos = xsp;");
+      //out.println("    else if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
     }
     if (!recursive_call) {
-      ostr.println("    " + genReturn(false));
-      ostr.println("  }");
-      ostr.println("");
+      out.println("    " + genReturn(false));
+      out.println("  }");
+      out.println("");
     }
   }
 
@@ -1104,12 +1114,12 @@ public class ParseEngine extends JavaCCGlobals {
     return retval;
   }
 
-  static void build(final java.io.PrintWriter ps) {
+  static void build(final PrintWriter ps) {
     NormalProduction p;
     JavaCodeProduction_ jp;
     Token t = null;
 
-    ostr = ps;
+    out = ps;
 
     for (final Iterator<NormalProduction> prodIterator = bnfproductions.iterator(); prodIterator.hasNext();) {
       p = prodIterator.next();
@@ -1118,53 +1128,53 @@ public class ParseEngine extends JavaCCGlobals {
         t = (jp.getReturnTypeTokens().get(0));
         printTokenSetup(t);
         ccol = 1;
-        printLeadingComments(t, ostr);
-        ostr.print("  " + staticOpt() + (p.getAccessMod() != null ? p.getAccessMod() + " " : ""));
+        printLeadingComments(t, out);
+        out.print("  " + staticOpt() + (p.getAccessMod() != null ? p.getAccessMod() + " " : ""));
         cline = t.beginLine;
         ccol = t.beginColumn;
-        printTokenOnly(t, ostr);
+        printTokenOnly(t, out);
         for (int i = 1; i < jp.getReturnTypeTokens().size(); i++) {
           t = (jp.getReturnTypeTokens().get(i));
-          printToken(t, ostr);
+          printToken(t, out);
         }
-        printTrailingComments(t, ostr);
-        ostr.print(" " + jp.getLhs() + "(");
+        printTrailingComments(t, out);
+        out.print(" " + jp.getLhs() + "(");
         if (jp.getParameterListTokens().size() != 0) {
           printTokenSetup((jp.getParameterListTokens().get(0)));
           for (final Iterator<Token> it = jp.getParameterListTokens().iterator(); it.hasNext();) {
             t = it.next();
-            printToken(t, ostr);
+            printToken(t, out);
           }
-          printTrailingComments(t, ostr);
+          printTrailingComments(t, out);
         }
-        ostr.print(") throws ParseException");
+        out.print(") throws ParseException");
         for (final Iterator<List<Token>> it = jp.getThrowsList().iterator(); it.hasNext();) {
-          ostr.print(", ");
+          out.print(", ");
           final List<Token> name = it.next();
           for (final Iterator<Token> it2 = name.iterator(); it2.hasNext();) {
             t = it2.next();
-            ostr.print(t.image);
+            out.print(t.image);
           }
         }
-        ostr.print(" {");
+        out.print(" {");
         if (Options.getDebugParser()) {
-          ostr.println("");
-          ostr.println("    trace_call(\"" + jp.getLhs() + "\");");
-          ostr.print("    try {");
+          out.println("");
+          out.println("    trace_call(\"" + jp.getLhs() + "\");");
+          out.print("    try {");
         }
         if (jp.getCodeTokens().size() != 0) {
           printTokenSetup((jp.getCodeTokens().get(0)));
           cline--;
-          printTokenList(jp.getCodeTokens(), ostr);
+          printTokenList(jp.getCodeTokens(), out);
         }
-        ostr.println("");
+        out.println("");
         if (Options.getDebugParser()) {
-          ostr.println("    } finally {");
-          ostr.println("      trace_return(\"" + jp.getLhs() + "\");");
-          ostr.println("    }");
+          out.println("    } finally {");
+          out.println("      trace_return(\"" + jp.getLhs() + "\");");
+          out.println("    }");
         }
-        ostr.println("  }");
-        ostr.println("");
+        out.println("  }");
+        out.println("");
       } else {
         buildPhase1Routine((BNFProduction_) p);
       }
@@ -1189,7 +1199,7 @@ public class ParseEngine extends JavaCCGlobals {
   }
 
   public static void reInit() {
-    ostr = null;
+    out = null;
     gensymindex = 0;
     indentamt = 0;
     jj2LA = false;
@@ -1204,21 +1214,25 @@ public class ParseEngine extends JavaCCGlobals {
 }
 
 /**
- * This class stores information to pass from phase 2 to phase 3.
+ * Stores information to pass from phase 2 to phase 3.
  */
 class Phase3Data {
 
-  /*
-   * This is the expansion to generate the jj3 method for.
-   */
+  /** This is the expansion to generate the jj3 method for */
   Expansion_ exp;
 
-  /*
-   * This is the number of tokens that can still be consumed.  This
-   * number is used to limit the number of jj3 methods generated.
+  /**
+   * The number of tokens that can still be consumed. This number is used to limit the number of jj3
+   * methods generated
    */
   int        count;
 
+  /**
+   * Constructor with parameters
+   * 
+   * @param e - the node
+   * @param c - the number of tokens
+   */
   Phase3Data(final Expansion_ e, final int c) {
     exp = e;
     count = c;

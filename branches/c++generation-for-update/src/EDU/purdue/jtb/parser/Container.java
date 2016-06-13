@@ -28,11 +28,14 @@
 package EDU.purdue.jtb.parser;
 
 /**
- * An object container.  Used to pass references to objects as parameter.
+ * An object container. Used to pass references to objects as parameter.
+ * 
+ * @author Marc Mazas
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
-
 public class Container {
 
+  /** The contained object */
   public Object member;
 
 }

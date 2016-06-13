@@ -59,6 +59,7 @@ import java.util.Set;
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar<br>
  *          1.4.0 : 11/2009 : MMa : added JTB options
  * @version 1.4.6 : 01/2011 : FA/MMa : added JTB_VA and JTB_NPFX and JTB_NSFX options
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public class Options {
   /**
@@ -422,7 +423,7 @@ public class Options {
   /**
    * Normalizes the options (ie checks coherence and dependences).
    */
-  // MMa : added public
+  // ModMMa : added public
   public static void normalize() {
     if (getDebugLookahead() && !getDebugParser()) {
       if (cmdLineSetting.contains("DEBUG_PARSER") || inputFileSetting.contains("DEBUG_PARSER")) {

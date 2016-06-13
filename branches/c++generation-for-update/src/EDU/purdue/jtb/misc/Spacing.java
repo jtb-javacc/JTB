@@ -41,11 +41,11 @@ import java.util.List;
 public class Spacing {
 
   /** The indentation amount */
-  private final int               INDENT_AMT;
+  private final int          INDENT_AMT;
   /** The indentation string */
-  public String                   spc         = "";
+  public String              spc         = "";
   /** The indentation level */
-  public int                      indentLevel = 0;
+  public int                 indentLevel = 0;
   /** The internal list of indentation strings for the indentation levels */
   private final List<String> str;
 

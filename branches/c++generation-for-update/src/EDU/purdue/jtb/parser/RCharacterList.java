@@ -320,8 +320,8 @@ public class RCharacterList extends RegularExpression_ {
     }
     transformed = true;
     final Nfa retVal = new Nfa();
-    final NfaState startState = retVal.start;
-    final NfaState finalState = retVal.end;
+    final NfaState startState = retVal.startNfaState;
+    final NfaState finalState = retVal.endNfaState;
     int i;
     for (i = 0; i < descriptors.size(); i++) {
       if (descriptors.get(i) instanceof SingleCharacter)
@@ -491,9 +491,15 @@ public class RCharacterList extends RegularExpression_ {
      */
   }
 
+  /** Standard constructor */
   RCharacterList() {
   }
 
+  /**
+   * Constructor with parameters
+   * 
+   * @param c - the caracter
+   */
   RCharacterList(final char c) {
     descriptors = new ArrayList<Object>();
     descriptors.add(new SingleCharacter(c));

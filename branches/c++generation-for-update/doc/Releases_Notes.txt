@@ -1,4 +1,57 @@
 ---------------
+Version 1.4.11
+---------------
+-> xx/04/2016
+- fixed (added) spaces between the '<' and '>' and the token labels in the generated javadoc comments
+- fixed the conditions on displaying the "warning:  Empty choice : a NodeChoice with a 'null' choice member ..."
+- fixed column numbers in messages
+
+---------------
+Version 1.4.10
+---------------
+-> 13/04/2015
+- JTB#main() returns error codes
+
+---------------
+Version 1.4.9
+---------------
+-> ??/??/2015
+same as 1.4.8.fix_a
+
+---------------
+Version 1.4.8.fix_a
+---------------
+-> ??/01/2015
+- fixed regression (Annotator#bnfFinalActions())
+
+---------------
+Version 1.4.8
+---------------
+-> 30/12/2014
+- removed warnings everywhere except in some big classes in parser
+- removed the ordinal field in RegularExpression which was hiding the one in the superclass Expansion_
+- renamed TreeWalkerOp in ITreeWalkerOp
+- switched from implementing interfaces to import static for constants
+- changed versions tags from 4.2.j.m to 5.0
+- improved printing specials
+- fixed the ExplicitConstructorInvocation production
+- fixed java blocs generation (Annotator visit LocalVariableDeclaration)
+- modified the warning message on ignored LOOKAHEAD (as it can actually be not ignored)
+- added short names generation for generated intermediate variables (default)
+- fixed printing specials in generating JTB options
+- added node_descriptor() and node_descriptor_expression() and modified JavaCodeProduction, BNFProduction,
+   Expansion & MethodDeclaration to allow a node descriptor
+- added @Override and @SuppressWarnings("unused") annotations in the generated visitors and base classes
+- added ReferenceType() in ExplicitConstructorInvocation() in the grammar
+- added AnnotationTypeDeclaration() in ClassOrInterfaceBodyDeclaration() in the grammar
+- changed in NodeToken.java  public ArrayList<NodeToken> specialTokens; into public List<NodeToken> specialTokens;
+- fixed prefix / suffix in lookahead
+- added "%" syntax on javacode
+- fixed bug 3164860
+- added control that a javacode production is not declared more than once
+- fixed problem "null choice for an empty choice"
+
+---------------
 Version 1.4.7
 ---------------
 -> 25/09/2012

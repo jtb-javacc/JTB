@@ -29,24 +29,32 @@ package EDU.purdue.jtb.parser;
 
 /**
  * A Non-deterministic Finite Automaton.
- *
+ * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
-public class Nfa
-{
-   NfaState start;
-   NfaState end;
+public class Nfa {
 
-   public Nfa()
-   {
-      start = new NfaState();
-      end = new NfaState();
-   }
+  /** This NFA start state */
+  NfaState startNfaState;
+  /** This NFA end state */
+  NfaState endNfaState;
 
-   public Nfa(final NfaState startGiven, final NfaState finalGiven)
-   {
-      start = startGiven;
-      end = finalGiven;
-   }
+  /** Standard constructor */
+  public Nfa() {
+    startNfaState = new NfaState();
+    endNfaState = new NfaState();
+  }
+
+  /**
+   * Constructor with start and end states
+   * 
+   * @param start - the start state
+   * @param end - the end state
+   */
+  public Nfa(final NfaState start, final NfaState end) {
+    startNfaState = start;
+    endNfaState = end;
+  }
 }

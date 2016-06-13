@@ -59,8 +59,8 @@ import EDU.purdue.jtb.syntaxtree.INode;
 import EDU.purdue.jtb.visitor.JavaPrinter;
 
 /**
- * Class JavaBranchPrinter visits a java code branch of the tree and returns a pretty printed string
- * representation of the subtree.
+ * Class JavaBranchPrinter uses a {@link JavaPrinter} visitor to visit a java code branch of the
+ * tree and returns a pretty printed string representation of the subtree.
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
@@ -69,8 +69,8 @@ public class JavaBranchPrinter {
 
   /** The buffer to print into */
   private final StringBuilder sb;
-  /** The {@link JavaPrinter} to use */
-  private final JavaPrinter   jp;
+  /** The {@link JavaPrinter} visitor */
+  private final JavaPrinter   jpv;
   /** The indentation object */
   private Spacing             spc;
 
@@ -84,7 +84,7 @@ public class JavaBranchPrinter {
     spc = aSPC;
     if (spc == null)
       spc = new Spacing(INDENT_AMT);
-    jp = new JavaPrinter(sb, spc);
+    jpv = new JavaPrinter(sb, spc);
   }
 
   /**
@@ -93,13 +93,13 @@ public class JavaBranchPrinter {
    * Implementation note : it reuses a class allocated StringBuilder buffer, which is therefore
    * overwritten on a next call.
    * 
-   * @param javaNode - the node to walk down and pretty print
+   * @param aJavaNode - the node to walk down and pretty print
    * @return the pretty print in a reused StringBuilder buffer
    */
-  public StringBuilder genJavaBranch(final INode javaNode) {
+  public StringBuilder genJavaBranch(final INode aJavaNode) {
     sb.setLength(0);
-    jp.reset(sb, spc);
-    javaNode.accept(jp);
+    jpv.reset(sb, spc);
+    aJavaNode.accept(jpv);
     return sb;
   }
 
@@ -109,16 +109,16 @@ public class JavaBranchPrinter {
    * Implementation note : it reuses a class allocated StringBuilder buffer, which is therefore
    * overwritten on a next call.
    * 
-   * @param javaNode - the node to walk down and pretty print
+   * @param aJavaNode - the node to walk down and pretty print
    * @param noDebugComments - true to suppress debug comments, false otherwise
    * @return the pretty print in a reused StringBuilder buffer
    */
-  public StringBuilder genJavaBranch(final INode javaNode, final boolean noDebugComments) {
+  public StringBuilder genJavaBranch(final INode aJavaNode, final boolean noDebugComments) {
     sb.setLength(0);
-    jp.reset(sb, spc);
-    jp.noDebugComments = noDebugComments;
-    javaNode.accept(jp);
-    jp.noDebugComments = false;
+    jpv.reset(sb, spc);
+    jpv.noDebugComments = noDebugComments;
+    aJavaNode.accept(jpv);
+    jpv.noDebugComments = false;
     return sb;
   }
 

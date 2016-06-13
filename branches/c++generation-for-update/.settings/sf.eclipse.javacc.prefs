@@ -1,13 +1,32 @@
+<<<<<<< .working
 CLEAR_CONSOLE=false
 JAVACC_OPTIONS=
 JJDOC_OPTIONS=
 JJTREE_OPTIONS=
 JJ_NATURE=false
+=======
+CLEAR_CONSOLE=true
+JAVACC_OPTIONS=
+JJDOC_OPTIONS=
+JJTREE_OPTIONS=
+JJ_NATURE=false
+>>>>>>> .merge-right.r82
 JTB_OPTIONS=
+<<<<<<< .working
 MARK_GEN_FILES_AS_DERIVED=true
 RUNTIME_JAR=G\:\\Java\\JavaCC-5.0\\bin\\lib\\javacc.jar
+=======
+KEEP_DEL_FILES_IN_HISTORY=false
+MARK_GEN_FILES_AS_DERIVED=true
+OUTLINE_SYNC_FROM_EDITOR=true
+>>>>>>> .merge-right.r82
 RUNTIME_JJJAR=
 RUNTIME_JTBJAR=
+<<<<<<< .working
 SHOW_CONSOLE=true
+=======
+RUNTIME_JVMOPTIONS=
+SHOW_CONSOLE=true
+>>>>>>> .merge-right.r82
 SUPPRESS_WARNINGS=false
 eclipse.preferences.version=1

@@ -1,6 +1,5 @@
 package EDU.purdue.jtb.misc;
 
-import static EDU.purdue.jtb.misc.Globals.LS;
 
 
 @SuppressWarnings("javadoc")

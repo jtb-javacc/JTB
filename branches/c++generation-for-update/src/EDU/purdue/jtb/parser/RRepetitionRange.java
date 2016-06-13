@@ -35,17 +35,20 @@ import java.util.List;
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public class RRepetitionRange extends RegularExpression_ {
 
-  /**
-   * The regular expression which is repeated one or more times.
-   */
+  /** The regular expression which is repeated one or more times */
   public RegularExpression_ regexpr;
+  /** The minimum */
   public int                min = 0;
+  /** The maximum */
   public int                max = -1;
+  /** True if it has a maximum, false otherwise */
   public boolean            hasMax;
 
+  /** Standard constructor */
   public RRepetitionRange() {
     expType = EXP_TYPE.R_REPETITION_RANGE;
   }
