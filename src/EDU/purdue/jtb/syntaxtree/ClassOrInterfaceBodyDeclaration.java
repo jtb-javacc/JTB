@@ -3,6 +3,7 @@ package EDU.purdue.jtb.syntaxtree;
 
 import EDU.purdue.jtb.visitor.*;
 
+
 /**
  * JTB node class for the production ClassOrInterfaceBodyDeclaration:<br>
  * Corresponding grammar:<br>
@@ -10,10 +11,9 @@ import EDU.purdue.jtb.visitor.*;
  * .. .. | %1 #0 Modifiers()<br>
  * .. .. . .. #1 ( &0 ClassOrInterfaceDeclaration()<br>
  * .. .. . .. .. | &1 EnumDeclaration()<br>
- * .. .. . .. .. | &2 AnnotationTypeDeclaration()<br>
- * .. .. . .. .. | &3 ConstructorDeclaration()<br>
- * .. .. . .. .. | &4 FieldDeclaration()<br>
- * .. .. . .. .. | &5 MethodDeclaration() )<br>
+ * .. .. . .. .. | &2 ConstructorDeclaration()<br>
+ * .. .. . .. .. | &3 FieldDeclaration()<br>
+ * .. .. . .. .. | &4 MethodDeclaration() )<br>
  * .. .. | %2 ";"<br>
  */
 public class ClassOrInterfaceBodyDeclaration implements INode {
@@ -42,7 +42,6 @@ public class ClassOrInterfaceBodyDeclaration implements INode {
    * @param argu - a user chosen argument
    * @return a user chosen return information
    */
-  @Override
   public <R, A> R accept(final IRetArguVisitor<R, A> vis, final A argu) {
     return vis.visit(this, argu);
   }
@@ -54,7 +53,6 @@ public class ClassOrInterfaceBodyDeclaration implements INode {
    * @param vis - the visitor
    * @return a user chosen return information
    */
-  @Override
   public <R> R accept(final IRetVisitor<R> vis) {
     return vis.visit(this);
   }
@@ -66,7 +64,6 @@ public class ClassOrInterfaceBodyDeclaration implements INode {
    * @param vis - the visitor
    * @param argu - a user chosen argument
    */
-  @Override
   public <A> void accept(final IVoidArguVisitor<A> vis, final A argu) {
     vis.visit(this, argu);
   }
@@ -76,7 +73,6 @@ public class ClassOrInterfaceBodyDeclaration implements INode {
    *
    * @param vis - the visitor
    */
-  @Override
   public void accept(final IVoidVisitor vis) {
     vis.visit(this);
   }

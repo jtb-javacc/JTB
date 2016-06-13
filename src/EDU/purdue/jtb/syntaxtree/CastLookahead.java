@@ -3,6 +3,7 @@ package EDU.purdue.jtb.syntaxtree;
 
 import EDU.purdue.jtb.visitor.*;
 
+
 /**
  * JTB node class for the production CastLookahead:<br>
  * Corresponding grammar:<br>
@@ -12,7 +13,7 @@ import EDU.purdue.jtb.visitor.*;
  * .. .. . .. #3 ( &0 "~"<br>
  * .. .. . .. .. | &1 "!"<br>
  * .. .. . .. .. | &2 "("<br>
- * .. .. . .. .. | &3 < IDENTIFIER ><br>
+ * .. .. . .. .. | &3 <IDENTIFIER><br>
  * .. .. . .. .. | &4 "this"<br>
  * .. .. . .. .. | &5 "super"<br>
  * .. .. . .. .. | &6 "new"<br>
@@ -44,7 +45,6 @@ public class CastLookahead implements INode {
    * @param argu - a user chosen argument
    * @return a user chosen return information
    */
-  @Override
   public <R, A> R accept(final IRetArguVisitor<R, A> vis, final A argu) {
     return vis.visit(this, argu);
   }
@@ -56,7 +56,6 @@ public class CastLookahead implements INode {
    * @param vis - the visitor
    * @return a user chosen return information
    */
-  @Override
   public <R> R accept(final IRetVisitor<R> vis) {
     return vis.visit(this);
   }
@@ -68,7 +67,6 @@ public class CastLookahead implements INode {
    * @param vis - the visitor
    * @param argu - a user chosen argument
    */
-  @Override
   public <A> void accept(final IVoidArguVisitor<A> vis, final A argu) {
     vis.visit(this, argu);
   }
@@ -78,7 +76,6 @@ public class CastLookahead implements INode {
    *
    * @param vis - the visitor
    */
-  @Override
   public void accept(final IVoidVisitor vis) {
     vis.visit(this);
   }

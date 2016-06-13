@@ -60,7 +60,6 @@ public class NodeOptional implements INode {
    * @param argu - the user Argument data
    * @return the user Return data
    */
-  @Override
   public <R, A> R accept(final IRetArguVisitor<R, A> vis, final A argu) {
     return vis.visit(this, argu);
   }
@@ -72,7 +71,6 @@ public class NodeOptional implements INode {
    * @param vis - the visitor
    * @return the user Return data
    */
-  @Override
   public <R> R accept(final IRetVisitor<R> vis) {
     return vis.visit(this);
   }
@@ -84,7 +82,6 @@ public class NodeOptional implements INode {
    * @param vis - the visitor
    * @param argu - the user Argument data
    */
-  @Override
   public <A> void accept(final IVoidArguVisitor<A> vis, final A argu) {
     vis.visit(this, argu);
   }
@@ -94,7 +91,6 @@ public class NodeOptional implements INode {
    *
    * @param vis - the visitor
    */
-  @Override
   public void accept(final IVoidVisitor vis) {
     vis.visit(this);
   }

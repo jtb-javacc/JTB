@@ -3,6 +3,7 @@ package EDU.purdue.jtb.syntaxtree;
 
 import EDU.purdue.jtb.visitor.*;
 
+
 /**
  * JTB node class for the production JavaCodeProduction:<br>
  * Corresponding grammar:<br>
@@ -13,8 +14,7 @@ import EDU.purdue.jtb.visitor.*;
  * f4 -> FormalParameters()<br>
  * f5 -> [ #0 "throws" #1 Name()<br>
  * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
- * f6 -> [ "%" ]<br>
- * f7 -> Block()<br>
+ * f6 -> Block()<br>
  */
 public class JavaCodeProduction implements INode {
 
@@ -37,10 +37,7 @@ public class JavaCodeProduction implements INode {
   public NodeOptional f5;
 
   /** Child node 7 */
-  public NodeOptional f6;
-
-  /** Child node 8 */
-  public Block f7;
+  public Block f6;
 
   /** The serial version UID */
   private static final long serialVersionUID = 1411L;
@@ -55,9 +52,8 @@ public class JavaCodeProduction implements INode {
    * @param n4 - next child node
    * @param n5 - next child node
    * @param n6 - next child node
-   * @param n7 - next child node
    */
-  public JavaCodeProduction(final NodeToken n0, final AccessModifier n1, final ResultType n2, final IdentifierAsString n3, final FormalParameters n4, final NodeOptional n5, final NodeOptional n6, final Block n7) {
+  public JavaCodeProduction(final NodeToken n0, final AccessModifier n1, final ResultType n2, final IdentifierAsString n3, final FormalParameters n4, final NodeOptional n5, final Block n6) {
     f0 = n0;
     f1 = n1;
     f2 = n2;
@@ -65,7 +61,6 @@ public class JavaCodeProduction implements INode {
     f4 = n4;
     f5 = n5;
     f6 = n6;
-    f7 = n7;
   }
 
   /**
@@ -77,7 +72,6 @@ public class JavaCodeProduction implements INode {
    * @param argu - a user chosen argument
    * @return a user chosen return information
    */
-  @Override
   public <R, A> R accept(final IRetArguVisitor<R, A> vis, final A argu) {
     return vis.visit(this, argu);
   }
@@ -89,7 +83,6 @@ public class JavaCodeProduction implements INode {
    * @param vis - the visitor
    * @return a user chosen return information
    */
-  @Override
   public <R> R accept(final IRetVisitor<R> vis) {
     return vis.visit(this);
   }
@@ -101,7 +94,6 @@ public class JavaCodeProduction implements INode {
    * @param vis - the visitor
    * @param argu - a user chosen argument
    */
-  @Override
   public <A> void accept(final IVoidArguVisitor<A> vis, final A argu) {
     vis.visit(this, argu);
   }
@@ -111,7 +103,6 @@ public class JavaCodeProduction implements INode {
    *
    * @param vis - the visitor
    */
-  @Override
   public void accept(final IVoidVisitor vis) {
     vis.visit(this);
   }

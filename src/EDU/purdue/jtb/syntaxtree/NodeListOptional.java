@@ -67,7 +67,6 @@ public class NodeListOptional implements INodeList {
    *
    * @param n - the node to add
    */
-  @Override
   public void addNode(final INode n) {
     if (++allocNb < allocTb.length)
       nodes.ensureCapacity(allocTb[allocNb]);
@@ -82,7 +81,6 @@ public class NodeListOptional implements INodeList {
    * @param i - the node's position
    * @return the node
    */
-  @Override
   public INode elementAt(final int i) {
     return nodes.get(i); }
 
@@ -91,7 +89,6 @@ public class NodeListOptional implements INodeList {
    *
    * @return the iterator
    */
-  @Override
   public Iterator<INode> elements() {
     return nodes.iterator(); }
 
@@ -100,7 +97,6 @@ public class NodeListOptional implements INodeList {
    *
    * @return the list size
    */
-  @Override
   public int size() {
     return nodes.size(); }
 
@@ -119,7 +115,6 @@ public class NodeListOptional implements INodeList {
    * @param argu - the user Argument data
    * @return the user Return data
    */
-  @Override
   public <R, A> R accept(final IRetArguVisitor<R, A> vis, final A argu) {
     return vis.visit(this, argu);
   }
@@ -131,7 +126,6 @@ public class NodeListOptional implements INodeList {
    * @param vis - the visitor
    * @return the user Return data
    */
-  @Override
   public <R> R accept(final IRetVisitor<R> vis) {
     return vis.visit(this);
   }
@@ -143,7 +137,6 @@ public class NodeListOptional implements INodeList {
    * @param vis - the visitor
    * @param argu - the user Argument data
    */
-  @Override
   public <A> void accept(final IVoidArguVisitor<A> vis, final A argu) {
     vis.visit(this, argu);
   }
@@ -153,7 +146,6 @@ public class NodeListOptional implements INodeList {
    *
    * @param vis - the visitor
    */
-  @Override
   public void accept(final IVoidVisitor vis) {
     vis.visit(this);
   }

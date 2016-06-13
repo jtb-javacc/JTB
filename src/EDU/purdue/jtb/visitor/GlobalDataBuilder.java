@@ -1,17 +1,13 @@
 package EDU.purdue.jtb.visitor;
 
-import static EDU.purdue.jtb.misc.Globals.*;
+import static EDU.purdue.jtb.misc.Globals.JTBRT_PREFIX;
+import static EDU.purdue.jtb.misc.Globals.staticFlag;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
-import EDU.purdue.jtb.JTB;
-import EDU.purdue.jtb.misc.ClassInfo;
-import EDU.purdue.jtb.misc.DepthFirstVisitorsGenerator;
-import EDU.purdue.jtb.misc.Messages;
+import EDU.purdue.jtb.misc.ClassInfoForJava;
 import EDU.purdue.jtb.syntaxtree.BNFProduction;
 import EDU.purdue.jtb.syntaxtree.ClassOrInterfaceType;
 import EDU.purdue.jtb.syntaxtree.ComplexRegularExpression;
@@ -37,83 +33,58 @@ import EDU.purdue.jtb.syntaxtree.StringLiteral;
 import EDU.purdue.jtb.syntaxtree.Type;
 
 /**
- * The {@link GlobalDataBuilder} visitor performs, at the beginning of the {@link JTB} processing,
- * some error checking and build objects needed by other classes ({@link ClassesFinder},
- * {@link ClassInfo}, {@link SemanticChecker}, {@link CommentsPrinter} ), {@link Annotator},
- * {@link AcceptInliner}), {@link DepthFirstVisitorsGenerator} :
+ * The {@link GlobalDataBuilder} visitor builds :
  * <ul>
- * <li>a {@link CommentsPrinter} (to be used by all {@link ClassInfo}),</li>
- * <li>a Hashtable ({@link #nsnHT}) of JavaCodeProductions whose nodes must be created ("%" syntax)
- * and of BNFProductions whose nodes must not be created ("!" syntax),</li>
- * <li>a Hashtable ({@link #prodHT}) of all JavaCodeProductions and BNFProductions identifiers and
- * their result type,</li>
- * <li>a list ({@link #retVarDecl}) of return variables declarations (for all non "void"
- * JavaCodeProductions and BNFProductions for which the node creation has not been forbidden - "!"
- * syntax)</li>
+ * <li>a Hashtable ({@link #ncnHT}) of all JavaCodeProductions and BNFProductions for which the node
+ * creation has been forbidden,</li>
+ * <li>a Hashtable ({@link #retVarIdentHT}) of return variable identifiers for all non "void"
+ * BNFProductions for which the node creation has not been forbidden,</li>
+ * <li>a list {@link #retVarDecl} of return variables declarations for all non "void"
+ * JavaCodeProductions and BNFProductions for which the node creation has not been forbidden</li>
  * <li>a Hashtable ({@link #tokenHT}) of tokens which have a constant regular expression, e.g. <
- * PLUS : "+" >, which will be used to generate a default constructor.</li>
+ * PLUS : "+" >, which will be used to generate a default constructor,</li>
+ * <li>a {@link CommentsPrinter} (to be used by all {@link ClassInfoForJava}.</li>
  * </ul>
  * 
  * @version 1.4.7 : 09/2012 : MMa : created from the old GlobalDataFinder in Annotator and
  *          TokenTableBuilder.
- * @version 1.4.8 : 10/2012 : MMa : added JavaCodeProduction class generation if requested ;
- *          modified error checking and messages
  */
 public class GlobalDataBuilder extends DepthFirstVoidVisitor {
 
-  /** The {@link CommentsPrinter} visitor */
-  CommentsPrinter                   cpv;
+  /**
+   * The table of the nodes that must not be created (JavaCodeProductions and those with "!" syntax)
+   */
+  Hashtable<String, String>               ncnHT                = new Hashtable<String, String>();
+
+  /** The table of all return variables identifiers (== non void BNF productions) */
+  Hashtable<String, String>               retVarIdentHT        = new Hashtable<String, String>();
+
+  /** The list of all return variables pairs of comments and declarations */
+  ArrayList<String>                       retVarDecl           = new ArrayList<String>();
+
+  /** The comments printer visitor */
+  CommentsPrinter                         cpv;
 
   /**
-   * The table of non standard nodes : JavaCodeProductions whose nodes must be created ("%" syntax)
-   * and BNFProductions whose nodes must not be created ("!" syntax)<br>
-   * key = identifier, value = {@link #JC_IND} for JavaCodeProductions or {@link #BNF_IND} for
-   * BNFProduction
+   * The table of tokens : keys = token names, values = regular expressions or
+   * {@link #DONT_CREATE_NODE_STR} for nodes not to be created
    */
-  Map<String, String>               nsnHT       = new Hashtable<String, String>();
-
-  /**
-   * The table of all nodes : JavaCodeProductions and BNFProductions<br>
-   * key = identifier, value = {@link #JC_IND} or {@link #BNF_IND} + ResultType
-   */
-  Map<String, String>               prodHT      = new Hashtable<String, String>(100);
-
-  /** The indicator for JavaCodeProduction in the {@link #nsnHT} and {@link #prodHT} tables */
-  public static final String        JC_IND      = "µ";
-
-  /** The indicator for BNFProduction in the {@link #nsnHT} and {@link #prodHT} tables */
-  public static final String        BNF_IND     = "£";
-
-  /**
-   * The list of all return variables pairs of comments and declarations (for all non "void"
-   * JavaCodeProductions and BNFProductions for which the node creation has not been forbidden)
-   */
-  List<String>                      retVarDecl  = new ArrayList<String>();
-
-  /**
-   * The table of tokens<br>
-   * key = token name, value = regular expression or {@link #DONT_CREATE} for nodes not to be
-   * created
-   */
-  private final Map<String, String> tokenHT     = new Hashtable<String, String>();
+  private final Hashtable<String, String> tokenHT              = new Hashtable<String, String>();
 
   /** The current token's name */
-  private String                    name        = "";
+  private String                          name                 = "";
 
   /**
-   * The current token's regular expression ; set to {@link #DONT_CREATE} for a node not to be
-   * created
+   * The current token's regular expression ; set to {@link #DONT_CREATE_NODE_STR} for a node not to
+   * be created
    */
-  private String                    regExpr     = "";
+  private String                          regExpr              = "";
 
-  /** The specific regular expression for a node not to be created */
-  public static final String        DONT_CREATE = "!";
+  /** Specific regular expression for a node not to be created */
+  public static final String              DONT_CREATE_NODE_STR = "!";
 
-  /** True to tell from RegExprSpec to create a node, false otherwise */
-  boolean                           cnfres      = true;
-
-  /** True for first pass, false for the second */
-  boolean                           firstPass   = true;
+  /** Flag to tell from RegExprSpec whether to create a node or not */
+  boolean                                 cnfres               = true;
 
   /**
    * Constructor.
@@ -147,10 +118,6 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
     for (final Iterator<INode> e = n.f10.elements(); e.hasNext();) {
       e.next().accept(this);
     }
-    firstPass = false;
-    for (final Iterator<INode> e = n.f10.elements(); e.hasNext();) {
-      e.next().accept(this);
-    }
   }
 
   /**
@@ -180,144 +147,31 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
    * f4 -> FormalParameters()<br>
    * f5 -> [ #0 "throws" #1 Name()<br>
    * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
-   * f6 -> [ "%" ]<br>
-   * f7 -> Block()<br>
+   * f6 -> Block()<br>
    * 
    * @param n - the node to visit
    */
   @Override
   public void visit(final JavaCodeProduction n) {
     // f3 -> IdentifierAsString()
+    // store it in the Hashtable
     final String ident = n.f3.f0.tokenImage;
-    if (firstPass) {
-      // controls and global data
-      if (prodHT.containsKey(ident))
-        Messages.softErr("This JavaCodeProduction has the same name '" + ident +
-                             "' as another BNFProduction or JavaCodeProduction.",
-                         n.f3.f0.beginLine,
-                         n.f3.f0.beginColumn);
-      else if (ident.equals(iNode) || ident.equals(iNodeList) || ident.equals(nodeList) ||
-               ident.equals(nodeListOpt) || ident.equals(nodeOpt) || ident.equals(nodeSeq) ||
-               ident.equals(nodeToken) || ident.equals(nodeChoice))
-        Messages.softErr("JavaCodeProduction '" + ident +
-                             "()' has the same name as a JTB generated class.", n.f3.f0.beginLine,
-                         n.f3.f0.beginColumn);
-      else {
-        // f2 -> ResultType()
-        final String resType = getResultType(n.f2);
-        if ((!"void".equals(resType))) {
-          if (resType.equals(ident))
-            Messages.softErr("JavaCodeProduction '" + ident +
-                                 "()' has a return type of the same name," +
-                                 " that would conflict with the generated node class.",
-                             n.f3.f0.beginLine, n.f3.f0.beginColumn);
-        }
-        prodHT.put(ident, JC_IND + resType);
-        // f6 -> [ "%" ]
-        if (n.f6.present()) {
-          // add this node to the list of non standard nodes
-          nsnHT.put(ident, JC_IND);
-        }
-      }
-    } else {
-      // return variable declaration
-      if (n.f6.present()) {
-        final String resType = getResultType(n.f2);
-        if ((!"void".equals(resType)))
-          if (prodHT.containsKey(resType)) {
-            Messages.softErr("This JavaCodeProduction '" + ident + "'has a ResultType '" + resType +
-                                 "' of the same name as another BNFProduction or JavaCodeProduction.",
-                             n.f3.f0.beginLine, n.f3.f0.beginColumn);
-          } else {
-            // generate return variable declaration
-            final String comm = "/** Return variable for the {@link #".concat(ident)
-                                                                      .concat("} JavaCodeProduction */");
-            retVarDecl.add(comm);
-            final String rt = fixResultType(ident, resType);
-            final String decl = (staticFlag ? "static " : "").concat(rt).concat(" ")
-                                                             .concat(jtbRtPrefix).concat(ident)
-                                                             .concat(";");
-            retVarDecl.add(decl);
-          }
-      }
+    ncnHT.put(ident, ident);
+    // store it in the list if non "void"
+    final String resType = getResultType(n.f2);
+    if (!"void".equals(resType)) {
+      final String comm = "/** Return variable for {@link #".concat(ident)
+                                                            .concat("} JavaCode production */");
+      retVarDecl.add(comm);
+      final String decl = (staticFlag ? "static " : "").concat(resType).concat(" ")
+                                                       .concat(JTBRT_PREFIX).concat(ident)
+                                                       .concat(";");
+      retVarDecl.add(decl);
     }
   }
 
   /**
-   * Visits a {@link BNFProduction} node, whose children are the following :
-   * <p>
-   * f0 -> AccessModifier()<br>
-   * f1 -> ResultType()<br>
-   * f2 -> IdentifierAsString()<br>
-   * f3 -> FormalParameters()<br>
-   * f4 -> [ #0 "throws" #1 Name()<br>
-   * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
-   * f5 -> [ "!" ]<br>
-   * f6 -> ":"<br>
-   * f7 -> Block()<br>
-   * f8 -> "{"<br>
-   * f9 -> ExpansionChoices()<br>
-   * f10 -> "}"<br>
-   * 
-   * @param n - the node to visit
-   */
-  @Override
-  public void visit(final BNFProduction n) {
-    // f2 -> IdentifierAsString()
-    final String ident = n.f2.f0.tokenImage;
-    if (firstPass) {
-      // controls and global data
-      if (prodHT.containsKey(ident))
-        Messages.softErr("This BNFProduction has the same name '" + ident +
-                             "' as another BNFProduction or JavaCodeProduction.",
-                         n.f2.f0.beginLine,
-                         n.f2.f0.beginColumn);
-      else if (ident.equals(iNode) || ident.equals(iNodeList) || ident.equals(nodeList) ||
-               ident.equals(nodeListOpt) || ident.equals(nodeOpt) || ident.equals(nodeSeq) ||
-               ident.equals(nodeToken) || ident.equals(nodeChoice))
-        Messages.softErr("BNFProduction '" + ident +
-                             "()' has the same name as a JTB generated class.", n.f2.f0.beginLine,
-                         n.f2.f0.beginColumn);
-      else {
-        // f1 -> ResultType()
-        final String resType = getResultType(n.f1);
-        if ((!"void".equals(resType)))
-          if (resType.equals(ident))
-            Messages.softErr("BNFProduction '" + ident + "()' has a return type of the same name," +
-                                 " that would conflict with the generated node class.",
-                             n.f2.f0.beginLine, n.f2.f0.beginColumn);
-        prodHT.put(ident, BNF_IND + resType);
-        // f5 -> [ "!" ]
-        if (n.f5.present()) {
-          // add this node to the list of non standard nodes
-          nsnHT.put(ident, BNF_IND);
-        }
-      }
-    } else {
-      // return variable declaration
-      if (!n.f5.present()) {
-        final String resType = getResultType(n.f1);
-        if ((!"void".equals(resType)))
-          if (prodHT.containsKey(resType)) {
-            Messages.softErr("This BNFProduction '" + ident + "'has a ResultType '" + resType +
-                                 "' of the same name as another BNFProduction or JavaCodeProduction.",
-                             n.f2.f0.beginLine, n.f2.f0.beginColumn);
-          } else {
-            final String comm = "/** Return variable for the {@link #".concat(ident)
-                                                                      .concat("} BNFProduction */");
-            retVarDecl.add(comm);
-            final String rt = fixResultType(ident, resType);
-            final String decl = (staticFlag ? "static " : "").concat(rt).concat(" ")
-                                                             .concat(jtbRtPrefix).concat(ident)
-                                                             .concat(";");
-            retVarDecl.add(decl);
-          }
-      }
-    }
-  }
-
-  /**
-   * Gets the ResultType from the grammar. Walks down the tree to find the first token.
+   * Gets the ResultType. Walks down the tree to find the first token.
    * <p>
    * {@link ResultType}<br>
    * f0 -> ( %0 "void"<br>
@@ -352,7 +206,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
    * @param rt - the node to process
    * @return the result type token image
    */
-  static String getResultType(final ResultType rt) {
+  String getResultType(final ResultType rt) {
     NodeToken tk;
     final INode n = rt.f0.choice;
     if (rt.f0.which == 0) {
@@ -380,20 +234,48 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
   }
 
   /**
-   * Returns the right result type to be output, with or without prefix / suffix.
+   * Visits a {@link BNFProduction} node, whose children are the following :
+   * <p>
+   * f0 -> AccessModifier()<br>
+   * f1 -> ResultType()<br>
+   * f2 -> IdentifierAsString()<br>
+   * f3 -> FormalParameters()<br>
+   * f4 -> [ #0 "throws" #1 Name()<br>
+   * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
+   * f5 -> [ "!" ]<br>
+   * f6 -> ":"<br>
+   * f7 -> Block()<br>
+   * f8 -> "{"<br>
+   * f9 -> ExpansionChoices()<br>
+   * f10 -> "}"<br>
    * 
-   * @param aIdent - the production identifier
-   * @param aResType - the production result type
-   * @return the right result type, with or without prefix / suffix
+   * @param n - the node to visit
    */
-  String fixResultType(final String aIdent, final String aResType) {
-    String rt = prodHT.get(aIdent);
-    if (rt == null)
-      return aResType;
-    rt = rt.substring(1);
-    if ("void".equals(rt))
-      return getFixedName(aResType);
-    return prodHT.containsKey(rt) ? getFixedName(aResType) : aResType;
+  @Override
+  public void visit(final BNFProduction n) {
+    // f2 -> IdentifierAsString()
+    final String ident = n.f2.f0.tokenImage;
+    // f5 -> [ "!" ]
+    if (n.f5.present()) {
+      // add this node to the list of nodes that must not be created
+      ncnHT.put(ident, ident);
+    } else {
+      // generate return variables declaration
+      // f1 -> ResultType()
+      final String resType = getResultType(n.f1);
+
+      retVarIdentHT.put(ident, resType);
+
+      if (!"void".equals(resType)) {
+        final String comm = "/** Return variable for {@link #".concat(ident)
+                                                              .concat("} BNF production */");
+        retVarDecl.add(comm);
+        final String decl = (staticFlag ? "static " : "").concat(resType).concat(" ")
+                                                         .concat(JTBRT_PREFIX).concat(ident)
+                                                         .concat(";");
+        retVarDecl.add(decl);
+      }
+    }
   }
 
 /**
@@ -482,7 +364,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
           seq.elementAt(2).accept(this);
           tokenHT.put(name, regExpr);
         } else
-          tokenHT.put(name, DONT_CREATE);
+          tokenHT.put(name, DONT_CREATE_NODE_STR);
         // reset for next pass
         name = "";
         regExpr = "";
@@ -577,24 +459,23 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
    */
 
   /**
-   * @return the table of JavaCodeProductions whose nodes must be created ("%" syntax) and of
-   *         BNFProductions whose nodes must not be created ("!" syntax)
+   * @return the table of the nodes that must not be created
    */
-  public final Map<String, String> getNsnHT() {
-    return nsnHT;
+  public final Hashtable<String, String> getNcnHT() {
+    return ncnHT;
   }
 
   /**
-   * @return the table of all BNFProductions and JavaCodeProductions
+   * @return the table of all return variables identifiers
    */
-  public final Map<String, String> getProdHT() {
-    return prodHT;
+  public final Hashtable<String, String> getRetVarIdentHT() {
+    return retVarIdentHT;
   }
 
   /**
    * @return the list of all return variables pairs of comments and declarations
    */
-  public final List<String> getRetVarDecl() {
+  public final ArrayList<String> getRetVarDecl() {
     return retVarDecl;
   }
 
@@ -611,7 +492,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
    * 
    * @return the Hashtable
    */
-  public Map<String, String> getTokenHT() {
+  public Hashtable<String, String> getTokenHT() {
     return tokenHT;
   }
 
@@ -659,7 +540,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
           // $0 IdentifierAsString() $1 Arguments() $2 [ "!" ]
           final NodeSequence seq1 = (NodeSequence) ch.choice;
           final String ident = ((IdentifierAsString) seq1.elementAt(0)).f0.tokenImage;
-          if (nsnHT.containsKey(ident) || ((NodeOptional) seq1.elementAt(2)).present())
+          if (ncnHT.containsKey(ident) || ((NodeOptional) seq1.elementAt(2)).present())
             // node not to be created
             return false;
           else
@@ -679,7 +560,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
               final String val = tokenHT.get(ident);
               //            if (val == null)
               //              throw new AssertionError("val is null");
-              if (DONT_CREATE.equals(val))
+              if (DONT_CREATE_NODE_STR.equals(val))
                 // node not to be created
                 return false;
               else

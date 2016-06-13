@@ -27,7 +27,24 @@
  */
 package EDU.purdue.jtb.parser;
 
-import static EDU.purdue.jtb.misc.Globals.*;
+import static EDU.purdue.jtb.misc.Globals.DEF_OUT_FILE_NAME;
+import static EDU.purdue.jtb.misc.Globals.depthLevel;
+import static EDU.purdue.jtb.misc.Globals.descriptiveFieldNames;
+import static EDU.purdue.jtb.misc.Globals.inlineAcceptMethods;
+import static EDU.purdue.jtb.misc.Globals.javaDocComments;
+import static EDU.purdue.jtb.misc.Globals.keepSpecialTokens;
+import static EDU.purdue.jtb.misc.Globals.noOverwrite;
+import static EDU.purdue.jtb.misc.Globals.noSemanticCheck;
+import static EDU.purdue.jtb.misc.Globals.nodePrefix;
+import static EDU.purdue.jtb.misc.Globals.nodeSuffix;
+import static EDU.purdue.jtb.misc.Globals.astNodesDirName;
+import static EDU.purdue.jtb.misc.Globals.nodesPackageName;
+import static EDU.purdue.jtb.misc.Globals.parentPointer;
+import static EDU.purdue.jtb.misc.Globals.printClassList;
+import static EDU.purdue.jtb.misc.Globals.printerToolkit;
+import static EDU.purdue.jtb.misc.Globals.schemeToolkit;
+import static EDU.purdue.jtb.misc.Globals.visitorsDirName;
+import static EDU.purdue.jtb.misc.Globals.visitorsPackageName;
 
 import java.io.File;
 import java.util.HashMap;
@@ -45,7 +62,6 @@ import java.util.Set;
  * @version 1.4.8 : 12/2014 : MMa : improved javadoc
  */
 public class Options {
-
   /**
    * Limit sub classing to derived classes.
    */
@@ -144,6 +160,9 @@ public class Options {
     optionValues.put("NODE_SUFFIX", "");
     optionValues.put("OTHER_AMBIGUITY_CHECK", new Integer(1));
     optionValues.put("OUTPUT_DIRECTORY", ".");
+    optionValues.put("OUTPUT_LANGUAGE", "java");
+    optionValues.put("NAMESPACE", "AST");
+    
     optionValues.put("SANITY_CHECK", Boolean.TRUE);
     optionValues.put("STATIC", Boolean.TRUE);
     optionValues.put("SUPPORT_CLASS_VISIBILITY_PUBLIC", Boolean.TRUE);
@@ -153,6 +172,15 @@ public class Options {
     optionValues.put("UNICODE_INPUT", Boolean.FALSE);
     optionValues.put("USER_CHAR_STREAM", Boolean.FALSE);
     optionValues.put("USER_TOKEN_MANAGER", Boolean.FALSE);
+    
+    optionValues.put("TOKEN_MANAGER_SUPER_CLASS", "");
+    optionValues.put("TOKEN_MANAGER_INCLUDES", "");
+    optionValues.put("PARSER_INCLUDES", "");
+    optionValues.put("PARSER_SUPER_CLASS", "");
+    optionValues.put("TOKEN_EXTENDS", "");
+    optionValues.put("TOKEN_INCLUDES", "");
+
+    
     // JTB Options (with default values or command line arguments)
     // -h & -si are not managed in an input file
     if (optionValues.get("JTB_CL") == null)
@@ -170,7 +198,7 @@ public class Options {
     if (optionValues.get("JTB_JD") == null)
       optionValues.put("JTB_JD", new Boolean(javaDocComments));
     if (optionValues.get("JTB_ND") == null)
-      optionValues.put("JTB_ND", nodesDirName);
+      optionValues.put("JTB_ND", astNodesDirName);
     if (optionValues.get("JTB_NP") == null)
       optionValues.put("JTB_NP", nodesPackageName);
     if (optionValues.get("JTB_NPFX") == null)
@@ -201,7 +229,12 @@ public class Options {
       optionValues.put("JTB_W", new Boolean(noOverwrite));
   }
 
-  /**
+  public static enum Language {
+    java, cpp;
+  }
+  public static Language language = Language.java;
+  
+ /**
    * Returns a string representation of the specified options of interest. Used when, for example,
    * generating Token.java to record the JavaCC options that were used to generate the file. All of
    * the options must be boolean values.
@@ -265,13 +298,13 @@ public class Options {
   public static void setInputFileOption(final Object nameloc, final Object valueloc,
                                         final String name, final Object value) {
     Object val = value;
-    final String s = name.toUpperCase();
-    if (!optionValues.containsKey(s)) {
+    final String optionNameUpperCase = name.toUpperCase();
+    if (!optionValues.containsKey(optionNameUpperCase)) {
       JavaCCErrors.warning(nameloc, "Bad option name \"" + name +
                                     "\".  Option setting will be ignored.");
       return;
     }
-    final Object existingValue = optionValues.get(s);
+    final Object existingValue = optionValues.get(optionNameUpperCase);
     val = upgradeValue(name, val);
     if (existingValue != null) {
       if ((existingValue.getClass() != val.getClass()) ||
@@ -280,21 +313,27 @@ public class Options {
                                        "\".  Option setting will be ignored.");
         return;
       }
-      if (inputFileSetting.contains(s)) {
+      if (inputFileSetting.contains(optionNameUpperCase)) {
         JavaCCErrors.warning(nameloc, "Duplicate option setting for \"" + name +
                                       "\" will be ignored.");
         return;
       }
-      if (cmdLineSetting.contains(s)) {
+      if (cmdLineSetting.contains(optionNameUpperCase)) {
         if (!existingValue.equals(val)) {
           JavaCCErrors.warning(nameloc, "Command line setting of \"" + name +
                                         "\" modifies option value in file.");
         }
         return;
       }
+      if (optionNameUpperCase.equalsIgnoreCase("OUTPUT_LANGUAGE")) {
+        String l = (String)value;
+        if (l.equalsIgnoreCase("c++")) {
+          language = Language.cpp;
+        }
+      }
     }
-    optionValues.put(s, val);
-    inputFileSetting.add(s);
+    optionValues.put(optionNameUpperCase, val);
+    inputFileSetting.add(optionNameUpperCase);
   }
 
   /**
@@ -587,6 +626,15 @@ public class Options {
    */
   public static File getOutputDirectory() {
     return new File(stringValue("OUTPUT_DIRECTORY"));
+  }
+
+  /**
+   * Find the output language.
+   * 
+   * @return The requested output language.
+   */
+  public static Language getOutputLanguage() {
+    return language;
   }
 
   /**

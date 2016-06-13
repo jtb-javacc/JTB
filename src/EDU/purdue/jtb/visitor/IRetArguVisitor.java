@@ -8,7 +8,7 @@ import EDU.purdue.jtb.syntaxtree.*;
  * @param <R> - The user return information type
  * @param <A> - The user argument type
  */
-public interface IRetArguVisitor<R, A> {
+public interface IRetArguVisitor<R,A> {
 
   /*
    * Base "RetArgu" visit methods
@@ -95,7 +95,7 @@ public interface IRetArguVisitor<R, A> {
    * f8 -> IdentifierAsString()<br>
    * f9 -> ")"<br>
    * f10 -> ( Production() )+<br>
-   * f11 -> < EOF ><br>
+   * f11 -> <EOF><br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -104,7 +104,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final JavaCCInput n, final A argu);
 
   /**
-   * Visits a {@link JavaCCOptions} node, whose child is the following :
+   * Visits a {@link JavaCCOptions} node, whose children are the following :
    * <p>
    * f0 -> [ #0 "options" #1 "{"<br>
    * .. .. . #2 ( OptionBinding() )*<br>
@@ -119,7 +119,7 @@ public interface IRetArguVisitor<R, A> {
   /**
    * Visits a {@link OptionBinding} node, whose children are the following :
    * <p>
-   * f0 -> ( %0 < IDENTIFIER ><br>
+   * f0 -> ( %0 <IDENTIFIER><br>
    * .. .. | %1 "LOOKAHEAD"<br>
    * .. .. | %2 "IGNORE_CASE"<br>
    * .. .. | %3 "static" )<br>
@@ -136,7 +136,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final OptionBinding n, final A argu);
 
   /**
-   * Visits a {@link Production} node, whose child is the following :
+   * Visits a {@link Production} node, whose children are the following :
    * <p>
    * f0 -> . %0 JavaCodeProduction()<br>
    * .. .. | %1 RegularExprProduction()<br>
@@ -159,8 +159,7 @@ public interface IRetArguVisitor<R, A> {
    * f4 -> FormalParameters()<br>
    * f5 -> [ #0 "throws" #1 Name()<br>
    * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
-   * f6 -> [ "%" ]<br>
-   * f7 -> Block()<br>
+   * f6 -> Block()<br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -191,7 +190,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final BNFProduction n, final A argu);
 
   /**
-   * Visits a {@link AccessModifier} node, whose child is the following :
+   * Visits a {@link AccessModifier} node, whose children are the following :
    * <p>
    * f0 -> ( %0 "public"<br>
    * .. .. | %1 "protected"<br>
@@ -208,8 +207,8 @@ public interface IRetArguVisitor<R, A> {
    * Visits a {@link RegularExprProduction} node, whose children are the following :
    * <p>
    * f0 -> [ %0 #0 "<" #1 "*" #2 ">"<br>
-   * .. .. | %1 #0 "<" #1 < IDENTIFIER ><br>
-   * .. .. . .. #2 ( $0 "," $1 < IDENTIFIER > )*<br>
+   * .. .. | %1 #0 "<" #1 <IDENTIFIER><br>
+   * .. .. . .. #2 ( $0 "," $1 <IDENTIFIER> )*<br>
    * .. .. . .. #3 ">" ]<br>
    * f1 -> RegExprKind()<br>
    * f2 -> [ #0 "[" #1 "IGNORE_CASE" #2 "]" ]<br>
@@ -239,7 +238,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final TokenManagerDecls n, final A argu);
 
   /**
-   * Visits a {@link RegExprKind} node, whose child is the following :
+   * Visits a {@link RegExprKind} node, whose children are the following :
    * <p>
    * f0 -> . %0 "TOKEN"<br>
    * .. .. | %1 "SPECIAL_TOKEN"<br>
@@ -258,7 +257,7 @@ public interface IRetArguVisitor<R, A> {
    * f0 -> RegularExpression()<br>
    * f1 -> [ "!" ]<br>
    * f2 -> [ Block() ]<br>
-   * f3 -> [ #0 ":" #1 < IDENTIFIER > ]<br>
+   * f3 -> [ #0 ":" #1 <IDENTIFIER> ]<br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -306,7 +305,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final LocalLookahead n, final A argu);
 
   /**
-   * Visits a {@link ExpansionUnit} node, whose child is the following :
+   * Visits a {@link ExpansionUnit} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"<br>
    * .. .. | %1 Block()<br>
@@ -316,7 +315,7 @@ public interface IRetArguVisitor<R, A> {
    * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
    * .. .. . .. .. . .. $2 [ "!" ]<br>
    * .. .. . .. .. | &1 $0 RegularExpression()<br>
-   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ]<br>
+   * .. .. . .. .. . .. $1 [ ?0 "." ?1 <IDENTIFIER> ]<br>
    * .. .. . .. .. . .. $2 [ "!" ] )<br>
    * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
    * .. .. . .. #3 ( &0 "+"<br>
@@ -336,7 +335,7 @@ public interface IRetArguVisitor<R, A> {
    * f1 -> "{"<br>
    * f2 -> ExpansionChoices()<br>
    * f3 -> "}"<br>
-   * f4 -> ( #0 "catch" #1 "(" #2 Name() #3 < IDENTIFIER > #4 ")" #5 Block() )*<br>
+   * f4 -> ( #0 "catch" #1 "(" #2 Name() #3 <IDENTIFIER> #4 ")" #5 Block() )*<br>
    * f5 -> [ #0 "finally" #1 Block() ]<br>
    *
    * @param n - the node to visit
@@ -346,7 +345,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final ExpansionUnitTCF n, final A argu);
 
   /**
-   * Visits a {@link RegularExpression} node, whose child is the following :
+   * Visits a {@link RegularExpression} node, whose children are the following :
    * <p>
    * f0 -> . %0 StringLiteral()<br>
    * .. .. | %1 #0 "<"<br>
@@ -375,7 +374,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final ComplexRegularExpressionChoices n, final A argu);
 
   /**
-   * Visits a {@link ComplexRegularExpression} node, whose child is the following :
+   * Visits a {@link ComplexRegularExpression} node, whose children are the following :
    * <p>
    * f0 -> ( ComplexRegularExpressionUnit() )+<br>
    *
@@ -386,7 +385,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final ComplexRegularExpression n, final A argu);
 
   /**
-   * Visits a {@link ComplexRegularExpressionUnit} node, whose child is the following :
+   * Visits a {@link ComplexRegularExpressionUnit} node, whose children are the following :
    * <p>
    * f0 -> . %0 StringLiteral()<br>
    * .. .. | %1 #0 "<" #1 IdentifierAsString() #2 ">"<br>
@@ -434,9 +433,9 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final CharacterDescriptor n, final A argu);
 
   /**
-   * Visits a {@link IdentifierAsString} node, whose child is the following :
+   * Visits a {@link IdentifierAsString} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -445,9 +444,9 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final IdentifierAsString n, final A argu);
 
   /**
-   * Visits a {@link JavaIdentifier} node, whose child is the following :
+   * Visits a {@link JavaIdentifier} node, whose children are the following :
    * <p>
-   * f0 -> ( %00 < IDENTIFIER ><br>
+   * f0 -> ( %00 <IDENTIFIER><br>
    * .. .. | %01 "LOOKAHEAD"<br>
    * .. .. | %02 "IGNORE_CASE"<br>
    * .. .. | %03 "PARSER_BEGIN"<br>
@@ -508,7 +507,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final ImportDeclaration n, final A argu);
 
   /**
-   * Visits a {@link Modifiers} node, whose child is the following :
+   * Visits a {@link Modifiers} node, whose children are the following :
    * <p>
    * f0 -> ( ( %00 "public"<br>
    * .. .. . | %01 "static"<br>
@@ -530,7 +529,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final Modifiers n, final A argu);
 
   /**
-   * Visits a {@link TypeDeclaration} node, whose child is the following :
+   * Visits a {@link TypeDeclaration} node, whose children are the following :
    * <p>
    * f0 -> . %0 ";"<br>
    * .. .. | %1 #0 Modifiers()<br>
@@ -549,7 +548,7 @@ public interface IRetArguVisitor<R, A> {
    * <p>
    * f0 -> ( %0 "class"<br>
    * .. .. | %1 "interface" )<br>
-   * f1 -> < IDENTIFIER ><br>
+   * f1 -> <IDENTIFIER><br>
    * f2 -> [ TypeParameters() ]<br>
    * f3 -> [ ExtendsList() ]<br>
    * f4 -> [ ImplementsList() ]<br>
@@ -591,7 +590,7 @@ public interface IRetArguVisitor<R, A> {
    * Visits a {@link EnumDeclaration} node, whose children are the following :
    * <p>
    * f0 -> "enum"<br>
-   * f1 -> < IDENTIFIER ><br>
+   * f1 -> <IDENTIFIER><br>
    * f2 -> [ ImplementsList() ]<br>
    * f3 -> EnumBody()<br>
    *
@@ -622,7 +621,7 @@ public interface IRetArguVisitor<R, A> {
    * Visits a {@link EnumConstant} node, whose children are the following :
    * <p>
    * f0 -> Modifiers()<br>
-   * f1 -> < IDENTIFIER ><br>
+   * f1 -> <IDENTIFIER><br>
    * f2 -> [ Arguments() ]<br>
    * f3 -> [ ClassOrInterfaceBody() ]<br>
    *
@@ -649,7 +648,7 @@ public interface IRetArguVisitor<R, A> {
   /**
    * Visits a {@link TypeParameter} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    * f1 -> [ TypeBound() ]<br>
    *
    * @param n - the node to visit
@@ -685,16 +684,15 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final ClassOrInterfaceBody n, final A argu);
 
   /**
-   * Visits a {@link ClassOrInterfaceBodyDeclaration} node, whose child is the following :
+   * Visits a {@link ClassOrInterfaceBodyDeclaration} node, whose children are the following :
    * <p>
    * f0 -> . %0 Initializer()<br>
    * .. .. | %1 #0 Modifiers()<br>
    * .. .. . .. #1 ( &0 ClassOrInterfaceDeclaration()<br>
    * .. .. . .. .. | &1 EnumDeclaration()<br>
-   * .. .. . .. .. | &2 AnnotationTypeDeclaration()<br>
-   * .. .. . .. .. | &3 ConstructorDeclaration()<br>
-   * .. .. . .. .. | &4 FieldDeclaration()<br>
-   * .. .. . .. .. | &5 MethodDeclaration() )<br>
+   * .. .. . .. .. | &2 ConstructorDeclaration()<br>
+   * .. .. . .. .. | &3 FieldDeclaration()<br>
+   * .. .. . .. .. | &4 MethodDeclaration() )<br>
    * .. .. | %2 ";"<br>
    *
    * @param n - the node to visit
@@ -732,7 +730,7 @@ public interface IRetArguVisitor<R, A> {
   /**
    * Visits a {@link VariableDeclaratorId} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    * f1 -> ( #0 "[" #1 "]" )*<br>
    *
    * @param n - the node to visit
@@ -742,7 +740,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final VariableDeclaratorId n, final A argu);
 
   /**
-   * Visits a {@link VariableInitializer} node, whose child is the following :
+   * Visits a {@link VariableInitializer} node, whose children are the following :
    * <p>
    * f0 -> . %0 ArrayInitializer()<br>
    * .. .. | %1 Expression()<br>
@@ -787,7 +785,7 @@ public interface IRetArguVisitor<R, A> {
   /**
    * Visits a {@link MethodDeclarator} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    * f1 -> FormalParameters()<br>
    * f2 -> ( #0 "[" #1 "]" )*<br>
    *
@@ -829,7 +827,7 @@ public interface IRetArguVisitor<R, A> {
    * Visits a {@link ConstructorDeclaration} node, whose children are the following :
    * <p>
    * f0 -> [ TypeParameters() ]<br>
-   * f1 -> < IDENTIFIER ><br>
+   * f1 -> <IDENTIFIER><br>
    * f2 -> FormalParameters()<br>
    * f3 -> [ #0 "throws" #1 NameList() ]<br>
    * f4 -> "{"<br>
@@ -844,14 +842,11 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final ConstructorDeclaration n, final A argu);
 
   /**
-   * Visits a {@link ExplicitConstructorInvocation} node, whose child is the following :
+   * Visits a {@link ExplicitConstructorInvocation} node, whose children are the following :
    * <p>
-   * f0 -> ( %0 #0 [ $0 "<" $1 ReferenceType()<br>
-   * .. .. . .. .. . $2 ( ?0 "," ?1 ReferenceType() )*<br>
-   * .. .. . .. .. . $3 ">" ]<br>
-   * .. .. . .. #1 ( &0 $0 "this" $1 Arguments() $2 ";"<br>
-   * .. .. . .. .. | &1 $0 "super" $1 Arguments() $2 ";" )<br>
-   * .. .. | %1 ( #0 PrimaryExpression() #1 "." #2 "super" #3 Arguments() #4 ";" ) )<br>
+   * f0 -> . %0 #0 "this" #1 Arguments() #2 ";"<br>
+   * .. .. | %1 #0 [ $0 PrimaryExpression() $1 "." ]<br>
+   * .. .. . .. #1 "super" #2 Arguments() #3 ";"<br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -872,7 +867,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final Initializer n, final A argu);
 
   /**
-   * Visits a {@link Type} node, whose child is the following :
+   * Visits a {@link Type} node, whose children are the following :
    * <p>
    * f0 -> . %0 ReferenceType()<br>
    * .. .. | %1 PrimitiveType()<br>
@@ -884,7 +879,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final Type n, final A argu);
 
   /**
-   * Visits a {@link ReferenceType} node, whose child is the following :
+   * Visits a {@link ReferenceType} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 PrimitiveType()<br>
    * .. .. . .. #1 ( $0 "[" $1 "]" )+<br>
@@ -900,9 +895,9 @@ public interface IRetArguVisitor<R, A> {
   /**
    * Visits a {@link ClassOrInterfaceType} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    * f1 -> [ TypeArguments() ]<br>
-   * f2 -> ( #0 "." #1 < IDENTIFIER ><br>
+   * f2 -> ( #0 "." #1 <IDENTIFIER><br>
    * .. .. . #2 [ TypeArguments() ] )*<br>
    *
    * @param n - the node to visit
@@ -926,7 +921,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final TypeArguments n, final A argu);
 
   /**
-   * Visits a {@link TypeArgument} node, whose child is the following :
+   * Visits a {@link TypeArgument} node, whose children are the following :
    * <p>
    * f0 -> . %0 ReferenceType()<br>
    * .. .. | %1 #0 "?"<br>
@@ -939,7 +934,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final TypeArgument n, final A argu);
 
   /**
-   * Visits a {@link WildcardBounds} node, whose child is the following :
+   * Visits a {@link WildcardBounds} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 "extends" #1 ReferenceType()<br>
    * .. .. | %1 #0 "super" #1 ReferenceType()<br>
@@ -951,7 +946,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final WildcardBounds n, final A argu);
 
   /**
-   * Visits a {@link PrimitiveType} node, whose child is the following :
+   * Visits a {@link PrimitiveType} node, whose children are the following :
    * <p>
    * f0 -> . %0 "boolean"<br>
    * .. .. | %1 "char"<br>
@@ -969,7 +964,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final PrimitiveType n, final A argu);
 
   /**
-   * Visits a {@link ResultType} node, whose child is the following :
+   * Visits a {@link ResultType} node, whose children are the following :
    * <p>
    * f0 -> ( %0 "void"<br>
    * .. .. | %1 Type() )<br>
@@ -1017,7 +1012,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final Expression n, final A argu);
 
   /**
-   * Visits a {@link AssignmentOperator} node, whose child is the following :
+   * Visits a {@link AssignmentOperator} node, whose children are the following :
    * <p>
    * f0 -> . %00 "="<br>
    * .. .. | %01 "*="<br>
@@ -1168,7 +1163,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final ShiftExpression n, final A argu);
 
   /**
-   * Visits a {@link RSignedShift} node, whose child is the following :
+   * Visits a {@link RSignedShift} node, whose children are the following :
    * <p>
    * f0 -> ">>"<br>
    *
@@ -1179,7 +1174,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final RSignedShift n, final A argu);
 
   /**
-   * Visits a {@link RUnsignedShift} node, whose child is the following :
+   * Visits a {@link RUnsignedShift} node, whose children are the following :
    * <p>
    * f0 -> ">>>"<br>
    *
@@ -1219,7 +1214,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final MultiplicativeExpression n, final A argu);
 
   /**
-   * Visits a {@link UnaryExpression} node, whose child is the following :
+   * Visits a {@link UnaryExpression} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 ( &0 "+"<br>
    * .. .. . .. .. | &1 "-" )<br>
@@ -1259,7 +1254,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final PreDecrementExpression n, final A argu);
 
   /**
-   * Visits a {@link UnaryExpressionNotPlusMinus} node, whose child is the following :
+   * Visits a {@link UnaryExpressionNotPlusMinus} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 ( &0 "~"<br>
    * .. .. . .. .. | &1 "!" )<br>
@@ -1274,7 +1269,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final UnaryExpressionNotPlusMinus n, final A argu);
 
   /**
-   * Visits a {@link CastLookahead} node, whose child is the following :
+   * Visits a {@link CastLookahead} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 "(" #1 PrimitiveType()<br>
    * .. .. | %1 #0 "(" #1 Type() #2 "[" #3 "]"<br>
@@ -1282,7 +1277,7 @@ public interface IRetArguVisitor<R, A> {
    * .. .. . .. #3 ( &0 "~"<br>
    * .. .. . .. .. | &1 "!"<br>
    * .. .. . .. .. | &2 "("<br>
-   * .. .. . .. .. | &3 < IDENTIFIER ><br>
+   * .. .. . .. .. | &3 <IDENTIFIER><br>
    * .. .. . .. .. | &4 "this"<br>
    * .. .. . .. .. | &5 "super"<br>
    * .. .. . .. .. | &6 "new"<br>
@@ -1308,7 +1303,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final PostfixExpression n, final A argu);
 
   /**
-   * Visits a {@link CastExpression} node, whose child is the following :
+   * Visits a {@link CastExpression} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 "(" #1 Type() #2 ")" #3 UnaryExpression()<br>
    * .. .. | %1 #0 "(" #1 Type() #2 ")" #3 UnaryExpressionNotPlusMinus()<br>
@@ -1336,7 +1331,7 @@ public interface IRetArguVisitor<R, A> {
    * <p>
    * f0 -> "."<br>
    * f1 -> TypeArguments()<br>
-   * f2 -> < IDENTIFIER ><br>
+   * f2 -> <IDENTIFIER><br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -1345,11 +1340,11 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final MemberSelector n, final A argu);
 
   /**
-   * Visits a {@link PrimaryPrefix} node, whose child is the following :
+   * Visits a {@link PrimaryPrefix} node, whose children are the following :
    * <p>
    * f0 -> . %0 Literal()<br>
    * .. .. | %1 "this"<br>
-   * .. .. | %2 #0 "super" #1 "." #2 < IDENTIFIER ><br>
+   * .. .. | %2 #0 "super" #1 "." #2 <IDENTIFIER><br>
    * .. .. | %3 #0 "(" #1 Expression() #2 ")"<br>
    * .. .. | %4 AllocationExpression()<br>
    * .. .. | %5 #0 ResultType() #1 "." #2 "class"<br>
@@ -1362,13 +1357,13 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final PrimaryPrefix n, final A argu);
 
   /**
-   * Visits a {@link PrimarySuffix} node, whose child is the following :
+   * Visits a {@link PrimarySuffix} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 "." #1 "this"<br>
    * .. .. | %1 #0 "." #1 AllocationExpression()<br>
    * .. .. | %2 MemberSelector()<br>
    * .. .. | %3 #0 "[" #1 Expression() #2 "]"<br>
-   * .. .. | %4 #0 "." #1 < IDENTIFIER ><br>
+   * .. .. | %4 #0 "." #1 <IDENTIFIER><br>
    * .. .. | %5 Arguments()<br>
    *
    * @param n - the node to visit
@@ -1378,12 +1373,12 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final PrimarySuffix n, final A argu);
 
   /**
-   * Visits a {@link Literal} node, whose child is the following :
+   * Visits a {@link Literal} node, whose children are the following :
    * <p>
-   * f0 -> . %0 < INTEGER_LITERAL ><br>
-   * .. .. | %1 < FLOATING_POINT_LITERAL ><br>
-   * .. .. | %2 < CHARACTER_LITERAL ><br>
-   * .. .. | %3 < STRING_LITERAL ><br>
+   * f0 -> . %0 <INTEGER_LITERAL><br>
+   * .. .. | %1 <FLOATING_POINT_LITERAL><br>
+   * .. .. | %2 <CHARACTER_LITERAL><br>
+   * .. .. | %3 <STRING_LITERAL><br>
    * .. .. | %4 BooleanLiteral()<br>
    * .. .. | %5 NullLiteral()<br>
    *
@@ -1394,9 +1389,9 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final Literal n, final A argu);
 
   /**
-   * Visits a {@link IntegerLiteral} node, whose child is the following :
+   * Visits a {@link IntegerLiteral} node, whose children are the following :
    * <p>
-   * f0 -> < INTEGER_LITERAL ><br>
+   * f0 -> <INTEGER_LITERAL><br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -1405,7 +1400,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final IntegerLiteral n, final A argu);
 
   /**
-   * Visits a {@link BooleanLiteral} node, whose child is the following :
+   * Visits a {@link BooleanLiteral} node, whose children are the following :
    * <p>
    * f0 -> . %0 "true"<br>
    * .. .. | %1 "false"<br>
@@ -1417,9 +1412,9 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final BooleanLiteral n, final A argu);
 
   /**
-   * Visits a {@link StringLiteral} node, whose child is the following :
+   * Visits a {@link StringLiteral} node, whose children are the following :
    * <p>
-   * f0 -> < STRING_LITERAL ><br>
+   * f0 -> <STRING_LITERAL><br>
    *
    * @param n - the node to visit
    * @param argu - the user argument
@@ -1428,7 +1423,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final StringLiteral n, final A argu);
 
   /**
-   * Visits a {@link NullLiteral} node, whose child is the following :
+   * Visits a {@link NullLiteral} node, whose children are the following :
    * <p>
    * f0 -> "null"<br>
    *
@@ -1464,7 +1459,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final ArgumentList n, final A argu);
 
   /**
-   * Visits a {@link AllocationExpression} node, whose child is the following :
+   * Visits a {@link AllocationExpression} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 "new" #1 PrimitiveType() #2 ArrayDimsAndInits()<br>
    * .. .. | %1 #0 "new" #1 ClassOrInterfaceType()<br>
@@ -1480,7 +1475,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final AllocationExpression n, final A argu);
 
   /**
-   * Visits a {@link ArrayDimsAndInits} node, whose child is the following :
+   * Visits a {@link ArrayDimsAndInits} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 ( $0 "[" $1 Expression() $2 "]" )+<br>
    * .. .. . .. #1 ( $0 "[" $1 "]" )*<br>
@@ -1494,7 +1489,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final ArrayDimsAndInits n, final A argu);
 
   /**
-   * Visits a {@link Statement} node, whose child is the following :
+   * Visits a {@link Statement} node, whose children are the following :
    * <p>
    * f0 -> . %00 LabeledStatement()<br>
    * .. .. | %01 AssertStatement()<br>
@@ -1536,7 +1531,7 @@ public interface IRetArguVisitor<R, A> {
   /**
    * Visits a {@link LabeledStatement} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    * f1 -> ":"<br>
    * f2 -> Statement()<br>
    *
@@ -1560,7 +1555,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final Block n, final A argu);
 
   /**
-   * Visits a {@link BlockStatement} node, whose child is the following :
+   * Visits a {@link BlockStatement} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 LocalVariableDeclaration() #1 ";"<br>
    * .. .. | %1 Statement()<br>
@@ -1587,7 +1582,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final LocalVariableDeclaration n, final A argu);
 
   /**
-   * Visits a {@link VariableModifiers} node, whose child is the following :
+   * Visits a {@link VariableModifiers} node, whose children are the following :
    * <p>
    * f0 -> ( ( %0 "final"<br>
    * .. .. . | %1 Annotation() ) )*<br>
@@ -1599,7 +1594,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final VariableModifiers n, final A argu);
 
   /**
-   * Visits a {@link EmptyStatement} node, whose child is the following :
+   * Visits a {@link EmptyStatement} node, whose children are the following :
    * <p>
    * f0 -> ";"<br>
    *
@@ -1610,7 +1605,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final EmptyStatement n, final A argu);
 
   /**
-   * Visits a {@link StatementExpression} node, whose child is the following :
+   * Visits a {@link StatementExpression} node, whose children are the following :
    * <p>
    * f0 -> . %0 PreIncrementExpression()<br>
    * .. .. | %1 PreDecrementExpression()<br>
@@ -1644,7 +1639,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final SwitchStatement n, final A argu);
 
   /**
-   * Visits a {@link SwitchLabel} node, whose child is the following :
+   * Visits a {@link SwitchLabel} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 "case" #1 Expression() #2 ":"<br>
    * .. .. | %1 #0 "default" #1 ":"<br>
@@ -1708,7 +1703,7 @@ public interface IRetArguVisitor<R, A> {
    * <p>
    * f0 -> "for"<br>
    * f1 -> "("<br>
-   * f2 -> ( %0 #0 VariableModifiers() #1 Type() #2 < IDENTIFIER > #3 ":" #4 Expression()<br>
+   * f2 -> ( %0 #0 VariableModifiers() #1 Type() #2 <IDENTIFIER> #3 ":" #4 Expression()<br>
    * .. .. | %1 #0 [ ForInit() ]<br>
    * .. .. . .. #1 ";"<br>
    * .. .. . .. #2 [ Expression() ]<br>
@@ -1724,7 +1719,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final ForStatement n, final A argu);
 
   /**
-   * Visits a {@link ForInit} node, whose child is the following :
+   * Visits a {@link ForInit} node, whose children are the following :
    * <p>
    * f0 -> . %0 LocalVariableDeclaration()<br>
    * .. .. | %1 StatementExpressionList()<br>
@@ -1748,7 +1743,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final StatementExpressionList n, final A argu);
 
   /**
-   * Visits a {@link ForUpdate} node, whose child is the following :
+   * Visits a {@link ForUpdate} node, whose children are the following :
    * <p>
    * f0 -> StatementExpressionList()<br>
    *
@@ -1762,7 +1757,7 @@ public interface IRetArguVisitor<R, A> {
    * Visits a {@link BreakStatement} node, whose children are the following :
    * <p>
    * f0 -> "break"<br>
-   * f1 -> [ < IDENTIFIER > ]<br>
+   * f1 -> [ <IDENTIFIER> ]<br>
    * f2 -> ";"<br>
    *
    * @param n - the node to visit
@@ -1775,7 +1770,7 @@ public interface IRetArguVisitor<R, A> {
    * Visits a {@link ContinueStatement} node, whose children are the following :
    * <p>
    * f0 -> "continue"<br>
-   * f1 -> [ < IDENTIFIER > ]<br>
+   * f1 -> [ <IDENTIFIER> ]<br>
    * f2 -> ";"<br>
    *
    * @param n - the node to visit
@@ -1840,7 +1835,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final TryStatement n, final A argu);
 
   /**
-   * Visits a {@link Annotation} node, whose child is the following :
+   * Visits a {@link Annotation} node, whose children are the following :
    * <p>
    * f0 -> . %0 NormalAnnotation()<br>
    * .. .. | %1 SingleMemberAnnotation()<br>
@@ -1909,7 +1904,7 @@ public interface IRetArguVisitor<R, A> {
   /**
    * Visits a {@link MemberValuePair} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    * f1 -> "="<br>
    * f2 -> MemberValue()<br>
    *
@@ -1920,7 +1915,7 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final MemberValuePair n, final A argu);
 
   /**
-   * Visits a {@link MemberValue} node, whose child is the following :
+   * Visits a {@link MemberValue} node, whose children are the following :
    * <p>
    * f0 -> . %0 Annotation()<br>
    * .. .. | %1 MemberValueArrayInitializer()<br>
@@ -1952,7 +1947,7 @@ public interface IRetArguVisitor<R, A> {
    * <p>
    * f0 -> "@"<br>
    * f1 -> "interface"<br>
-   * f2 -> < IDENTIFIER ><br>
+   * f2 -> <IDENTIFIER><br>
    * f3 -> AnnotationTypeBody()<br>
    *
    * @param n - the node to visit
@@ -1975,10 +1970,10 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final AnnotationTypeBody n, final A argu);
 
   /**
-   * Visits a {@link AnnotationTypeMemberDeclaration} node, whose child is the following :
+   * Visits a {@link AnnotationTypeMemberDeclaration} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 Modifiers()<br>
-   * .. .. . .. #1 ( &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"<br>
+   * .. .. . .. #1 ( &0 $0 Type() $1 <IDENTIFIER> $2 "(" $3 ")"<br>
    * .. .. . .. .. . .. $4 [ DefaultValue() ]<br>
    * .. .. . .. .. . .. $5 ";"<br>
    * .. .. . .. .. | &1 ClassOrInterfaceDeclaration()<br>

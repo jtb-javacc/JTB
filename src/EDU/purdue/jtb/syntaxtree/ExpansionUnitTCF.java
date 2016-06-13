@@ -3,6 +3,7 @@ package EDU.purdue.jtb.syntaxtree;
 
 import EDU.purdue.jtb.visitor.*;
 
+
 /**
  * JTB node class for the production ExpansionUnitTCF:<br>
  * Corresponding grammar:<br>
@@ -10,7 +11,7 @@ import EDU.purdue.jtb.visitor.*;
  * f1 -> "{"<br>
  * f2 -> ExpansionChoices()<br>
  * f3 -> "}"<br>
- * f4 -> ( #0 "catch" #1 "(" #2 Name() #3 < IDENTIFIER > #4 ")" #5 Block() )*<br>
+ * f4 -> ( #0 "catch" #1 "(" #2 Name() #3 <IDENTIFIER> #4 ")" #5 Block() )*<br>
  * f5 -> [ #0 "finally" #1 Block() ]<br>
  */
 public class ExpansionUnitTCF implements INode {
@@ -64,7 +65,6 @@ public class ExpansionUnitTCF implements INode {
    * @param argu - a user chosen argument
    * @return a user chosen return information
    */
-  @Override
   public <R, A> R accept(final IRetArguVisitor<R, A> vis, final A argu) {
     return vis.visit(this, argu);
   }
@@ -76,7 +76,6 @@ public class ExpansionUnitTCF implements INode {
    * @param vis - the visitor
    * @return a user chosen return information
    */
-  @Override
   public <R> R accept(final IRetVisitor<R> vis) {
     return vis.visit(this);
   }
@@ -88,7 +87,6 @@ public class ExpansionUnitTCF implements INode {
    * @param vis - the visitor
    * @param argu - a user chosen argument
    */
-  @Override
   public <A> void accept(final IVoidArguVisitor<A> vis, final A argu) {
     vis.visit(this, argu);
   }
@@ -98,7 +96,6 @@ public class ExpansionUnitTCF implements INode {
    *
    * @param vis - the visitor
    */
-  @Override
   public void accept(final IVoidVisitor vis) {
     vis.visit(this);
   }

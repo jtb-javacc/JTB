@@ -23,11 +23,10 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final NodeChoice n) {
     /* You have to adapt which data is returned (result variables below are just examples) */
-    final R nRes = n.choice.accept(this);
-    return nRes;
+    final R r = n.choice.accept(this);
+    return r;
   }
 
   /**
@@ -36,15 +35,14 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final NodeList n) {
     /* You have to adapt which data is returned (result variables below are just examples) */
-    R nRes = null;
+    R r = null;
     for (final Iterator<INode> e = n.elements(); e.hasNext();) {
       @SuppressWarnings("unused")
       final R sRes = e.next().accept(this);
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -53,16 +51,15 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final NodeListOptional n) {
     /* You have to adapt which data is returned (result variables below are just examples) */
     if (n.present()) {
-      R nRes = null;
+      R r = null;
       for (final Iterator<INode> e = n.elements(); e.hasNext();) {
         @SuppressWarnings("unused")
         R sRes = e.next().accept(this);
         }
-      return nRes;
+      return r;
     } else
       return null;
   }
@@ -73,12 +70,11 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final NodeOptional n) {
     /* You have to adapt which data is returned (result variables below are just examples) */
     if (n.present()) {
-      final R nRes = n.node.accept(this);
-      return nRes;
+      final R r = n.node.accept(this);
+      return r;
     } else
       return null;
   }
@@ -89,15 +85,14 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final NodeSequence n) {
     /* You have to adapt which data is returned (result variables below are just examples) */
-    R nRes = null;
+    R r = null;
     for (final Iterator<INode> e = n.elements(); e.hasNext();) {
       @SuppressWarnings("unused")
       R subRet = e.next().accept(this);
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -106,13 +101,12 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final NodeTCF n) {
     /* You have to adapt which data is returned (result variables below are just examples) */
-    R nRes = null;
+    R r = null;
     @SuppressWarnings("unused")
     final String tkIm = n.tokenImage;
-    return nRes;
+    return r;
   }
 
   /**
@@ -121,13 +115,12 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final NodeToken n) {
     /* You have to adapt which data is returned (result variables below are just examples) */
-    R nRes = null;
+    R r = null;
     @SuppressWarnings("unused")
     final String tkIm = n.tokenImage;
-    return nRes;
+    return r;
   }
 
   /*
@@ -148,58 +141,57 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * f8 -> IdentifierAsString()<br>
    * f9 -> ")"<br>
    * f10 -> ( Production() )+<br>
-   * f11 -> < EOF ><br>
+   * f11 -> <EOF><br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final JavaCCInput n) {
-    R nRes = null;
+    R r = null;
     // f0 -> JavaCCOptions()
     final JavaCCOptions n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> "PARSER_BEGIN"
     final NodeToken n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> "("
     final NodeToken n2 = n.f2;
-    nRes = n2.accept(this);
+    r = n2.accept(this);
     // f3 -> IdentifierAsString()
     final IdentifierAsString n3 = n.f3;
-    nRes = n3.accept(this);
+    r = n3.accept(this);
     // f4 -> ")"
     final NodeToken n4 = n.f4;
-    nRes = n4.accept(this);
+    r = n4.accept(this);
     // f5 -> CompilationUnit()
     final CompilationUnit n5 = n.f5;
-    nRes = n5.accept(this);
+    r = n5.accept(this);
     // f6 -> "PARSER_END"
     final NodeToken n6 = n.f6;
-    nRes = n6.accept(this);
+    r = n6.accept(this);
     // f7 -> "("
     final NodeToken n7 = n.f7;
-    nRes = n7.accept(this);
+    r = n7.accept(this);
     // f8 -> IdentifierAsString()
     final IdentifierAsString n8 = n.f8;
-    nRes = n8.accept(this);
+    r = n8.accept(this);
     // f9 -> ")"
     final NodeToken n9 = n.f9;
-    nRes = n9.accept(this);
+    r = n9.accept(this);
     // f10 -> ( Production() )+
     final NodeList n10 = n.f10;
     for (int i = 0; i < n10.size(); i++) {
-      final INode lsteai = n10.elementAt(i);
-      nRes = lsteai.accept(this);
+      final INode n10Ei = n10.elementAt(i);
+      r = n10Ei.accept(this);
     }
-    // f11 -> < EOF >
+    // f11 -> <EOF>
     final NodeToken n11 = n.f11;
-    nRes = n11.accept(this);
-    return nRes;
+    r = n11.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link JavaCCOptions} node, whose child is the following :
+   * Visits a {@link JavaCCOptions} node, whose children are the following :
    * <p>
    * f0 -> [ #0 "options" #1 "{"<br>
    * .. .. . #2 ( OptionBinding() )*<br>
@@ -208,41 +200,41 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final JavaCCOptions n) {
-    R nRes = null;
+    R r = null;
     // f0 -> [ #0 "options" #1 "{"
     // .. .. . #2 ( OptionBinding() )*
     // .. .. . #3 "}" ]
     final NodeOptional n0 = n.f0;
-    if (n0.present()) {
-      final NodeSequence seq = (NodeSequence) n0.node;
+    final NodeOptional n0P = (NodeOptional) n0;
+    if (n0P.present()) {
+      final NodeSequence n0PS0 = (NodeSequence) n0P.node;
       // #0 "options"
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
+      final INode n0PS0A0 = ((NodeSequence) n0PS0).elementAt(0);
+      r = n0PS0A0.accept(this);
       // #1 "{"
-      final INode seq2 = seq.elementAt(1);
-      nRes = seq2.accept(this);
+      final INode n0PS0A1 = ((NodeSequence) n0PS0).elementAt(1);
+      r = n0PS0A1.accept(this);
       // #2 ( OptionBinding() )*
-      final INode seq3 = seq.elementAt(2);
-      final NodeListOptional nlo = (NodeListOptional) seq3;
-      if (nlo.present()) {
-        for (int i = 0; i < nlo.size(); i++) {
-          final INode nloeai = nlo.elementAt(i);
-          nRes = nloeai.accept(this);
+      final INode n0PS0A2 = ((NodeSequence) n0PS0).elementAt(2);
+      final NodeListOptional n0PS0A2T = (NodeListOptional) n0PS0A2;
+      if (n0PS0A2T.present()) {
+        for (int i = 0; i < n0PS0A2T.size(); i++) {
+          final INode n0PS0A2TMi = n0PS0A2T.elementAt(i);
+          r = n0PS0A2TMi.accept(this);
         }
       }
       // #3 "}"
-      final INode seq4 = seq.elementAt(3);
-      nRes = seq4.accept(this);
+      final INode n0PS0A3 = ((NodeSequence) n0PS0).elementAt(3);
+      r = n0PS0A3.accept(this);
     }
-    return nRes;
+    return r;
   }
 
   /**
    * Visits a {@link OptionBinding} node, whose children are the following :
    * <p>
-   * f0 -> ( %0 < IDENTIFIER ><br>
+   * f0 -> ( %0 <IDENTIFIER><br>
    * .. .. | %1 "LOOKAHEAD"<br>
    * .. .. | %2 "IGNORE_CASE"<br>
    * .. .. | %3 "static" )<br>
@@ -255,32 +247,31 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final OptionBinding n) {
-    R nRes = null;
-    // f0 -> ( %0 < IDENTIFIER >
+    R r = null;
+    // f0 -> ( %0 <IDENTIFIER>
     // .. .. | %1 "LOOKAHEAD"
     // .. .. | %2 "IGNORE_CASE"
     // .. .. | %3 "static" )
     final NodeChoice n0 = n.f0;
-    final NodeChoice nch = n0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = (NodeChoice) n0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
-        // %0 < IDENTIFIER >
-        nRes = ich.accept(this);
+        // %0 <IDENTIFIER>
+        r = n0CH.accept(this);
         break;
       case 1:
         // %1 "LOOKAHEAD"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 2:
         // %2 "IGNORE_CASE"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 3:
         // %3 "static"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
@@ -288,25 +279,25 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
     }
     // f1 -> "="
     final NodeToken n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> ( %0 IntegerLiteral()
     // .. .. | %1 BooleanLiteral()
     // .. .. | %2 StringLiteral() )
     final NodeChoice n2 = n.f2;
-    final NodeChoice nch1 = n2;
-    final INode ich1 = nch1.choice;
-    switch (nch1.which) {
+    final NodeChoice n2C = (NodeChoice) n2;
+    final INode n2CH = n2C.choice;
+    switch (n2C.which) {
       case 0:
         // %0 IntegerLiteral()
-        nRes = ich1.accept(this);
+        r = n2CH.accept(this);
         break;
       case 1:
         // %1 BooleanLiteral()
-        nRes = ich1.accept(this);
+        r = n2CH.accept(this);
         break;
       case 2:
         // %2 StringLiteral()
-        nRes = ich1.accept(this);
+        r = n2CH.accept(this);
         break;
       default:
         // should not occur !!!
@@ -314,12 +305,12 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
     }
     // f3 -> ";"
     final NodeToken n3 = n.f3;
-    nRes = n3.accept(this);
-    return nRes;
+    r = n3.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link Production} node, whose child is the following :
+   * Visits a {@link Production} node, whose children are the following :
    * <p>
    * f0 -> . %0 JavaCodeProduction()<br>
    * .. .. | %1 RegularExprProduction()<br>
@@ -329,37 +320,36 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final Production n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 JavaCodeProduction()
     // .. .. | %1 RegularExprProduction()
     // .. .. | %2 TokenManagerDecls()
     // .. .. | %3 BNFProduction()
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 JavaCodeProduction()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %1 RegularExprProduction()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 2:
         // %2 TokenManagerDecls()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 3:
         // %3 BNFProduction()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -372,66 +362,60 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * f4 -> FormalParameters()<br>
    * f5 -> [ #0 "throws" #1 Name()<br>
    * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
-   * f6 -> [ "%" ]<br>
-   * f7 -> Block()<br>
+   * f6 -> Block()<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final JavaCodeProduction n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "JAVACODE"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> AccessModifier()
     final AccessModifier n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> ResultType()
     final ResultType n2 = n.f2;
-    nRes = n2.accept(this);
+    r = n2.accept(this);
     // f3 -> IdentifierAsString()
     final IdentifierAsString n3 = n.f3;
-    nRes = n3.accept(this);
+    r = n3.accept(this);
     // f4 -> FormalParameters()
     final FormalParameters n4 = n.f4;
-    nRes = n4.accept(this);
+    r = n4.accept(this);
     // f5 -> [ #0 "throws" #1 Name()
     // .. .. . #2 ( $0 "," $1 Name() )* ]
     final NodeOptional n5 = n.f5;
-    if (n5.present()) {
-      final NodeSequence seq = (NodeSequence) n5.node;
+    final NodeOptional n5P = (NodeOptional) n5;
+    if (n5P.present()) {
+      final NodeSequence n5PS0 = (NodeSequence) n5P.node;
       // #0 "throws"
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
+      final INode n5PS0A0 = ((NodeSequence) n5PS0).elementAt(0);
+      r = n5PS0A0.accept(this);
       // #1 Name()
-      final INode seq2 = seq.elementAt(1);
-      nRes = seq2.accept(this);
+      final INode n5PS0A1 = ((NodeSequence) n5PS0).elementAt(1);
+      r = n5PS0A1.accept(this);
       // #2 ( $0 "," $1 Name() )*
-      final INode seq3 = seq.elementAt(2);
-      final NodeListOptional nlo = (NodeListOptional) seq3;
-      if (nlo.present()) {
-        for (int i = 0; i < nlo.size(); i++) {
-          final INode nloeai = nlo.elementAt(i);
-          final NodeSequence seq4 = (NodeSequence) nloeai;
+      final INode n5PS0A2 = ((NodeSequence) n5PS0).elementAt(2);
+      final NodeListOptional n5PS0A2T = (NodeListOptional) n5PS0A2;
+      if (n5PS0A2T.present()) {
+        for (int i = 0; i < n5PS0A2T.size(); i++) {
+          final INode n5PS0A2TMi = n5PS0A2T.elementAt(i);
+          final NodeSequence n5PS0A2TMiS1 = (NodeSequence) n5PS0A2TMi;
           // $0 ","
-          final INode seq5 = seq4.elementAt(0);
-          nRes = seq5.accept(this);
+          final INode n5PS0A2TMiS1A0 = ((NodeSequence) n5PS0A2TMiS1).elementAt(0);
+          r = n5PS0A2TMiS1A0.accept(this);
           // $1 Name()
-          final INode seq6 = seq4.elementAt(1);
-          nRes = seq6.accept(this);
+          final INode n5PS0A2TMiS1A1 = ((NodeSequence) n5PS0A2TMiS1).elementAt(1);
+          r = n5PS0A2TMiS1A1.accept(this);
         }
       }
     }
-    // f6 -> [ "%" ]
-    final NodeOptional n6 = n.f6;
-    if (n6.present()) {
-      nRes = n6.accept(this);
-    }
-    // f7 -> Block()
-    final Block n7 = n.f7;
-    nRes = n7.accept(this);
-    return nRes;
+    // f6 -> Block()
+    final Block n6 = n.f6;
+    r = n6.accept(this);
+    return r;
   }
 
   /**
@@ -453,73 +437,74 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final BNFProduction n) {
-    R nRes = null;
+    R r = null;
     // f0 -> AccessModifier()
     final AccessModifier n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ResultType()
     final ResultType n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> IdentifierAsString()
     final IdentifierAsString n2 = n.f2;
-    nRes = n2.accept(this);
+    r = n2.accept(this);
     // f3 -> FormalParameters()
     final FormalParameters n3 = n.f3;
-    nRes = n3.accept(this);
+    r = n3.accept(this);
     // f4 -> [ #0 "throws" #1 Name()
     // .. .. . #2 ( $0 "," $1 Name() )* ]
     final NodeOptional n4 = n.f4;
-    if (n4.present()) {
-      final NodeSequence seq = (NodeSequence) n4.node;
+    final NodeOptional n4P = (NodeOptional) n4;
+    if (n4P.present()) {
+      final NodeSequence n4PS0 = (NodeSequence) n4P.node;
       // #0 "throws"
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
+      final INode n4PS0A0 = ((NodeSequence) n4PS0).elementAt(0);
+      r = n4PS0A0.accept(this);
       // #1 Name()
-      final INode seq2 = seq.elementAt(1);
-      nRes = seq2.accept(this);
+      final INode n4PS0A1 = ((NodeSequence) n4PS0).elementAt(1);
+      r = n4PS0A1.accept(this);
       // #2 ( $0 "," $1 Name() )*
-      final INode seq3 = seq.elementAt(2);
-      final NodeListOptional nlo = (NodeListOptional) seq3;
-      if (nlo.present()) {
-        for (int i = 0; i < nlo.size(); i++) {
-          final INode nloeai = nlo.elementAt(i);
-          final NodeSequence seq4 = (NodeSequence) nloeai;
+      final INode n4PS0A2 = ((NodeSequence) n4PS0).elementAt(2);
+      final NodeListOptional n4PS0A2T = (NodeListOptional) n4PS0A2;
+      if (n4PS0A2T.present()) {
+        for (int i = 0; i < n4PS0A2T.size(); i++) {
+          final INode n4PS0A2TMi = n4PS0A2T.elementAt(i);
+          final NodeSequence n4PS0A2TMiS1 = (NodeSequence) n4PS0A2TMi;
           // $0 ","
-          final INode seq5 = seq4.elementAt(0);
-          nRes = seq5.accept(this);
+          final INode n4PS0A2TMiS1A0 = ((NodeSequence) n4PS0A2TMiS1).elementAt(0);
+          r = n4PS0A2TMiS1A0.accept(this);
           // $1 Name()
-          final INode seq6 = seq4.elementAt(1);
-          nRes = seq6.accept(this);
+          final INode n4PS0A2TMiS1A1 = ((NodeSequence) n4PS0A2TMiS1).elementAt(1);
+          r = n4PS0A2TMiS1A1.accept(this);
         }
       }
     }
     // f5 -> [ "!" ]
     final NodeOptional n5 = n.f5;
-    if (n5.present()) {
-      nRes = n5.accept(this);
+    final NodeOptional n5P = (NodeOptional) n5;
+    if (n5P.present()) {
+      r = n5P.accept(this);
     }
     // f6 -> ":"
     final NodeToken n6 = n.f6;
-    nRes = n6.accept(this);
+    r = n6.accept(this);
     // f7 -> Block()
     final Block n7 = n.f7;
-    nRes = n7.accept(this);
+    r = n7.accept(this);
     // f8 -> "{"
     final NodeToken n8 = n.f8;
-    nRes = n8.accept(this);
+    r = n8.accept(this);
     // f9 -> ExpansionChoices()
     final ExpansionChoices n9 = n.f9;
-    nRes = n9.accept(this);
+    r = n9.accept(this);
     // f10 -> "}"
     final NodeToken n10 = n.f10;
-    nRes = n10.accept(this);
-    return nRes;
+    r = n10.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link AccessModifier} node, whose child is the following :
+   * Visits a {@link AccessModifier} node, whose children are the following :
    * <p>
    * f0 -> ( %0 "public"<br>
    * .. .. | %1 "protected"<br>
@@ -529,35 +514,35 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final AccessModifier n) {
-    R nRes = null;
+    R r = null;
     // f0 -> ( %0 "public"
     // .. .. | %1 "protected"
     // .. .. | %2 "private"
     // .. .. | %3 "final" )*
     final NodeListOptional n0 = n.f0;
-    if (n0.present()) {
-      for (int i = 0; i < n0.size(); i++) {
-        final INode nloeai = n0.elementAt(i);
-        final NodeChoice nch = (NodeChoice) nloeai;
-        final INode ich = nch.choice;
-        switch (nch.which) {
+    final NodeListOptional n0T = (NodeListOptional) n0;
+    if (n0T.present()) {
+      for (int i = 0; i < n0T.size(); i++) {
+        final INode n0TMi = n0T.elementAt(i);
+        final NodeChoice n0TMiC = (NodeChoice) n0TMi;
+        final INode n0TMiCH = n0TMiC.choice;
+        switch (n0TMiC.which) {
           case 0:
             // %0 "public"
-            nRes = ich.accept(this);
+            r = n0TMiCH.accept(this);
             break;
           case 1:
             // %1 "protected"
-            nRes = ich.accept(this);
+            r = n0TMiCH.accept(this);
             break;
           case 2:
             // %2 "private"
-            nRes = ich.accept(this);
+            r = n0TMiCH.accept(this);
             break;
           case 3:
             // %3 "final"
-            nRes = ich.accept(this);
+            r = n0TMiCH.accept(this);
             break;
           default:
             // should not occur !!!
@@ -565,15 +550,15 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         }
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
    * Visits a {@link RegularExprProduction} node, whose children are the following :
    * <p>
    * f0 -> [ %0 #0 "<" #1 "*" #2 ">"<br>
-   * .. .. | %1 #0 "<" #1 < IDENTIFIER ><br>
-   * .. .. . .. #2 ( $0 "," $1 < IDENTIFIER > )*<br>
+   * .. .. | %1 #0 "<" #1 <IDENTIFIER><br>
+   * .. .. . .. #2 ( $0 "," $1 <IDENTIFIER> )*<br>
    * .. .. . .. #3 ">" ]<br>
    * f1 -> RegExprKind()<br>
    * f2 -> [ #0 "[" #1 "IGNORE_CASE" #2 "]" ]<br>
@@ -586,60 +571,60 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final RegularExprProduction n) {
-    R nRes = null;
+    R r = null;
     // f0 -> [ %0 #0 "<" #1 "*" #2 ">"
-    // .. .. | %1 #0 "<" #1 < IDENTIFIER >
-    // .. .. . .. #2 ( $0 "," $1 < IDENTIFIER > )*
+    // .. .. | %1 #0 "<" #1 <IDENTIFIER>
+    // .. .. . .. #2 ( $0 "," $1 <IDENTIFIER> )*
     // .. .. . .. #3 ">" ]
     final NodeOptional n0 = n.f0;
-    if (n0.present()) {
-      final NodeChoice nch = (NodeChoice) n0.node;
-      final INode ich = nch.choice;
-      switch (nch.which) {
+    final NodeOptional n0P = (NodeOptional) n0;
+    if (n0P.present()) {
+      final NodeChoice n0PC = (NodeChoice) n0P.node;
+      final INode n0PCH = n0PC.choice;
+      switch (n0PC.which) {
         case 0:
           // %0 #0 "<" #1 "*" #2 ">"
-          final NodeSequence seq = (NodeSequence) ich;
+          final NodeSequence n0PCHS0 = (NodeSequence) n0PCH;
           // #0 "<"
-          final INode seq1 = seq.elementAt(0);
-          nRes = seq1.accept(this);
+          final INode n0PCHS00A0 = ((NodeSequence) n0PCHS0).elementAt(0);
+          r = n0PCHS00A0.accept(this);
           // #1 "*"
-          final INode seq2 = seq.elementAt(1);
-          nRes = seq2.accept(this);
+          final INode n0PCHS00A1 = ((NodeSequence) n0PCHS0).elementAt(1);
+          r = n0PCHS00A1.accept(this);
           // #2 ">"
-          final INode seq3 = seq.elementAt(2);
-          nRes = seq3.accept(this);
+          final INode n0PCHS00A2 = ((NodeSequence) n0PCHS0).elementAt(2);
+          r = n0PCHS00A2.accept(this);
           break;
         case 1:
-          // %1 #0 "<" #1 < IDENTIFIER >
-          // .. #2 ( $0 "," $1 < IDENTIFIER > )*
+          // %1 #0 "<" #1 <IDENTIFIER>
+          // .. #2 ( $0 "," $1 <IDENTIFIER> )*
           // .. #3 ">"
-          final NodeSequence seq4 = (NodeSequence) ich;
+          final NodeSequence n0PCHS1 = (NodeSequence) n0PCH;
           // #0 "<"
-          final INode seq5 = seq4.elementAt(0);
-          nRes = seq5.accept(this);
-          // #1 < IDENTIFIER >
-          final INode seq6 = seq4.elementAt(1);
-          nRes = seq6.accept(this);
-          // #2 ( $0 "," $1 < IDENTIFIER > )*
-          final INode seq7 = seq4.elementAt(2);
-          final NodeListOptional nlo = (NodeListOptional) seq7;
-          if (nlo.present()) {
-            for (int i = 0; i < nlo.size(); i++) {
-              final INode nloeai = nlo.elementAt(i);
-              final NodeSequence seq8 = (NodeSequence) nloeai;
+          final INode n0PCHS11A0 = ((NodeSequence) n0PCHS1).elementAt(0);
+          r = n0PCHS11A0.accept(this);
+          // #1 <IDENTIFIER>
+          final INode n0PCHS11A1 = ((NodeSequence) n0PCHS1).elementAt(1);
+          r = n0PCHS11A1.accept(this);
+          // #2 ( $0 "," $1 <IDENTIFIER> )*
+          final INode n0PCHS11A2 = ((NodeSequence) n0PCHS1).elementAt(2);
+          final NodeListOptional n0PCHS11A2T = (NodeListOptional) n0PCHS11A2;
+          if (n0PCHS11A2T.present()) {
+            for (int i = 0; i < n0PCHS11A2T.size(); i++) {
+              final INode n0PCHS11A2TMi = n0PCHS11A2T.elementAt(i);
+              final NodeSequence n0PCHS11A2TMiS2 = (NodeSequence) n0PCHS11A2TMi;
               // $0 ","
-              final INode seq9 = seq8.elementAt(0);
-              nRes = seq9.accept(this);
-              // $1 < IDENTIFIER >
-              final INode seq10 = seq8.elementAt(1);
-              nRes = seq10.accept(this);
+              final INode n0PCHS11A2TMiS2A0 = ((NodeSequence) n0PCHS11A2TMiS2).elementAt(0);
+              r = n0PCHS11A2TMiS2A0.accept(this);
+              // $1 <IDENTIFIER>
+              final INode n0PCHS11A2TMiS2A1 = ((NodeSequence) n0PCHS11A2TMiS2).elementAt(1);
+              r = n0PCHS11A2TMiS2A1.accept(this);
             }
           }
           // #3 ">"
-          final INode seq11 = seq4.elementAt(3);
-          nRes = seq11.accept(this);
+          final INode n0PCHS1A3 = ((NodeSequence) n0PCHS1).elementAt(3);
+          r = n0PCHS1A3.accept(this);
           break;
         default:
           // should not occur !!!
@@ -648,48 +633,50 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
     }
     // f1 -> RegExprKind()
     final RegExprKind n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> [ #0 "[" #1 "IGNORE_CASE" #2 "]" ]
     final NodeOptional n2 = n.f2;
-    if (n2.present()) {
-      final NodeSequence seq12 = (NodeSequence) n2.node;
+    final NodeOptional n2P = (NodeOptional) n2;
+    if (n2P.present()) {
+      final NodeSequence n2PS0 = (NodeSequence) n2P.node;
       // #0 "["
-      final INode seq13 = seq12.elementAt(0);
-      nRes = seq13.accept(this);
+      final INode n2PS0A0 = ((NodeSequence) n2PS0).elementAt(0);
+      r = n2PS0A0.accept(this);
       // #1 "IGNORE_CASE"
-      final INode seq14 = seq12.elementAt(1);
-      nRes = seq14.accept(this);
+      final INode n2PS0A1 = ((NodeSequence) n2PS0).elementAt(1);
+      r = n2PS0A1.accept(this);
       // #2 "]"
-      final INode seq15 = seq12.elementAt(2);
-      nRes = seq15.accept(this);
+      final INode n2PS0A2 = ((NodeSequence) n2PS0).elementAt(2);
+      r = n2PS0A2.accept(this);
     }
     // f3 -> ":"
     final NodeToken n3 = n.f3;
-    nRes = n3.accept(this);
+    r = n3.accept(this);
     // f4 -> "{"
     final NodeToken n4 = n.f4;
-    nRes = n4.accept(this);
+    r = n4.accept(this);
     // f5 -> RegExprSpec()
     final RegExprSpec n5 = n.f5;
-    nRes = n5.accept(this);
+    r = n5.accept(this);
     // f6 -> ( #0 "|" #1 RegExprSpec() )*
     final NodeListOptional n6 = n.f6;
-    if (n6.present()) {
-      for (int i = 0; i < n6.size(); i++) {
-        final INode nloeai = n6.elementAt(i);
-        final NodeSequence seq16 = (NodeSequence) nloeai;
+    final NodeListOptional n6T1 = (NodeListOptional) n6;
+    if (n6T1.present()) {
+      for (int i = 0; i < n6T1.size(); i++) {
+        final INode n6T1Mi = n6T1.elementAt(i);
+        final NodeSequence n6T1MiS0 = (NodeSequence) n6T1Mi;
         // #0 "|"
-        final INode seq17 = seq16.elementAt(0);
-        nRes = seq17.accept(this);
+        final INode n6T1MiS0A0 = ((NodeSequence) n6T1MiS0).elementAt(0);
+        r = n6T1MiS0A0.accept(this);
         // #1 RegExprSpec()
-        final INode seq18 = seq16.elementAt(1);
-        nRes = seq18.accept(this);
+        final INode n6T1MiS0A1 = ((NodeSequence) n6T1MiS0).elementAt(1);
+        r = n6T1MiS0A1.accept(this);
       }
     }
     // f7 -> "}"
     final NodeToken n7 = n.f7;
-    nRes = n7.accept(this);
-    return nRes;
+    r = n7.accept(this);
+    return r;
   }
 
   /**
@@ -702,23 +689,22 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final TokenManagerDecls n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "TOKEN_MGR_DECLS"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ":"
     final NodeToken n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> ClassOrInterfaceBody()
     final ClassOrInterfaceBody n2 = n.f2;
-    nRes = n2.accept(this);
-    return nRes;
+    r = n2.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link RegExprKind} node, whose child is the following :
+   * Visits a {@link RegExprKind} node, whose children are the following :
    * <p>
    * f0 -> . %0 "TOKEN"<br>
    * .. .. | %1 "SPECIAL_TOKEN"<br>
@@ -728,37 +714,36 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final RegExprKind n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 "TOKEN"
     // .. .. | %1 "SPECIAL_TOKEN"
     // .. .. | %2 "SKIP"
     // .. .. | %3 "MORE"
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 "TOKEN"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %1 "SPECIAL_TOKEN"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 2:
         // %2 "SKIP"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 3:
         // %3 "MORE"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -767,39 +752,41 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * f0 -> RegularExpression()<br>
    * f1 -> [ "!" ]<br>
    * f2 -> [ Block() ]<br>
-   * f3 -> [ #0 ":" #1 < IDENTIFIER > ]<br>
+   * f3 -> [ #0 ":" #1 <IDENTIFIER> ]<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final RegExprSpec n) {
-    R nRes = null;
+    R r = null;
     // f0 -> RegularExpression()
     final RegularExpression n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> [ "!" ]
     final NodeOptional n1 = n.f1;
-    if (n1.present()) {
-      nRes = n1.accept(this);
+    final NodeOptional n1P = (NodeOptional) n1;
+    if (n1P.present()) {
+      r = n1P.accept(this);
     }
     // f2 -> [ Block() ]
     final NodeOptional n2 = n.f2;
-    if (n2.present()) {
-      nRes = n2.accept(this);
+    final NodeOptional n2P = (NodeOptional) n2;
+    if (n2P.present()) {
+      r = n2P.accept(this);
     }
-    // f3 -> [ #0 ":" #1 < IDENTIFIER > ]
+    // f3 -> [ #0 ":" #1 <IDENTIFIER> ]
     final NodeOptional n3 = n.f3;
-    if (n3.present()) {
-      final NodeSequence seq = (NodeSequence) n3.node;
+    final NodeOptional n3P = (NodeOptional) n3;
+    if (n3P.present()) {
+      final NodeSequence n3PS0 = (NodeSequence) n3P.node;
       // #0 ":"
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
-      // #1 < IDENTIFIER >
-      final INode seq2 = seq.elementAt(1);
-      nRes = seq2.accept(this);
+      final INode n3PS0A0 = ((NodeSequence) n3PS0).elementAt(0);
+      r = n3PS0A0.accept(this);
+      // #1 <IDENTIFIER>
+      final INode n3PS0A1 = ((NodeSequence) n3PS0).elementAt(1);
+      r = n3PS0A1.accept(this);
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -811,27 +798,27 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ExpansionChoices n) {
-    R nRes = null;
+    R r = null;
     // f0 -> Expansion()
     final Expansion n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( #0 "|" #1 Expansion() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        final NodeSequence n1TMiS0 = (NodeSequence) n1TMi;
         // #0 "|"
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n1TMiS0A0 = ((NodeSequence) n1TMiS0).elementAt(0);
+        r = n1TMiS0A0.accept(this);
         // #1 Expansion()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n1TMiS0A1 = ((NodeSequence) n1TMiS0).elementAt(1);
+        r = n1TMiS0A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -843,33 +830,33 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final Expansion n) {
-    R nRes = null;
+    R r = null;
     // f0 -> ( #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" )?
     final NodeOptional n0 = n.f0;
-    if (n0.present()) {
-      final NodeSequence seq = (NodeSequence) n0.node;
+    final NodeOptional n0P = (NodeOptional) n0;
+    if (n0P.present()) {
+      final NodeSequence n0PS0 = (NodeSequence) n0P.node;
       // #0 "LOOKAHEAD"
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
+      final INode n0PS0A0 = ((NodeSequence) n0PS0).elementAt(0);
+      r = n0PS0A0.accept(this);
       // #1 "("
-      final INode seq2 = seq.elementAt(1);
-      nRes = seq2.accept(this);
+      final INode n0PS0A1 = ((NodeSequence) n0PS0).elementAt(1);
+      r = n0PS0A1.accept(this);
       // #2 LocalLookahead()
-      final INode seq3 = seq.elementAt(2);
-      nRes = seq3.accept(this);
+      final INode n0PS0A2 = ((NodeSequence) n0PS0).elementAt(2);
+      r = n0PS0A2.accept(this);
       // #3 ")"
-      final INode seq4 = seq.elementAt(3);
-      nRes = seq4.accept(this);
+      final INode n0PS0A3 = ((NodeSequence) n0PS0).elementAt(3);
+      r = n0PS0A3.accept(this);
     }
     // f1 -> ( ExpansionUnit() )+
     final NodeList n1 = n.f1;
     for (int i = 0; i < n1.size(); i++) {
-      final INode lsteai = n1.elementAt(i);
-      nRes = lsteai.accept(this);
+      final INode n1Ei = n1.elementAt(i);
+      r = n1Ei.accept(this);
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -884,48 +871,52 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final LocalLookahead n) {
-    R nRes = null;
+    R r = null;
     // f0 -> [ IntegerLiteral() ]
     final NodeOptional n0 = n.f0;
-    if (n0.present()) {
-      nRes = n0.accept(this);
+    final NodeOptional n0P = (NodeOptional) n0;
+    if (n0P.present()) {
+      r = n0P.accept(this);
     }
     // f1 -> [ "," ]
     final NodeOptional n1 = n.f1;
-    if (n1.present()) {
-      nRes = n1.accept(this);
+    final NodeOptional n1P = (NodeOptional) n1;
+    if (n1P.present()) {
+      r = n1P.accept(this);
     }
     // f2 -> [ ExpansionChoices() ]
     final NodeOptional n2 = n.f2;
-    if (n2.present()) {
-      nRes = n2.accept(this);
+    final NodeOptional n2P = (NodeOptional) n2;
+    if (n2P.present()) {
+      r = n2P.accept(this);
     }
     // f3 -> [ "," ]
     final NodeOptional n3 = n.f3;
-    if (n3.present()) {
-      nRes = n3.accept(this);
+    final NodeOptional n3P = (NodeOptional) n3;
+    if (n3P.present()) {
+      r = n3P.accept(this);
     }
     // f4 -> [ #0 "{" #1 Expression() #2 "}" ]
     final NodeOptional n4 = n.f4;
-    if (n4.present()) {
-      final NodeSequence seq = (NodeSequence) n4.node;
+    final NodeOptional n4P = (NodeOptional) n4;
+    if (n4P.present()) {
+      final NodeSequence n4PS0 = (NodeSequence) n4P.node;
       // #0 "{"
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
+      final INode n4PS0A0 = ((NodeSequence) n4PS0).elementAt(0);
+      r = n4PS0A0.accept(this);
       // #1 Expression()
-      final INode seq2 = seq.elementAt(1);
-      nRes = seq2.accept(this);
+      final INode n4PS0A1 = ((NodeSequence) n4PS0).elementAt(1);
+      r = n4PS0A1.accept(this);
       // #2 "}"
-      final INode seq3 = seq.elementAt(2);
-      nRes = seq3.accept(this);
+      final INode n4PS0A2 = ((NodeSequence) n4PS0).elementAt(2);
+      r = n4PS0A2.accept(this);
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link ExpansionUnit} node, whose child is the following :
+   * Visits a {@link ExpansionUnit} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"<br>
    * .. .. | %1 Block()<br>
@@ -935,7 +926,7 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
    * .. .. . .. .. . .. $2 [ "!" ]<br>
    * .. .. . .. .. | &1 $0 RegularExpression()<br>
-   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ]<br>
+   * .. .. . .. .. . .. $1 [ ?0 "." ?1 <IDENTIFIER> ]<br>
    * .. .. . .. .. . .. $2 [ "!" ] )<br>
    * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
    * .. .. . .. #3 ( &0 "+"<br>
@@ -945,9 +936,8 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ExpansionUnit n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"
     // .. .. | %1 Block()
     // .. .. | %2 #0 "[" #1 ExpansionChoices() #2 "]"
@@ -956,123 +946,123 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
     // .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()
     // .. .. . .. .. . .. $2 [ "!" ]
     // .. .. . .. .. | &1 $0 RegularExpression()
-    // .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
+    // .. .. . .. .. . .. $1 [ ?0 "." ?1 <IDENTIFIER> ]
     // .. .. . .. .. . .. $2 [ "!" ] )
     // .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"
     // .. .. . .. #3 ( &0 "+"
     // .. .. . .. .. | &1 "*"
     // .. .. . .. .. | &2 "?" )?
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"
-        final NodeSequence seq = (NodeSequence) ich;
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "LOOKAHEAD"
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n0CHS00A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        r = n0CHS00A0.accept(this);
         // #1 "("
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n0CHS00A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        r = n0CHS00A1.accept(this);
         // #2 LocalLookahead()
-        final INode seq3 = seq.elementAt(2);
-        nRes = seq3.accept(this);
+        final INode n0CHS00A2 = ((NodeSequence) n0CHS0).elementAt(2);
+        r = n0CHS00A2.accept(this);
         // #3 ")"
-        final INode seq4 = seq.elementAt(3);
-        nRes = seq4.accept(this);
+        final INode n0CHS00A3 = ((NodeSequence) n0CHS0).elementAt(3);
+        r = n0CHS00A3.accept(this);
         break;
       case 1:
         // %1 Block()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 2:
         // %2 #0 "[" #1 ExpansionChoices() #2 "]"
-        final NodeSequence seq5 = (NodeSequence) ich;
+        final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "["
-        final INode seq6 = seq5.elementAt(0);
-        nRes = seq6.accept(this);
+        final INode n0CHS12A0 = ((NodeSequence) n0CHS1).elementAt(0);
+        r = n0CHS12A0.accept(this);
         // #1 ExpansionChoices()
-        final INode seq7 = seq5.elementAt(1);
-        nRes = seq7.accept(this);
+        final INode n0CHS12A1 = ((NodeSequence) n0CHS1).elementAt(1);
+        r = n0CHS12A1.accept(this);
         // #2 "]"
-        final INode seq8 = seq5.elementAt(2);
-        nRes = seq8.accept(this);
+        final INode n0CHS12A2 = ((NodeSequence) n0CHS1).elementAt(2);
+        r = n0CHS12A2.accept(this);
         break;
       case 3:
         // %3 ExpansionUnitTCF()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 4:
         // %4 #0 [ $0 PrimaryExpression() $1 "=" ]
         // .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()
         // .. .. .. $2 [ "!" ]
         // .. .. | &1 $0 RegularExpression()
-        // .. .. .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
+        // .. .. .. $1 [ ?0 "." ?1 <IDENTIFIER> ]
         // .. .. .. $2 [ "!" ] )
-        final NodeSequence seq9 = (NodeSequence) ich;
+        final NodeSequence n0CHS2 = (NodeSequence) n0CH;
         // #0 [ $0 PrimaryExpression() $1 "=" ]
-        final INode seq10 = seq9.elementAt(0);
-        final NodeOptional opt = (NodeOptional) seq10;
-        if (opt.present()) {
-          final NodeSequence seq11 = (NodeSequence) opt.node;
+        final INode n0CHS24A0 = ((NodeSequence) n0CHS2).elementAt(0);
+        final NodeOptional n0CHS24A0P = (NodeOptional) n0CHS24A0;
+        if (n0CHS24A0P.present()) {
+          final NodeSequence n0CHS24A0PS3 = (NodeSequence) n0CHS24A0P.node;
           // $0 PrimaryExpression()
-          final INode seq12 = seq11.elementAt(0);
-          nRes = seq12.accept(this);
+          final INode n0CHS24A0PS3A0 = ((NodeSequence) n0CHS24A0PS3).elementAt(0);
+          r = n0CHS24A0PS3A0.accept(this);
           // $1 "="
-          final INode seq13 = seq11.elementAt(1);
-          nRes = seq13.accept(this);
+          final INode n0CHS24A0PS3A1 = ((NodeSequence) n0CHS24A0PS3).elementAt(1);
+          r = n0CHS24A0PS3A1.accept(this);
         }
         // #1 ( &0 $0 IdentifierAsString() $1 Arguments()
         // .. .. $2 [ "!" ]
         // .. | &1 $0 RegularExpression()
-        // .. .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
+        // .. .. $1 [ ?0 "." ?1 <IDENTIFIER> ]
         // .. .. $2 [ "!" ] )
-        final INode seq14 = seq9.elementAt(1);
-        final NodeChoice nch1 = (NodeChoice) seq14;
-        final INode ich1 = nch1.choice;
-        switch (nch1.which) {
+        final INode n0CHS2A1 = ((NodeSequence) n0CHS2).elementAt(1);
+        final NodeChoice n0CHS2A1C = (NodeChoice) n0CHS2A1;
+        final INode n0CHS2A1CH = n0CHS2A1C.choice;
+        switch (n0CHS2A1C.which) {
           case 0:
             // &0 $0 IdentifierAsString() $1 Arguments()
             // .. $2 [ "!" ]
-            final NodeSequence seq15 = (NodeSequence) ich1;
+            final NodeSequence n0CHS2A1CHS3 = (NodeSequence) n0CHS2A1CH;
             // $0 IdentifierAsString()
-            final INode seq16 = seq15.elementAt(0);
-            nRes = seq16.accept(this);
+            final INode n0CHS2A1CHS30A0 = ((NodeSequence) n0CHS2A1CHS3).elementAt(0);
+            r = n0CHS2A1CHS30A0.accept(this);
             // $1 Arguments()
-            final INode seq17 = seq15.elementAt(1);
-            nRes = seq17.accept(this);
+            final INode n0CHS2A1CHS30A1 = ((NodeSequence) n0CHS2A1CHS3).elementAt(1);
+            r = n0CHS2A1CHS30A1.accept(this);
             // $2 [ "!" ]
-            final INode seq18 = seq15.elementAt(2);
-            final NodeOptional opt1 = (NodeOptional) seq18;
-            if (opt1.present()) {
-              nRes = opt1.accept(this);
+            final INode n0CHS2A1CHS30A2 = ((NodeSequence) n0CHS2A1CHS3).elementAt(2);
+            final NodeOptional n0CHS2A1CHS30A2P = (NodeOptional) n0CHS2A1CHS30A2;
+            if (n0CHS2A1CHS30A2P.present()) {
+              r = n0CHS2A1CHS30A2P.accept(this);
             }
             break;
           case 1:
             // &1 $0 RegularExpression()
-            // .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
+            // .. $1 [ ?0 "." ?1 <IDENTIFIER> ]
             // .. $2 [ "!" ]
-            final NodeSequence seq19 = (NodeSequence) ich1;
+            final NodeSequence n0CHS2A1CHS4 = (NodeSequence) n0CHS2A1CH;
             // $0 RegularExpression()
-            final INode seq20 = seq19.elementAt(0);
-            nRes = seq20.accept(this);
-            // $1 [ ?0 "." ?1 < IDENTIFIER > ]
-            final INode seq21 = seq19.elementAt(1);
-            final NodeOptional opt2 = (NodeOptional) seq21;
-            if (opt2.present()) {
-              final NodeSequence seq22 = (NodeSequence) opt2.node;
+            final INode n0CHS2A1CHS41A0 = ((NodeSequence) n0CHS2A1CHS4).elementAt(0);
+            r = n0CHS2A1CHS41A0.accept(this);
+            // $1 [ ?0 "." ?1 <IDENTIFIER> ]
+            final INode n0CHS2A1CHS41A1 = ((NodeSequence) n0CHS2A1CHS4).elementAt(1);
+            final NodeOptional n0CHS2A1CHS41A1P = (NodeOptional) n0CHS2A1CHS41A1;
+            if (n0CHS2A1CHS41A1P.present()) {
+              final NodeSequence n0CHS2A1CHS41A1PS5 = (NodeSequence) n0CHS2A1CHS41A1P.node;
               // ?0 "."
-              final INode seq23 = seq22.elementAt(0);
-              nRes = seq23.accept(this);
-              // ?1 < IDENTIFIER >
-              final INode seq24 = seq22.elementAt(1);
-              nRes = seq24.accept(this);
+              final INode n0CHS2A1CHS41A1PS5A0 = ((NodeSequence) n0CHS2A1CHS41A1PS5).elementAt(0);
+              r = n0CHS2A1CHS41A1PS5A0.accept(this);
+              // ?1 <IDENTIFIER>
+              final INode n0CHS2A1CHS41A1PS5A1 = ((NodeSequence) n0CHS2A1CHS41A1PS5).elementAt(1);
+              r = n0CHS2A1CHS41A1PS5A1.accept(this);
             }
             // $2 [ "!" ]
-            final INode seq25 = seq19.elementAt(2);
-            final NodeOptional opt3 = (NodeOptional) seq25;
-            if (opt3.present()) {
-              nRes = opt3.accept(this);
+            final INode n0CHS2A1CHS4A2 = ((NodeSequence) n0CHS2A1CHS4).elementAt(2);
+            final NodeOptional n0CHS2A1CHS4A2P = (NodeOptional) n0CHS2A1CHS4A2;
+            if (n0CHS2A1CHS4A2P.present()) {
+              r = n0CHS2A1CHS4A2P.accept(this);
             }
             break;
           default:
@@ -1085,36 +1075,36 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. #3 ( &0 "+"
         // .. .. | &1 "*"
         // .. .. | &2 "?" )?
-        final NodeSequence seq26 = (NodeSequence) ich;
+        final NodeSequence n0CHS3 = (NodeSequence) n0CH;
         // #0 "("
-        final INode seq27 = seq26.elementAt(0);
-        nRes = seq27.accept(this);
+        final INode n0CHS35A0 = ((NodeSequence) n0CHS3).elementAt(0);
+        r = n0CHS35A0.accept(this);
         // #1 ExpansionChoices()
-        final INode seq28 = seq26.elementAt(1);
-        nRes = seq28.accept(this);
+        final INode n0CHS35A1 = ((NodeSequence) n0CHS3).elementAt(1);
+        r = n0CHS35A1.accept(this);
         // #2 ")"
-        final INode seq29 = seq26.elementAt(2);
-        nRes = seq29.accept(this);
+        final INode n0CHS35A2 = ((NodeSequence) n0CHS3).elementAt(2);
+        r = n0CHS35A2.accept(this);
         // #3 ( &0 "+"
         // .. | &1 "*"
         // .. | &2 "?" )?
-        final INode seq30 = seq26.elementAt(3);
-        final NodeOptional opt4 = (NodeOptional) seq30;
-        if (opt4.present()) {
-          final NodeChoice nch2 = (NodeChoice) opt4.node;
-          final INode ich2 = nch2.choice;
-          switch (nch2.which) {
+        final INode n0CHS35A3 = ((NodeSequence) n0CHS3).elementAt(3);
+        final NodeOptional n0CHS35A3P = (NodeOptional) n0CHS35A3;
+        if (n0CHS35A3P.present()) {
+          final NodeChoice n0CHS35A3PC = (NodeChoice) n0CHS35A3P.node;
+          final INode n0CHS35A3PCH = n0CHS35A3PC.choice;
+          switch (n0CHS35A3PC.which) {
             case 0:
               // &0 "+"
-              nRes = ich2.accept(this);
+              r = n0CHS35A3PCH.accept(this);
               break;
             case 1:
               // &1 "*"
-              nRes = ich2.accept(this);
+              r = n0CHS35A3PCH.accept(this);
               break;
             case 2:
               // &2 "?"
-              nRes = ich2.accept(this);
+              r = n0CHS35A3PCH.accept(this);
               break;
             default:
               // should not occur !!!
@@ -1126,7 +1116,7 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -1136,69 +1126,70 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * f1 -> "{"<br>
    * f2 -> ExpansionChoices()<br>
    * f3 -> "}"<br>
-   * f4 -> ( #0 "catch" #1 "(" #2 Name() #3 < IDENTIFIER > #4 ")" #5 Block() )*<br>
+   * f4 -> ( #0 "catch" #1 "(" #2 Name() #3 <IDENTIFIER> #4 ")" #5 Block() )*<br>
    * f5 -> [ #0 "finally" #1 Block() ]<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ExpansionUnitTCF n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "try"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> "{"
     final NodeToken n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> ExpansionChoices()
     final ExpansionChoices n2 = n.f2;
-    nRes = n2.accept(this);
+    r = n2.accept(this);
     // f3 -> "}"
     final NodeToken n3 = n.f3;
-    nRes = n3.accept(this);
-    // f4 -> ( #0 "catch" #1 "(" #2 Name() #3 < IDENTIFIER > #4 ")" #5 Block() )*
+    r = n3.accept(this);
+    // f4 -> ( #0 "catch" #1 "(" #2 Name() #3 <IDENTIFIER> #4 ")" #5 Block() )*
     final NodeListOptional n4 = n.f4;
-    if (n4.present()) {
-      for (int i = 0; i < n4.size(); i++) {
-        final INode nloeai = n4.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n4T = (NodeListOptional) n4;
+    if (n4T.present()) {
+      for (int i = 0; i < n4T.size(); i++) {
+        final INode n4TMi = n4T.elementAt(i);
+        final NodeSequence n4TMiS0 = (NodeSequence) n4TMi;
         // #0 "catch"
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n4TMiS0A0 = ((NodeSequence) n4TMiS0).elementAt(0);
+        r = n4TMiS0A0.accept(this);
         // #1 "("
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n4TMiS0A1 = ((NodeSequence) n4TMiS0).elementAt(1);
+        r = n4TMiS0A1.accept(this);
         // #2 Name()
-        final INode seq3 = seq.elementAt(2);
-        nRes = seq3.accept(this);
-        // #3 < IDENTIFIER >
-        final INode seq4 = seq.elementAt(3);
-        nRes = seq4.accept(this);
+        final INode n4TMiS0A2 = ((NodeSequence) n4TMiS0).elementAt(2);
+        r = n4TMiS0A2.accept(this);
+        // #3 <IDENTIFIER>
+        final INode n4TMiS0A3 = ((NodeSequence) n4TMiS0).elementAt(3);
+        r = n4TMiS0A3.accept(this);
         // #4 ")"
-        final INode seq5 = seq.elementAt(4);
-        nRes = seq5.accept(this);
+        final INode n4TMiS0A4 = ((NodeSequence) n4TMiS0).elementAt(4);
+        r = n4TMiS0A4.accept(this);
         // #5 Block()
-        final INode seq6 = seq.elementAt(5);
-        nRes = seq6.accept(this);
+        final INode n4TMiS0A5 = ((NodeSequence) n4TMiS0).elementAt(5);
+        r = n4TMiS0A5.accept(this);
       }
     }
     // f5 -> [ #0 "finally" #1 Block() ]
     final NodeOptional n5 = n.f5;
-    if (n5.present()) {
-      final NodeSequence seq7 = (NodeSequence) n5.node;
+    final NodeOptional n5P = (NodeOptional) n5;
+    if (n5P.present()) {
+      final NodeSequence n5PS0 = (NodeSequence) n5P.node;
       // #0 "finally"
-      final INode seq8 = seq7.elementAt(0);
-      nRes = seq8.accept(this);
+      final INode n5PS0A0 = ((NodeSequence) n5PS0).elementAt(0);
+      r = n5PS0A0.accept(this);
       // #1 Block()
-      final INode seq9 = seq7.elementAt(1);
-      nRes = seq9.accept(this);
+      final INode n5PS0A1 = ((NodeSequence) n5PS0).elementAt(1);
+      r = n5PS0A1.accept(this);
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link RegularExpression} node, whose child is the following :
+   * Visits a {@link RegularExpression} node, whose children are the following :
    * <p>
    * f0 -> . %0 StringLiteral()<br>
    * .. .. | %1 #0 "<"<br>
@@ -1211,9 +1202,8 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final RegularExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 StringLiteral()
     // .. .. | %1 #0 "<"
     // .. .. . .. #1 [ $0 [ "#" ]
@@ -1221,79 +1211,79 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
     // .. .. . .. #2 ComplexRegularExpressionChoices() #3 ">"
     // .. .. | %2 #0 "<" #1 IdentifierAsString() #2 ">"
     // .. .. | %3 #0 "<" #1 "EOF" #2 ">"
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 StringLiteral()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %1 #0 "<"
         // .. #1 [ $0 [ "#" ]
         // .. .. . $1 IdentifierAsString() $2 ":" ]
         // .. #2 ComplexRegularExpressionChoices() #3 ">"
-        final NodeSequence seq = (NodeSequence) ich;
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "<"
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n0CHS01A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        r = n0CHS01A0.accept(this);
         // #1 [ $0 [ "#" ]
         // .. . $1 IdentifierAsString() $2 ":" ]
-        final INode seq2 = seq.elementAt(1);
-        final NodeOptional opt = (NodeOptional) seq2;
-        if (opt.present()) {
-          final NodeSequence seq3 = (NodeSequence) opt.node;
+        final INode n0CHS01A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        final NodeOptional n0CHS01A1P = (NodeOptional) n0CHS01A1;
+        if (n0CHS01A1P.present()) {
+          final NodeSequence n0CHS01A1PS1 = (NodeSequence) n0CHS01A1P.node;
           // $0 [ "#" ]
-          final INode seq4 = seq3.elementAt(0);
-          final NodeOptional opt1 = (NodeOptional) seq4;
-          if (opt1.present()) {
-            nRes = opt1.accept(this);
+          final INode n0CHS01A1PS1A0 = ((NodeSequence) n0CHS01A1PS1).elementAt(0);
+          final NodeOptional n0CHS01A1PS1A0P = (NodeOptional) n0CHS01A1PS1A0;
+          if (n0CHS01A1PS1A0P.present()) {
+            r = n0CHS01A1PS1A0P.accept(this);
           }
           // $1 IdentifierAsString()
-          final INode seq5 = seq3.elementAt(1);
-          nRes = seq5.accept(this);
+          final INode n0CHS01A1PS1A1 = ((NodeSequence) n0CHS01A1PS1).elementAt(1);
+          r = n0CHS01A1PS1A1.accept(this);
           // $2 ":"
-          final INode seq6 = seq3.elementAt(2);
-          nRes = seq6.accept(this);
+          final INode n0CHS01A1PS1A2 = ((NodeSequence) n0CHS01A1PS1).elementAt(2);
+          r = n0CHS01A1PS1A2.accept(this);
         }
         // #2 ComplexRegularExpressionChoices()
-        final INode seq7 = seq.elementAt(2);
-        nRes = seq7.accept(this);
+        final INode n0CHS0A2 = ((NodeSequence) n0CHS0).elementAt(2);
+        r = n0CHS0A2.accept(this);
         // #3 ">"
-        final INode seq8 = seq.elementAt(3);
-        nRes = seq8.accept(this);
+        final INode n0CHS0A3 = ((NodeSequence) n0CHS0).elementAt(3);
+        r = n0CHS0A3.accept(this);
         break;
       case 2:
         // %2 #0 "<" #1 IdentifierAsString() #2 ">"
-        final NodeSequence seq9 = (NodeSequence) ich;
+        final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "<"
-        final INode seq10 = seq9.elementAt(0);
-        nRes = seq10.accept(this);
+        final INode n0CHS12A0 = ((NodeSequence) n0CHS1).elementAt(0);
+        r = n0CHS12A0.accept(this);
         // #1 IdentifierAsString()
-        final INode seq11 = seq9.elementAt(1);
-        nRes = seq11.accept(this);
+        final INode n0CHS12A1 = ((NodeSequence) n0CHS1).elementAt(1);
+        r = n0CHS12A1.accept(this);
         // #2 ">"
-        final INode seq12 = seq9.elementAt(2);
-        nRes = seq12.accept(this);
+        final INode n0CHS12A2 = ((NodeSequence) n0CHS1).elementAt(2);
+        r = n0CHS12A2.accept(this);
         break;
       case 3:
         // %3 #0 "<" #1 "EOF" #2 ">"
-        final NodeSequence seq13 = (NodeSequence) ich;
+        final NodeSequence n0CHS2 = (NodeSequence) n0CH;
         // #0 "<"
-        final INode seq14 = seq13.elementAt(0);
-        nRes = seq14.accept(this);
+        final INode n0CHS23A0 = ((NodeSequence) n0CHS2).elementAt(0);
+        r = n0CHS23A0.accept(this);
         // #1 "EOF"
-        final INode seq15 = seq13.elementAt(1);
-        nRes = seq15.accept(this);
+        final INode n0CHS23A1 = ((NodeSequence) n0CHS2).elementAt(1);
+        r = n0CHS23A1.accept(this);
         // #2 ">"
-        final INode seq16 = seq13.elementAt(2);
-        nRes = seq16.accept(this);
+        final INode n0CHS23A2 = ((NodeSequence) n0CHS2).elementAt(2);
+        r = n0CHS23A2.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -1305,51 +1295,50 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ComplexRegularExpressionChoices n) {
-    R nRes = null;
+    R r = null;
     // f0 -> ComplexRegularExpression()
     final ComplexRegularExpression n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( #0 "|" #1 ComplexRegularExpression() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        final NodeSequence n1TMiS0 = (NodeSequence) n1TMi;
         // #0 "|"
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n1TMiS0A0 = ((NodeSequence) n1TMiS0).elementAt(0);
+        r = n1TMiS0A0.accept(this);
         // #1 ComplexRegularExpression()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n1TMiS0A1 = ((NodeSequence) n1TMiS0).elementAt(1);
+        r = n1TMiS0A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link ComplexRegularExpression} node, whose child is the following :
+   * Visits a {@link ComplexRegularExpression} node, whose children are the following :
    * <p>
    * f0 -> ( ComplexRegularExpressionUnit() )+<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ComplexRegularExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> ( ComplexRegularExpressionUnit() )+
     final NodeList n0 = n.f0;
     for (int i = 0; i < n0.size(); i++) {
-      final INode lsteai = n0.elementAt(i);
-      nRes = lsteai.accept(this);
+      final INode n0Ei = n0.elementAt(i);
+      r = n0Ei.accept(this);
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link ComplexRegularExpressionUnit} node, whose child is the following :
+   * Visits a {@link ComplexRegularExpressionUnit} node, whose children are the following :
    * <p>
    * f0 -> . %0 StringLiteral()<br>
    * .. .. | %1 #0 "<" #1 IdentifierAsString() #2 ">"<br>
@@ -1366,9 +1355,8 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ComplexRegularExpressionUnit n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 StringLiteral()
     // .. .. | %1 #0 "<" #1 IdentifierAsString() #2 ">"
     // .. .. | %2 CharacterList()
@@ -1380,29 +1368,29 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
     // .. .. . .. .. . .. $2 [ ?0 ","
     // .. .. . .. .. . .. .. . ?1 [ IntegerLiteral() ] ]
     // .. .. . .. .. . .. $3 "}" )?
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 StringLiteral()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %1 #0 "<" #1 IdentifierAsString() #2 ">"
-        final NodeSequence seq = (NodeSequence) ich;
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "<"
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n0CHS01A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        r = n0CHS01A0.accept(this);
         // #1 IdentifierAsString()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n0CHS01A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        r = n0CHS01A1.accept(this);
         // #2 ">"
-        final INode seq3 = seq.elementAt(2);
-        nRes = seq3.accept(this);
+        final INode n0CHS01A2 = ((NodeSequence) n0CHS0).elementAt(2);
+        r = n0CHS01A2.accept(this);
         break;
       case 2:
         // %2 CharacterList()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 3:
         // %3 #0 "(" #1 ComplexRegularExpressionChoices() #2 ")"
@@ -1413,16 +1401,16 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. .. .. $2 [ ?0 ","
         // .. .. .. .. . ?1 [ IntegerLiteral() ] ]
         // .. .. .. $3 "}" )?
-        final NodeSequence seq4 = (NodeSequence) ich;
+        final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "("
-        final INode seq5 = seq4.elementAt(0);
-        nRes = seq5.accept(this);
+        final INode n0CHS13A0 = ((NodeSequence) n0CHS1).elementAt(0);
+        r = n0CHS13A0.accept(this);
         // #1 ComplexRegularExpressionChoices()
-        final INode seq6 = seq4.elementAt(1);
-        nRes = seq6.accept(this);
+        final INode n0CHS13A1 = ((NodeSequence) n0CHS1).elementAt(1);
+        r = n0CHS13A1.accept(this);
         // #2 ")"
-        final INode seq7 = seq4.elementAt(2);
-        nRes = seq7.accept(this);
+        final INode n0CHS13A2 = ((NodeSequence) n0CHS1).elementAt(2);
+        r = n0CHS13A2.accept(this);
         // #3 ( &0 "+"
         // .. | &1 "*"
         // .. | &2 "?"
@@ -1430,55 +1418,55 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. .. $2 [ ?0 ","
         // .. .. .. . ?1 [ IntegerLiteral() ] ]
         // .. .. $3 "}" )?
-        final INode seq8 = seq4.elementAt(3);
-        final NodeOptional opt = (NodeOptional) seq8;
-        if (opt.present()) {
-          final NodeChoice nch1 = (NodeChoice) opt.node;
-          final INode ich1 = nch1.choice;
-          switch (nch1.which) {
+        final INode n0CHS13A3 = ((NodeSequence) n0CHS1).elementAt(3);
+        final NodeOptional n0CHS13A3P = (NodeOptional) n0CHS13A3;
+        if (n0CHS13A3P.present()) {
+          final NodeChoice n0CHS13A3PC = (NodeChoice) n0CHS13A3P.node;
+          final INode n0CHS13A3PCH = n0CHS13A3PC.choice;
+          switch (n0CHS13A3PC.which) {
             case 0:
               // &0 "+"
-              nRes = ich1.accept(this);
+              r = n0CHS13A3PCH.accept(this);
               break;
             case 1:
               // &1 "*"
-              nRes = ich1.accept(this);
+              r = n0CHS13A3PCH.accept(this);
               break;
             case 2:
               // &2 "?"
-              nRes = ich1.accept(this);
+              r = n0CHS13A3PCH.accept(this);
               break;
             case 3:
               // &3 $0 "{" $1 IntegerLiteral()
               // .. $2 [ ?0 ","
               // .. .. . ?1 [ IntegerLiteral() ] ]
               // .. $3 "}"
-              final NodeSequence seq9 = (NodeSequence) ich1;
+              final NodeSequence n0CHS13A3PCHS2 = (NodeSequence) n0CHS13A3PCH;
               // $0 "{"
-              final INode seq10 = seq9.elementAt(0);
-              nRes = seq10.accept(this);
+              final INode n0CHS13A3PCHS23A0 = ((NodeSequence) n0CHS13A3PCHS2).elementAt(0);
+              r = n0CHS13A3PCHS23A0.accept(this);
               // $1 IntegerLiteral()
-              final INode seq11 = seq9.elementAt(1);
-              nRes = seq11.accept(this);
+              final INode n0CHS13A3PCHS23A1 = ((NodeSequence) n0CHS13A3PCHS2).elementAt(1);
+              r = n0CHS13A3PCHS23A1.accept(this);
               // $2 [ ?0 ","
               // .. . ?1 [ IntegerLiteral() ] ]
-              final INode seq12 = seq9.elementAt(2);
-              final NodeOptional opt1 = (NodeOptional) seq12;
-              if (opt1.present()) {
-                final NodeSequence seq13 = (NodeSequence) opt1.node;
+              final INode n0CHS13A3PCHS23A2 = ((NodeSequence) n0CHS13A3PCHS2).elementAt(2);
+              final NodeOptional n0CHS13A3PCHS23A2P = (NodeOptional) n0CHS13A3PCHS23A2;
+              if (n0CHS13A3PCHS23A2P.present()) {
+                final NodeSequence n0CHS13A3PCHS23A2PS3 = (NodeSequence) n0CHS13A3PCHS23A2P.node;
                 // ?0 ","
-                final INode seq14 = seq13.elementAt(0);
-                nRes = seq14.accept(this);
+                final INode n0CHS13A3PCHS23A2PS3A0 = ((NodeSequence) n0CHS13A3PCHS23A2PS3).elementAt(0);
+                r = n0CHS13A3PCHS23A2PS3A0.accept(this);
                 // ?1 [ IntegerLiteral() ]
-                final INode seq15 = seq13.elementAt(1);
-                final NodeOptional opt2 = (NodeOptional) seq15;
-                if (opt2.present()) {
-                  nRes = opt2.accept(this);
+                final INode n0CHS13A3PCHS23A2PS3A1 = ((NodeSequence) n0CHS13A3PCHS23A2PS3).elementAt(1);
+                final NodeOptional n0CHS13A3PCHS23A2PS3A1P = (NodeOptional) n0CHS13A3PCHS23A2PS3A1;
+                if (n0CHS13A3PCHS23A2PS3A1P.present()) {
+                  r = n0CHS13A3PCHS23A2PS3A1P.accept(this);
                 }
               }
               // $3 "}"
-              final INode seq16 = seq9.elementAt(3);
-              nRes = seq16.accept(this);
+              final INode n0CHS13A3PCHS2A3 = ((NodeSequence) n0CHS13A3PCHS2).elementAt(3);
+              r = n0CHS13A3PCHS2A3.accept(this);
               break;
             default:
               // should not occur !!!
@@ -1490,7 +1478,7 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -1505,45 +1493,46 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final CharacterList n) {
-    R nRes = null;
+    R r = null;
     // f0 -> [ "~" ]
     final NodeOptional n0 = n.f0;
-    if (n0.present()) {
-      nRes = n0.accept(this);
+    final NodeOptional n0P = (NodeOptional) n0;
+    if (n0P.present()) {
+      r = n0P.accept(this);
     }
     // f1 -> "["
     final NodeToken n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> [ #0 CharacterDescriptor()
     // .. .. . #1 ( $0 "," $1 CharacterDescriptor() )* ]
     final NodeOptional n2 = n.f2;
-    if (n2.present()) {
-      final NodeSequence seq = (NodeSequence) n2.node;
+    final NodeOptional n2P = (NodeOptional) n2;
+    if (n2P.present()) {
+      final NodeSequence n2PS0 = (NodeSequence) n2P.node;
       // #0 CharacterDescriptor()
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
+      final INode n2PS0A0 = ((NodeSequence) n2PS0).elementAt(0);
+      r = n2PS0A0.accept(this);
       // #1 ( $0 "," $1 CharacterDescriptor() )*
-      final INode seq2 = seq.elementAt(1);
-      final NodeListOptional nlo = (NodeListOptional) seq2;
-      if (nlo.present()) {
-        for (int i = 0; i < nlo.size(); i++) {
-          final INode nloeai = nlo.elementAt(i);
-          final NodeSequence seq3 = (NodeSequence) nloeai;
+      final INode n2PS0A1 = ((NodeSequence) n2PS0).elementAt(1);
+      final NodeListOptional n2PS0A1T = (NodeListOptional) n2PS0A1;
+      if (n2PS0A1T.present()) {
+        for (int i = 0; i < n2PS0A1T.size(); i++) {
+          final INode n2PS0A1TMi = n2PS0A1T.elementAt(i);
+          final NodeSequence n2PS0A1TMiS1 = (NodeSequence) n2PS0A1TMi;
           // $0 ","
-          final INode seq4 = seq3.elementAt(0);
-          nRes = seq4.accept(this);
+          final INode n2PS0A1TMiS1A0 = ((NodeSequence) n2PS0A1TMiS1).elementAt(0);
+          r = n2PS0A1TMiS1A0.accept(this);
           // $1 CharacterDescriptor()
-          final INode seq5 = seq3.elementAt(1);
-          nRes = seq5.accept(this);
+          final INode n2PS0A1TMiS1A1 = ((NodeSequence) n2PS0A1TMiS1).elementAt(1);
+          r = n2PS0A1TMiS1A1.accept(this);
         }
       }
     }
     // f3 -> "]"
     final NodeToken n3 = n.f3;
-    nRes = n3.accept(this);
-    return nRes;
+    r = n3.accept(this);
+    return r;
   }
 
   /**
@@ -1555,47 +1544,46 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final CharacterDescriptor n) {
-    R nRes = null;
+    R r = null;
     // f0 -> StringLiteral()
     final StringLiteral n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> [ #0 "-" #1 StringLiteral() ]
     final NodeOptional n1 = n.f1;
-    if (n1.present()) {
-      final NodeSequence seq = (NodeSequence) n1.node;
+    final NodeOptional n1P = (NodeOptional) n1;
+    if (n1P.present()) {
+      final NodeSequence n1PS0 = (NodeSequence) n1P.node;
       // #0 "-"
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
+      final INode n1PS0A0 = ((NodeSequence) n1PS0).elementAt(0);
+      r = n1PS0A0.accept(this);
       // #1 StringLiteral()
-      final INode seq2 = seq.elementAt(1);
-      nRes = seq2.accept(this);
+      final INode n1PS0A1 = ((NodeSequence) n1PS0).elementAt(1);
+      r = n1PS0A1.accept(this);
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link IdentifierAsString} node, whose child is the following :
+   * Visits a {@link IdentifierAsString} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final IdentifierAsString n) {
-    R nRes = null;
-    // f0 -> < IDENTIFIER >
+    R r = null;
+    // f0 -> <IDENTIFIER>
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
-    return nRes;
+    r = n0.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link JavaIdentifier} node, whose child is the following :
+   * Visits a {@link JavaIdentifier} node, whose children are the following :
    * <p>
-   * f0 -> ( %00 < IDENTIFIER ><br>
+   * f0 -> ( %00 <IDENTIFIER><br>
    * .. .. | %01 "LOOKAHEAD"<br>
    * .. .. | %02 "IGNORE_CASE"<br>
    * .. .. | %03 "PARSER_BEGIN"<br>
@@ -1611,10 +1599,9 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final JavaIdentifier n) {
-    R nRes = null;
-    // f0 -> ( %00 < IDENTIFIER >
+    R r = null;
+    // f0 -> ( %00 <IDENTIFIER>
     // .. .. | %01 "LOOKAHEAD"
     // .. .. | %02 "IGNORE_CASE"
     // .. .. | %03 "PARSER_BEGIN"
@@ -1627,62 +1614,62 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
     // .. .. | %10 "TOKEN_MGR_DECLS"
     // .. .. | %11 "EOF" )
     final NodeChoice n0 = n.f0;
-    final NodeChoice nch = n0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = (NodeChoice) n0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
-        // %00 < IDENTIFIER >
-        nRes = ich.accept(this);
+        // %00 <IDENTIFIER>
+        r = n0CH.accept(this);
         break;
       case 1:
         // %01 "LOOKAHEAD"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 2:
         // %02 "IGNORE_CASE"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 3:
         // %03 "PARSER_BEGIN"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 4:
         // %04 "PARSER_END"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 5:
         // %05 "JAVACODE"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 6:
         // %06 "TOKEN"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 7:
         // %07 "SPECIAL_TOKEN"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 8:
         // %08 "MORE"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 9:
         // %09 "SKIP"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 10:
         // %10 "TOKEN_MGR_DECLS"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 11:
         // %11 "EOF"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -1695,31 +1682,33 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final CompilationUnit n) {
-    R nRes = null;
+    R r = null;
     // f0 -> [ PackageDeclaration() ]
     final NodeOptional n0 = n.f0;
-    if (n0.present()) {
-      nRes = n0.accept(this);
+    final NodeOptional n0P = (NodeOptional) n0;
+    if (n0P.present()) {
+      r = n0P.accept(this);
     }
     // f1 -> ( ImportDeclaration() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        nRes = nloeai.accept(this);
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        r = n1TMi.accept(this);
       }
     }
     // f2 -> ( TypeDeclaration() )*
     final NodeListOptional n2 = n.f2;
-    if (n2.present()) {
-      for (int i = 0; i < n2.size(); i++) {
-        final INode nloeai = n2.elementAt(i);
-        nRes = nloeai.accept(this);
+    final NodeListOptional n2T1 = (NodeListOptional) n2;
+    if (n2T1.present()) {
+      for (int i = 0; i < n2T1.size(); i++) {
+        final INode n2T1Mi = n2T1.elementAt(i);
+        r = n2T1Mi.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -1732,19 +1721,18 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final PackageDeclaration n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "package"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> Name()
     final Name n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> ";"
     final NodeToken n2 = n.f2;
-    nRes = n2.accept(this);
-    return nRes;
+    r = n2.accept(this);
+    return r;
   }
 
   /**
@@ -1759,39 +1747,40 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ImportDeclaration n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "import"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> [ "static" ]
     final NodeOptional n1 = n.f1;
-    if (n1.present()) {
-      nRes = n1.accept(this);
+    final NodeOptional n1P = (NodeOptional) n1;
+    if (n1P.present()) {
+      r = n1P.accept(this);
     }
     // f2 -> Name()
     final Name n2 = n.f2;
-    nRes = n2.accept(this);
+    r = n2.accept(this);
     // f3 -> [ #0 "." #1 "*" ]
     final NodeOptional n3 = n.f3;
-    if (n3.present()) {
-      final NodeSequence seq = (NodeSequence) n3.node;
+    final NodeOptional n3P = (NodeOptional) n3;
+    if (n3P.present()) {
+      final NodeSequence n3PS0 = (NodeSequence) n3P.node;
       // #0 "."
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
+      final INode n3PS0A0 = ((NodeSequence) n3PS0).elementAt(0);
+      r = n3PS0A0.accept(this);
       // #1 "*"
-      final INode seq2 = seq.elementAt(1);
-      nRes = seq2.accept(this);
+      final INode n3PS0A1 = ((NodeSequence) n3PS0).elementAt(1);
+      r = n3PS0A1.accept(this);
     }
     // f4 -> ";"
     final NodeToken n4 = n.f4;
-    nRes = n4.accept(this);
-    return nRes;
+    r = n4.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link Modifiers} node, whose child is the following :
+   * Visits a {@link Modifiers} node, whose children are the following :
    * <p>
    * f0 -> ( ( %00 "public"<br>
    * .. .. . | %01 "static"<br>
@@ -1809,9 +1798,8 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final Modifiers n) {
-    R nRes = null;
+    R r = null;
     // f0 -> ( ( %00 "public"
     // .. .. . | %01 "static"
     // .. .. . | %02 "protected"
@@ -1825,59 +1813,60 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
     // .. .. . | %10 "strictfp"
     // .. .. . | %11 Annotation() ) )*
     final NodeListOptional n0 = n.f0;
-    if (n0.present()) {
-      for (int i = 0; i < n0.size(); i++) {
-        final INode nloeai = n0.elementAt(i);
-        final NodeChoice nch = (NodeChoice) nloeai;
-        final INode ich = nch.choice;
-        switch (nch.which) {
+    final NodeListOptional n0T = (NodeListOptional) n0;
+    if (n0T.present()) {
+      for (int i = 0; i < n0T.size(); i++) {
+        final INode n0TMi = n0T.elementAt(i);
+        final NodeChoice n0TMiC = (NodeChoice) n0TMi;
+        final INode n0TMiCH = n0TMiC.choice;
+        switch (n0TMiC.which) {
           case 0:
             // %00 "public"
-            nRes = ich.accept(this);
+            r = n0TMiCH.accept(this);
             break;
           case 1:
             // %01 "static"
-            nRes = ich.accept(this);
+            r = n0TMiCH.accept(this);
             break;
           case 2:
             // %02 "protected"
-            nRes = ich.accept(this);
+            r = n0TMiCH.accept(this);
             break;
           case 3:
             // %03 "private"
-            nRes = ich.accept(this);
+            r = n0TMiCH.accept(this);
             break;
           case 4:
             // %04 "final"
-            nRes = ich.accept(this);
+            r = n0TMiCH.accept(this);
             break;
           case 5:
             // %05 "abstract"
-            nRes = ich.accept(this);
+            r = n0TMiCH.accept(this);
             break;
           case 6:
             // %06 "synchronized"
-            nRes = ich.accept(this);
+            r = n0TMiCH.accept(this);
             break;
           case 7:
             // %07 "native"
-            nRes = ich.accept(this);
+            r = n0TMiCH.accept(this);
             break;
           case 8:
             // %08 "transient"
-            nRes = ich.accept(this);
+            r = n0TMiCH.accept(this);
             break;
           case 9:
             // %09 "volatile"
-            nRes = ich.accept(this);
+            r = n0TMiCH.accept(this);
             break;
           case 10:
             // %10 "strictfp"
-            nRes = ich.accept(this);
+            r = n0TMiCH.accept(this);
             break;
           case 11:
             // %11 Annotation()
-            nRes = ich.accept(this);
+            r = n0TMiCH.accept(this);
             break;
           default:
             // should not occur !!!
@@ -1885,11 +1874,11 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         }
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link TypeDeclaration} node, whose child is the following :
+   * Visits a {@link TypeDeclaration} node, whose children are the following :
    * <p>
    * f0 -> . %0 ";"<br>
    * .. .. | %1 #0 Modifiers()<br>
@@ -1900,48 +1889,47 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final TypeDeclaration n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 ";"
     // .. .. | %1 #0 Modifiers()
     // .. .. . .. #1 ( &0 ClassOrInterfaceDeclaration()
     // .. .. . .. .. | &1 EnumDeclaration()
     // .. .. . .. .. | &2 AnnotationTypeDeclaration() )
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 ";"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %1 #0 Modifiers()
         // .. #1 ( &0 ClassOrInterfaceDeclaration()
         // .. .. | &1 EnumDeclaration()
         // .. .. | &2 AnnotationTypeDeclaration() )
-        final NodeSequence seq = (NodeSequence) ich;
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 Modifiers()
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n0CHS01A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        r = n0CHS01A0.accept(this);
         // #1 ( &0 ClassOrInterfaceDeclaration()
         // .. | &1 EnumDeclaration()
         // .. | &2 AnnotationTypeDeclaration() )
-        final INode seq2 = seq.elementAt(1);
-        final NodeChoice nch1 = (NodeChoice) seq2;
-        final INode ich1 = nch1.choice;
-        switch (nch1.which) {
+        final INode n0CHS01A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        final NodeChoice n0CHS01A1C = (NodeChoice) n0CHS01A1;
+        final INode n0CHS01A1CH = n0CHS01A1C.choice;
+        switch (n0CHS01A1C.which) {
           case 0:
             // &0 ClassOrInterfaceDeclaration()
-            nRes = ich1.accept(this);
+            r = n0CHS01A1CH.accept(this);
             break;
           case 1:
             // &1 EnumDeclaration()
-            nRes = ich1.accept(this);
+            r = n0CHS01A1CH.accept(this);
             break;
           case 2:
             // &2 AnnotationTypeDeclaration()
-            nRes = ich1.accept(this);
+            r = n0CHS01A1CH.accept(this);
             break;
           default:
             // should not occur !!!
@@ -1952,7 +1940,7 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -1960,7 +1948,7 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * <p>
    * f0 -> ( %0 "class"<br>
    * .. .. | %1 "interface" )<br>
-   * f1 -> < IDENTIFIER ><br>
+   * f1 -> <IDENTIFIER><br>
    * f2 -> [ TypeParameters() ]<br>
    * f3 -> [ ExtendsList() ]<br>
    * f4 -> [ ImplementsList() ]<br>
@@ -1969,49 +1957,51 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ClassOrInterfaceDeclaration n) {
-    R nRes = null;
+    R r = null;
     // f0 -> ( %0 "class"
     // .. .. | %1 "interface" )
     final NodeChoice n0 = n.f0;
-    final NodeChoice nch = n0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = (NodeChoice) n0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 "class"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %1 "interface"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    // f1 -> < IDENTIFIER >
+    // f1 -> <IDENTIFIER>
     final NodeToken n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> [ TypeParameters() ]
     final NodeOptional n2 = n.f2;
-    if (n2.present()) {
-      nRes = n2.accept(this);
+    final NodeOptional n2P = (NodeOptional) n2;
+    if (n2P.present()) {
+      r = n2P.accept(this);
     }
     // f3 -> [ ExtendsList() ]
     final NodeOptional n3 = n.f3;
-    if (n3.present()) {
-      nRes = n3.accept(this);
+    final NodeOptional n3P = (NodeOptional) n3;
+    if (n3P.present()) {
+      r = n3P.accept(this);
     }
     // f4 -> [ ImplementsList() ]
     final NodeOptional n4 = n.f4;
-    if (n4.present()) {
-      nRes = n4.accept(this);
+    final NodeOptional n4P = (NodeOptional) n4;
+    if (n4P.present()) {
+      r = n4P.accept(this);
     }
     // f5 -> ClassOrInterfaceBody()
     final ClassOrInterfaceBody n5 = n.f5;
-    nRes = n5.accept(this);
-    return nRes;
+    r = n5.accept(this);
+    return r;
   }
 
   /**
@@ -2024,30 +2014,30 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ExtendsList n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "extends"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ClassOrInterfaceType()
     final ClassOrInterfaceType n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> ( #0 "," #1 ClassOrInterfaceType() )*
     final NodeListOptional n2 = n.f2;
-    if (n2.present()) {
-      for (int i = 0; i < n2.size(); i++) {
-        final INode nloeai = n2.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n2T = (NodeListOptional) n2;
+    if (n2T.present()) {
+      for (int i = 0; i < n2T.size(); i++) {
+        final INode n2TMi = n2T.elementAt(i);
+        final NodeSequence n2TMiS0 = (NodeSequence) n2TMi;
         // #0 ","
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n2TMiS0A0 = ((NodeSequence) n2TMiS0).elementAt(0);
+        r = n2TMiS0A0.accept(this);
         // #1 ClassOrInterfaceType()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n2TMiS0A1 = ((NodeSequence) n2TMiS0).elementAt(1);
+        r = n2TMiS0A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -2060,61 +2050,61 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ImplementsList n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "implements"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ClassOrInterfaceType()
     final ClassOrInterfaceType n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> ( #0 "," #1 ClassOrInterfaceType() )*
     final NodeListOptional n2 = n.f2;
-    if (n2.present()) {
-      for (int i = 0; i < n2.size(); i++) {
-        final INode nloeai = n2.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n2T = (NodeListOptional) n2;
+    if (n2T.present()) {
+      for (int i = 0; i < n2T.size(); i++) {
+        final INode n2TMi = n2T.elementAt(i);
+        final NodeSequence n2TMiS0 = (NodeSequence) n2TMi;
         // #0 ","
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n2TMiS0A0 = ((NodeSequence) n2TMiS0).elementAt(0);
+        r = n2TMiS0A0.accept(this);
         // #1 ClassOrInterfaceType()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n2TMiS0A1 = ((NodeSequence) n2TMiS0).elementAt(1);
+        r = n2TMiS0A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
    * Visits a {@link EnumDeclaration} node, whose children are the following :
    * <p>
    * f0 -> "enum"<br>
-   * f1 -> < IDENTIFIER ><br>
+   * f1 -> <IDENTIFIER><br>
    * f2 -> [ ImplementsList() ]<br>
    * f3 -> EnumBody()<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final EnumDeclaration n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "enum"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
-    // f1 -> < IDENTIFIER >
+    r = n0.accept(this);
+    // f1 -> <IDENTIFIER>
     final NodeToken n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> [ ImplementsList() ]
     final NodeOptional n2 = n.f2;
-    if (n2.present()) {
-      nRes = n2.accept(this);
+    final NodeOptional n2P = (NodeOptional) n2;
+    if (n2P.present()) {
+      r = n2P.accept(this);
     }
     // f3 -> EnumBody()
     final EnumBody n3 = n.f3;
-    nRes = n3.accept(this);
-    return nRes;
+    r = n3.accept(this);
+    return r;
   }
 
   /**
@@ -2131,96 +2121,99 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final EnumBody n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "{"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> [ #0 EnumConstant()
     // .. .. . #1 ( $0 "," $1 EnumConstant() )* ]
     final NodeOptional n1 = n.f1;
-    if (n1.present()) {
-      final NodeSequence seq = (NodeSequence) n1.node;
+    final NodeOptional n1P = (NodeOptional) n1;
+    if (n1P.present()) {
+      final NodeSequence n1PS0 = (NodeSequence) n1P.node;
       // #0 EnumConstant()
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
+      final INode n1PS0A0 = ((NodeSequence) n1PS0).elementAt(0);
+      r = n1PS0A0.accept(this);
       // #1 ( $0 "," $1 EnumConstant() )*
-      final INode seq2 = seq.elementAt(1);
-      final NodeListOptional nlo = (NodeListOptional) seq2;
-      if (nlo.present()) {
-        for (int i = 0; i < nlo.size(); i++) {
-          final INode nloeai = nlo.elementAt(i);
-          final NodeSequence seq3 = (NodeSequence) nloeai;
+      final INode n1PS0A1 = ((NodeSequence) n1PS0).elementAt(1);
+      final NodeListOptional n1PS0A1T = (NodeListOptional) n1PS0A1;
+      if (n1PS0A1T.present()) {
+        for (int i = 0; i < n1PS0A1T.size(); i++) {
+          final INode n1PS0A1TMi = n1PS0A1T.elementAt(i);
+          final NodeSequence n1PS0A1TMiS1 = (NodeSequence) n1PS0A1TMi;
           // $0 ","
-          final INode seq4 = seq3.elementAt(0);
-          nRes = seq4.accept(this);
+          final INode n1PS0A1TMiS1A0 = ((NodeSequence) n1PS0A1TMiS1).elementAt(0);
+          r = n1PS0A1TMiS1A0.accept(this);
           // $1 EnumConstant()
-          final INode seq5 = seq3.elementAt(1);
-          nRes = seq5.accept(this);
+          final INode n1PS0A1TMiS1A1 = ((NodeSequence) n1PS0A1TMiS1).elementAt(1);
+          r = n1PS0A1TMiS1A1.accept(this);
         }
       }
     }
     // f2 -> [ "," ]
     final NodeOptional n2 = n.f2;
-    if (n2.present()) {
-      nRes = n2.accept(this);
+    final NodeOptional n2P = (NodeOptional) n2;
+    if (n2P.present()) {
+      r = n2P.accept(this);
     }
     // f3 -> [ #0 ";"
     // .. .. . #1 ( ClassOrInterfaceBodyDeclaration() )* ]
     final NodeOptional n3 = n.f3;
-    if (n3.present()) {
-      final NodeSequence seq6 = (NodeSequence) n3.node;
+    final NodeOptional n3P = (NodeOptional) n3;
+    if (n3P.present()) {
+      final NodeSequence n3PS0 = (NodeSequence) n3P.node;
       // #0 ";"
-      final INode seq7 = seq6.elementAt(0);
-      nRes = seq7.accept(this);
+      final INode n3PS0A0 = ((NodeSequence) n3PS0).elementAt(0);
+      r = n3PS0A0.accept(this);
       // #1 ( ClassOrInterfaceBodyDeclaration() )*
-      final INode seq8 = seq6.elementAt(1);
-      final NodeListOptional nlo1 = (NodeListOptional) seq8;
-      if (nlo1.present()) {
-        for (int i = 0; i < nlo1.size(); i++) {
-          final INode nloeai = nlo1.elementAt(i);
-          nRes = nloeai.accept(this);
+      final INode n3PS0A1 = ((NodeSequence) n3PS0).elementAt(1);
+      final NodeListOptional n3PS0A1T1 = (NodeListOptional) n3PS0A1;
+      if (n3PS0A1T1.present()) {
+        for (int i = 0; i < n3PS0A1T1.size(); i++) {
+          final INode n3PS0A1T1Mi = n3PS0A1T1.elementAt(i);
+          r = n3PS0A1T1Mi.accept(this);
         }
       }
     }
     // f4 -> "}"
     final NodeToken n4 = n.f4;
-    nRes = n4.accept(this);
-    return nRes;
+    r = n4.accept(this);
+    return r;
   }
 
   /**
    * Visits a {@link EnumConstant} node, whose children are the following :
    * <p>
    * f0 -> Modifiers()<br>
-   * f1 -> < IDENTIFIER ><br>
+   * f1 -> <IDENTIFIER><br>
    * f2 -> [ Arguments() ]<br>
    * f3 -> [ ClassOrInterfaceBody() ]<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final EnumConstant n) {
-    R nRes = null;
+    R r = null;
     // f0 -> Modifiers()
     final Modifiers n0 = n.f0;
-    nRes = n0.accept(this);
-    // f1 -> < IDENTIFIER >
+    r = n0.accept(this);
+    // f1 -> <IDENTIFIER>
     final NodeToken n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> [ Arguments() ]
     final NodeOptional n2 = n.f2;
-    if (n2.present()) {
-      nRes = n2.accept(this);
+    final NodeOptional n2P = (NodeOptional) n2;
+    if (n2P.present()) {
+      r = n2P.accept(this);
     }
     // f3 -> [ ClassOrInterfaceBody() ]
     final NodeOptional n3 = n.f3;
-    if (n3.present()) {
-      nRes = n3.accept(this);
+    final NodeOptional n3P = (NodeOptional) n3;
+    if (n3P.present()) {
+      r = n3P.accept(this);
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -2234,56 +2227,56 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final TypeParameters n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "<"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> TypeParameter()
     final TypeParameter n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> ( #0 "," #1 TypeParameter() )*
     final NodeListOptional n2 = n.f2;
-    if (n2.present()) {
-      for (int i = 0; i < n2.size(); i++) {
-        final INode nloeai = n2.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n2T = (NodeListOptional) n2;
+    if (n2T.present()) {
+      for (int i = 0; i < n2T.size(); i++) {
+        final INode n2TMi = n2T.elementAt(i);
+        final NodeSequence n2TMiS0 = (NodeSequence) n2TMi;
         // #0 ","
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n2TMiS0A0 = ((NodeSequence) n2TMiS0).elementAt(0);
+        r = n2TMiS0A0.accept(this);
         // #1 TypeParameter()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n2TMiS0A1 = ((NodeSequence) n2TMiS0).elementAt(1);
+        r = n2TMiS0A1.accept(this);
       }
     }
     // f3 -> ">"
     final NodeToken n3 = n.f3;
-    nRes = n3.accept(this);
-    return nRes;
+    r = n3.accept(this);
+    return r;
   }
 
   /**
    * Visits a {@link TypeParameter} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    * f1 -> [ TypeBound() ]<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final TypeParameter n) {
-    R nRes = null;
-    // f0 -> < IDENTIFIER >
+    R r = null;
+    // f0 -> <IDENTIFIER>
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> [ TypeBound() ]
     final NodeOptional n1 = n.f1;
-    if (n1.present()) {
-      nRes = n1.accept(this);
+    final NodeOptional n1P = (NodeOptional) n1;
+    if (n1P.present()) {
+      r = n1P.accept(this);
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -2296,30 +2289,30 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final TypeBound n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "extends"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ClassOrInterfaceType()
     final ClassOrInterfaceType n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> ( #0 "&" #1 ClassOrInterfaceType() )*
     final NodeListOptional n2 = n.f2;
-    if (n2.present()) {
-      for (int i = 0; i < n2.size(); i++) {
-        final INode nloeai = n2.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n2T = (NodeListOptional) n2;
+    if (n2T.present()) {
+      for (int i = 0; i < n2T.size(); i++) {
+        final INode n2TMi = n2T.elementAt(i);
+        final NodeSequence n2TMiS0 = (NodeSequence) n2TMi;
         // #0 "&"
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n2TMiS0A0 = ((NodeSequence) n2TMiS0).elementAt(0);
+        r = n2TMiS0A0.accept(this);
         // #1 ClassOrInterfaceType()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n2TMiS0A1 = ((NodeSequence) n2TMiS0).elementAt(1);
+        r = n2TMiS0A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -2332,106 +2325,97 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ClassOrInterfaceBody n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "{"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( ClassOrInterfaceBodyDeclaration() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        nRes = nloeai.accept(this);
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        r = n1TMi.accept(this);
       }
     }
     // f2 -> "}"
     final NodeToken n2 = n.f2;
-    nRes = n2.accept(this);
-    return nRes;
+    r = n2.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link ClassOrInterfaceBodyDeclaration} node, whose child is the following :
+   * Visits a {@link ClassOrInterfaceBodyDeclaration} node, whose children are the following :
    * <p>
    * f0 -> . %0 Initializer()<br>
    * .. .. | %1 #0 Modifiers()<br>
    * .. .. . .. #1 ( &0 ClassOrInterfaceDeclaration()<br>
    * .. .. . .. .. | &1 EnumDeclaration()<br>
-   * .. .. . .. .. | &2 AnnotationTypeDeclaration()<br>
-   * .. .. . .. .. | &3 ConstructorDeclaration()<br>
-   * .. .. . .. .. | &4 FieldDeclaration()<br>
-   * .. .. . .. .. | &5 MethodDeclaration() )<br>
+   * .. .. . .. .. | &2 ConstructorDeclaration()<br>
+   * .. .. . .. .. | &3 FieldDeclaration()<br>
+   * .. .. . .. .. | &4 MethodDeclaration() )<br>
    * .. .. | %2 ";"<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ClassOrInterfaceBodyDeclaration n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 Initializer()
     // .. .. | %1 #0 Modifiers()
     // .. .. . .. #1 ( &0 ClassOrInterfaceDeclaration()
     // .. .. . .. .. | &1 EnumDeclaration()
-    // .. .. . .. .. | &2 AnnotationTypeDeclaration()
-    // .. .. . .. .. | &3 ConstructorDeclaration()
-    // .. .. . .. .. | &4 FieldDeclaration()
-    // .. .. . .. .. | &5 MethodDeclaration() )
+    // .. .. . .. .. | &2 ConstructorDeclaration()
+    // .. .. . .. .. | &3 FieldDeclaration()
+    // .. .. . .. .. | &4 MethodDeclaration() )
     // .. .. | %2 ";"
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 Initializer()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %1 #0 Modifiers()
         // .. #1 ( &0 ClassOrInterfaceDeclaration()
         // .. .. | &1 EnumDeclaration()
-        // .. .. | &2 AnnotationTypeDeclaration()
-        // .. .. | &3 ConstructorDeclaration()
-        // .. .. | &4 FieldDeclaration()
-        // .. .. | &5 MethodDeclaration() )
-        final NodeSequence seq = (NodeSequence) ich;
+        // .. .. | &2 ConstructorDeclaration()
+        // .. .. | &3 FieldDeclaration()
+        // .. .. | &4 MethodDeclaration() )
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 Modifiers()
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n0CHS01A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        r = n0CHS01A0.accept(this);
         // #1 ( &0 ClassOrInterfaceDeclaration()
         // .. | &1 EnumDeclaration()
-        // .. | &2 AnnotationTypeDeclaration()
-        // .. | &3 ConstructorDeclaration()
-        // .. | &4 FieldDeclaration()
-        // .. | &5 MethodDeclaration() )
-        final INode seq2 = seq.elementAt(1);
-        final NodeChoice nch1 = (NodeChoice) seq2;
-        final INode ich1 = nch1.choice;
-        switch (nch1.which) {
+        // .. | &2 ConstructorDeclaration()
+        // .. | &3 FieldDeclaration()
+        // .. | &4 MethodDeclaration() )
+        final INode n0CHS01A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        final NodeChoice n0CHS01A1C = (NodeChoice) n0CHS01A1;
+        final INode n0CHS01A1CH = n0CHS01A1C.choice;
+        switch (n0CHS01A1C.which) {
           case 0:
             // &0 ClassOrInterfaceDeclaration()
-            nRes = ich1.accept(this);
+            r = n0CHS01A1CH.accept(this);
             break;
           case 1:
             // &1 EnumDeclaration()
-            nRes = ich1.accept(this);
+            r = n0CHS01A1CH.accept(this);
             break;
           case 2:
-            // &2 AnnotationTypeDeclaration()
-            nRes = ich1.accept(this);
+            // &2 ConstructorDeclaration()
+            r = n0CHS01A1CH.accept(this);
             break;
           case 3:
-            // &3 ConstructorDeclaration()
-            nRes = ich1.accept(this);
+            // &3 FieldDeclaration()
+            r = n0CHS01A1CH.accept(this);
             break;
           case 4:
-            // &4 FieldDeclaration()
-            nRes = ich1.accept(this);
-            break;
-          case 5:
-            // &5 MethodDeclaration()
-            nRes = ich1.accept(this);
+            // &4 MethodDeclaration()
+            r = n0CHS01A1CH.accept(this);
             break;
           default:
             // should not occur !!!
@@ -2440,13 +2424,13 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         break;
       case 2:
         // %2 ";"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -2460,33 +2444,33 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final FieldDeclaration n) {
-    R nRes = null;
+    R r = null;
     // f0 -> Type()
     final Type n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> VariableDeclarator()
     final VariableDeclarator n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> ( #0 "," #1 VariableDeclarator() )*
     final NodeListOptional n2 = n.f2;
-    if (n2.present()) {
-      for (int i = 0; i < n2.size(); i++) {
-        final INode nloeai = n2.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n2T = (NodeListOptional) n2;
+    if (n2T.present()) {
+      for (int i = 0; i < n2T.size(); i++) {
+        final INode n2TMi = n2T.elementAt(i);
+        final NodeSequence n2TMiS0 = (NodeSequence) n2TMi;
         // #0 ","
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n2TMiS0A0 = ((NodeSequence) n2TMiS0).elementAt(0);
+        r = n2TMiS0A0.accept(this);
         // #1 VariableDeclarator()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n2TMiS0A1 = ((NodeSequence) n2TMiS0).elementAt(1);
+        r = n2TMiS0A1.accept(this);
       }
     }
     // f3 -> ";"
     final NodeToken n3 = n.f3;
-    nRes = n3.accept(this);
-    return nRes;
+    r = n3.accept(this);
+    return r;
   }
 
   /**
@@ -2498,60 +2482,60 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final VariableDeclarator n) {
-    R nRes = null;
+    R r = null;
     // f0 -> VariableDeclaratorId()
     final VariableDeclaratorId n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> [ #0 "=" #1 VariableInitializer() ]
     final NodeOptional n1 = n.f1;
-    if (n1.present()) {
-      final NodeSequence seq = (NodeSequence) n1.node;
+    final NodeOptional n1P = (NodeOptional) n1;
+    if (n1P.present()) {
+      final NodeSequence n1PS0 = (NodeSequence) n1P.node;
       // #0 "="
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
+      final INode n1PS0A0 = ((NodeSequence) n1PS0).elementAt(0);
+      r = n1PS0A0.accept(this);
       // #1 VariableInitializer()
-      final INode seq2 = seq.elementAt(1);
-      nRes = seq2.accept(this);
+      final INode n1PS0A1 = ((NodeSequence) n1PS0).elementAt(1);
+      r = n1PS0A1.accept(this);
     }
-    return nRes;
+    return r;
   }
 
   /**
    * Visits a {@link VariableDeclaratorId} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    * f1 -> ( #0 "[" #1 "]" )*<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final VariableDeclaratorId n) {
-    R nRes = null;
-    // f0 -> < IDENTIFIER >
+    R r = null;
+    // f0 -> <IDENTIFIER>
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( #0 "[" #1 "]" )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        final NodeSequence n1TMiS0 = (NodeSequence) n1TMi;
         // #0 "["
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n1TMiS0A0 = ((NodeSequence) n1TMiS0).elementAt(0);
+        r = n1TMiS0A0.accept(this);
         // #1 "]"
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n1TMiS0A1 = ((NodeSequence) n1TMiS0).elementAt(1);
+        r = n1TMiS0A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link VariableInitializer} node, whose child is the following :
+   * Visits a {@link VariableInitializer} node, whose children are the following :
    * <p>
    * f0 -> . %0 ArrayInitializer()<br>
    * .. .. | %1 Expression()<br>
@@ -2559,27 +2543,26 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final VariableInitializer n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 ArrayInitializer()
     // .. .. | %1 Expression()
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 ArrayInitializer()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %1 Expression()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -2594,45 +2577,46 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ArrayInitializer n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "{"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> [ #0 VariableInitializer()
     // .. .. . #1 ( $0 "," $1 VariableInitializer() )* ]
     final NodeOptional n1 = n.f1;
-    if (n1.present()) {
-      final NodeSequence seq = (NodeSequence) n1.node;
+    final NodeOptional n1P = (NodeOptional) n1;
+    if (n1P.present()) {
+      final NodeSequence n1PS0 = (NodeSequence) n1P.node;
       // #0 VariableInitializer()
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
+      final INode n1PS0A0 = ((NodeSequence) n1PS0).elementAt(0);
+      r = n1PS0A0.accept(this);
       // #1 ( $0 "," $1 VariableInitializer() )*
-      final INode seq2 = seq.elementAt(1);
-      final NodeListOptional nlo = (NodeListOptional) seq2;
-      if (nlo.present()) {
-        for (int i = 0; i < nlo.size(); i++) {
-          final INode nloeai = nlo.elementAt(i);
-          final NodeSequence seq3 = (NodeSequence) nloeai;
+      final INode n1PS0A1 = ((NodeSequence) n1PS0).elementAt(1);
+      final NodeListOptional n1PS0A1T = (NodeListOptional) n1PS0A1;
+      if (n1PS0A1T.present()) {
+        for (int i = 0; i < n1PS0A1T.size(); i++) {
+          final INode n1PS0A1TMi = n1PS0A1T.elementAt(i);
+          final NodeSequence n1PS0A1TMiS1 = (NodeSequence) n1PS0A1TMi;
           // $0 ","
-          final INode seq4 = seq3.elementAt(0);
-          nRes = seq4.accept(this);
+          final INode n1PS0A1TMiS1A0 = ((NodeSequence) n1PS0A1TMiS1).elementAt(0);
+          r = n1PS0A1TMiS1A0.accept(this);
           // $1 VariableInitializer()
-          final INode seq5 = seq3.elementAt(1);
-          nRes = seq5.accept(this);
+          final INode n1PS0A1TMiS1A1 = ((NodeSequence) n1PS0A1TMiS1).elementAt(1);
+          r = n1PS0A1TMiS1A1.accept(this);
         }
       }
     }
     // f2 -> [ "," ]
     final NodeOptional n2 = n.f2;
-    if (n2.present()) {
-      nRes = n2.accept(this);
+    final NodeOptional n2P = (NodeOptional) n2;
+    if (n2P.present()) {
+      r = n2P.accept(this);
     }
     // f3 -> "}"
     final NodeToken n3 = n.f3;
-    nRes = n3.accept(this);
-    return nRes;
+    r = n3.accept(this);
+    return r;
   }
 
   /**
@@ -2648,86 +2632,87 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final MethodDeclaration n) {
-    R nRes = null;
+    R r = null;
     // f0 -> [ TypeParameters() ]
     final NodeOptional n0 = n.f0;
-    if (n0.present()) {
-      nRes = n0.accept(this);
+    final NodeOptional n0P = (NodeOptional) n0;
+    if (n0P.present()) {
+      r = n0P.accept(this);
     }
     // f1 -> ResultType()
     final ResultType n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> MethodDeclarator()
     final MethodDeclarator n2 = n.f2;
-    nRes = n2.accept(this);
+    r = n2.accept(this);
     // f3 -> [ #0 "throws" #1 NameList() ]
     final NodeOptional n3 = n.f3;
-    if (n3.present()) {
-      final NodeSequence seq = (NodeSequence) n3.node;
+    final NodeOptional n3P = (NodeOptional) n3;
+    if (n3P.present()) {
+      final NodeSequence n3PS0 = (NodeSequence) n3P.node;
       // #0 "throws"
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
+      final INode n3PS0A0 = ((NodeSequence) n3PS0).elementAt(0);
+      r = n3PS0A0.accept(this);
       // #1 NameList()
-      final INode seq2 = seq.elementAt(1);
-      nRes = seq2.accept(this);
+      final INode n3PS0A1 = ((NodeSequence) n3PS0).elementAt(1);
+      r = n3PS0A1.accept(this);
     }
     // f4 -> ( %0 Block()
     // .. .. | %1 ";" )
     final NodeChoice n4 = n.f4;
-    final NodeChoice nch = n4;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n4C = (NodeChoice) n4;
+    final INode n4CH = n4C.choice;
+    switch (n4C.which) {
       case 0:
         // %0 Block()
-        nRes = ich.accept(this);
+        r = n4CH.accept(this);
         break;
       case 1:
         // %1 ";"
-        nRes = ich.accept(this);
+        r = n4CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
    * Visits a {@link MethodDeclarator} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    * f1 -> FormalParameters()<br>
    * f2 -> ( #0 "[" #1 "]" )*<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final MethodDeclarator n) {
-    R nRes = null;
-    // f0 -> < IDENTIFIER >
+    R r = null;
+    // f0 -> <IDENTIFIER>
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> FormalParameters()
     final FormalParameters n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> ( #0 "[" #1 "]" )*
     final NodeListOptional n2 = n.f2;
-    if (n2.present()) {
-      for (int i = 0; i < n2.size(); i++) {
-        final INode nloeai = n2.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n2T = (NodeListOptional) n2;
+    if (n2T.present()) {
+      for (int i = 0; i < n2T.size(); i++) {
+        final INode n2TMi = n2T.elementAt(i);
+        final NodeSequence n2TMiS0 = (NodeSequence) n2TMi;
         // #0 "["
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n2TMiS0A0 = ((NodeSequence) n2TMiS0).elementAt(0);
+        r = n2TMiS0A0.accept(this);
         // #1 "]"
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n2TMiS0A1 = ((NodeSequence) n2TMiS0).elementAt(1);
+        r = n2TMiS0A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -2741,40 +2726,40 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final FormalParameters n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "("
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> [ #0 FormalParameter()
     // .. .. . #1 ( $0 "," $1 FormalParameter() )* ]
     final NodeOptional n1 = n.f1;
-    if (n1.present()) {
-      final NodeSequence seq = (NodeSequence) n1.node;
+    final NodeOptional n1P = (NodeOptional) n1;
+    if (n1P.present()) {
+      final NodeSequence n1PS0 = (NodeSequence) n1P.node;
       // #0 FormalParameter()
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
+      final INode n1PS0A0 = ((NodeSequence) n1PS0).elementAt(0);
+      r = n1PS0A0.accept(this);
       // #1 ( $0 "," $1 FormalParameter() )*
-      final INode seq2 = seq.elementAt(1);
-      final NodeListOptional nlo = (NodeListOptional) seq2;
-      if (nlo.present()) {
-        for (int i = 0; i < nlo.size(); i++) {
-          final INode nloeai = nlo.elementAt(i);
-          final NodeSequence seq3 = (NodeSequence) nloeai;
+      final INode n1PS0A1 = ((NodeSequence) n1PS0).elementAt(1);
+      final NodeListOptional n1PS0A1T = (NodeListOptional) n1PS0A1;
+      if (n1PS0A1T.present()) {
+        for (int i = 0; i < n1PS0A1T.size(); i++) {
+          final INode n1PS0A1TMi = n1PS0A1T.elementAt(i);
+          final NodeSequence n1PS0A1TMiS1 = (NodeSequence) n1PS0A1TMi;
           // $0 ","
-          final INode seq4 = seq3.elementAt(0);
-          nRes = seq4.accept(this);
+          final INode n1PS0A1TMiS1A0 = ((NodeSequence) n1PS0A1TMiS1).elementAt(0);
+          r = n1PS0A1TMiS1A0.accept(this);
           // $1 FormalParameter()
-          final INode seq5 = seq3.elementAt(1);
-          nRes = seq5.accept(this);
+          final INode n1PS0A1TMiS1A1 = ((NodeSequence) n1PS0A1TMiS1).elementAt(1);
+          r = n1PS0A1TMiS1A1.accept(this);
         }
       }
     }
     // f2 -> ")"
     final NodeToken n2 = n.f2;
-    nRes = n2.accept(this);
-    return nRes;
+    r = n2.accept(this);
+    return r;
   }
 
   /**
@@ -2788,31 +2773,31 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final FormalParameter n) {
-    R nRes = null;
+    R r = null;
     // f0 -> Modifiers()
     final Modifiers n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> Type()
     final Type n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> [ "..." ]
     final NodeOptional n2 = n.f2;
-    if (n2.present()) {
-      nRes = n2.accept(this);
+    final NodeOptional n2P = (NodeOptional) n2;
+    if (n2P.present()) {
+      r = n2P.accept(this);
     }
     // f3 -> VariableDeclaratorId()
     final VariableDeclaratorId n3 = n.f3;
-    nRes = n3.accept(this);
-    return nRes;
+    r = n3.accept(this);
+    return r;
   }
 
   /**
    * Visits a {@link ConstructorDeclaration} node, whose children are the following :
    * <p>
    * f0 -> [ TypeParameters() ]<br>
-   * f1 -> < IDENTIFIER ><br>
+   * f1 -> <IDENTIFIER><br>
    * f2 -> FormalParameters()<br>
    * f3 -> [ #0 "throws" #1 NameList() ]<br>
    * f4 -> "{"<br>
@@ -2823,179 +2808,118 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ConstructorDeclaration n) {
-    R nRes = null;
+    R r = null;
     // f0 -> [ TypeParameters() ]
     final NodeOptional n0 = n.f0;
-    if (n0.present()) {
-      nRes = n0.accept(this);
+    final NodeOptional n0P = (NodeOptional) n0;
+    if (n0P.present()) {
+      r = n0P.accept(this);
     }
-    // f1 -> < IDENTIFIER >
+    // f1 -> <IDENTIFIER>
     final NodeToken n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> FormalParameters()
     final FormalParameters n2 = n.f2;
-    nRes = n2.accept(this);
+    r = n2.accept(this);
     // f3 -> [ #0 "throws" #1 NameList() ]
     final NodeOptional n3 = n.f3;
-    if (n3.present()) {
-      final NodeSequence seq = (NodeSequence) n3.node;
+    final NodeOptional n3P = (NodeOptional) n3;
+    if (n3P.present()) {
+      final NodeSequence n3PS0 = (NodeSequence) n3P.node;
       // #0 "throws"
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
+      final INode n3PS0A0 = ((NodeSequence) n3PS0).elementAt(0);
+      r = n3PS0A0.accept(this);
       // #1 NameList()
-      final INode seq2 = seq.elementAt(1);
-      nRes = seq2.accept(this);
+      final INode n3PS0A1 = ((NodeSequence) n3PS0).elementAt(1);
+      r = n3PS0A1.accept(this);
     }
     // f4 -> "{"
     final NodeToken n4 = n.f4;
-    nRes = n4.accept(this);
+    r = n4.accept(this);
     // f5 -> [ ExplicitConstructorInvocation() ]
     final NodeOptional n5 = n.f5;
-    if (n5.present()) {
-      nRes = n5.accept(this);
+    final NodeOptional n5P = (NodeOptional) n5;
+    if (n5P.present()) {
+      r = n5P.accept(this);
     }
     // f6 -> ( BlockStatement() )*
     final NodeListOptional n6 = n.f6;
-    if (n6.present()) {
-      for (int i = 0; i < n6.size(); i++) {
-        final INode nloeai = n6.elementAt(i);
-        nRes = nloeai.accept(this);
+    final NodeListOptional n6T = (NodeListOptional) n6;
+    if (n6T.present()) {
+      for (int i = 0; i < n6T.size(); i++) {
+        final INode n6TMi = n6T.elementAt(i);
+        r = n6TMi.accept(this);
       }
     }
     // f7 -> "}"
     final NodeToken n7 = n.f7;
-    nRes = n7.accept(this);
-    return nRes;
+    r = n7.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link ExplicitConstructorInvocation} node, whose child is the following :
+   * Visits a {@link ExplicitConstructorInvocation} node, whose children are the following :
    * <p>
-   * f0 -> ( %0 #0 [ $0 "<" $1 ReferenceType()<br>
-   * .. .. . .. .. . $2 ( ?0 "," ?1 ReferenceType() )*<br>
-   * .. .. . .. .. . $3 ">" ]<br>
-   * .. .. . .. #1 ( &0 $0 "this" $1 Arguments() $2 ";"<br>
-   * .. .. . .. .. | &1 $0 "super" $1 Arguments() $2 ";" )<br>
-   * .. .. | %1 ( #0 PrimaryExpression() #1 "." #2 "super" #3 Arguments() #4 ";" ) )<br>
+   * f0 -> . %0 #0 "this" #1 Arguments() #2 ";"<br>
+   * .. .. | %1 #0 [ $0 PrimaryExpression() $1 "." ]<br>
+   * .. .. . .. #1 "super" #2 Arguments() #3 ";"<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ExplicitConstructorInvocation n) {
-    R nRes = null;
-    // f0 -> ( %0 #0 [ $0 "<" $1 ReferenceType()
-    // .. .. . .. .. . $2 ( ?0 "," ?1 ReferenceType() )*
-    // .. .. . .. .. . $3 ">" ]
-    // .. .. . .. #1 ( &0 $0 "this" $1 Arguments() $2 ";"
-    // .. .. . .. .. | &1 $0 "super" $1 Arguments() $2 ";" )
-    // .. .. | %1 ( #0 PrimaryExpression() #1 "." #2 "super" #3 Arguments() #4 ";" ) )
-    final NodeChoice n0 = n.f0;
-    final NodeChoice nch = n0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    R r = null;
+    // f0 -> . %0 #0 "this" #1 Arguments() #2 ";"
+    // .. .. | %1 #0 [ $0 PrimaryExpression() $1 "." ]
+    // .. .. . .. #1 "super" #2 Arguments() #3 ";"
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
-        // %0 #0 [ $0 "<" $1 ReferenceType()
-        // .. .. . $2 ( ?0 "," ?1 ReferenceType() )*
-        // .. .. . $3 ">" ]
-        // .. #1 ( &0 $0 "this" $1 Arguments() $2 ";"
-        // .. .. | &1 $0 "super" $1 Arguments() $2 ";" )
-        final NodeSequence seq = (NodeSequence) ich;
-        // #0 [ $0 "<" $1 ReferenceType()
-        // .. . $2 ( ?0 "," ?1 ReferenceType() )*
-        // .. . $3 ">" ]
-        final INode seq1 = seq.elementAt(0);
-        final NodeOptional opt = (NodeOptional) seq1;
-        if (opt.present()) {
-          final NodeSequence seq2 = (NodeSequence) opt.node;
-          // $0 "<"
-          final INode seq3 = seq2.elementAt(0);
-          nRes = seq3.accept(this);
-          // $1 ReferenceType()
-          final INode seq4 = seq2.elementAt(1);
-          nRes = seq4.accept(this);
-          // $2 ( ?0 "," ?1 ReferenceType() )*
-          final INode seq5 = seq2.elementAt(2);
-          final NodeListOptional nlo = (NodeListOptional) seq5;
-          if (nlo.present()) {
-            for (int i = 0; i < nlo.size(); i++) {
-              final INode nloeai = nlo.elementAt(i);
-              final NodeSequence seq6 = (NodeSequence) nloeai;
-              // ?0 ","
-              final INode seq7 = seq6.elementAt(0);
-              nRes = seq7.accept(this);
-              // ?1 ReferenceType()
-              final INode seq8 = seq6.elementAt(1);
-              nRes = seq8.accept(this);
-            }
-          }
-          // $3 ">"
-          final INode seq9 = seq2.elementAt(3);
-          nRes = seq9.accept(this);
-        }
-        // #1 ( &0 $0 "this" $1 Arguments() $2 ";"
-        // .. | &1 $0 "super" $1 Arguments() $2 ";" )
-        final INode seq10 = seq.elementAt(1);
-        final NodeChoice nch1 = (NodeChoice) seq10;
-        final INode ich1 = nch1.choice;
-        switch (nch1.which) {
-          case 0:
-            // &0 $0 "this" $1 Arguments() $2 ";"
-            final NodeSequence seq11 = (NodeSequence) ich1;
-            // $0 "this"
-            final INode seq12 = seq11.elementAt(0);
-            nRes = seq12.accept(this);
-            // $1 Arguments()
-            final INode seq13 = seq11.elementAt(1);
-            nRes = seq13.accept(this);
-            // $2 ";"
-            final INode seq14 = seq11.elementAt(2);
-            nRes = seq14.accept(this);
-            break;
-          case 1:
-            // &1 $0 "super" $1 Arguments() $2 ";"
-            final NodeSequence seq15 = (NodeSequence) ich1;
-            // $0 "super"
-            final INode seq16 = seq15.elementAt(0);
-            nRes = seq16.accept(this);
-            // $1 Arguments()
-            final INode seq17 = seq15.elementAt(1);
-            nRes = seq17.accept(this);
-            // $2 ";"
-            final INode seq18 = seq15.elementAt(2);
-            nRes = seq18.accept(this);
-            break;
-          default:
-            // should not occur !!!
-            break;
-        }
+        // %0 #0 "this" #1 Arguments() #2 ";"
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
+        // #0 "this"
+        final INode n0CHS00A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        r = n0CHS00A0.accept(this);
+        // #1 Arguments()
+        final INode n0CHS00A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        r = n0CHS00A1.accept(this);
+        // #2 ";"
+        final INode n0CHS00A2 = ((NodeSequence) n0CHS0).elementAt(2);
+        r = n0CHS00A2.accept(this);
         break;
       case 1:
-        // %1 ( #0 PrimaryExpression() #1 "." #2 "super" #3 Arguments() #4 ";" )
-        final NodeSequence seq19 = (NodeSequence) ich;
-        // #0 PrimaryExpression()
-        final INode seq20 = seq19.elementAt(0);
-        nRes = seq20.accept(this);
-        // #1 "."
-        final INode seq21 = seq19.elementAt(1);
-        nRes = seq21.accept(this);
-        // #2 "super"
-        final INode seq22 = seq19.elementAt(2);
-        nRes = seq22.accept(this);
-        // #3 Arguments()
-        final INode seq23 = seq19.elementAt(3);
-        nRes = seq23.accept(this);
-        // #4 ";"
-        final INode seq24 = seq19.elementAt(4);
-        nRes = seq24.accept(this);
+        // %1 #0 [ $0 PrimaryExpression() $1 "." ]
+        // .. #1 "super" #2 Arguments() #3 ";"
+        final NodeSequence n0CHS1 = (NodeSequence) n0CH;
+        // #0 [ $0 PrimaryExpression() $1 "." ]
+        final INode n0CHS11A0 = ((NodeSequence) n0CHS1).elementAt(0);
+        final NodeOptional n0CHS11A0P = (NodeOptional) n0CHS11A0;
+        if (n0CHS11A0P.present()) {
+          final NodeSequence n0CHS11A0PS2 = (NodeSequence) n0CHS11A0P.node;
+          // $0 PrimaryExpression()
+          final INode n0CHS11A0PS2A0 = ((NodeSequence) n0CHS11A0PS2).elementAt(0);
+          r = n0CHS11A0PS2A0.accept(this);
+          // $1 "."
+          final INode n0CHS11A0PS2A1 = ((NodeSequence) n0CHS11A0PS2).elementAt(1);
+          r = n0CHS11A0PS2A1.accept(this);
+        }
+        // #1 "super"
+        final INode n0CHS1A1 = ((NodeSequence) n0CHS1).elementAt(1);
+        r = n0CHS1A1.accept(this);
+        // #2 Arguments()
+        final INode n0CHS1A2 = ((NodeSequence) n0CHS1).elementAt(2);
+        r = n0CHS1A2.accept(this);
+        // #3 ";"
+        final INode n0CHS1A3 = ((NodeSequence) n0CHS1).elementAt(3);
+        r = n0CHS1A3.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -3007,22 +2931,22 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final Initializer n) {
-    R nRes = null;
+    R r = null;
     // f0 -> [ "static" ]
     final NodeOptional n0 = n.f0;
-    if (n0.present()) {
-      nRes = n0.accept(this);
+    final NodeOptional n0P = (NodeOptional) n0;
+    if (n0P.present()) {
+      r = n0P.accept(this);
     }
     // f1 -> Block()
     final Block n1 = n.f1;
-    nRes = n1.accept(this);
-    return nRes;
+    r = n1.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link Type} node, whose child is the following :
+   * Visits a {@link Type} node, whose children are the following :
    * <p>
    * f0 -> . %0 ReferenceType()<br>
    * .. .. | %1 PrimitiveType()<br>
@@ -3030,31 +2954,30 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final Type n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 ReferenceType()
     // .. .. | %1 PrimitiveType()
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 ReferenceType()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %1 PrimitiveType()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link ReferenceType} node, whose child is the following :
+   * Visits a {@link ReferenceType} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 PrimitiveType()<br>
    * .. .. . .. #1 ( $0 "[" $1 "]" )+<br>
@@ -3064,57 +2987,56 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ReferenceType n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 #0 PrimitiveType()
     // .. .. . .. #1 ( $0 "[" $1 "]" )+
     // .. .. | %1 #0 ClassOrInterfaceType()
     // .. .. . .. #1 ( $0 "[" $1 "]" )*
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 #0 PrimitiveType()
         // .. #1 ( $0 "[" $1 "]" )+
-        final NodeSequence seq = (NodeSequence) ich;
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 PrimitiveType()
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n0CHS00A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        r = n0CHS00A0.accept(this);
         // #1 ( $0 "[" $1 "]" )+
-        final INode seq2 = seq.elementAt(1);
-        final NodeList lst = (NodeList) seq2;
-        for (int i = 0; i < lst.size(); i++) {
-          final INode lsteai = lst.elementAt(i);
-          final NodeSequence seq3 = (NodeSequence) lsteai;
+        final INode n0CHS00A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        final NodeList n0CHS00A1L = (NodeList) n0CHS00A1;
+        for (int i = 0; i < n0CHS00A1L.size(); i++) {
+          final INode n0CHS00A1LEi = n0CHS00A1L.elementAt(i);
+          final NodeSequence n0CHS00A1LEiS1 = (NodeSequence) n0CHS00A1LEi;
           // $0 "["
-          final INode seq4 = seq3.elementAt(0);
-          nRes = seq4.accept(this);
+          final INode n0CHS00A1LEiS1A0 = ((NodeSequence) n0CHS00A1LEiS1).elementAt(0);
+          r = n0CHS00A1LEiS1A0.accept(this);
           // $1 "]"
-          final INode seq5 = seq3.elementAt(1);
-          nRes = seq5.accept(this);
+          final INode n0CHS00A1LEiS1A1 = ((NodeSequence) n0CHS00A1LEiS1).elementAt(1);
+          r = n0CHS00A1LEiS1A1.accept(this);
         }
         break;
       case 1:
         // %1 #0 ClassOrInterfaceType()
         // .. #1 ( $0 "[" $1 "]" )*
-        final NodeSequence seq6 = (NodeSequence) ich;
+        final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 ClassOrInterfaceType()
-        final INode seq7 = seq6.elementAt(0);
-        nRes = seq7.accept(this);
+        final INode n0CHS11A0 = ((NodeSequence) n0CHS1).elementAt(0);
+        r = n0CHS11A0.accept(this);
         // #1 ( $0 "[" $1 "]" )*
-        final INode seq8 = seq6.elementAt(1);
-        final NodeListOptional nlo = (NodeListOptional) seq8;
-        if (nlo.present()) {
-          for (int i = 0; i < nlo.size(); i++) {
-            final INode nloeai = nlo.elementAt(i);
-            final NodeSequence seq9 = (NodeSequence) nloeai;
+        final INode n0CHS11A1 = ((NodeSequence) n0CHS1).elementAt(1);
+        final NodeListOptional n0CHS11A1T = (NodeListOptional) n0CHS11A1;
+        if (n0CHS11A1T.present()) {
+          for (int i = 0; i < n0CHS11A1T.size(); i++) {
+            final INode n0CHS11A1TMi = n0CHS11A1T.elementAt(i);
+            final NodeSequence n0CHS11A1TMiS2 = (NodeSequence) n0CHS11A1TMi;
             // $0 "["
-            final INode seq10 = seq9.elementAt(0);
-            nRes = seq10.accept(this);
+            final INode n0CHS11A1TMiS2A0 = ((NodeSequence) n0CHS11A1TMiS2).elementAt(0);
+            r = n0CHS11A1TMiS2A0.accept(this);
             // $1 "]"
-            final INode seq11 = seq9.elementAt(1);
-            nRes = seq11.accept(this);
+            final INode n0CHS11A1TMiS2A1 = ((NodeSequence) n0CHS11A1TMiS2).elementAt(1);
+            r = n0CHS11A1TMiS2A1.accept(this);
           }
         }
         break;
@@ -3122,53 +3044,54 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
    * Visits a {@link ClassOrInterfaceType} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    * f1 -> [ TypeArguments() ]<br>
-   * f2 -> ( #0 "." #1 < IDENTIFIER ><br>
+   * f2 -> ( #0 "." #1 <IDENTIFIER><br>
    * .. .. . #2 [ TypeArguments() ] )*<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ClassOrInterfaceType n) {
-    R nRes = null;
-    // f0 -> < IDENTIFIER >
+    R r = null;
+    // f0 -> <IDENTIFIER>
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> [ TypeArguments() ]
     final NodeOptional n1 = n.f1;
-    if (n1.present()) {
-      nRes = n1.accept(this);
+    final NodeOptional n1P = (NodeOptional) n1;
+    if (n1P.present()) {
+      r = n1P.accept(this);
     }
-    // f2 -> ( #0 "." #1 < IDENTIFIER >
+    // f2 -> ( #0 "." #1 <IDENTIFIER>
     // .. .. . #2 [ TypeArguments() ] )*
     final NodeListOptional n2 = n.f2;
-    if (n2.present()) {
-      for (int i = 0; i < n2.size(); i++) {
-        final INode nloeai = n2.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n2T = (NodeListOptional) n2;
+    if (n2T.present()) {
+      for (int i = 0; i < n2T.size(); i++) {
+        final INode n2TMi = n2T.elementAt(i);
+        final NodeSequence n2TMiS0 = (NodeSequence) n2TMi;
         // #0 "."
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
-        // #1 < IDENTIFIER >
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n2TMiS0A0 = ((NodeSequence) n2TMiS0).elementAt(0);
+        r = n2TMiS0A0.accept(this);
+        // #1 <IDENTIFIER>
+        final INode n2TMiS0A1 = ((NodeSequence) n2TMiS0).elementAt(1);
+        r = n2TMiS0A1.accept(this);
         // #2 [ TypeArguments() ]
-        final INode seq3 = seq.elementAt(2);
-        final NodeOptional opt = (NodeOptional) seq3;
-        if (opt.present()) {
-          nRes = opt.accept(this);
+        final INode n2TMiS0A2 = ((NodeSequence) n2TMiS0).elementAt(2);
+        final NodeOptional n2TMiS0A2P = (NodeOptional) n2TMiS0A2;
+        if (n2TMiS0A2P.present()) {
+          r = n2TMiS0A2P.accept(this);
         }
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -3182,37 +3105,37 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final TypeArguments n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "<"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> TypeArgument()
     final TypeArgument n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> ( #0 "," #1 TypeArgument() )*
     final NodeListOptional n2 = n.f2;
-    if (n2.present()) {
-      for (int i = 0; i < n2.size(); i++) {
-        final INode nloeai = n2.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n2T = (NodeListOptional) n2;
+    if (n2T.present()) {
+      for (int i = 0; i < n2T.size(); i++) {
+        final INode n2TMi = n2T.elementAt(i);
+        final NodeSequence n2TMiS0 = (NodeSequence) n2TMi;
         // #0 ","
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n2TMiS0A0 = ((NodeSequence) n2TMiS0).elementAt(0);
+        r = n2TMiS0A0.accept(this);
         // #1 TypeArgument()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n2TMiS0A1 = ((NodeSequence) n2TMiS0).elementAt(1);
+        r = n2TMiS0A1.accept(this);
       }
     }
     // f3 -> ">"
     final NodeToken n3 = n.f3;
-    nRes = n3.accept(this);
-    return nRes;
+    r = n3.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link TypeArgument} node, whose child is the following :
+   * Visits a {@link TypeArgument} node, whose children are the following :
    * <p>
    * f0 -> . %0 ReferenceType()<br>
    * .. .. | %1 #0 "?"<br>
@@ -3221,42 +3144,41 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final TypeArgument n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 ReferenceType()
     // .. .. | %1 #0 "?"
     // .. .. . .. #1 [ WildcardBounds() ]
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 ReferenceType()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %1 #0 "?"
         // .. #1 [ WildcardBounds() ]
-        final NodeSequence seq = (NodeSequence) ich;
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "?"
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n0CHS01A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        r = n0CHS01A0.accept(this);
         // #1 [ WildcardBounds() ]
-        final INode seq2 = seq.elementAt(1);
-        final NodeOptional opt = (NodeOptional) seq2;
-        if (opt.present()) {
-          nRes = opt.accept(this);
+        final INode n0CHS01A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        final NodeOptional n0CHS01A1P = (NodeOptional) n0CHS01A1;
+        if (n0CHS01A1P.present()) {
+          r = n0CHS01A1P.accept(this);
         }
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link WildcardBounds} node, whose child is the following :
+   * Visits a {@link WildcardBounds} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 "extends" #1 ReferenceType()<br>
    * .. .. | %1 #0 "super" #1 ReferenceType()<br>
@@ -3264,43 +3186,42 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final WildcardBounds n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 #0 "extends" #1 ReferenceType()
     // .. .. | %1 #0 "super" #1 ReferenceType()
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 #0 "extends" #1 ReferenceType()
-        final NodeSequence seq = (NodeSequence) ich;
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "extends"
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n0CHS00A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        r = n0CHS00A0.accept(this);
         // #1 ReferenceType()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n0CHS00A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        r = n0CHS00A1.accept(this);
         break;
       case 1:
         // %1 #0 "super" #1 ReferenceType()
-        final NodeSequence seq3 = (NodeSequence) ich;
+        final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "super"
-        final INode seq4 = seq3.elementAt(0);
-        nRes = seq4.accept(this);
+        final INode n0CHS11A0 = ((NodeSequence) n0CHS1).elementAt(0);
+        r = n0CHS11A0.accept(this);
         // #1 ReferenceType()
-        final INode seq5 = seq3.elementAt(1);
-        nRes = seq5.accept(this);
+        final INode n0CHS11A1 = ((NodeSequence) n0CHS1).elementAt(1);
+        r = n0CHS11A1.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link PrimitiveType} node, whose child is the following :
+   * Visits a {@link PrimitiveType} node, whose children are the following :
    * <p>
    * f0 -> . %0 "boolean"<br>
    * .. .. | %1 "char"<br>
@@ -3314,9 +3235,8 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final PrimitiveType n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 "boolean"
     // .. .. | %1 "char"
     // .. .. | %2 "byte"
@@ -3325,50 +3245,50 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
     // .. .. | %5 "long"
     // .. .. | %6 "float"
     // .. .. | %7 "double"
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 "boolean"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %1 "char"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 2:
         // %2 "byte"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 3:
         // %3 "short"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 4:
         // %4 "int"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 5:
         // %5 "long"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 6:
         // %6 "float"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 7:
         // %7 "double"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link ResultType} node, whose child is the following :
+   * Visits a {@link ResultType} node, whose children are the following :
    * <p>
    * f0 -> ( %0 "void"<br>
    * .. .. | %1 Type() )<br>
@@ -3376,28 +3296,27 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ResultType n) {
-    R nRes = null;
+    R r = null;
     // f0 -> ( %0 "void"
     // .. .. | %1 Type() )
     final NodeChoice n0 = n.f0;
-    final NodeChoice nch = n0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = (NodeChoice) n0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 "void"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %1 Type()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -3409,27 +3328,27 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final Name n) {
-    R nRes = null;
+    R r = null;
     // f0 -> JavaIdentifier()
     final JavaIdentifier n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( #0 "." #1 JavaIdentifier() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        final NodeSequence n1TMiS0 = (NodeSequence) n1TMi;
         // #0 "."
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n1TMiS0A0 = ((NodeSequence) n1TMiS0).elementAt(0);
+        r = n1TMiS0A0.accept(this);
         // #1 JavaIdentifier()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n1TMiS0A1 = ((NodeSequence) n1TMiS0).elementAt(1);
+        r = n1TMiS0A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -3441,27 +3360,27 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final NameList n) {
-    R nRes = null;
+    R r = null;
     // f0 -> Name()
     final Name n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( #0 "," #1 Name() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        final NodeSequence n1TMiS0 = (NodeSequence) n1TMi;
         // #0 ","
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n1TMiS0A0 = ((NodeSequence) n1TMiS0).elementAt(0);
+        r = n1TMiS0A0.accept(this);
         // #1 Name()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n1TMiS0A1 = ((NodeSequence) n1TMiS0).elementAt(1);
+        r = n1TMiS0A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -3473,28 +3392,28 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final Expression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> ConditionalExpression()
     final ConditionalExpression n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> [ #0 AssignmentOperator() #1 Expression() ]
     final NodeOptional n1 = n.f1;
-    if (n1.present()) {
-      final NodeSequence seq = (NodeSequence) n1.node;
+    final NodeOptional n1P = (NodeOptional) n1;
+    if (n1P.present()) {
+      final NodeSequence n1PS0 = (NodeSequence) n1P.node;
       // #0 AssignmentOperator()
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
+      final INode n1PS0A0 = ((NodeSequence) n1PS0).elementAt(0);
+      r = n1PS0A0.accept(this);
       // #1 Expression()
-      final INode seq2 = seq.elementAt(1);
-      nRes = seq2.accept(this);
+      final INode n1PS0A1 = ((NodeSequence) n1PS0).elementAt(1);
+      r = n1PS0A1.accept(this);
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link AssignmentOperator} node, whose child is the following :
+   * Visits a {@link AssignmentOperator} node, whose children are the following :
    * <p>
    * f0 -> . %00 "="<br>
    * .. .. | %01 "*="<br>
@@ -3512,9 +3431,8 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final AssignmentOperator n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %00 "="
     // .. .. | %01 "*="
     // .. .. | %02 "/="
@@ -3527,62 +3445,62 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
     // .. .. | %09 "&="
     // .. .. | %10 "^="
     // .. .. | %11 "|="
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %00 "="
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %01 "*="
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 2:
         // %02 "/="
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 3:
         // %03 "%="
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 4:
         // %04 "+="
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 5:
         // %05 "-="
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 6:
         // %06 "<<="
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 7:
         // %07 ">>="
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 8:
         // %08 ">>>="
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 9:
         // %09 "&="
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 10:
         // %10 "^="
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 11:
         // %11 "|="
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -3594,30 +3512,30 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ConditionalExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> ConditionalOrExpression()
     final ConditionalOrExpression n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> [ #0 "?" #1 Expression() #2 ":" #3 Expression() ]
     final NodeOptional n1 = n.f1;
-    if (n1.present()) {
-      final NodeSequence seq = (NodeSequence) n1.node;
+    final NodeOptional n1P = (NodeOptional) n1;
+    if (n1P.present()) {
+      final NodeSequence n1PS0 = (NodeSequence) n1P.node;
       // #0 "?"
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
+      final INode n1PS0A0 = ((NodeSequence) n1PS0).elementAt(0);
+      r = n1PS0A0.accept(this);
       // #1 Expression()
-      final INode seq2 = seq.elementAt(1);
-      nRes = seq2.accept(this);
+      final INode n1PS0A1 = ((NodeSequence) n1PS0).elementAt(1);
+      r = n1PS0A1.accept(this);
       // #2 ":"
-      final INode seq3 = seq.elementAt(2);
-      nRes = seq3.accept(this);
+      final INode n1PS0A2 = ((NodeSequence) n1PS0).elementAt(2);
+      r = n1PS0A2.accept(this);
       // #3 Expression()
-      final INode seq4 = seq.elementAt(3);
-      nRes = seq4.accept(this);
+      final INode n1PS0A3 = ((NodeSequence) n1PS0).elementAt(3);
+      r = n1PS0A3.accept(this);
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -3629,27 +3547,27 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ConditionalOrExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> ConditionalAndExpression()
     final ConditionalAndExpression n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( #0 "||" #1 ConditionalAndExpression() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        final NodeSequence n1TMiS0 = (NodeSequence) n1TMi;
         // #0 "||"
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n1TMiS0A0 = ((NodeSequence) n1TMiS0).elementAt(0);
+        r = n1TMiS0A0.accept(this);
         // #1 ConditionalAndExpression()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n1TMiS0A1 = ((NodeSequence) n1TMiS0).elementAt(1);
+        r = n1TMiS0A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -3661,27 +3579,27 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ConditionalAndExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> InclusiveOrExpression()
     final InclusiveOrExpression n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( #0 "&&" #1 InclusiveOrExpression() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        final NodeSequence n1TMiS0 = (NodeSequence) n1TMi;
         // #0 "&&"
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n1TMiS0A0 = ((NodeSequence) n1TMiS0).elementAt(0);
+        r = n1TMiS0A0.accept(this);
         // #1 InclusiveOrExpression()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n1TMiS0A1 = ((NodeSequence) n1TMiS0).elementAt(1);
+        r = n1TMiS0A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -3693,27 +3611,27 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final InclusiveOrExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> ExclusiveOrExpression()
     final ExclusiveOrExpression n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( #0 "|" #1 ExclusiveOrExpression() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        final NodeSequence n1TMiS0 = (NodeSequence) n1TMi;
         // #0 "|"
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n1TMiS0A0 = ((NodeSequence) n1TMiS0).elementAt(0);
+        r = n1TMiS0A0.accept(this);
         // #1 ExclusiveOrExpression()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n1TMiS0A1 = ((NodeSequence) n1TMiS0).elementAt(1);
+        r = n1TMiS0A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -3725,27 +3643,27 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ExclusiveOrExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> AndExpression()
     final AndExpression n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( #0 "^" #1 AndExpression() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        final NodeSequence n1TMiS0 = (NodeSequence) n1TMi;
         // #0 "^"
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n1TMiS0A0 = ((NodeSequence) n1TMiS0).elementAt(0);
+        r = n1TMiS0A0.accept(this);
         // #1 AndExpression()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n1TMiS0A1 = ((NodeSequence) n1TMiS0).elementAt(1);
+        r = n1TMiS0A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -3757,27 +3675,27 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final AndExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> EqualityExpression()
     final EqualityExpression n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( #0 "&" #1 EqualityExpression() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        final NodeSequence n1TMiS0 = (NodeSequence) n1TMi;
         // #0 "&"
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n1TMiS0A0 = ((NodeSequence) n1TMiS0).elementAt(0);
+        r = n1TMiS0A0.accept(this);
         // #1 EqualityExpression()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n1TMiS0A1 = ((NodeSequence) n1TMiS0).elementAt(1);
+        r = n1TMiS0A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -3791,44 +3709,44 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final EqualityExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> InstanceOfExpression()
     final InstanceOfExpression n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( #0 ( %0 "=="
     // .. .. . .. | %1 "!=" )
     // .. .. . #1 InstanceOfExpression() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        final NodeSequence n1TMiS0 = (NodeSequence) n1TMi;
         // #0 ( %0 "=="
         // .. | %1 "!=" )
-        final INode seq1 = seq.elementAt(0);
-        final NodeChoice nch = (NodeChoice) seq1;
-        final INode ich = nch.choice;
-        switch (nch.which) {
+        final INode n1TMiS0A0 = ((NodeSequence) n1TMiS0).elementAt(0);
+        final NodeChoice n1TMiS0A0C = (NodeChoice) n1TMiS0A0;
+        final INode n1TMiS0A0CH = n1TMiS0A0C.choice;
+        switch (n1TMiS0A0C.which) {
           case 0:
             // %0 "=="
-            nRes = ich.accept(this);
+            r = n1TMiS0A0CH.accept(this);
             break;
           case 1:
             // %1 "!="
-            nRes = ich.accept(this);
+            r = n1TMiS0A0CH.accept(this);
             break;
           default:
             // should not occur !!!
             break;
         }
         // #1 InstanceOfExpression()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n1TMiS01A1 = ((NodeSequence) n1TMiS0).elementAt(1);
+        r = n1TMiS01A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -3840,24 +3758,24 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final InstanceOfExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> RelationalExpression()
     final RelationalExpression n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> [ #0 "instanceof" #1 Type() ]
     final NodeOptional n1 = n.f1;
-    if (n1.present()) {
-      final NodeSequence seq = (NodeSequence) n1.node;
+    final NodeOptional n1P = (NodeOptional) n1;
+    if (n1P.present()) {
+      final NodeSequence n1PS0 = (NodeSequence) n1P.node;
       // #0 "instanceof"
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
+      final INode n1PS0A0 = ((NodeSequence) n1PS0).elementAt(0);
+      r = n1PS0A0.accept(this);
       // #1 Type()
-      final INode seq2 = seq.elementAt(1);
-      nRes = seq2.accept(this);
+      final INode n1PS0A1 = ((NodeSequence) n1PS0).elementAt(1);
+      r = n1PS0A1.accept(this);
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -3873,56 +3791,56 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final RelationalExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> ShiftExpression()
     final ShiftExpression n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( #0 ( %0 "<"
     // .. .. . .. | %1 ">"
     // .. .. . .. | %2 "<="
     // .. .. . .. | %3 ">=" )
     // .. .. . #1 ShiftExpression() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        final NodeSequence n1TMiS0 = (NodeSequence) n1TMi;
         // #0 ( %0 "<"
         // .. | %1 ">"
         // .. | %2 "<="
         // .. | %3 ">=" )
-        final INode seq1 = seq.elementAt(0);
-        final NodeChoice nch = (NodeChoice) seq1;
-        final INode ich = nch.choice;
-        switch (nch.which) {
+        final INode n1TMiS0A0 = ((NodeSequence) n1TMiS0).elementAt(0);
+        final NodeChoice n1TMiS0A0C = (NodeChoice) n1TMiS0A0;
+        final INode n1TMiS0A0CH = n1TMiS0A0C.choice;
+        switch (n1TMiS0A0C.which) {
           case 0:
             // %0 "<"
-            nRes = ich.accept(this);
+            r = n1TMiS0A0CH.accept(this);
             break;
           case 1:
             // %1 ">"
-            nRes = ich.accept(this);
+            r = n1TMiS0A0CH.accept(this);
             break;
           case 2:
             // %2 "<="
-            nRes = ich.accept(this);
+            r = n1TMiS0A0CH.accept(this);
             break;
           case 3:
             // %3 ">="
-            nRes = ich.accept(this);
+            r = n1TMiS0A0CH.accept(this);
             break;
           default:
             // should not occur !!!
             break;
         }
         // #1 ShiftExpression()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n1TMiS03A1 = ((NodeSequence) n1TMiS0).elementAt(1);
+        r = n1TMiS03A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -3937,84 +3855,82 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ShiftExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> AdditiveExpression()
     final AdditiveExpression n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( #0 ( %0 "<<"
     // .. .. . .. | %1 RUnsignedShift()
     // .. .. . .. | %2 RSignedShift() )
     // .. .. . #1 AdditiveExpression() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        final NodeSequence n1TMiS0 = (NodeSequence) n1TMi;
         // #0 ( %0 "<<"
         // .. | %1 RUnsignedShift()
         // .. | %2 RSignedShift() )
-        final INode seq1 = seq.elementAt(0);
-        final NodeChoice nch = (NodeChoice) seq1;
-        final INode ich = nch.choice;
-        switch (nch.which) {
+        final INode n1TMiS0A0 = ((NodeSequence) n1TMiS0).elementAt(0);
+        final NodeChoice n1TMiS0A0C = (NodeChoice) n1TMiS0A0;
+        final INode n1TMiS0A0CH = n1TMiS0A0C.choice;
+        switch (n1TMiS0A0C.which) {
           case 0:
             // %0 "<<"
-            nRes = ich.accept(this);
+            r = n1TMiS0A0CH.accept(this);
             break;
           case 1:
             // %1 RUnsignedShift()
-            nRes = ich.accept(this);
+            r = n1TMiS0A0CH.accept(this);
             break;
           case 2:
             // %2 RSignedShift()
-            nRes = ich.accept(this);
+            r = n1TMiS0A0CH.accept(this);
             break;
           default:
             // should not occur !!!
             break;
         }
         // #1 AdditiveExpression()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n1TMiS02A1 = ((NodeSequence) n1TMiS0).elementAt(1);
+        r = n1TMiS02A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link RSignedShift} node, whose child is the following :
+   * Visits a {@link RSignedShift} node, whose children are the following :
    * <p>
    * f0 -> ">>"<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final RSignedShift n) {
-    R nRes = null;
+    R r = null;
     // f0 -> ">>"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
-    return nRes;
+    r = n0.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link RUnsignedShift} node, whose child is the following :
+   * Visits a {@link RUnsignedShift} node, whose children are the following :
    * <p>
    * f0 -> ">>>"<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final RUnsignedShift n) {
-    R nRes = null;
+    R r = null;
     // f0 -> ">>>"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
-    return nRes;
+    r = n0.accept(this);
+    return r;
   }
 
   /**
@@ -4028,44 +3944,44 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final AdditiveExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> MultiplicativeExpression()
     final MultiplicativeExpression n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( #0 ( %0 "+"
     // .. .. . .. | %1 "-" )
     // .. .. . #1 MultiplicativeExpression() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        final NodeSequence n1TMiS0 = (NodeSequence) n1TMi;
         // #0 ( %0 "+"
         // .. | %1 "-" )
-        final INode seq1 = seq.elementAt(0);
-        final NodeChoice nch = (NodeChoice) seq1;
-        final INode ich = nch.choice;
-        switch (nch.which) {
+        final INode n1TMiS0A0 = ((NodeSequence) n1TMiS0).elementAt(0);
+        final NodeChoice n1TMiS0A0C = (NodeChoice) n1TMiS0A0;
+        final INode n1TMiS0A0CH = n1TMiS0A0C.choice;
+        switch (n1TMiS0A0C.which) {
           case 0:
             // %0 "+"
-            nRes = ich.accept(this);
+            r = n1TMiS0A0CH.accept(this);
             break;
           case 1:
             // %1 "-"
-            nRes = ich.accept(this);
+            r = n1TMiS0A0CH.accept(this);
             break;
           default:
             // should not occur !!!
             break;
         }
         // #1 MultiplicativeExpression()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n1TMiS01A1 = ((NodeSequence) n1TMiS0).elementAt(1);
+        r = n1TMiS01A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -4080,54 +3996,54 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final MultiplicativeExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> UnaryExpression()
     final UnaryExpression n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( #0 ( %0 "*"
     // .. .. . .. | %1 "/"
     // .. .. . .. | %2 "%" )
     // .. .. . #1 UnaryExpression() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        final NodeSequence n1TMiS0 = (NodeSequence) n1TMi;
         // #0 ( %0 "*"
         // .. | %1 "/"
         // .. | %2 "%" )
-        final INode seq1 = seq.elementAt(0);
-        final NodeChoice nch = (NodeChoice) seq1;
-        final INode ich = nch.choice;
-        switch (nch.which) {
+        final INode n1TMiS0A0 = ((NodeSequence) n1TMiS0).elementAt(0);
+        final NodeChoice n1TMiS0A0C = (NodeChoice) n1TMiS0A0;
+        final INode n1TMiS0A0CH = n1TMiS0A0C.choice;
+        switch (n1TMiS0A0C.which) {
           case 0:
             // %0 "*"
-            nRes = ich.accept(this);
+            r = n1TMiS0A0CH.accept(this);
             break;
           case 1:
             // %1 "/"
-            nRes = ich.accept(this);
+            r = n1TMiS0A0CH.accept(this);
             break;
           case 2:
             // %2 "%"
-            nRes = ich.accept(this);
+            r = n1TMiS0A0CH.accept(this);
             break;
           default:
             // should not occur !!!
             break;
         }
         // #1 UnaryExpression()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n1TMiS02A1 = ((NodeSequence) n1TMiS0).elementAt(1);
+        r = n1TMiS02A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link UnaryExpression} node, whose child is the following :
+   * Visits a {@link UnaryExpression} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 ( &0 "+"<br>
    * .. .. . .. .. | &1 "-" )<br>
@@ -4139,62 +4055,61 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final UnaryExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 #0 ( &0 "+"
     // .. .. . .. .. | &1 "-" )
     // .. .. . .. #1 UnaryExpression()
     // .. .. | %1 PreIncrementExpression()
     // .. .. | %2 PreDecrementExpression()
     // .. .. | %3 UnaryExpressionNotPlusMinus()
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 #0 ( &0 "+"
         // .. .. | &1 "-" )
         // .. #1 UnaryExpression()
-        final NodeSequence seq = (NodeSequence) ich;
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 ( &0 "+"
         // .. | &1 "-" )
-        final INode seq1 = seq.elementAt(0);
-        final NodeChoice nch1 = (NodeChoice) seq1;
-        final INode ich1 = nch1.choice;
-        switch (nch1.which) {
+        final INode n0CHS00A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        final NodeChoice n0CHS00A0C = (NodeChoice) n0CHS00A0;
+        final INode n0CHS00A0CH = n0CHS00A0C.choice;
+        switch (n0CHS00A0C.which) {
           case 0:
             // &0 "+"
-            nRes = ich1.accept(this);
+            r = n0CHS00A0CH.accept(this);
             break;
           case 1:
             // &1 "-"
-            nRes = ich1.accept(this);
+            r = n0CHS00A0CH.accept(this);
             break;
           default:
             // should not occur !!!
             break;
         }
         // #1 UnaryExpression()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n0CHS01A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        r = n0CHS01A1.accept(this);
         break;
       case 1:
         // %1 PreIncrementExpression()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 2:
         // %2 PreDecrementExpression()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 3:
         // %3 UnaryExpressionNotPlusMinus()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -4206,16 +4121,15 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final PreIncrementExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "++"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> PrimaryExpression()
     final PrimaryExpression n1 = n.f1;
-    nRes = n1.accept(this);
-    return nRes;
+    r = n1.accept(this);
+    return r;
   }
 
   /**
@@ -4227,20 +4141,19 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final PreDecrementExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "--"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> PrimaryExpression()
     final PrimaryExpression n1 = n.f1;
-    nRes = n1.accept(this);
-    return nRes;
+    r = n1.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link UnaryExpressionNotPlusMinus} node, whose child is the following :
+   * Visits a {@link UnaryExpressionNotPlusMinus} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 ( &0 "~"<br>
    * .. .. . .. .. | &1 "!" )<br>
@@ -4251,61 +4164,60 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final UnaryExpressionNotPlusMinus n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 #0 ( &0 "~"
     // .. .. . .. .. | &1 "!" )
     // .. .. . .. #1 UnaryExpression()
     // .. .. | %1 CastExpression()
     // .. .. | %2 PostfixExpression()
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 #0 ( &0 "~"
         // .. .. | &1 "!" )
         // .. #1 UnaryExpression()
-        final NodeSequence seq = (NodeSequence) ich;
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 ( &0 "~"
         // .. | &1 "!" )
-        final INode seq1 = seq.elementAt(0);
-        final NodeChoice nch1 = (NodeChoice) seq1;
-        final INode ich1 = nch1.choice;
-        switch (nch1.which) {
+        final INode n0CHS00A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        final NodeChoice n0CHS00A0C = (NodeChoice) n0CHS00A0;
+        final INode n0CHS00A0CH = n0CHS00A0C.choice;
+        switch (n0CHS00A0C.which) {
           case 0:
             // &0 "~"
-            nRes = ich1.accept(this);
+            r = n0CHS00A0CH.accept(this);
             break;
           case 1:
             // &1 "!"
-            nRes = ich1.accept(this);
+            r = n0CHS00A0CH.accept(this);
             break;
           default:
             // should not occur !!!
             break;
         }
         // #1 UnaryExpression()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n0CHS01A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        r = n0CHS01A1.accept(this);
         break;
       case 1:
         // %1 CastExpression()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 2:
         // %2 PostfixExpression()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link CastLookahead} node, whose child is the following :
+   * Visits a {@link CastLookahead} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 "(" #1 PrimitiveType()<br>
    * .. .. | %1 #0 "(" #1 Type() #2 "[" #3 "]"<br>
@@ -4313,7 +4225,7 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * .. .. . .. #3 ( &0 "~"<br>
    * .. .. . .. .. | &1 "!"<br>
    * .. .. . .. .. | &2 "("<br>
-   * .. .. . .. .. | &3 < IDENTIFIER ><br>
+   * .. .. . .. .. | &3 <IDENTIFIER><br>
    * .. .. . .. .. | &4 "this"<br>
    * .. .. . .. .. | &5 "super"<br>
    * .. .. . .. .. | &6 "new"<br>
@@ -4322,112 +4234,111 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final CastLookahead n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 #0 "(" #1 PrimitiveType()
     // .. .. | %1 #0 "(" #1 Type() #2 "[" #3 "]"
     // .. .. | %2 #0 "(" #1 Type() #2 ")"
     // .. .. . .. #3 ( &0 "~"
     // .. .. . .. .. | &1 "!"
     // .. .. . .. .. | &2 "("
-    // .. .. . .. .. | &3 < IDENTIFIER >
+    // .. .. . .. .. | &3 <IDENTIFIER>
     // .. .. . .. .. | &4 "this"
     // .. .. . .. .. | &5 "super"
     // .. .. . .. .. | &6 "new"
     // .. .. . .. .. | &7 Literal() )
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 #0 "(" #1 PrimitiveType()
-        final NodeSequence seq = (NodeSequence) ich;
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "("
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n0CHS00A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        r = n0CHS00A0.accept(this);
         // #1 PrimitiveType()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n0CHS00A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        r = n0CHS00A1.accept(this);
         break;
       case 1:
         // %1 #0 "(" #1 Type() #2 "[" #3 "]"
-        final NodeSequence seq3 = (NodeSequence) ich;
+        final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "("
-        final INode seq4 = seq3.elementAt(0);
-        nRes = seq4.accept(this);
+        final INode n0CHS11A0 = ((NodeSequence) n0CHS1).elementAt(0);
+        r = n0CHS11A0.accept(this);
         // #1 Type()
-        final INode seq5 = seq3.elementAt(1);
-        nRes = seq5.accept(this);
+        final INode n0CHS11A1 = ((NodeSequence) n0CHS1).elementAt(1);
+        r = n0CHS11A1.accept(this);
         // #2 "["
-        final INode seq6 = seq3.elementAt(2);
-        nRes = seq6.accept(this);
+        final INode n0CHS11A2 = ((NodeSequence) n0CHS1).elementAt(2);
+        r = n0CHS11A2.accept(this);
         // #3 "]"
-        final INode seq7 = seq3.elementAt(3);
-        nRes = seq7.accept(this);
+        final INode n0CHS11A3 = ((NodeSequence) n0CHS1).elementAt(3);
+        r = n0CHS11A3.accept(this);
         break;
       case 2:
         // %2 #0 "(" #1 Type() #2 ")"
         // .. #3 ( &0 "~"
         // .. .. | &1 "!"
         // .. .. | &2 "("
-        // .. .. | &3 < IDENTIFIER >
+        // .. .. | &3 <IDENTIFIER>
         // .. .. | &4 "this"
         // .. .. | &5 "super"
         // .. .. | &6 "new"
         // .. .. | &7 Literal() )
-        final NodeSequence seq8 = (NodeSequence) ich;
+        final NodeSequence n0CHS2 = (NodeSequence) n0CH;
         // #0 "("
-        final INode seq9 = seq8.elementAt(0);
-        nRes = seq9.accept(this);
+        final INode n0CHS22A0 = ((NodeSequence) n0CHS2).elementAt(0);
+        r = n0CHS22A0.accept(this);
         // #1 Type()
-        final INode seq10 = seq8.elementAt(1);
-        nRes = seq10.accept(this);
+        final INode n0CHS22A1 = ((NodeSequence) n0CHS2).elementAt(1);
+        r = n0CHS22A1.accept(this);
         // #2 ")"
-        final INode seq11 = seq8.elementAt(2);
-        nRes = seq11.accept(this);
+        final INode n0CHS22A2 = ((NodeSequence) n0CHS2).elementAt(2);
+        r = n0CHS22A2.accept(this);
         // #3 ( &0 "~"
         // .. | &1 "!"
         // .. | &2 "("
-        // .. | &3 < IDENTIFIER >
+        // .. | &3 <IDENTIFIER>
         // .. | &4 "this"
         // .. | &5 "super"
         // .. | &6 "new"
         // .. | &7 Literal() )
-        final INode seq12 = seq8.elementAt(3);
-        final NodeChoice nch1 = (NodeChoice) seq12;
-        final INode ich1 = nch1.choice;
-        switch (nch1.which) {
+        final INode n0CHS22A3 = ((NodeSequence) n0CHS2).elementAt(3);
+        final NodeChoice n0CHS22A3C = (NodeChoice) n0CHS22A3;
+        final INode n0CHS22A3CH = n0CHS22A3C.choice;
+        switch (n0CHS22A3C.which) {
           case 0:
             // &0 "~"
-            nRes = ich1.accept(this);
+            r = n0CHS22A3CH.accept(this);
             break;
           case 1:
             // &1 "!"
-            nRes = ich1.accept(this);
+            r = n0CHS22A3CH.accept(this);
             break;
           case 2:
             // &2 "("
-            nRes = ich1.accept(this);
+            r = n0CHS22A3CH.accept(this);
             break;
           case 3:
-            // &3 < IDENTIFIER >
-            nRes = ich1.accept(this);
+            // &3 <IDENTIFIER>
+            r = n0CHS22A3CH.accept(this);
             break;
           case 4:
             // &4 "this"
-            nRes = ich1.accept(this);
+            r = n0CHS22A3CH.accept(this);
             break;
           case 5:
             // &5 "super"
-            nRes = ich1.accept(this);
+            r = n0CHS22A3CH.accept(this);
             break;
           case 6:
             // &6 "new"
-            nRes = ich1.accept(this);
+            r = n0CHS22A3CH.accept(this);
             break;
           case 7:
             // &7 Literal()
-            nRes = ich1.accept(this);
+            r = n0CHS22A3CH.accept(this);
             break;
           default:
             // should not occur !!!
@@ -4438,7 +4349,7 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -4451,37 +4362,37 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final PostfixExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> PrimaryExpression()
     final PrimaryExpression n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> [ %0 "++"
     // .. .. | %1 "--" ]
     final NodeOptional n1 = n.f1;
-    if (n1.present()) {
-      final NodeChoice nch = (NodeChoice) n1.node;
-      final INode ich = nch.choice;
-      switch (nch.which) {
+    final NodeOptional n1P = (NodeOptional) n1;
+    if (n1P.present()) {
+      final NodeChoice n1PC = (NodeChoice) n1P.node;
+      final INode n1PCH = n1PC.choice;
+      switch (n1PC.which) {
         case 0:
           // %0 "++"
-          nRes = ich.accept(this);
+          r = n1PCH.accept(this);
           break;
         case 1:
           // %1 "--"
-          nRes = ich.accept(this);
+          r = n1PCH.accept(this);
           break;
         default:
           // should not occur !!!
           break;
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link CastExpression} node, whose child is the following :
+   * Visits a {@link CastExpression} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 "(" #1 Type() #2 ")" #3 UnaryExpression()<br>
    * .. .. | %1 #0 "(" #1 Type() #2 ")" #3 UnaryExpressionNotPlusMinus()<br>
@@ -4489,51 +4400,50 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final CastExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 #0 "(" #1 Type() #2 ")" #3 UnaryExpression()
     // .. .. | %1 #0 "(" #1 Type() #2 ")" #3 UnaryExpressionNotPlusMinus()
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 #0 "(" #1 Type() #2 ")" #3 UnaryExpression()
-        final NodeSequence seq = (NodeSequence) ich;
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "("
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n0CHS00A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        r = n0CHS00A0.accept(this);
         // #1 Type()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n0CHS00A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        r = n0CHS00A1.accept(this);
         // #2 ")"
-        final INode seq3 = seq.elementAt(2);
-        nRes = seq3.accept(this);
+        final INode n0CHS00A2 = ((NodeSequence) n0CHS0).elementAt(2);
+        r = n0CHS00A2.accept(this);
         // #3 UnaryExpression()
-        final INode seq4 = seq.elementAt(3);
-        nRes = seq4.accept(this);
+        final INode n0CHS00A3 = ((NodeSequence) n0CHS0).elementAt(3);
+        r = n0CHS00A3.accept(this);
         break;
       case 1:
         // %1 #0 "(" #1 Type() #2 ")" #3 UnaryExpressionNotPlusMinus()
-        final NodeSequence seq5 = (NodeSequence) ich;
+        final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "("
-        final INode seq6 = seq5.elementAt(0);
-        nRes = seq6.accept(this);
+        final INode n0CHS11A0 = ((NodeSequence) n0CHS1).elementAt(0);
+        r = n0CHS11A0.accept(this);
         // #1 Type()
-        final INode seq7 = seq5.elementAt(1);
-        nRes = seq7.accept(this);
+        final INode n0CHS11A1 = ((NodeSequence) n0CHS1).elementAt(1);
+        r = n0CHS11A1.accept(this);
         // #2 ")"
-        final INode seq8 = seq5.elementAt(2);
-        nRes = seq8.accept(this);
+        final INode n0CHS11A2 = ((NodeSequence) n0CHS1).elementAt(2);
+        r = n0CHS11A2.accept(this);
         // #3 UnaryExpressionNotPlusMinus()
-        final INode seq9 = seq5.elementAt(3);
-        nRes = seq9.accept(this);
+        final INode n0CHS11A3 = ((NodeSequence) n0CHS1).elementAt(3);
+        r = n0CHS11A3.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -4545,21 +4455,21 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final PrimaryExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> PrimaryPrefix()
     final PrimaryPrefix n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( PrimarySuffix() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        nRes = nloeai.accept(this);
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        r = n1TMi.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -4567,32 +4477,31 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * <p>
    * f0 -> "."<br>
    * f1 -> TypeArguments()<br>
-   * f2 -> < IDENTIFIER ><br>
+   * f2 -> <IDENTIFIER><br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final MemberSelector n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "."
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> TypeArguments()
     final TypeArguments n1 = n.f1;
-    nRes = n1.accept(this);
-    // f2 -> < IDENTIFIER >
+    r = n1.accept(this);
+    // f2 -> <IDENTIFIER>
     final NodeToken n2 = n.f2;
-    nRes = n2.accept(this);
-    return nRes;
+    r = n2.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link PrimaryPrefix} node, whose child is the following :
+   * Visits a {@link PrimaryPrefix} node, whose children are the following :
    * <p>
    * f0 -> . %0 Literal()<br>
    * .. .. | %1 "this"<br>
-   * .. .. | %2 #0 "super" #1 "." #2 < IDENTIFIER ><br>
+   * .. .. | %2 #0 "super" #1 "." #2 <IDENTIFIER><br>
    * .. .. | %3 #0 "(" #1 Expression() #2 ")"<br>
    * .. .. | %4 AllocationExpression()<br>
    * .. .. | %5 #0 ResultType() #1 "." #2 "class"<br>
@@ -4601,239 +4510,235 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final PrimaryPrefix n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 Literal()
     // .. .. | %1 "this"
-    // .. .. | %2 #0 "super" #1 "." #2 < IDENTIFIER >
+    // .. .. | %2 #0 "super" #1 "." #2 <IDENTIFIER>
     // .. .. | %3 #0 "(" #1 Expression() #2 ")"
     // .. .. | %4 AllocationExpression()
     // .. .. | %5 #0 ResultType() #1 "." #2 "class"
     // .. .. | %6 Name()
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 Literal()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %1 "this"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 2:
-        // %2 #0 "super" #1 "." #2 < IDENTIFIER >
-        final NodeSequence seq = (NodeSequence) ich;
+        // %2 #0 "super" #1 "." #2 <IDENTIFIER>
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "super"
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n0CHS02A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        r = n0CHS02A0.accept(this);
         // #1 "."
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
-        // #2 < IDENTIFIER >
-        final INode seq3 = seq.elementAt(2);
-        nRes = seq3.accept(this);
+        final INode n0CHS02A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        r = n0CHS02A1.accept(this);
+        // #2 <IDENTIFIER>
+        final INode n0CHS02A2 = ((NodeSequence) n0CHS0).elementAt(2);
+        r = n0CHS02A2.accept(this);
         break;
       case 3:
         // %3 #0 "(" #1 Expression() #2 ")"
-        final NodeSequence seq4 = (NodeSequence) ich;
+        final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "("
-        final INode seq5 = seq4.elementAt(0);
-        nRes = seq5.accept(this);
+        final INode n0CHS13A0 = ((NodeSequence) n0CHS1).elementAt(0);
+        r = n0CHS13A0.accept(this);
         // #1 Expression()
-        final INode seq6 = seq4.elementAt(1);
-        nRes = seq6.accept(this);
+        final INode n0CHS13A1 = ((NodeSequence) n0CHS1).elementAt(1);
+        r = n0CHS13A1.accept(this);
         // #2 ")"
-        final INode seq7 = seq4.elementAt(2);
-        nRes = seq7.accept(this);
+        final INode n0CHS13A2 = ((NodeSequence) n0CHS1).elementAt(2);
+        r = n0CHS13A2.accept(this);
         break;
       case 4:
         // %4 AllocationExpression()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 5:
         // %5 #0 ResultType() #1 "." #2 "class"
-        final NodeSequence seq8 = (NodeSequence) ich;
+        final NodeSequence n0CHS2 = (NodeSequence) n0CH;
         // #0 ResultType()
-        final INode seq9 = seq8.elementAt(0);
-        nRes = seq9.accept(this);
+        final INode n0CHS25A0 = ((NodeSequence) n0CHS2).elementAt(0);
+        r = n0CHS25A0.accept(this);
         // #1 "."
-        final INode seq10 = seq8.elementAt(1);
-        nRes = seq10.accept(this);
+        final INode n0CHS25A1 = ((NodeSequence) n0CHS2).elementAt(1);
+        r = n0CHS25A1.accept(this);
         // #2 "class"
-        final INode seq11 = seq8.elementAt(2);
-        nRes = seq11.accept(this);
+        final INode n0CHS25A2 = ((NodeSequence) n0CHS2).elementAt(2);
+        r = n0CHS25A2.accept(this);
         break;
       case 6:
         // %6 Name()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link PrimarySuffix} node, whose child is the following :
+   * Visits a {@link PrimarySuffix} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 "." #1 "this"<br>
    * .. .. | %1 #0 "." #1 AllocationExpression()<br>
    * .. .. | %2 MemberSelector()<br>
    * .. .. | %3 #0 "[" #1 Expression() #2 "]"<br>
-   * .. .. | %4 #0 "." #1 < IDENTIFIER ><br>
+   * .. .. | %4 #0 "." #1 <IDENTIFIER><br>
    * .. .. | %5 Arguments()<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final PrimarySuffix n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 #0 "." #1 "this"
     // .. .. | %1 #0 "." #1 AllocationExpression()
     // .. .. | %2 MemberSelector()
     // .. .. | %3 #0 "[" #1 Expression() #2 "]"
-    // .. .. | %4 #0 "." #1 < IDENTIFIER >
+    // .. .. | %4 #0 "." #1 <IDENTIFIER>
     // .. .. | %5 Arguments()
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 #0 "." #1 "this"
-        final NodeSequence seq = (NodeSequence) ich;
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "."
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n0CHS00A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        r = n0CHS00A0.accept(this);
         // #1 "this"
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n0CHS00A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        r = n0CHS00A1.accept(this);
         break;
       case 1:
         // %1 #0 "." #1 AllocationExpression()
-        final NodeSequence seq3 = (NodeSequence) ich;
+        final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "."
-        final INode seq4 = seq3.elementAt(0);
-        nRes = seq4.accept(this);
+        final INode n0CHS11A0 = ((NodeSequence) n0CHS1).elementAt(0);
+        r = n0CHS11A0.accept(this);
         // #1 AllocationExpression()
-        final INode seq5 = seq3.elementAt(1);
-        nRes = seq5.accept(this);
+        final INode n0CHS11A1 = ((NodeSequence) n0CHS1).elementAt(1);
+        r = n0CHS11A1.accept(this);
         break;
       case 2:
         // %2 MemberSelector()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 3:
         // %3 #0 "[" #1 Expression() #2 "]"
-        final NodeSequence seq6 = (NodeSequence) ich;
+        final NodeSequence n0CHS2 = (NodeSequence) n0CH;
         // #0 "["
-        final INode seq7 = seq6.elementAt(0);
-        nRes = seq7.accept(this);
+        final INode n0CHS23A0 = ((NodeSequence) n0CHS2).elementAt(0);
+        r = n0CHS23A0.accept(this);
         // #1 Expression()
-        final INode seq8 = seq6.elementAt(1);
-        nRes = seq8.accept(this);
+        final INode n0CHS23A1 = ((NodeSequence) n0CHS2).elementAt(1);
+        r = n0CHS23A1.accept(this);
         // #2 "]"
-        final INode seq9 = seq6.elementAt(2);
-        nRes = seq9.accept(this);
+        final INode n0CHS23A2 = ((NodeSequence) n0CHS2).elementAt(2);
+        r = n0CHS23A2.accept(this);
         break;
       case 4:
-        // %4 #0 "." #1 < IDENTIFIER >
-        final NodeSequence seq10 = (NodeSequence) ich;
+        // %4 #0 "." #1 <IDENTIFIER>
+        final NodeSequence n0CHS3 = (NodeSequence) n0CH;
         // #0 "."
-        final INode seq11 = seq10.elementAt(0);
-        nRes = seq11.accept(this);
-        // #1 < IDENTIFIER >
-        final INode seq12 = seq10.elementAt(1);
-        nRes = seq12.accept(this);
+        final INode n0CHS34A0 = ((NodeSequence) n0CHS3).elementAt(0);
+        r = n0CHS34A0.accept(this);
+        // #1 <IDENTIFIER>
+        final INode n0CHS34A1 = ((NodeSequence) n0CHS3).elementAt(1);
+        r = n0CHS34A1.accept(this);
         break;
       case 5:
         // %5 Arguments()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link Literal} node, whose child is the following :
+   * Visits a {@link Literal} node, whose children are the following :
    * <p>
-   * f0 -> . %0 < INTEGER_LITERAL ><br>
-   * .. .. | %1 < FLOATING_POINT_LITERAL ><br>
-   * .. .. | %2 < CHARACTER_LITERAL ><br>
-   * .. .. | %3 < STRING_LITERAL ><br>
+   * f0 -> . %0 <INTEGER_LITERAL><br>
+   * .. .. | %1 <FLOATING_POINT_LITERAL><br>
+   * .. .. | %2 <CHARACTER_LITERAL><br>
+   * .. .. | %3 <STRING_LITERAL><br>
    * .. .. | %4 BooleanLiteral()<br>
    * .. .. | %5 NullLiteral()<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final Literal n) {
-    R nRes = null;
-    // f0 -> . %0 < INTEGER_LITERAL >
-    // .. .. | %1 < FLOATING_POINT_LITERAL >
-    // .. .. | %2 < CHARACTER_LITERAL >
-    // .. .. | %3 < STRING_LITERAL >
+    R r = null;
+    // f0 -> . %0 <INTEGER_LITERAL>
+    // .. .. | %1 <FLOATING_POINT_LITERAL>
+    // .. .. | %2 <CHARACTER_LITERAL>
+    // .. .. | %3 <STRING_LITERAL>
     // .. .. | %4 BooleanLiteral()
     // .. .. | %5 NullLiteral()
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
-        // %0 < INTEGER_LITERAL >
-        nRes = ich.accept(this);
+        // %0 <INTEGER_LITERAL>
+        r = n0CH.accept(this);
         break;
       case 1:
-        // %1 < FLOATING_POINT_LITERAL >
-        nRes = ich.accept(this);
+        // %1 <FLOATING_POINT_LITERAL>
+        r = n0CH.accept(this);
         break;
       case 2:
-        // %2 < CHARACTER_LITERAL >
-        nRes = ich.accept(this);
+        // %2 <CHARACTER_LITERAL>
+        r = n0CH.accept(this);
         break;
       case 3:
-        // %3 < STRING_LITERAL >
-        nRes = ich.accept(this);
+        // %3 <STRING_LITERAL>
+        r = n0CH.accept(this);
         break;
       case 4:
         // %4 BooleanLiteral()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 5:
         // %5 NullLiteral()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link IntegerLiteral} node, whose child is the following :
+   * Visits a {@link IntegerLiteral} node, whose children are the following :
    * <p>
-   * f0 -> < INTEGER_LITERAL ><br>
+   * f0 -> <INTEGER_LITERAL><br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final IntegerLiteral n) {
-    R nRes = null;
-    // f0 -> < INTEGER_LITERAL >
+    R r = null;
+    // f0 -> <INTEGER_LITERAL>
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
-    return nRes;
+    r = n0.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link BooleanLiteral} node, whose child is the following :
+   * Visits a {@link BooleanLiteral} node, whose children are the following :
    * <p>
    * f0 -> . %0 "true"<br>
    * .. .. | %1 "false"<br>
@@ -4841,61 +4746,58 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final BooleanLiteral n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 "true"
     // .. .. | %1 "false"
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 "true"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %1 "false"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link StringLiteral} node, whose child is the following :
+   * Visits a {@link StringLiteral} node, whose children are the following :
    * <p>
-   * f0 -> < STRING_LITERAL ><br>
+   * f0 -> <STRING_LITERAL><br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final StringLiteral n) {
-    R nRes = null;
-    // f0 -> < STRING_LITERAL >
+    R r = null;
+    // f0 -> <STRING_LITERAL>
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
-    return nRes;
+    r = n0.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link NullLiteral} node, whose child is the following :
+   * Visits a {@link NullLiteral} node, whose children are the following :
    * <p>
    * f0 -> "null"<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final NullLiteral n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "null"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
-    return nRes;
+    r = n0.accept(this);
+    return r;
   }
 
   /**
@@ -4908,21 +4810,21 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final Arguments n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "("
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> [ ArgumentList() ]
     final NodeOptional n1 = n.f1;
-    if (n1.present()) {
-      nRes = n1.accept(this);
+    final NodeOptional n1P = (NodeOptional) n1;
+    if (n1P.present()) {
+      r = n1P.accept(this);
     }
     // f2 -> ")"
     final NodeToken n2 = n.f2;
-    nRes = n2.accept(this);
-    return nRes;
+    r = n2.accept(this);
+    return r;
   }
 
   /**
@@ -4934,31 +4836,31 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ArgumentList n) {
-    R nRes = null;
+    R r = null;
     // f0 -> Expression()
     final Expression n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( #0 "," #1 Expression() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        final NodeSequence n1TMiS0 = (NodeSequence) n1TMi;
         // #0 ","
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n1TMiS0A0 = ((NodeSequence) n1TMiS0).elementAt(0);
+        r = n1TMiS0A0.accept(this);
         // #1 Expression()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n1TMiS0A1 = ((NodeSequence) n1TMiS0).elementAt(1);
+        r = n1TMiS0A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link AllocationExpression} node, whose child is the following :
+   * Visits a {@link AllocationExpression} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 "new" #1 PrimitiveType() #2 ArrayDimsAndInits()<br>
    * .. .. | %1 #0 "new" #1 ClassOrInterfaceType()<br>
@@ -4970,30 +4872,29 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final AllocationExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 #0 "new" #1 PrimitiveType() #2 ArrayDimsAndInits()
     // .. .. | %1 #0 "new" #1 ClassOrInterfaceType()
     // .. .. . .. #2 [ TypeArguments() ]
     // .. .. . .. #3 ( &0 ArrayDimsAndInits()
     // .. .. . .. .. | &1 $0 Arguments()
     // .. .. . .. .. . .. $1 [ ClassOrInterfaceBody() ] )
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 #0 "new" #1 PrimitiveType() #2 ArrayDimsAndInits()
-        final NodeSequence seq = (NodeSequence) ich;
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "new"
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n0CHS00A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        r = n0CHS00A0.accept(this);
         // #1 PrimitiveType()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n0CHS00A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        r = n0CHS00A1.accept(this);
         // #2 ArrayDimsAndInits()
-        final INode seq3 = seq.elementAt(2);
-        nRes = seq3.accept(this);
+        final INode n0CHS00A2 = ((NodeSequence) n0CHS0).elementAt(2);
+        r = n0CHS00A2.accept(this);
         break;
       case 1:
         // %1 #0 "new" #1 ClassOrInterfaceType()
@@ -5001,42 +4902,42 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. #3 ( &0 ArrayDimsAndInits()
         // .. .. | &1 $0 Arguments()
         // .. .. .. $1 [ ClassOrInterfaceBody() ] )
-        final NodeSequence seq4 = (NodeSequence) ich;
+        final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "new"
-        final INode seq5 = seq4.elementAt(0);
-        nRes = seq5.accept(this);
+        final INode n0CHS11A0 = ((NodeSequence) n0CHS1).elementAt(0);
+        r = n0CHS11A0.accept(this);
         // #1 ClassOrInterfaceType()
-        final INode seq6 = seq4.elementAt(1);
-        nRes = seq6.accept(this);
+        final INode n0CHS11A1 = ((NodeSequence) n0CHS1).elementAt(1);
+        r = n0CHS11A1.accept(this);
         // #2 [ TypeArguments() ]
-        final INode seq7 = seq4.elementAt(2);
-        final NodeOptional opt = (NodeOptional) seq7;
-        if (opt.present()) {
-          nRes = opt.accept(this);
+        final INode n0CHS11A2 = ((NodeSequence) n0CHS1).elementAt(2);
+        final NodeOptional n0CHS11A2P = (NodeOptional) n0CHS11A2;
+        if (n0CHS11A2P.present()) {
+          r = n0CHS11A2P.accept(this);
         }
         // #3 ( &0 ArrayDimsAndInits()
         // .. | &1 $0 Arguments()
         // .. .. $1 [ ClassOrInterfaceBody() ] )
-        final INode seq8 = seq4.elementAt(3);
-        final NodeChoice nch1 = (NodeChoice) seq8;
-        final INode ich1 = nch1.choice;
-        switch (nch1.which) {
+        final INode n0CHS1A3 = ((NodeSequence) n0CHS1).elementAt(3);
+        final NodeChoice n0CHS1A3C = (NodeChoice) n0CHS1A3;
+        final INode n0CHS1A3CH = n0CHS1A3C.choice;
+        switch (n0CHS1A3C.which) {
           case 0:
             // &0 ArrayDimsAndInits()
-            nRes = ich1.accept(this);
+            r = n0CHS1A3CH.accept(this);
             break;
           case 1:
             // &1 $0 Arguments()
             // .. $1 [ ClassOrInterfaceBody() ]
-            final NodeSequence seq9 = (NodeSequence) ich1;
+            final NodeSequence n0CHS1A3CHS2 = (NodeSequence) n0CHS1A3CH;
             // $0 Arguments()
-            final INode seq10 = seq9.elementAt(0);
-            nRes = seq10.accept(this);
+            final INode n0CHS1A3CHS21A0 = ((NodeSequence) n0CHS1A3CHS2).elementAt(0);
+            r = n0CHS1A3CHS21A0.accept(this);
             // $1 [ ClassOrInterfaceBody() ]
-            final INode seq11 = seq9.elementAt(1);
-            final NodeOptional opt1 = (NodeOptional) seq11;
-            if (opt1.present()) {
-              nRes = opt1.accept(this);
+            final INode n0CHS1A3CHS21A1 = ((NodeSequence) n0CHS1A3CHS2).elementAt(1);
+            final NodeOptional n0CHS1A3CHS21A1P = (NodeOptional) n0CHS1A3CHS21A1;
+            if (n0CHS1A3CHS21A1P.present()) {
+              r = n0CHS1A3CHS21A1P.accept(this);
             }
             break;
           default:
@@ -5048,11 +4949,11 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link ArrayDimsAndInits} node, whose child is the following :
+   * Visits a {@link ArrayDimsAndInits} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 ( $0 "[" $1 Expression() $2 "]" )+<br>
    * .. .. . .. #1 ( $0 "[" $1 "]" )*<br>
@@ -5062,82 +4963,81 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ArrayDimsAndInits n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 #0 ( $0 "[" $1 Expression() $2 "]" )+
     // .. .. . .. #1 ( $0 "[" $1 "]" )*
     // .. .. | %1 #0 ( $0 "[" $1 "]" )+
     // .. .. . .. #1 ArrayInitializer()
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 #0 ( $0 "[" $1 Expression() $2 "]" )+
         // .. #1 ( $0 "[" $1 "]" )*
-        final NodeSequence seq = (NodeSequence) ich;
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 ( $0 "[" $1 Expression() $2 "]" )+
-        final INode seq1 = seq.elementAt(0);
-        final NodeList lst = (NodeList) seq1;
-        for (int i = 0; i < lst.size(); i++) {
-          final INode lsteai = lst.elementAt(i);
-          final NodeSequence seq2 = (NodeSequence) lsteai;
+        final INode n0CHS00A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        final NodeList n0CHS00A0L = (NodeList) n0CHS00A0;
+        for (int i = 0; i < n0CHS00A0L.size(); i++) {
+          final INode n0CHS00A0LEi = n0CHS00A0L.elementAt(i);
+          final NodeSequence n0CHS00A0LEiS1 = (NodeSequence) n0CHS00A0LEi;
           // $0 "["
-          final INode seq3 = seq2.elementAt(0);
-          nRes = seq3.accept(this);
+          final INode n0CHS00A0LEiS1A0 = ((NodeSequence) n0CHS00A0LEiS1).elementAt(0);
+          r = n0CHS00A0LEiS1A0.accept(this);
           // $1 Expression()
-          final INode seq4 = seq2.elementAt(1);
-          nRes = seq4.accept(this);
+          final INode n0CHS00A0LEiS1A1 = ((NodeSequence) n0CHS00A0LEiS1).elementAt(1);
+          r = n0CHS00A0LEiS1A1.accept(this);
           // $2 "]"
-          final INode seq5 = seq2.elementAt(2);
-          nRes = seq5.accept(this);
+          final INode n0CHS00A0LEiS1A2 = ((NodeSequence) n0CHS00A0LEiS1).elementAt(2);
+          r = n0CHS00A0LEiS1A2.accept(this);
         }
         // #1 ( $0 "[" $1 "]" )*
-        final INode seq6 = seq.elementAt(1);
-        final NodeListOptional nlo = (NodeListOptional) seq6;
-        if (nlo.present()) {
-          for (int i = 0; i < nlo.size(); i++) {
-            final INode nloeai = nlo.elementAt(i);
-            final NodeSequence seq7 = (NodeSequence) nloeai;
+        final INode n0CHS0A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        final NodeListOptional n0CHS0A1T = (NodeListOptional) n0CHS0A1;
+        if (n0CHS0A1T.present()) {
+          for (int i = 0; i < n0CHS0A1T.size(); i++) {
+            final INode n0CHS0A1TMi = n0CHS0A1T.elementAt(i);
+            final NodeSequence n0CHS0A1TMiS1 = (NodeSequence) n0CHS0A1TMi;
             // $0 "["
-            final INode seq8 = seq7.elementAt(0);
-            nRes = seq8.accept(this);
+            final INode n0CHS0A1TMiS1A0 = ((NodeSequence) n0CHS0A1TMiS1).elementAt(0);
+            r = n0CHS0A1TMiS1A0.accept(this);
             // $1 "]"
-            final INode seq9 = seq7.elementAt(1);
-            nRes = seq9.accept(this);
+            final INode n0CHS0A1TMiS1A1 = ((NodeSequence) n0CHS0A1TMiS1).elementAt(1);
+            r = n0CHS0A1TMiS1A1.accept(this);
           }
         }
         break;
       case 1:
         // %1 #0 ( $0 "[" $1 "]" )+
         // .. #1 ArrayInitializer()
-        final NodeSequence seq10 = (NodeSequence) ich;
+        final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 ( $0 "[" $1 "]" )+
-        final INode seq11 = seq10.elementAt(0);
-        final NodeList lst1 = (NodeList) seq11;
-        for (int i = 0; i < lst1.size(); i++) {
-          final INode lsteai = lst1.elementAt(i);
-          final NodeSequence seq12 = (NodeSequence) lsteai;
+        final INode n0CHS11A0 = ((NodeSequence) n0CHS1).elementAt(0);
+        final NodeList n0CHS11A0L1 = (NodeList) n0CHS11A0;
+        for (int i = 0; i < n0CHS11A0L1.size(); i++) {
+          final INode n0CHS11A0L1Ei = n0CHS11A0L1.elementAt(i);
+          final NodeSequence n0CHS11A0L1EiS2 = (NodeSequence) n0CHS11A0L1Ei;
           // $0 "["
-          final INode seq13 = seq12.elementAt(0);
-          nRes = seq13.accept(this);
+          final INode n0CHS11A0L1EiS2A0 = ((NodeSequence) n0CHS11A0L1EiS2).elementAt(0);
+          r = n0CHS11A0L1EiS2A0.accept(this);
           // $1 "]"
-          final INode seq14 = seq12.elementAt(1);
-          nRes = seq14.accept(this);
+          final INode n0CHS11A0L1EiS2A1 = ((NodeSequence) n0CHS11A0L1EiS2).elementAt(1);
+          r = n0CHS11A0L1EiS2A1.accept(this);
         }
         // #1 ArrayInitializer()
-        final INode seq15 = seq10.elementAt(1);
-        nRes = seq15.accept(this);
+        final INode n0CHS1A1 = ((NodeSequence) n0CHS1).elementAt(1);
+        r = n0CHS1A1.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link Statement} node, whose child is the following :
+   * Visits a {@link Statement} node, whose children are the following :
    * <p>
    * f0 -> . %00 LabeledStatement()<br>
    * .. .. | %01 AssertStatement()<br>
@@ -5159,9 +5059,8 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final Statement n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %00 LabeledStatement()
     // .. .. | %01 AssertStatement()
     // .. .. | %02 Block()
@@ -5178,84 +5077,84 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
     // .. .. | %13 ThrowStatement()
     // .. .. | %14 SynchronizedStatement()
     // .. .. | %15 TryStatement()
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %00 LabeledStatement()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %01 AssertStatement()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 2:
         // %02 Block()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 3:
         // %03 EmptyStatement()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 4:
         // %04 #0 StatementExpression() #1 ";"
-        final NodeSequence seq = (NodeSequence) ich;
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 StatementExpression()
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n0CHS04A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        r = n0CHS04A0.accept(this);
         // #1 ";"
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n0CHS04A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        r = n0CHS04A1.accept(this);
         break;
       case 5:
         // %05 SwitchStatement()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 6:
         // %06 IfStatement()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 7:
         // %07 WhileStatement()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 8:
         // %08 DoStatement()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 9:
         // %09 ForStatement()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 10:
         // %10 BreakStatement()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 11:
         // %11 ContinueStatement()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 12:
         // %12 ReturnStatement()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 13:
         // %13 ThrowStatement()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 14:
         // %14 SynchronizedStatement()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 15:
         // %15 TryStatement()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -5269,55 +5168,54 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final AssertStatement n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "assert"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> Expression()
     final Expression n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> [ #0 ":" #1 Expression() ]
     final NodeOptional n2 = n.f2;
-    if (n2.present()) {
-      final NodeSequence seq = (NodeSequence) n2.node;
+    final NodeOptional n2P = (NodeOptional) n2;
+    if (n2P.present()) {
+      final NodeSequence n2PS0 = (NodeSequence) n2P.node;
       // #0 ":"
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
+      final INode n2PS0A0 = ((NodeSequence) n2PS0).elementAt(0);
+      r = n2PS0A0.accept(this);
       // #1 Expression()
-      final INode seq2 = seq.elementAt(1);
-      nRes = seq2.accept(this);
+      final INode n2PS0A1 = ((NodeSequence) n2PS0).elementAt(1);
+      r = n2PS0A1.accept(this);
     }
     // f3 -> ";"
     final NodeToken n3 = n.f3;
-    nRes = n3.accept(this);
-    return nRes;
+    r = n3.accept(this);
+    return r;
   }
 
   /**
    * Visits a {@link LabeledStatement} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    * f1 -> ":"<br>
    * f2 -> Statement()<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final LabeledStatement n) {
-    R nRes = null;
-    // f0 -> < IDENTIFIER >
+    R r = null;
+    // f0 -> <IDENTIFIER>
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ":"
     final NodeToken n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> Statement()
     final Statement n2 = n.f2;
-    nRes = n2.accept(this);
-    return nRes;
+    r = n2.accept(this);
+    return r;
   }
 
   /**
@@ -5330,28 +5228,28 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final Block n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "{"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( BlockStatement() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        nRes = nloeai.accept(this);
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        r = n1TMi.accept(this);
       }
     }
     // f2 -> "}"
     final NodeToken n2 = n.f2;
-    nRes = n2.accept(this);
-    return nRes;
+    r = n2.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link BlockStatement} node, whose child is the following :
+   * Visits a {@link BlockStatement} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 LocalVariableDeclaration() #1 ";"<br>
    * .. .. | %1 Statement()<br>
@@ -5360,38 +5258,37 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final BlockStatement n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 #0 LocalVariableDeclaration() #1 ";"
     // .. .. | %1 Statement()
     // .. .. | %2 ClassOrInterfaceDeclaration()
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 #0 LocalVariableDeclaration() #1 ";"
-        final NodeSequence seq = (NodeSequence) ich;
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 LocalVariableDeclaration()
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n0CHS00A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        r = n0CHS00A0.accept(this);
         // #1 ";"
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n0CHS00A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        r = n0CHS00A1.accept(this);
         break;
       case 1:
         // %1 Statement()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 2:
         // %2 ClassOrInterfaceDeclaration()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -5405,37 +5302,37 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final LocalVariableDeclaration n) {
-    R nRes = null;
+    R r = null;
     // f0 -> VariableModifiers()
     final VariableModifiers n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> Type()
     final Type n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> VariableDeclarator()
     final VariableDeclarator n2 = n.f2;
-    nRes = n2.accept(this);
+    r = n2.accept(this);
     // f3 -> ( #0 "," #1 VariableDeclarator() )*
     final NodeListOptional n3 = n.f3;
-    if (n3.present()) {
-      for (int i = 0; i < n3.size(); i++) {
-        final INode nloeai = n3.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n3T = (NodeListOptional) n3;
+    if (n3T.present()) {
+      for (int i = 0; i < n3T.size(); i++) {
+        final INode n3TMi = n3T.elementAt(i);
+        final NodeSequence n3TMiS0 = (NodeSequence) n3TMi;
         // #0 ","
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n3TMiS0A0 = ((NodeSequence) n3TMiS0).elementAt(0);
+        r = n3TMiS0A0.accept(this);
         // #1 VariableDeclarator()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n3TMiS0A1 = ((NodeSequence) n3TMiS0).elementAt(1);
+        r = n3TMiS0A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link VariableModifiers} node, whose child is the following :
+   * Visits a {@link VariableModifiers} node, whose children are the following :
    * <p>
    * f0 -> ( ( %0 "final"<br>
    * .. .. . | %1 Annotation() ) )*<br>
@@ -5443,25 +5340,25 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final VariableModifiers n) {
-    R nRes = null;
+    R r = null;
     // f0 -> ( ( %0 "final"
     // .. .. . | %1 Annotation() ) )*
     final NodeListOptional n0 = n.f0;
-    if (n0.present()) {
-      for (int i = 0; i < n0.size(); i++) {
-        final INode nloeai = n0.elementAt(i);
-        final NodeChoice nch = (NodeChoice) nloeai;
-        final INode ich = nch.choice;
-        switch (nch.which) {
+    final NodeListOptional n0T = (NodeListOptional) n0;
+    if (n0T.present()) {
+      for (int i = 0; i < n0T.size(); i++) {
+        final INode n0TMi = n0T.elementAt(i);
+        final NodeChoice n0TMiC = (NodeChoice) n0TMi;
+        final INode n0TMiCH = n0TMiC.choice;
+        switch (n0TMiC.which) {
           case 0:
             // %0 "final"
-            nRes = ich.accept(this);
+            r = n0TMiCH.accept(this);
             break;
           case 1:
             // %1 Annotation()
-            nRes = ich.accept(this);
+            r = n0TMiCH.accept(this);
             break;
           default:
             // should not occur !!!
@@ -5469,28 +5366,27 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         }
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link EmptyStatement} node, whose child is the following :
+   * Visits a {@link EmptyStatement} node, whose children are the following :
    * <p>
    * f0 -> ";"<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final EmptyStatement n) {
-    R nRes = null;
+    R r = null;
     // f0 -> ";"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
-    return nRes;
+    r = n0.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link StatementExpression} node, whose child is the following :
+   * Visits a {@link StatementExpression} node, whose children are the following :
    * <p>
    * f0 -> . %0 PreIncrementExpression()<br>
    * .. .. | %1 PreDecrementExpression()<br>
@@ -5502,61 +5398,60 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final StatementExpression n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 PreIncrementExpression()
     // .. .. | %1 PreDecrementExpression()
     // .. .. | %2 #0 PrimaryExpression()
     // .. .. . .. #1 [ &0 "++"
     // .. .. . .. .. | &1 "--"
     // .. .. . .. .. | &2 $0 AssignmentOperator() $1 Expression() ]
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 PreIncrementExpression()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %1 PreDecrementExpression()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 2:
         // %2 #0 PrimaryExpression()
         // .. #1 [ &0 "++"
         // .. .. | &1 "--"
         // .. .. | &2 $0 AssignmentOperator() $1 Expression() ]
-        final NodeSequence seq = (NodeSequence) ich;
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 PrimaryExpression()
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n0CHS02A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        r = n0CHS02A0.accept(this);
         // #1 [ &0 "++"
         // .. | &1 "--"
         // .. | &2 $0 AssignmentOperator() $1 Expression() ]
-        final INode seq2 = seq.elementAt(1);
-        final NodeOptional opt = (NodeOptional) seq2;
-        if (opt.present()) {
-          final NodeChoice nch1 = (NodeChoice) opt.node;
-          final INode ich1 = nch1.choice;
-          switch (nch1.which) {
+        final INode n0CHS02A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        final NodeOptional n0CHS02A1P = (NodeOptional) n0CHS02A1;
+        if (n0CHS02A1P.present()) {
+          final NodeChoice n0CHS02A1PC = (NodeChoice) n0CHS02A1P.node;
+          final INode n0CHS02A1PCH = n0CHS02A1PC.choice;
+          switch (n0CHS02A1PC.which) {
             case 0:
               // &0 "++"
-              nRes = ich1.accept(this);
+              r = n0CHS02A1PCH.accept(this);
               break;
             case 1:
               // &1 "--"
-              nRes = ich1.accept(this);
+              r = n0CHS02A1PCH.accept(this);
               break;
             case 2:
               // &2 $0 AssignmentOperator() $1 Expression()
-              final NodeSequence seq3 = (NodeSequence) ich1;
+              final NodeSequence n0CHS02A1PCHS1 = (NodeSequence) n0CHS02A1PCH;
               // $0 AssignmentOperator()
-              final INode seq4 = seq3.elementAt(0);
-              nRes = seq4.accept(this);
+              final INode n0CHS02A1PCHS12A0 = ((NodeSequence) n0CHS02A1PCHS1).elementAt(0);
+              r = n0CHS02A1PCHS12A0.accept(this);
               // $1 Expression()
-              final INode seq5 = seq3.elementAt(1);
-              nRes = seq5.accept(this);
+              final INode n0CHS02A1PCHS12A1 = ((NodeSequence) n0CHS02A1PCHS1).elementAt(1);
+              r = n0CHS02A1PCHS12A1.accept(this);
               break;
             default:
               // should not occur !!!
@@ -5568,7 +5463,7 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -5586,53 +5481,53 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final SwitchStatement n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "switch"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> "("
     final NodeToken n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> Expression()
     final Expression n2 = n.f2;
-    nRes = n2.accept(this);
+    r = n2.accept(this);
     // f3 -> ")"
     final NodeToken n3 = n.f3;
-    nRes = n3.accept(this);
+    r = n3.accept(this);
     // f4 -> "{"
     final NodeToken n4 = n.f4;
-    nRes = n4.accept(this);
+    r = n4.accept(this);
     // f5 -> ( #0 SwitchLabel()
     // .. .. . #1 ( BlockStatement() )* )*
     final NodeListOptional n5 = n.f5;
-    if (n5.present()) {
-      for (int i = 0; i < n5.size(); i++) {
-        final INode nloeai = n5.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n5T = (NodeListOptional) n5;
+    if (n5T.present()) {
+      for (int i = 0; i < n5T.size(); i++) {
+        final INode n5TMi = n5T.elementAt(i);
+        final NodeSequence n5TMiS0 = (NodeSequence) n5TMi;
         // #0 SwitchLabel()
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n5TMiS0A0 = ((NodeSequence) n5TMiS0).elementAt(0);
+        r = n5TMiS0A0.accept(this);
         // #1 ( BlockStatement() )*
-        final INode seq2 = seq.elementAt(1);
-        final NodeListOptional nlo = (NodeListOptional) seq2;
-        if (nlo.present()) {
-          for (int i1 = 0; i1 < nlo.size(); i1++) {
-            final INode nloeai1 = nlo.elementAt(i1);
-            nRes = nloeai1.accept(this);
+        final INode n5TMiS0A1 = ((NodeSequence) n5TMiS0).elementAt(1);
+        final NodeListOptional n5TMiS0A1T1 = (NodeListOptional) n5TMiS0A1;
+        if (n5TMiS0A1T1.present()) {
+          for (int i1 = 0; i1 < n5TMiS0A1T1.size(); i1++) {
+            final INode n5TMiS0A1T1Mi = n5TMiS0A1T1.elementAt(i1);
+            r = n5TMiS0A1T1Mi.accept(this);
           }
         }
       }
     }
     // f6 -> "}"
     final NodeToken n6 = n.f6;
-    nRes = n6.accept(this);
-    return nRes;
+    r = n6.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link SwitchLabel} node, whose child is the following :
+   * Visits a {@link SwitchLabel} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 "case" #1 Expression() #2 ":"<br>
    * .. .. | %1 #0 "default" #1 ":"<br>
@@ -5640,42 +5535,41 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final SwitchLabel n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 #0 "case" #1 Expression() #2 ":"
     // .. .. | %1 #0 "default" #1 ":"
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 #0 "case" #1 Expression() #2 ":"
-        final NodeSequence seq = (NodeSequence) ich;
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 "case"
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n0CHS00A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        r = n0CHS00A0.accept(this);
         // #1 Expression()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n0CHS00A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        r = n0CHS00A1.accept(this);
         // #2 ":"
-        final INode seq3 = seq.elementAt(2);
-        nRes = seq3.accept(this);
+        final INode n0CHS00A2 = ((NodeSequence) n0CHS0).elementAt(2);
+        r = n0CHS00A2.accept(this);
         break;
       case 1:
         // %1 #0 "default" #1 ":"
-        final NodeSequence seq4 = (NodeSequence) ich;
+        final NodeSequence n0CHS1 = (NodeSequence) n0CH;
         // #0 "default"
-        final INode seq5 = seq4.elementAt(0);
-        nRes = seq5.accept(this);
+        final INode n0CHS11A0 = ((NodeSequence) n0CHS1).elementAt(0);
+        r = n0CHS11A0.accept(this);
         // #1 ":"
-        final INode seq6 = seq4.elementAt(1);
-        nRes = seq6.accept(this);
+        final INode n0CHS11A1 = ((NodeSequence) n0CHS1).elementAt(1);
+        r = n0CHS11A1.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -5691,36 +5585,36 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final IfStatement n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "if"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> "("
     final NodeToken n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> Expression()
     final Expression n2 = n.f2;
-    nRes = n2.accept(this);
+    r = n2.accept(this);
     // f3 -> ")"
     final NodeToken n3 = n.f3;
-    nRes = n3.accept(this);
+    r = n3.accept(this);
     // f4 -> Statement()
     final Statement n4 = n.f4;
-    nRes = n4.accept(this);
+    r = n4.accept(this);
     // f5 -> [ #0 "else" #1 Statement() ]
     final NodeOptional n5 = n.f5;
-    if (n5.present()) {
-      final NodeSequence seq = (NodeSequence) n5.node;
+    final NodeOptional n5P = (NodeOptional) n5;
+    if (n5P.present()) {
+      final NodeSequence n5PS0 = (NodeSequence) n5P.node;
       // #0 "else"
-      final INode seq1 = seq.elementAt(0);
-      nRes = seq1.accept(this);
+      final INode n5PS0A0 = ((NodeSequence) n5PS0).elementAt(0);
+      r = n5PS0A0.accept(this);
       // #1 Statement()
-      final INode seq2 = seq.elementAt(1);
-      nRes = seq2.accept(this);
+      final INode n5PS0A1 = ((NodeSequence) n5PS0).elementAt(1);
+      r = n5PS0A1.accept(this);
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -5735,25 +5629,24 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final WhileStatement n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "while"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> "("
     final NodeToken n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> Expression()
     final Expression n2 = n.f2;
-    nRes = n2.accept(this);
+    r = n2.accept(this);
     // f3 -> ")"
     final NodeToken n3 = n.f3;
-    nRes = n3.accept(this);
+    r = n3.accept(this);
     // f4 -> Statement()
     final Statement n4 = n.f4;
-    nRes = n4.accept(this);
-    return nRes;
+    r = n4.accept(this);
+    return r;
   }
 
   /**
@@ -5770,31 +5663,30 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final DoStatement n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "do"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> Statement()
     final Statement n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> "while"
     final NodeToken n2 = n.f2;
-    nRes = n2.accept(this);
+    r = n2.accept(this);
     // f3 -> "("
     final NodeToken n3 = n.f3;
-    nRes = n3.accept(this);
+    r = n3.accept(this);
     // f4 -> Expression()
     final Expression n4 = n.f4;
-    nRes = n4.accept(this);
+    r = n4.accept(this);
     // f5 -> ")"
     final NodeToken n5 = n.f5;
-    nRes = n5.accept(this);
+    r = n5.accept(this);
     // f6 -> ";"
     final NodeToken n6 = n.f6;
-    nRes = n6.accept(this);
-    return nRes;
+    r = n6.accept(this);
+    return r;
   }
 
   /**
@@ -5802,7 +5694,7 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * <p>
    * f0 -> "for"<br>
    * f1 -> "("<br>
-   * f2 -> ( %0 #0 VariableModifiers() #1 Type() #2 < IDENTIFIER > #3 ":" #4 Expression()<br>
+   * f2 -> ( %0 #0 VariableModifiers() #1 Type() #2 <IDENTIFIER> #3 ":" #4 Expression()<br>
    * .. .. | %1 #0 [ ForInit() ]<br>
    * .. .. . .. #1 ";"<br>
    * .. .. . .. #2 [ Expression() ]<br>
@@ -5814,43 +5706,42 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ForStatement n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "for"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> "("
     final NodeToken n1 = n.f1;
-    nRes = n1.accept(this);
-    // f2 -> ( %0 #0 VariableModifiers() #1 Type() #2 < IDENTIFIER > #3 ":" #4 Expression()
+    r = n1.accept(this);
+    // f2 -> ( %0 #0 VariableModifiers() #1 Type() #2 <IDENTIFIER> #3 ":" #4 Expression()
     // .. .. | %1 #0 [ ForInit() ]
     // .. .. . .. #1 ";"
     // .. .. . .. #2 [ Expression() ]
     // .. .. . .. #3 ";"
     // .. .. . .. #4 [ ForUpdate() ] )
     final NodeChoice n2 = n.f2;
-    final NodeChoice nch = n2;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n2C = (NodeChoice) n2;
+    final INode n2CH = n2C.choice;
+    switch (n2C.which) {
       case 0:
-        // %0 #0 VariableModifiers() #1 Type() #2 < IDENTIFIER > #3 ":" #4 Expression()
-        final NodeSequence seq = (NodeSequence) ich;
+        // %0 #0 VariableModifiers() #1 Type() #2 <IDENTIFIER> #3 ":" #4 Expression()
+        final NodeSequence n2CHS0 = (NodeSequence) n2CH;
         // #0 VariableModifiers()
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n2CHS00A0 = ((NodeSequence) n2CHS0).elementAt(0);
+        r = n2CHS00A0.accept(this);
         // #1 Type()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
-        // #2 < IDENTIFIER >
-        final INode seq3 = seq.elementAt(2);
-        nRes = seq3.accept(this);
+        final INode n2CHS00A1 = ((NodeSequence) n2CHS0).elementAt(1);
+        r = n2CHS00A1.accept(this);
+        // #2 <IDENTIFIER>
+        final INode n2CHS00A2 = ((NodeSequence) n2CHS0).elementAt(2);
+        r = n2CHS00A2.accept(this);
         // #3 ":"
-        final INode seq4 = seq.elementAt(3);
-        nRes = seq4.accept(this);
+        final INode n2CHS00A3 = ((NodeSequence) n2CHS0).elementAt(3);
+        r = n2CHS00A3.accept(this);
         // #4 Expression()
-        final INode seq5 = seq.elementAt(4);
-        nRes = seq5.accept(this);
+        final INode n2CHS00A4 = ((NodeSequence) n2CHS0).elementAt(4);
+        r = n2CHS00A4.accept(this);
         break;
       case 1:
         // %1 #0 [ ForInit() ]
@@ -5858,30 +5749,30 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         // .. #2 [ Expression() ]
         // .. #3 ";"
         // .. #4 [ ForUpdate() ]
-        final NodeSequence seq6 = (NodeSequence) ich;
+        final NodeSequence n2CHS1 = (NodeSequence) n2CH;
         // #0 [ ForInit() ]
-        final INode seq7 = seq6.elementAt(0);
-        final NodeOptional opt = (NodeOptional) seq7;
-        if (opt.present()) {
-          nRes = opt.accept(this);
+        final INode n2CHS11A0 = ((NodeSequence) n2CHS1).elementAt(0);
+        final NodeOptional n2CHS11A0P = (NodeOptional) n2CHS11A0;
+        if (n2CHS11A0P.present()) {
+          r = n2CHS11A0P.accept(this);
         }
         // #1 ";"
-        final INode seq8 = seq6.elementAt(1);
-        nRes = seq8.accept(this);
+        final INode n2CHS1A1 = ((NodeSequence) n2CHS1).elementAt(1);
+        r = n2CHS1A1.accept(this);
         // #2 [ Expression() ]
-        final INode seq9 = seq6.elementAt(2);
-        final NodeOptional opt1 = (NodeOptional) seq9;
-        if (opt1.present()) {
-          nRes = opt1.accept(this);
+        final INode n2CHS1A2 = ((NodeSequence) n2CHS1).elementAt(2);
+        final NodeOptional n2CHS1A2P = (NodeOptional) n2CHS1A2;
+        if (n2CHS1A2P.present()) {
+          r = n2CHS1A2P.accept(this);
         }
         // #3 ";"
-        final INode seq10 = seq6.elementAt(3);
-        nRes = seq10.accept(this);
+        final INode n2CHS1A3 = ((NodeSequence) n2CHS1).elementAt(3);
+        r = n2CHS1A3.accept(this);
         // #4 [ ForUpdate() ]
-        final INode seq11 = seq6.elementAt(4);
-        final NodeOptional opt2 = (NodeOptional) seq11;
-        if (opt2.present()) {
-          nRes = opt2.accept(this);
+        final INode n2CHS1A4 = ((NodeSequence) n2CHS1).elementAt(4);
+        final NodeOptional n2CHS1A4P = (NodeOptional) n2CHS1A4;
+        if (n2CHS1A4P.present()) {
+          r = n2CHS1A4P.accept(this);
         }
         break;
       default:
@@ -5890,15 +5781,15 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
     }
     // f3 -> ")"
     final NodeToken n3 = n.f3;
-    nRes = n3.accept(this);
+    r = n3.accept(this);
     // f4 -> Statement()
     final Statement n4 = n.f4;
-    nRes = n4.accept(this);
-    return nRes;
+    r = n4.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link ForInit} node, whose child is the following :
+   * Visits a {@link ForInit} node, whose children are the following :
    * <p>
    * f0 -> . %0 LocalVariableDeclaration()<br>
    * .. .. | %1 StatementExpressionList()<br>
@@ -5906,27 +5797,26 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ForInit n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 LocalVariableDeclaration()
     // .. .. | %1 StatementExpressionList()
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 LocalVariableDeclaration()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %1 StatementExpressionList()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -5938,98 +5828,97 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final StatementExpressionList n) {
-    R nRes = null;
+    R r = null;
     // f0 -> StatementExpression()
     final StatementExpression n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( #0 "," #1 StatementExpression() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        final NodeSequence n1TMiS0 = (NodeSequence) n1TMi;
         // #0 ","
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n1TMiS0A0 = ((NodeSequence) n1TMiS0).elementAt(0);
+        r = n1TMiS0A0.accept(this);
         // #1 StatementExpression()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n1TMiS0A1 = ((NodeSequence) n1TMiS0).elementAt(1);
+        r = n1TMiS0A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link ForUpdate} node, whose child is the following :
+   * Visits a {@link ForUpdate} node, whose children are the following :
    * <p>
    * f0 -> StatementExpressionList()<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ForUpdate n) {
-    R nRes = null;
+    R r = null;
     // f0 -> StatementExpressionList()
     final StatementExpressionList n0 = n.f0;
-    nRes = n0.accept(this);
-    return nRes;
+    r = n0.accept(this);
+    return r;
   }
 
   /**
    * Visits a {@link BreakStatement} node, whose children are the following :
    * <p>
    * f0 -> "break"<br>
-   * f1 -> [ < IDENTIFIER > ]<br>
+   * f1 -> [ <IDENTIFIER> ]<br>
    * f2 -> ";"<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final BreakStatement n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "break"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
-    // f1 -> [ < IDENTIFIER > ]
+    r = n0.accept(this);
+    // f1 -> [ <IDENTIFIER> ]
     final NodeOptional n1 = n.f1;
-    if (n1.present()) {
-      nRes = n1.accept(this);
+    final NodeOptional n1P = (NodeOptional) n1;
+    if (n1P.present()) {
+      r = n1P.accept(this);
     }
     // f2 -> ";"
     final NodeToken n2 = n.f2;
-    nRes = n2.accept(this);
-    return nRes;
+    r = n2.accept(this);
+    return r;
   }
 
   /**
    * Visits a {@link ContinueStatement} node, whose children are the following :
    * <p>
    * f0 -> "continue"<br>
-   * f1 -> [ < IDENTIFIER > ]<br>
+   * f1 -> [ <IDENTIFIER> ]<br>
    * f2 -> ";"<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ContinueStatement n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "continue"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
-    // f1 -> [ < IDENTIFIER > ]
+    r = n0.accept(this);
+    // f1 -> [ <IDENTIFIER> ]
     final NodeOptional n1 = n.f1;
-    if (n1.present()) {
-      nRes = n1.accept(this);
+    final NodeOptional n1P = (NodeOptional) n1;
+    if (n1P.present()) {
+      r = n1P.accept(this);
     }
     // f2 -> ";"
     final NodeToken n2 = n.f2;
-    nRes = n2.accept(this);
-    return nRes;
+    r = n2.accept(this);
+    return r;
   }
 
   /**
@@ -6042,21 +5931,21 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ReturnStatement n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "return"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> [ Expression() ]
     final NodeOptional n1 = n.f1;
-    if (n1.present()) {
-      nRes = n1.accept(this);
+    final NodeOptional n1P = (NodeOptional) n1;
+    if (n1P.present()) {
+      r = n1P.accept(this);
     }
     // f2 -> ";"
     final NodeToken n2 = n.f2;
-    nRes = n2.accept(this);
-    return nRes;
+    r = n2.accept(this);
+    return r;
   }
 
   /**
@@ -6069,19 +5958,18 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final ThrowStatement n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "throw"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> Expression()
     final Expression n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> ";"
     final NodeToken n2 = n.f2;
-    nRes = n2.accept(this);
-    return nRes;
+    r = n2.accept(this);
+    return r;
   }
 
   /**
@@ -6096,25 +5984,24 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final SynchronizedStatement n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "synchronized"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> "("
     final NodeToken n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> Expression()
     final Expression n2 = n.f2;
-    nRes = n2.accept(this);
+    r = n2.accept(this);
     // f3 -> ")"
     final NodeToken n3 = n.f3;
-    nRes = n3.accept(this);
+    r = n3.accept(this);
     // f4 -> Block()
     final Block n4 = n.f4;
-    nRes = n4.accept(this);
-    return nRes;
+    r = n4.accept(this);
+    return r;
   }
 
   /**
@@ -6128,54 +6015,55 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final TryStatement n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "try"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> Block()
     final Block n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> ( #0 "catch" #1 "(" #2 FormalParameter() #3 ")" #4 Block() )*
     final NodeListOptional n2 = n.f2;
-    if (n2.present()) {
-      for (int i = 0; i < n2.size(); i++) {
-        final INode nloeai = n2.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n2T = (NodeListOptional) n2;
+    if (n2T.present()) {
+      for (int i = 0; i < n2T.size(); i++) {
+        final INode n2TMi = n2T.elementAt(i);
+        final NodeSequence n2TMiS0 = (NodeSequence) n2TMi;
         // #0 "catch"
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n2TMiS0A0 = ((NodeSequence) n2TMiS0).elementAt(0);
+        r = n2TMiS0A0.accept(this);
         // #1 "("
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n2TMiS0A1 = ((NodeSequence) n2TMiS0).elementAt(1);
+        r = n2TMiS0A1.accept(this);
         // #2 FormalParameter()
-        final INode seq3 = seq.elementAt(2);
-        nRes = seq3.accept(this);
+        final INode n2TMiS0A2 = ((NodeSequence) n2TMiS0).elementAt(2);
+        r = n2TMiS0A2.accept(this);
         // #3 ")"
-        final INode seq4 = seq.elementAt(3);
-        nRes = seq4.accept(this);
+        final INode n2TMiS0A3 = ((NodeSequence) n2TMiS0).elementAt(3);
+        r = n2TMiS0A3.accept(this);
         // #4 Block()
-        final INode seq5 = seq.elementAt(4);
-        nRes = seq5.accept(this);
+        final INode n2TMiS0A4 = ((NodeSequence) n2TMiS0).elementAt(4);
+        r = n2TMiS0A4.accept(this);
       }
     }
     // f3 -> [ #0 "finally" #1 Block() ]
     final NodeOptional n3 = n.f3;
-    if (n3.present()) {
-      final NodeSequence seq6 = (NodeSequence) n3.node;
+    final NodeOptional n3P = (NodeOptional) n3;
+    if (n3P.present()) {
+      final NodeSequence n3PS0 = (NodeSequence) n3P.node;
       // #0 "finally"
-      final INode seq7 = seq6.elementAt(0);
-      nRes = seq7.accept(this);
+      final INode n3PS0A0 = ((NodeSequence) n3PS0).elementAt(0);
+      r = n3PS0A0.accept(this);
       // #1 Block()
-      final INode seq8 = seq6.elementAt(1);
-      nRes = seq8.accept(this);
+      final INode n3PS0A1 = ((NodeSequence) n3PS0).elementAt(1);
+      r = n3PS0A1.accept(this);
     }
-    return nRes;
+    return r;
   }
 
   /**
-   * Visits a {@link Annotation} node, whose child is the following :
+   * Visits a {@link Annotation} node, whose children are the following :
    * <p>
    * f0 -> . %0 NormalAnnotation()<br>
    * .. .. | %1 SingleMemberAnnotation()<br>
@@ -6184,32 +6072,31 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final Annotation n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 NormalAnnotation()
     // .. .. | %1 SingleMemberAnnotation()
     // .. .. | %2 MarkerAnnotation()
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 NormalAnnotation()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %1 SingleMemberAnnotation()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 2:
         // %2 MarkerAnnotation()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -6224,27 +6111,27 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final NormalAnnotation n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "@"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> Name()
     final Name n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> "("
     final NodeToken n2 = n.f2;
-    nRes = n2.accept(this);
+    r = n2.accept(this);
     // f3 -> [ MemberValuePairs() ]
     final NodeOptional n3 = n.f3;
-    if (n3.present()) {
-      nRes = n3.accept(this);
+    final NodeOptional n3P = (NodeOptional) n3;
+    if (n3P.present()) {
+      r = n3P.accept(this);
     }
     // f4 -> ")"
     final NodeToken n4 = n.f4;
-    nRes = n4.accept(this);
-    return nRes;
+    r = n4.accept(this);
+    return r;
   }
 
   /**
@@ -6256,16 +6143,15 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final MarkerAnnotation n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "@"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> Name()
     final Name n1 = n.f1;
-    nRes = n1.accept(this);
-    return nRes;
+    r = n1.accept(this);
+    return r;
   }
 
   /**
@@ -6280,25 +6166,24 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final SingleMemberAnnotation n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "@"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> Name()
     final Name n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> "("
     final NodeToken n2 = n.f2;
-    nRes = n2.accept(this);
+    r = n2.accept(this);
     // f3 -> MemberValue()
     final MemberValue n3 = n.f3;
-    nRes = n3.accept(this);
+    r = n3.accept(this);
     // f4 -> ")"
     final NodeToken n4 = n.f4;
-    nRes = n4.accept(this);
-    return nRes;
+    r = n4.accept(this);
+    return r;
   }
 
   /**
@@ -6310,56 +6195,55 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final MemberValuePairs n) {
-    R nRes = null;
+    R r = null;
     // f0 -> MemberValuePair()
     final MemberValuePair n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( #0 "," #1 MemberValuePair() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        final NodeSequence n1TMiS0 = (NodeSequence) n1TMi;
         // #0 ","
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n1TMiS0A0 = ((NodeSequence) n1TMiS0).elementAt(0);
+        r = n1TMiS0A0.accept(this);
         // #1 MemberValuePair()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n1TMiS0A1 = ((NodeSequence) n1TMiS0).elementAt(1);
+        r = n1TMiS0A1.accept(this);
       }
     }
-    return nRes;
+    return r;
   }
 
   /**
    * Visits a {@link MemberValuePair} node, whose children are the following :
    * <p>
-   * f0 -> < IDENTIFIER ><br>
+   * f0 -> <IDENTIFIER><br>
    * f1 -> "="<br>
    * f2 -> MemberValue()<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final MemberValuePair n) {
-    R nRes = null;
-    // f0 -> < IDENTIFIER >
+    R r = null;
+    // f0 -> <IDENTIFIER>
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> "="
     final NodeToken n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> MemberValue()
     final MemberValue n2 = n.f2;
-    nRes = n2.accept(this);
-    return nRes;
+    r = n2.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link MemberValue} node, whose child is the following :
+   * Visits a {@link MemberValue} node, whose children are the following :
    * <p>
    * f0 -> . %0 Annotation()<br>
    * .. .. | %1 MemberValueArrayInitializer()<br>
@@ -6368,32 +6252,31 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final MemberValue n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 Annotation()
     // .. .. | %1 MemberValueArrayInitializer()
     // .. .. | %2 ConditionalExpression()
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 Annotation()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 1:
         // %1 MemberValueArrayInitializer()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       case 2:
         // %2 ConditionalExpression()
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -6408,38 +6291,39 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final MemberValueArrayInitializer n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "{"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> MemberValue()
     final MemberValue n1 = n.f1;
-    nRes = n1.accept(this);
+    r = n1.accept(this);
     // f2 -> ( #0 "," #1 MemberValue() )*
     final NodeListOptional n2 = n.f2;
-    if (n2.present()) {
-      for (int i = 0; i < n2.size(); i++) {
-        final INode nloeai = n2.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
+    final NodeListOptional n2T = (NodeListOptional) n2;
+    if (n2T.present()) {
+      for (int i = 0; i < n2T.size(); i++) {
+        final INode n2TMi = n2T.elementAt(i);
+        final NodeSequence n2TMiS0 = (NodeSequence) n2TMi;
         // #0 ","
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
+        final INode n2TMiS0A0 = ((NodeSequence) n2TMiS0).elementAt(0);
+        r = n2TMiS0A0.accept(this);
         // #1 MemberValue()
-        final INode seq2 = seq.elementAt(1);
-        nRes = seq2.accept(this);
+        final INode n2TMiS0A1 = ((NodeSequence) n2TMiS0).elementAt(1);
+        r = n2TMiS0A1.accept(this);
       }
     }
     // f3 -> [ "," ]
     final NodeOptional n3 = n.f3;
-    if (n3.present()) {
-      nRes = n3.accept(this);
+    final NodeOptional n3P = (NodeOptional) n3;
+    if (n3P.present()) {
+      r = n3P.accept(this);
     }
     // f4 -> "}"
     final NodeToken n4 = n.f4;
-    nRes = n4.accept(this);
-    return nRes;
+    r = n4.accept(this);
+    return r;
   }
 
   /**
@@ -6447,28 +6331,27 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * <p>
    * f0 -> "@"<br>
    * f1 -> "interface"<br>
-   * f2 -> < IDENTIFIER ><br>
+   * f2 -> <IDENTIFIER><br>
    * f3 -> AnnotationTypeBody()<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final AnnotationTypeDeclaration n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "@"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> "interface"
     final NodeToken n1 = n.f1;
-    nRes = n1.accept(this);
-    // f2 -> < IDENTIFIER >
+    r = n1.accept(this);
+    // f2 -> <IDENTIFIER>
     final NodeToken n2 = n.f2;
-    nRes = n2.accept(this);
+    r = n2.accept(this);
     // f3 -> AnnotationTypeBody()
     final AnnotationTypeBody n3 = n.f3;
-    nRes = n3.accept(this);
-    return nRes;
+    r = n3.accept(this);
+    return r;
   }
 
   /**
@@ -6481,31 +6364,31 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final AnnotationTypeBody n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "{"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> ( AnnotationTypeMemberDeclaration() )*
     final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        nRes = nloeai.accept(this);
+    final NodeListOptional n1T = (NodeListOptional) n1;
+    if (n1T.present()) {
+      for (int i = 0; i < n1T.size(); i++) {
+        final INode n1TMi = n1T.elementAt(i);
+        r = n1TMi.accept(this);
       }
     }
     // f2 -> "}"
     final NodeToken n2 = n.f2;
-    nRes = n2.accept(this);
-    return nRes;
+    r = n2.accept(this);
+    return r;
   }
 
   /**
-   * Visits a {@link AnnotationTypeMemberDeclaration} node, whose child is the following :
+   * Visits a {@link AnnotationTypeMemberDeclaration} node, whose children are the following :
    * <p>
    * f0 -> . %0 #0 Modifiers()<br>
-   * .. .. . .. #1 ( &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"<br>
+   * .. .. . .. #1 ( &0 $0 Type() $1 <IDENTIFIER> $2 "(" $3 ")"<br>
    * .. .. . .. .. . .. $4 [ DefaultValue() ]<br>
    * .. .. . .. .. . .. $5 ";"<br>
    * .. .. . .. .. | &1 ClassOrInterfaceDeclaration()<br>
@@ -6517,11 +6400,10 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final AnnotationTypeMemberDeclaration n) {
-    R nRes = null;
+    R r = null;
     // f0 -> . %0 #0 Modifiers()
-    // .. .. . .. #1 ( &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"
+    // .. .. . .. #1 ( &0 $0 Type() $1 <IDENTIFIER> $2 "(" $3 ")"
     // .. .. . .. .. . .. $4 [ DefaultValue() ]
     // .. .. . .. .. . .. $5 ";"
     // .. .. . .. .. | &1 ClassOrInterfaceDeclaration()
@@ -6529,75 +6411,75 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
     // .. .. . .. .. | &3 AnnotationTypeDeclaration()
     // .. .. . .. .. | &4 FieldDeclaration() )
     // .. .. | %1 ";"
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
+    final NodeChoice n0C = n.f0;
+    final INode n0CH = n0C.choice;
+    switch (n0C.which) {
       case 0:
         // %0 #0 Modifiers()
-        // .. #1 ( &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"
+        // .. #1 ( &0 $0 Type() $1 <IDENTIFIER> $2 "(" $3 ")"
         // .. .. .. $4 [ DefaultValue() ]
         // .. .. .. $5 ";"
         // .. .. | &1 ClassOrInterfaceDeclaration()
         // .. .. | &2 EnumDeclaration()
         // .. .. | &3 AnnotationTypeDeclaration()
         // .. .. | &4 FieldDeclaration() )
-        final NodeSequence seq = (NodeSequence) ich;
+        final NodeSequence n0CHS0 = (NodeSequence) n0CH;
         // #0 Modifiers()
-        final INode seq1 = seq.elementAt(0);
-        nRes = seq1.accept(this);
-        // #1 ( &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"
+        final INode n0CHS00A0 = ((NodeSequence) n0CHS0).elementAt(0);
+        r = n0CHS00A0.accept(this);
+        // #1 ( &0 $0 Type() $1 <IDENTIFIER> $2 "(" $3 ")"
         // .. .. $4 [ DefaultValue() ]
         // .. .. $5 ";"
         // .. | &1 ClassOrInterfaceDeclaration()
         // .. | &2 EnumDeclaration()
         // .. | &3 AnnotationTypeDeclaration()
         // .. | &4 FieldDeclaration() )
-        final INode seq2 = seq.elementAt(1);
-        final NodeChoice nch1 = (NodeChoice) seq2;
-        final INode ich1 = nch1.choice;
-        switch (nch1.which) {
+        final INode n0CHS00A1 = ((NodeSequence) n0CHS0).elementAt(1);
+        final NodeChoice n0CHS00A1C = (NodeChoice) n0CHS00A1;
+        final INode n0CHS00A1CH = n0CHS00A1C.choice;
+        switch (n0CHS00A1C.which) {
           case 0:
-            // &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"
+            // &0 $0 Type() $1 <IDENTIFIER> $2 "(" $3 ")"
             // .. $4 [ DefaultValue() ]
             // .. $5 ";"
-            final NodeSequence seq3 = (NodeSequence) ich1;
+            final NodeSequence n0CHS00A1CHS1 = (NodeSequence) n0CHS00A1CH;
             // $0 Type()
-            final INode seq4 = seq3.elementAt(0);
-            nRes = seq4.accept(this);
-            // $1 < IDENTIFIER >
-            final INode seq5 = seq3.elementAt(1);
-            nRes = seq5.accept(this);
+            final INode n0CHS00A1CHS10A0 = ((NodeSequence) n0CHS00A1CHS1).elementAt(0);
+            r = n0CHS00A1CHS10A0.accept(this);
+            // $1 <IDENTIFIER>
+            final INode n0CHS00A1CHS10A1 = ((NodeSequence) n0CHS00A1CHS1).elementAt(1);
+            r = n0CHS00A1CHS10A1.accept(this);
             // $2 "("
-            final INode seq6 = seq3.elementAt(2);
-            nRes = seq6.accept(this);
+            final INode n0CHS00A1CHS10A2 = ((NodeSequence) n0CHS00A1CHS1).elementAt(2);
+            r = n0CHS00A1CHS10A2.accept(this);
             // $3 ")"
-            final INode seq7 = seq3.elementAt(3);
-            nRes = seq7.accept(this);
+            final INode n0CHS00A1CHS10A3 = ((NodeSequence) n0CHS00A1CHS1).elementAt(3);
+            r = n0CHS00A1CHS10A3.accept(this);
             // $4 [ DefaultValue() ]
-            final INode seq8 = seq3.elementAt(4);
-            final NodeOptional opt = (NodeOptional) seq8;
-            if (opt.present()) {
-              nRes = opt.accept(this);
+            final INode n0CHS00A1CHS10A4 = ((NodeSequence) n0CHS00A1CHS1).elementAt(4);
+            final NodeOptional n0CHS00A1CHS10A4P = (NodeOptional) n0CHS00A1CHS10A4;
+            if (n0CHS00A1CHS10A4P.present()) {
+              r = n0CHS00A1CHS10A4P.accept(this);
             }
             // $5 ";"
-            final INode seq9 = seq3.elementAt(5);
-            nRes = seq9.accept(this);
+            final INode n0CHS00A1CHS1A5 = ((NodeSequence) n0CHS00A1CHS1).elementAt(5);
+            r = n0CHS00A1CHS1A5.accept(this);
             break;
           case 1:
             // &1 ClassOrInterfaceDeclaration()
-            nRes = ich1.accept(this);
+            r = n0CHS00A1CH.accept(this);
             break;
           case 2:
             // &2 EnumDeclaration()
-            nRes = ich1.accept(this);
+            r = n0CHS00A1CH.accept(this);
             break;
           case 3:
             // &3 AnnotationTypeDeclaration()
-            nRes = ich1.accept(this);
+            r = n0CHS00A1CH.accept(this);
             break;
           case 4:
             // &4 FieldDeclaration()
-            nRes = ich1.accept(this);
+            r = n0CHS00A1CH.accept(this);
             break;
           default:
             // should not occur !!!
@@ -6606,13 +6488,13 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
         break;
       case 1:
         // %1 ";"
-        nRes = ich.accept(this);
+        r = n0CH.accept(this);
         break;
       default:
         // should not occur !!!
         break;
     }
-    return nRes;
+    return r;
   }
 
   /**
@@ -6624,16 +6506,15 @@ public class DepthFirstRetVisitor<R> implements IRetVisitor<R> {
    * @param n - the node to visit
    * @return the user return information
    */
-  @Override
   public R visit(final DefaultValue n) {
-    R nRes = null;
+    R r = null;
     // f0 -> "default"
     final NodeToken n0 = n.f0;
-    nRes = n0.accept(this);
+    r = n0.accept(this);
     // f1 -> MemberValue()
     final MemberValue n1 = n.f1;
-    nRes = n1.accept(this);
-    return nRes;
+    r = n1.accept(this);
+    return r;
   }
 
 }

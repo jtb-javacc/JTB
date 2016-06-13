@@ -3,11 +3,12 @@ package EDU.purdue.jtb.syntaxtree;
 
 import EDU.purdue.jtb.visitor.*;
 
+
 /**
  * JTB node class for the production AnnotationTypeMemberDeclaration:<br>
  * Corresponding grammar:<br>
  * f0 -> . %0 #0 Modifiers()<br>
- * .. .. . .. #1 ( &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"<br>
+ * .. .. . .. #1 ( &0 $0 Type() $1 <IDENTIFIER> $2 "(" $3 ")"<br>
  * .. .. . .. .. . .. $4 [ DefaultValue() ]<br>
  * .. .. . .. .. . .. $5 ";"<br>
  * .. .. . .. .. | &1 ClassOrInterfaceDeclaration()<br>
@@ -42,7 +43,6 @@ public class AnnotationTypeMemberDeclaration implements INode {
    * @param argu - a user chosen argument
    * @return a user chosen return information
    */
-  @Override
   public <R, A> R accept(final IRetArguVisitor<R, A> vis, final A argu) {
     return vis.visit(this, argu);
   }
@@ -54,7 +54,6 @@ public class AnnotationTypeMemberDeclaration implements INode {
    * @param vis - the visitor
    * @return a user chosen return information
    */
-  @Override
   public <R> R accept(final IRetVisitor<R> vis) {
     return vis.visit(this);
   }
@@ -66,7 +65,6 @@ public class AnnotationTypeMemberDeclaration implements INode {
    * @param vis - the visitor
    * @param argu - a user chosen argument
    */
-  @Override
   public <A> void accept(final IVoidArguVisitor<A> vis, final A argu) {
     vis.visit(this, argu);
   }
@@ -76,7 +74,6 @@ public class AnnotationTypeMemberDeclaration implements INode {
    *
    * @param vis - the visitor
    */
-  @Override
   public void accept(final IVoidVisitor vis) {
     vis.visit(this);
   }

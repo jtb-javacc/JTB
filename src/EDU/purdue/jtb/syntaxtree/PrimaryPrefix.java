@@ -3,12 +3,13 @@ package EDU.purdue.jtb.syntaxtree;
 
 import EDU.purdue.jtb.visitor.*;
 
+
 /**
  * JTB node class for the production PrimaryPrefix:<br>
  * Corresponding grammar:<br>
  * f0 -> . %0 Literal()<br>
  * .. .. | %1 "this"<br>
- * .. .. | %2 #0 "super" #1 "." #2 < IDENTIFIER ><br>
+ * .. .. | %2 #0 "super" #1 "." #2 <IDENTIFIER><br>
  * .. .. | %3 #0 "(" #1 Expression() #2 ")"<br>
  * .. .. | %4 AllocationExpression()<br>
  * .. .. | %5 #0 ResultType() #1 "." #2 "class"<br>
@@ -40,7 +41,6 @@ public class PrimaryPrefix implements INode {
    * @param argu - a user chosen argument
    * @return a user chosen return information
    */
-  @Override
   public <R, A> R accept(final IRetArguVisitor<R, A> vis, final A argu) {
     return vis.visit(this, argu);
   }
@@ -52,7 +52,6 @@ public class PrimaryPrefix implements INode {
    * @param vis - the visitor
    * @return a user chosen return information
    */
-  @Override
   public <R> R accept(final IRetVisitor<R> vis) {
     return vis.visit(this);
   }
@@ -64,7 +63,6 @@ public class PrimaryPrefix implements INode {
    * @param vis - the visitor
    * @param argu - a user chosen argument
    */
-  @Override
   public <A> void accept(final IVoidArguVisitor<A> vis, final A argu) {
     vis.visit(this, argu);
   }
@@ -74,7 +72,6 @@ public class PrimaryPrefix implements INode {
    *
    * @param vis - the visitor
    */
-  @Override
   public void accept(final IVoidVisitor vis) {
     vis.visit(this);
   }

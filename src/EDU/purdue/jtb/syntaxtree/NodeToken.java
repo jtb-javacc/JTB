@@ -18,7 +18,7 @@ public class NodeToken implements INode {
   public String tokenImage;
 
   /** The list of special tokens */
-  public List<NodeToken> specialTokens;
+  public ArrayList<NodeToken> specialTokens;
 
   /** The token first line (-1 means not available) */
   public int beginLine;
@@ -46,7 +46,7 @@ public class NodeToken implements INode {
    *
    * @param s - the token string
    */
-  public NodeToken(final String s) {
+  public NodeToken(String s) {
     this(s, -1, -1, -1, -1, -1);
   }
 
@@ -60,7 +60,7 @@ public class NodeToken implements INode {
    * @param el - the last line
    * @param ec - the last column
    */
-  public NodeToken(final String s, final int kn, final int bl, final int bc, final int el, final int ec) {
+  public NodeToken(String s, final int kn, final int bl, final int bc, final int el, final int ec) {
     tokenImage = s;
     specialTokens = null;
     kind = kn;
@@ -108,7 +108,7 @@ public class NodeToken implements INode {
   public void trimSpecials() {
     if (specialTokens == null)
       return;
-    ((ArrayList<NodeToken>) specialTokens).trimToSize();
+    specialTokens.trimToSize();
   }
 
   /**
@@ -129,39 +129,21 @@ public class NodeToken implements INode {
   public String getSpecials(final String spc) {
     if (specialTokens == null)
       return "";
-    int stLastLine = -1;
-    final StringBuilder buf = new StringBuilder(64);
-    boolean hasEol = false;
+    StringBuilder buf = new StringBuilder(64);
     for (final Iterator<NodeToken> e = specialTokens.iterator(); e.hasNext();) {
-      final NodeToken st = e.next();
-      final char c = st.tokenImage.charAt(st.tokenImage.length() - 1);
-      hasEol = c == '\n' || c == '\r';
-      if (stLastLine != -1)
-        // not first line 
-        if (stLastLine != st.beginLine)
-          // if not on the same line as the previous
-          buf.append(spc);
-        else
-          // on the same line as the previous
-          buf.append(' ');
-      buf.append(st.tokenImage);
-      if (!hasEol && e.hasNext()) {
-        // not a single line comment and not the last one
-        buf.append(LS);
-      }
-      stLastLine = st.endLine;
-    }
-    // keep the same number of blank lines before the current non special
-    for (int i = stLastLine + (hasEol ? 1 : 0); i < beginLine; i++) {
-      buf.append(LS);
-      if (i != beginLine - 1)
+      final String s = e.next().tokenImage;
+      final int p = s.length() - 1;
+      final char c = s.charAt(p);
+      buf.append(s);
+      // TODO modify specials to include end of lines
+      if (c == '\n' || c == '\r')
         buf.append(spc);
+      else
+        buf.append(LS).append(spc);
     }
-    // indent if the current non special is not on the same line
-    if (stLastLine != beginLine)
-      buf.append(spc);
     return buf.toString();
   }
+
   /**
    * Returns the list of special tokens of the current {@link NodeToken} and the current<br>
    * {@link NodeToken} as a string, taking in account a given indentation.
@@ -170,36 +152,12 @@ public class NodeToken implements INode {
    * @return the string representing the special tokens list and the token
    */
   public String withSpecials(final String spc) {
-    return withSpecials(spc, null);
-  }
-
-  /**
-   * Returns the list of special tokens of the current {@link NodeToken} and the current<br>
-   * {@link NodeToken} as a string, taking in account a given indentation and a given assignment.
-   *
-   * @param spc - the indentation
-   * @param var - the variable assignment to be inserted
-   * @return the string representing the special tokens list and the token
-   */
-  public String withSpecials(final String spc, final String var) {
     final String specials = getSpecials(spc);
-    int len = specials.length();
+    final int len = specials.length();
     if (len == 0)
-      return (var == null ? tokenImage : var + tokenImage);
-    if (var != null)
-      len += var.length();
+      return tokenImage;
     StringBuilder buf = new StringBuilder(len + tokenImage.length());
-    buf.append(specials);
-  // see if needed to add a space
-  int stLastLine = -1;
-  for (final Iterator<NodeToken> e = specialTokens.iterator(); e.hasNext();) {
-    stLastLine = e.next().endLine;
-  }
-  if (stLastLine == beginLine)
-    buf.append(' ');
-  if (var != null)
-    buf.append(var);
-  buf.append(tokenImage);
+    buf.append(specials).append(tokenImage);
     return buf.toString();
   }
 
@@ -212,7 +170,6 @@ public class NodeToken implements INode {
    * @param argu - the user Argument data
    * @return the user Return data
    */
-  @Override
   public <R, A> R accept(final IRetArguVisitor<R, A> vis, final A argu) {
     return vis.visit(this, argu);
   }
@@ -224,7 +181,6 @@ public class NodeToken implements INode {
    * @param vis - the visitor
    * @return the user Return data
    */
-  @Override
   public <R> R accept(final IRetVisitor<R> vis) {
     return vis.visit(this);
   }
@@ -236,7 +192,6 @@ public class NodeToken implements INode {
    * @param vis - the visitor
    * @param argu - the user Argument data
    */
-  @Override
   public <A> void accept(final IVoidArguVisitor<A> vis, final A argu) {
     vis.visit(this, argu);
   }
@@ -246,7 +201,6 @@ public class NodeToken implements INode {
    *
    * @param vis - the visitor
    */
-  @Override
   public void accept(final IVoidVisitor vis) {
     vis.visit(this);
   }

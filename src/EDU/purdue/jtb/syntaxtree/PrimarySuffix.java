@@ -3,6 +3,7 @@ package EDU.purdue.jtb.syntaxtree;
 
 import EDU.purdue.jtb.visitor.*;
 
+
 /**
  * JTB node class for the production PrimarySuffix:<br>
  * Corresponding grammar:<br>
@@ -10,7 +11,7 @@ import EDU.purdue.jtb.visitor.*;
  * .. .. | %1 #0 "." #1 AllocationExpression()<br>
  * .. .. | %2 MemberSelector()<br>
  * .. .. | %3 #0 "[" #1 Expression() #2 "]"<br>
- * .. .. | %4 #0 "." #1 < IDENTIFIER ><br>
+ * .. .. | %4 #0 "." #1 <IDENTIFIER><br>
  * .. .. | %5 Arguments()<br>
  */
 public class PrimarySuffix implements INode {
@@ -39,7 +40,6 @@ public class PrimarySuffix implements INode {
    * @param argu - a user chosen argument
    * @return a user chosen return information
    */
-  @Override
   public <R, A> R accept(final IRetArguVisitor<R, A> vis, final A argu) {
     return vis.visit(this, argu);
   }
@@ -51,7 +51,6 @@ public class PrimarySuffix implements INode {
    * @param vis - the visitor
    * @return a user chosen return information
    */
-  @Override
   public <R> R accept(final IRetVisitor<R> vis) {
     return vis.visit(this);
   }
@@ -63,7 +62,6 @@ public class PrimarySuffix implements INode {
    * @param vis - the visitor
    * @param argu - a user chosen argument
    */
-  @Override
   public <A> void accept(final IVoidArguVisitor<A> vis, final A argu) {
     vis.visit(this, argu);
   }
@@ -73,7 +71,6 @@ public class PrimarySuffix implements INode {
    *
    * @param vis - the visitor
    */
-  @Override
   public void accept(final IVoidVisitor vis) {
     vis.visit(this);
   }
