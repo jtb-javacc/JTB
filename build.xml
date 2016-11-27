@@ -22,10 +22,10 @@
 
 	<!-- import JTB properties -->
 	<property name="jtb_imp_dir" value="." />
-	<import file="${jtb_imp_dir}/build_jtb.properties" />
+	<import file="${jtb_imp_dir}/jtb.properties" />
 
 	<!-- import JavaCC / JJTree properties -->
-	<import file="${jtb_imp_dir}/build_javacc.properties" />
+	<import file="${jtb_imp_dir}/javacc.properties" />
 
 	<!-- Build new jar and test regenerate files with new jtb jar and compile -->
 	<target name="build_new_jtb_jar+test_generate_all+compile_java+make_new_jtb_jar"
