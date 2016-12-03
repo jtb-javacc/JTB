@@ -201,6 +201,8 @@
 		</uptodate>
 	</target>
 
+	<target name="clean" depends="clean_classes, clean_all_gen_files"/>
+	
 	<!-- Clean all JTB & JavaCC generated files -->
 	<target name="clean_all_gen_files" depends="clean_javacc_gen_files,clean_jtb_gen_files">
 	</target>
