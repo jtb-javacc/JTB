@@ -27,11 +27,17 @@
 
 	<!-- import JTB properties -->
 	<property name='jtb_imp_dir' value='${user.dir}' />
-	<import file='${jtb_imp_dir}/jtb.properties' />
+	<import file='${jtb_imp_dir}/jtb.xml' />
 
 	<!-- import JavaCC / JJTree properties -->
-	<import file='${jtb_imp_dir}/javacc.properties' />
+	<import file='${jtb_imp_dir}/javacc.xml' />
 
+	<property name="target-folder" value="target" />
+
+	<property file="version.properties" />
+	<!-- property name="version" value="${version.major}.${version.minor}.${version.patch}-SNAPSHOT" / -->
+	<property name="version" value="${version.major}.${version.minor}.${version.patch}" />
+	
 	<!-- Build new jar and test regenerate files with new jtb jar and compile -->
 	<target name='build_new_jtb_jar+test_generate_all+compile_java+make_new_jtb_jar'
 	   depends='build_new_jtb_jar,test_generate_all,compile_java'>
@@ -51,13 +57,14 @@
 	</target>
 
 	<!-- echo JTB and JavaCC / JJTree properties -->
-	<target name='echo_all_props' depends='echo_jtb_props,echo_jj_props'>
+	<target name='echo_all_props' depends='echo_jtb_props,echo_javacc_props'>
 	</target>
 
 	<!-- echo some JavaCC / JJTree properties -->
 	<target name='echo_jj_props'>
 		<echo message='javacc_ok_jar=${javacc_ok_jar}' />
 	</target>
+
 
 	<!-- Regenerate with ${jtb_ok_jar}, compile and create ${jtb_new_jar} -->
 	<target name='build_new_jtb_jar' depends='echo_all_props,generate_all+compile_java'>
@@ -275,9 +282,102 @@
 	<artifact:pom id='jtb.pom' file='${jtb_imp_dir}/pom.xml'>
 	</artifact:pom>
 
-	<target name='install' depends='' description='install version to Maven local repository'>
+	<target name="dist" depends="build_new_jtb_jar+test_generate_all+compile_java+make_new_jtb_jar, javadoc" description="build a distribution">
+		<property name="install-name" value="${target-folder}/jtb-${version}" />
+
+		<delete file="${install-name}-distribution.tar.gz" />
+		<tar destfile="${install-name}-distribution.tar.gz" compression="gzip">
+			<tarfileset username="root" uid="1" group="root" prefix="jtb-${version}/doc" filemode="444" dir="www/doc" />
+			<tarfileset username="root" uid="1" group="root" prefix="jtb-${version}/examples" filemode="444" dir="examples/" />
+			<tarfileset username="root" uid="1" group="root" prefix="jtb-${version}" filemode="444" file="LICENSE" />
+			<tarfileset username="root" uid="1" group="root" prefix="jtb-${version}/${target-folder}" filemode="444" file="${jtb}" />
+		</tar>
+
+		<delete file="${install-name}-distribution.zip" />
+		<zip destfile="${install-name}-distribution.zip">
+			<zipfileset prefix="jtb-${version}/${target-folder}" filemode="444" file="${jtb}" />
+			<zipfileset prefix="jtb-${version}/doc" filemode="444" dir="www/doc" />
+			<zipfileset prefix="jtb-${version}/examples" filemode="444" dir="examples/" />
+			<zipfileset prefix="jtb-${version}" filemode="444" file="LICENSE" />
+		</zip>
+
+		<delete dir="." includes="**/*.class" />
+		<delete file="${install-name}-sources.tar.gz" />
+
+		<tar destfile="${install-name}-sources.tar.gz" compression="gzip">
+			<tarfileset username="root" uid="1" group="root" prefix="jtb-${version}" filemode="444" file="./**" excludes="deployment_pom/**, target/**, temp/**, .svn,CVS,**/*.zip,**/*.tar.gz" />
+		</tar>
+
+		<delete file="${install-name}-sources.jar" />
+		<zip destfile="${install-name}-sources.jar">
+			<zipfileset prefix="jtb-${version}" filemode="444" file="./**" excludes=".svn,CVS,**/*.zip,**/*.tar.gz, deployment_pom/**, target/**, dist/**, temp/**" />
+		</zip>
+	</target>
+
+
+	<target name="javadoc">
+		<property name="install-name" value="${target-folder}/jtb-${version}" />
+
+		<delete dir="${target-folder}/javadoc" />
+		<mkdir dir="${target-folder}/javadoc" />
+		<javadoc destdir="${target-folder}/javadoc">
+			<fileset dir="${generated-src}" />
+			<fileset dir="${java-src}" />
+		</javadoc>
+
+		<zip destfile="${install-name}-javadoc.jar" basedir="${target-folder}/javadoc">
+		</zip>
+	</target>
+
+	<target name='install' depends='' >
 		<artifact:install file='${jtb_prev_jar}'>
 			<pom refid="jtb.pom" />			
 		</artifact:install>	
 	</target>
+
+	<target name="deploy" depends="dist" description="deploy snapshot version to Maven snapshot repository">
+		<artifact:mvn>
+			<arg value="org.apache.maven.plugins:maven-deploy-plugin:2.8:deploy-file" />
+			<arg value="-Durl=${ossrh-snapshots-repository-url}" />
+			<arg value="-DrepositoryId=${ossrh-server-id}" />
+			<arg value="-DpomFile=pom.xml" />
+			<arg value="-Dfile=${jtb-path}" />
+		</artifact:mvn>
+	</target>
+
+	<!-- before this, update project version (both build.xml and pom.xml) from SNAPSHOT to RELEASE -->
+	<target name="stage" depends="dist" description="deploy release version to Maven staging repository">
+		<!-- sign and deploy the main artifact -->
+		<artifact:mvn>
+			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.5:sign-and-deploy-file" />
+			<arg value="-Durl=${ossrh-staging-repository-url}" />
+			<arg value="-DrepositoryId=${ossrh-server-id}" />
+			<arg value="-DpomFile=pom.xml" />
+			<arg value="-Dfile=${jtb-path}" />
+			<arg value="-Pgpg" />
+		</artifact:mvn>
+
+		<!-- sign and deploy the sources artifact -->
+		<artifact:mvn>
+			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.5:sign-and-deploy-file" />
+			<arg value="-Durl=${ossrh-staging-repository-url}" />
+			<arg value="-DrepositoryId=${ossrh-server-id}" />
+			<arg value="-DpomFile=pom.xml" />
+			<arg value="-Dfile=${jtb-javadoc-path}" />
+			<arg value="-Dclassifier=sources" />
+			<arg value="-Pgpg" />
+		</artifact:mvn>
+
+		<!-- sign and deploy the javadoc artifact -->
+		<artifact:mvn>
+			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.5:sign-and-deploy-file" />
+			<arg value="-Durl=${ossrh-staging-repository-url}" />
+			<arg value="-DrepositoryId=${ossrh-server-id}" />
+			<arg value="-DpomFile=pom.xml" />
+			<arg value="-Dfile=${jtb-javadoc-path}" />
+			<arg value="-Dclassifier=javadoc" />
+			<arg value="-Pgpg" />
+		</artifact:mvn>
+	</target>
+
 </project>
