@@ -1,2 +1,14 @@
 /bin/
 *.jj
+target/
+
+src/EDU/purdue/jtb/syntaxtree/
+src/EDU/purdue/jtb/visitor/Depth*.*
+src/EDU/purdue/jtb/visitor/I*.*
+src/EDU/purdue/jtb/parser/JTBParser.java
+src/EDU/purdue/jtb/parser/JTBParserConstants.java
+src/EDU/purdue/jtb/parser/JTBParserTokenManager.java
+src/EDU/purdue/jtb/parser/JavaCharStream.java
+src/EDU/purdue/jtb/parser/ParseException.java
+src/EDU/purdue/jtb/parser/Token.java
+src/EDU/purdue/jtb/parser/TokenMgrError.java
