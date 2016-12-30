@@ -222,7 +222,7 @@ public class JavaCCPrinter extends DepthFirstVoidVisitor {
   @Override
   public void visit(final NodeToken n) {
     //    sb.append(keepSpecialTokens ? n.withSpecials(spc.spc) : n.tokenImage);
-    final String str = keepSpecialTokens && !withoutSpecials ? n.withSpecials(spc.spc, gvaStr)
+    final String str = keepSpecialTokens && !withoutSpecials ? n.withSpecials(spc.spc)
                                                              : n.tokenImage;
     sb.append(str);
     gvaStr = null;
@@ -1513,7 +1513,7 @@ public class JavaCCPrinter extends DepthFirstVoidVisitor {
    */
   @Override
   public void visit(final StringLiteral n) {
-    final String str = keepSpecialTokens && !withoutSpecials ? n.f0.withSpecials(spc.spc, gvaStr)
+    final String str = keepSpecialTokens && !withoutSpecials ? n.f0.withSpecials(spc.spc)
                                                              : n.f0.tokenImage;
     sb.append(UnicodeConverter.addUnicodeEscapes(str));
     gvaStr = null;
