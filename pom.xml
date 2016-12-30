@@ -21,6 +21,7 @@
 	
 	<scm>
 		<url>https://github.com/jtb-javacc/JTB</url>
+		<connection>scm:git:git@github.com/jtb-javacc/JTB.git</connection>
 	</scm>
 	
 	<developers>
@@ -56,6 +57,14 @@
 		<url>https://github.com/jtb-javacc/JTB/issues</url>
 		<system>GitHub</system>
 	</issueManagement>
+	
+	<licenses>
+		<license>
+			<name>UCLA Compilers Group License</name>
+			<url>http://compilers.cs.ucla.edu/jtb/license.html</url>
+		</license>
+	</licenses>
+	
 	<dependencies>
 		<dependency>
 			<groupId>net.java.dev.javacc</groupId>
