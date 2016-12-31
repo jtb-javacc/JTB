@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='ISO-8859-1' ?>
+<project name="javacc_props" default="echo_javacc_props">
+	<!-- property name="javacc_imp_dir" value="D:/Devs/javaCC-4.2-src" / -->
+	<property name="javacc_imp_dir" value="Z:/git/javacc/target" />
+	<property name="javacc_ok_jar" value="${javacc_imp_dir}/javacc.jar" />
+	<property name="javacc_main" value="org.javacc.parser.Main" />
+
+  <target name="echo_javacc_props">
+    <echo message="javacc_imp_dir=${javacc_imp_dir}" />
+    <echo message="javacc_ok_jar=${javacc_ok_jar}" />
+    <echo message="javacc_main=${javacc_main}" />
+  </target>
+</project>
