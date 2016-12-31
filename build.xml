@@ -333,14 +333,14 @@
 	</target>
 
 	<target name='install' depends='' >
-		<artifact:install file='${jtb_prev_jar}'>
+		<artifact:install file='${jtb_new_jar}'>
 			<pom refid="jtb.pom" />			
 		</artifact:install>	
 	</target>
 
-	<property name="jtb-path"         value="lib/jtb-1.4.12.jar"/>
-	<property name="jtb-sources-path" value="target/jtb-1.4.12-sources.jar"/>
-	<property name="jtb-javadoc-path" value="target/jtb-1.4.12-javadoc.jar"/>
+	<property name="jtb-path"         value="lib/jtb-${version}.jar"/>
+	<property name="jtb-sources-path" value="target/jtb-${version}-sources.jar"/>
+	<property name="jtb-javadoc-path" value="target/jtb-${version}-javadoc.jar"/>
 
 	<target name="deploy" depends="dist" description="deploy snapshot version to Maven snapshot repository">
 		<artifact:mvn>
