@@ -52,10 +52,16 @@
  */
 package EDU.purdue.jtb.visitor;
 
-import static EDU.purdue.jtb.misc.Globals.jtbRtPrefix;
-import static EDU.purdue.jtb.visitor.GlobalDataBuilder.BNF_IND;
-import static EDU.purdue.jtb.visitor.GlobalDataBuilder.DONT_CREATE;
-import static EDU.purdue.jtb.visitor.GlobalDataBuilder.JC_IND;
+import static EDU.purdue.jtb.misc.Globals.iNode;
+import static EDU.purdue.jtb.misc.Globals.iNodeList;
+import static EDU.purdue.jtb.misc.Globals.JTBRT_PREFIX;
+import static EDU.purdue.jtb.misc.Globals.nodeChoice;
+import static EDU.purdue.jtb.misc.Globals.nodeList;
+import static EDU.purdue.jtb.misc.Globals.nodeListOpt;
+import static EDU.purdue.jtb.misc.Globals.nodeOpt;
+import static EDU.purdue.jtb.misc.Globals.nodeSeq;
+import static EDU.purdue.jtb.misc.Globals.nodeToken;
+import static EDU.purdue.jtb.visitor.GlobalDataBuilder.DONT_CREATE_NODE_STR;
 
 import java.util.Iterator;
 
@@ -75,6 +81,7 @@ import EDU.purdue.jtb.syntaxtree.IdentifierAsString;
 import EDU.purdue.jtb.syntaxtree.IfStatement;
 import EDU.purdue.jtb.syntaxtree.JavaCCInput;
 import EDU.purdue.jtb.syntaxtree.JavaCodeProduction;
+import EDU.purdue.jtb.syntaxtree.LocalLookahead;
 import EDU.purdue.jtb.syntaxtree.LocalVariableDeclaration;
 import EDU.purdue.jtb.syntaxtree.NodeChoice;
 import EDU.purdue.jtb.syntaxtree.NodeListOptional;
@@ -101,33 +108,24 @@ import EDU.purdue.jtb.syntaxtree.VariableDeclarator;
 import EDU.purdue.jtb.syntaxtree.WhileStatement;
 
 /**
- * The {@link SemanticChecker} visitor checks and report informations, warnings or errors for the
- * following conditions:<br>
+ * SemanticChecker visitor checks and report informations, warnings or errors for the following
+ * conditions}<br>
  * <ul>
- * <li>when a JavaCodeProduction is to be generated (warning if return type is non "void",
- * information otherwise) (JTB will alter the code),</li>
- * <li>when a BNFProduction is not to be generated (information),</li>
- * <li>when a to be generated BNFProduction has a return value other than "void" (warning) (JTB will
- * alter the code),</li>
- * <li>when a JavaCodeProduction or a BNFProduction is not to be generated locally but is also not
- * to be generated globally (warning) (as unnecessary),</li>
- * <li>when a JavaCodeProduction or a BNFProduction has a name reserved for an automatically
- * generated JTB class (e.g. INode, INodeList, ...) or (error) (the project will not compile),</li>
- * <li>when a "void" JavaCodeProduction or BNFProduction is used in an assignment (error) (the
- * project will not compile),</li>
- * <li>when a "void" JavaCodeProduction or BNFProduction is used in a return statement with
- * expression (error) (the project will not compile),</li>
- * <li>when a user declared variable is not initialized (warning) (javac may complain while
- * compiling the generated parser),</li>
- * <li>when there are extraneous parentheses in a production (warning) (should be better to remove
- * them),</li>
- * <li>when a return statement is transformed (information).</li>
+ * <li>When productions have a return value other than "void" (information) (JTB will alter the
+ * code).
+ * <li>When JavaCode productions exist (information) (JTB will alter the code).
+ * <li>When a user declared variable is not initialized (warning) (javac may complain while
+ * compiling the generated parser).
+ * <li>When there are extraneous parentheses in a production (warning) (should be better to remove
+ * them).
+ * <li>When a production has a name reserved by an automatically generated JTB class (e.g. INode,
+ * INodeList, ...) (error) (the project will not compile).
  * </ul>
  * <p>
- * Note: the warning:<br>
+ * Note: the warning}<br>
  * "No blocks of Java code must exist within ExpansionUnit" (since the JTB first authors believed
  * they are generally unnecessary in JTB grammars)<br>
- * has been replaced by the following new information:<br>
+ * has been replaced by the following new information}<br>
  * "Return statement in a Java block in production '...' . It will be transformed in an assign
  * statement to the corresponding new parser class variable."<br>
  * These blocks are now allowed - as for example JavaCC 4.2 grammar has a lot of Java code blocks -<br>
@@ -135,20 +133,19 @@ import EDU.purdue.jtb.syntaxtree.WhileStatement;
  * productions and changes the production return types, JTB now creates an additional parser class
  * variable to store the user return information and changes the corresponding return statements.
  * <p>
- * Note: the warning:<br>
+ * Note: the warning}<br>
  * "JavaCodeProduction blocks must be specially handled."<br>
- * has been replaced by the following new information:<br>
+ * has been replaced by the following new information}<br>
  * "Non "void" JavaCodeProduction. Result type '...' will be changed into '...', and a parser class
  * variable 'jtbrt_...' of type '...'will be added to hold the return value."<br>
  * JTB now creates an additional parser class variable to store the user return information and
  * changes the corresponding return statements.
  * <p>
- * Note: the warning:<br>
+ * Note: the warning}<br>
  * "Non initialized user variable '...'. May lead to compiler error(s). Check in generated parser."<br>
  * has been added (it may lead to unnecessary warnings).
  * <p>
- * Note : could be done: check that the JTB generated return variables do not collide with user
- * variables.
+ * To be Done: check that the JTB generated return variables do not collide with user variables.
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
@@ -156,24 +153,22 @@ import EDU.purdue.jtb.syntaxtree.WhileStatement;
  * @version 1.4.7 : 07/2012 : MMa : followed changes in jtbgram.jtb (LocalVariableDeclaration())<br>
  *          1.4.7 : 09/2012 : MMa : added control on void production on the RHS of an assignment ;
  *          added non node creation ; changed from warning to info the message for unnecessary
- *          parenthesis ; fixed message for non void BNFProductions ; tuned messages labels
- * @version 1.4.8 : 10/2012 : MMa : added JavaCodeProduction class generation if requested ;
- *          modified checks and messages
+ *          parenthesis ; fixed message for non void BNF productions ; tuned messages labels
  */
 public class SemanticChecker extends DepthFirstVoidVisitor {
 
-  /** The {@link GlobalDataBuilder} visitor */
-  final GlobalDataBuilder gdbv;
+  /** The reference to the global data finder visitor */
+  final GlobalDataBuilder gdfv;
   /** The name of the current production */
   String                  prod;
 
   /**
    * Constructor.
    * 
-   * @param aGdbv - the GlobalDataBuilder visitor
+   * @param aGdfv - the global data finder visitor
    */
-  public SemanticChecker(final GlobalDataBuilder aGdbv) {
-    gdbv = aGdbv;
+  public SemanticChecker(final GlobalDataBuilder aGdfv) {
+    gdfv = aGdfv;
   }
 
   /**
@@ -248,147 +243,26 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * f4 -> FormalParameters()<br>
    * f5 -> [ #0 "throws" #1 Name()<br>
    * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
-   * f6 -> [ "%" ]<br>
-   * f7 -> Block()<br>
+   * f6 -> Block()<br>
    * 
    * @param n - the node to visit
    */
   @Override
   public void visit(final JavaCodeProduction n) {
     // f3 -> IdentifierAsString()
-    prod = n.f3.f0.tokenImage;
-    // f2 -> ResultType()
-    NodeToken tk;
-    final INode in = n.f2.f0.choice;
-    if (n.f2.f0.which == 0) {
-      // "void" type
-      // f6 -> [ "%" ]
-      if (n.f6.present())
-        Messages.info("The corresponding JTB node creation will BE generated " +
-                          "in all places where this JavaCodeProduction '" + prod + "' is used.",
-                      n.f3.f0.beginLine, n.f3.f0.beginColumn);
-    } else {
-      // Type(
-      final NodeChoice ch = ((Type) in).f0;
-      if (ch.which == 0) {
-        // ReferenceType()
-        final NodeChoice ch1 = ((ReferenceType) ch.choice).f0;
-        if (ch1.which == 0) {
-          // PrimitiveType() ( "[" "]" )+
-          tk = (NodeToken) ((PrimitiveType) ch1.choice).f0.choice;
-        } else {
-          // ClassOrInterfaceType() ( "[" "]" )*
-          tk = ((ClassOrInterfaceType) ((NodeSequence) ch1.choice).elementAt(0)).f0;
-        }
-      } else {
-        // PrimitiveType()
-        tk = (NodeToken) ((PrimitiveType) ch.choice).f0.choice;
-      }
-      final String resType = tk.tokenImage;
-      // messages in decreasing severity order for proper displaying in the plugin
-      // f6 -> [ "%" ]
-      if (n.f6.present()) {
-        Messages.warning("The corresponding JTB node creation will BE generated in all places where this "
-                             + "JavaCodeProduction is used, but this JavaCodeProduction should be of type 'void'. "
-                             + "Check if this is not an error.", n.f3.f0.beginLine,
-                         n.f3.f0.beginColumn);
-        if (!resType.equals(prod))
-          Messages.warning("Non 'void' JavaCodeProduction. Result type '" + resType +
-                               "' will be changed into '" + prod +
-                               "', and a parser class variable '" + jtbRtPrefix + prod +
-                               "' of type '" + resType +
-                               "' will be added to hold the return values.", tk.beginLine,
-                           tk.beginColumn);
-        else
-          Messages.info("A parser class variable '" + jtbRtPrefix + prod + "' of type '" + resType +
-                        "' will be added to hold the return values.", tk.beginLine, tk.beginColumn);
-      }
-    }
-    // f7 -> Block()
-    if (n.f7.f1.present()) {
-      // visit block declarations only if non empty
-      for (final Iterator<INode> e = n.f7.f1.elements(); e.hasNext();)
-        // BlockStatement(), not Block() !
-        e.next().accept(this);
+    final String ident = n.f3.f0.tokenImage;
+    final String resType = getResultType(n.f2);
+    if (!"void".equals(resType)) {
+      Messages.info("Non 'void' JavaCode Production. Result type '" + resType +
+                        "' will be changed into '" + ident +
+                        "', and a parser class variable 'jtbrt_" + resType + "' of type '" +
+                        resType + "' will be added to hold the return value.", n.f0.beginLine,
+                    n.f0.beginColumn);
     }
   }
 
   /**
-   * Visits a {@link BNFProduction} node, whose children are the following :
-   * <p>
-   * f0 -> AccessModifier()<br>
-   * f1 -> ResultType()<br>
-   * f2 -> IdentifierAsString()<br>
-   * f3 -> FormalParameters()<br>
-   * f4 -> [ #0 "throws" #1 Name()<br>
-   * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
-   * f5 -> [ "!" ]<br>
-   * f6 -> ":"<br>
-   * f7 -> Block()<br>
-   * f8 -> "{"<br>
-   * f9 -> ExpansionChoices()<br>
-   * f10 -> "}"<br>
-   * 
-   * @param n - the node to visit
-   */
-  @Override
-  public void visit(final BNFProduction n) {
-    // f2 -> IdentifierAsString()
-    prod = n.f2.f0.tokenImage;
-    // f1 -> ResultType()
-    NodeToken tk;
-    final INode in = n.f1.f0.choice;
-    if (n.f1.f0.which == 0) {
-      // "void" type
-      // f5 -> [ "!" ]
-      if (n.f5.present())
-        Messages.info("The corresponding JTB node creation will NOT be generated " +
-                          "in all places where this BNFProduction '" + prod + "' is used.",
-                      n.f2.f0.beginLine, n.f2.f0.beginColumn);
-    } else {
-      // Type(
-      final NodeChoice ch = ((Type) in).f0;
-      if (ch.which == 0) {
-        // ReferenceType()
-        final NodeChoice ch1 = ((ReferenceType) ch.choice).f0;
-        if (ch1.which == 0) {
-          // PrimitiveType() ( "[" "]" )+
-          tk = (NodeToken) ((PrimitiveType) ch1.choice).f0.choice;
-        } else {
-          // ClassOrInterfaceType() ( "[" "]" )*
-          tk = ((ClassOrInterfaceType) ((NodeSequence) ch1.choice).elementAt(0)).f0;
-        }
-      } else {
-        // PrimitiveType()
-        tk = (NodeToken) ((PrimitiveType) ch.choice).f0.choice;
-      }
-      final String resType = tk.tokenImage;
-      // messages in decreasing severity order for proper displaying in the plugin
-      // f5 -> [ "!" ]
-      if (n.f5.present())
-        Messages.warning("The corresponding JTB node creation will NOT be generated in all places where this "
-                             + "BNFProduction is used, but this BNFProduction should be of type 'void'. "
-                             + "Check if this is not an error.", n.f2.f0.beginLine,
-                         n.f2.f0.beginColumn);
-      else if (!"void".equals(resType))
-        Messages.warning("Non 'void' BNFProduction. Result type '" + resType +
-                         "' will be changed into '" + prod + "', and a parser class variable '" +
-                         jtbRtPrefix + prod + "' of type '" + resType +
-                         "' will be added to hold the return values.", tk.beginLine, tk.beginColumn);
-    }
-    // f7 -> Block()
-    if (n.f7.f1.present()) {
-      // visit block declarations only if non empty
-      for (final Iterator<INode> e = n.f7.f1.elements(); e.hasNext();)
-        // BlockStatement(), not Block() !
-        e.next().accept(this);
-    }
-    // f9 -> ExpansionChoices()
-    n.f9.accept(this);
-  }
-
-  /**
-   * Gets the ResultType as a String. Walks down the tree to find the first token.
+   * Gets the ResultType. Walks down the tree to find the first token.
    * <p>
    * {@link ResultType}<br>
    * f0 -> ( %0 "void"<br>
@@ -420,17 +294,18 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * f2 -> ( #0 "." #1 < IDENTIFIER ><br>
    * .. .. . #2 [ TypeArguments() ] )*<br>
    * 
-   * @param n - the node to process
+   * @param rt - the node to process
    * @return the result type token image
    */
-  static String getResultType(final ResultType n) {
+  String getResultType(final ResultType rt) {
     NodeToken tk;
-    if (n.f0.which == 0) {
+    final INode n = rt.f0.choice;
+    if (rt.f0.which == 0) {
       // "void"
-      tk = (NodeToken) n.f0.choice;
+      tk = (NodeToken) n;
     } else {
       // Type(
-      final NodeChoice ch = ((Type) n.f0.choice).f0;
+      final NodeChoice ch = ((Type) n).f0;
       if (ch.which == 0) {
         // ReferenceType()
         final NodeChoice ch1 = ((ReferenceType) ch.choice).f0;
@@ -526,6 +401,89 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
   @Override
   public void visit(@SuppressWarnings("unused") final TokenManagerDecls n) {
     // should not be called !
+  }
+
+  /**
+   * Visits a {@link BNFProduction} node, whose children are the following :
+   * <p>
+   * f0 -> AccessModifier()<br>
+   * f1 -> ResultType()<br>
+   * f2 -> IdentifierAsString()<br>
+   * f3 -> FormalParameters()<br>
+   * f4 -> [ #0 "throws" #1 Name()<br>
+   * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
+   * f5 -> [ "!" ]<br>
+   * f6 -> ":"<br>
+   * f7 -> Block()<br>
+   * f8 -> "{"<br>
+   * f9 -> ExpansionChoices()<br>
+   * f10 -> "}"<br>
+   * 
+   * @param n - the node to visit
+   */
+  @Override
+  public void visit(final BNFProduction n) {
+    prod = n.f2.f0.tokenImage;
+    // f1 -> ResultType()
+    final ResultType rt = n.f1;
+    NodeToken tk;
+    final INode in = rt.f0.choice;
+    if (rt.f0.which == 0) {
+      // "void" : no need for return variable, but need to check variable initialization
+      // f5 -> [ "!" ]
+      if (n.f5.present())
+        Messages.info("The corresponding JTB node creation will NOT be generated "
+                          + "in all places where this BNFProduction is used.", n.f2.f0.beginLine,
+                      n.f2.f0.beginColumn);
+    } else {
+      // Type(
+      final NodeChoice ch = ((Type) in).f0;
+      if (ch.which == 0) {
+        // ReferenceType()
+        final NodeChoice ch1 = ((ReferenceType) ch.choice).f0;
+        if (ch1.which == 0) {
+          // PrimitiveType() ( "[" "]" )+
+          tk = (NodeToken) ((PrimitiveType) ch1.choice).f0.choice;
+        } else {
+          // ClassOrInterfaceType() ( "[" "]" )*
+          tk = ((ClassOrInterfaceType) ((NodeSequence) ch1.choice).elementAt(0)).f0;
+        }
+      } else {
+        // PrimitiveType()
+        tk = (NodeToken) ((PrimitiveType) ch.choice).f0.choice;
+      }
+      final String resType = tk.tokenImage;
+      final String ident = n.f2.f0.tokenImage;
+      // messages in decreasing severity order for proper displaying in the plugin
+      if (prod.equals(iNode) || prod.equals(iNodeList) || prod.equals(nodeList) ||
+          prod.equals(nodeListOpt) || prod.equals(nodeOpt) || prod.equals(nodeSeq) ||
+          prod.equals(nodeToken) || prod.equals(nodeChoice))
+        Messages.softErr("Production '" + prod + "()' has the same name as a JTB generated class.",
+                         n.f2.f0.beginLine, n.f2.f0.beginColumn);
+      // f5 -> [ "!" ]
+      if (n.f5.present())
+        Messages.warning("The corresponding JTB node creation will NOT be generated in all places where this "
+                             + "BNFProduction is used, but this BNFProduction should be of type 'void'. "
+                             + "Check if this is not an error.", n.f2.f0.beginLine,
+                         n.f2.f0.beginColumn);
+      if (!resType.equals(ident))
+        Messages.warning("Non 'void' BNF production. Result type '" + resType +
+                         "' will be changed into '" + ident + "', and a parser class variable '" +
+                         JTBRT_PREFIX + ident + "' of type '" + resType +
+                         "' will be added to hold the return values.", tk.beginLine, tk.beginColumn);
+      else
+        Messages.info("A parser class variable '" + JTBRT_PREFIX + ident + "' of type '" + resType +
+                      "' will be added to hold the return values.", tk.beginLine, tk.beginColumn);
+    }
+    // f7 -> Block()
+    if (n.f7.f1.present()) {
+      // visit block declarations only if non empty
+      for (final Iterator<INode> e = n.f7.f1.elements(); e.hasNext();)
+        // BlockStatement(), not Block() !
+        e.next().accept(this);
+    }
+    // f9 -> ExpansionChoices()
+    n.f9.accept(this);
   }
 
   /**
@@ -673,40 +631,16 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
         // %12 ReturnStatement()
         final ReturnStatement rs = (ReturnStatement) n.f0.choice;
         // f1 -> [ Expression() ]
-        final String val = gdbv.getProdHT().get(prod);
-        if (val == null) {
-          Messages.softErr("Use of an identifier '" + prod +
-                               "' which is not a BNF Production or a JavaCodeProduction.",
-                           rs.f0.beginLine, rs.f0.beginColumn);
-        } else {
-          final String resType = val.substring(1);
-          final String indProd = val.substring(0, 1);
-          final String indNsn = gdbv.getNsnHT().get(prod);
-          boolean generatedProduction = true;
-          if (JC_IND.equals(indProd) && indNsn == null)
-            generatedProduction = false;
-          if (BNF_IND.equals(indProd) && indNsn != null)
-            generatedProduction = false;
-          if (generatedProduction)
-            if (rs.f1.present()) {
-              if ("void".equals(resType))
-                Messages.softErr("Return with expression statement in a Java block in production '" +
-                                     prod + "()' of type 'void'.", rs.f0.beginLine,
-                                 rs.f0.beginColumn);
-              else
-                Messages.info("This return statement will be transformed in an assign statement to the "
-                                  + "corresponding new parser class variable and a return statement of the node.",
-                              rs.f0.beginLine, rs.f0.beginColumn);
-            } else {
-              if (!"void".equals(resType))
-                Messages.softErr("Return without expression statement in a Java block in production '" +
-                                     prod + "()' of type non 'void'.", rs.f0.beginLine,
-                                 rs.f0.beginColumn);
-              else
-                Messages.info("This return statement will be transformed in a return statement of the node.",
-                              rs.f0.beginLine, rs.f0.beginColumn);
-            }
-        }
+        if (rs.f1.present())
+          if (gdfv.getNcnHT().get(prod) != null)
+            Messages.softErr("Non empty return statement in a Java block in Production '" + prod +
+                             "()' for which it has been requested in its declaration " +
+                             "not to create the node.", rs.f0.beginLine, rs.f0.beginColumn);
+          else
+            Messages.info("Non empty return statement in a Java block in Production '" + prod +
+                              "()'. It will be transformed in an assign statement to the " +
+                              "corresponding new parser class variable.", rs.f0.beginLine,
+                          rs.f0.beginColumn);
         break;
       case 14:
         // %14 SynchronizedStatement()
@@ -830,56 +764,42 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
           if (ch.which == 0) {
             // IdentifierAsString() -> jtbrt_Identifier
             // $0 IdentifierAsString() $1 Arguments() $2 [ "!" ]
-            final NodeToken tk = ((IdentifierAsString) seq1.elementAt(0)).f0;
-            final String ident = tk.tokenImage;
-            if ((JC_IND + "void").equals(gdbv.getProdHT().get(ident)))
-              Messages.softErr("Use in an assignment of the JavaCodeProduction '" + ident +
-                               "()' of type void.", tk.beginLine, tk.beginColumn);
-            if ((BNF_IND + "void").equals(gdbv.getProdHT().get(ident)))
-              Messages.softErr("Use in an assignment of the BNFProduction '" + ident +
-                               "()' of type void.", tk.beginLine, tk.beginColumn);
+            final NodeToken iasToken = ((IdentifierAsString) seq1.elementAt(0)).f0;
+            final String ident = iasToken.tokenImage;
+            if (gdfv.getRetVarIdentHT().get(ident) == null) {
+              if (gdfv.getNcnHT().get(ident) == null)
+                Messages.softErr("Use in an assignment of the (BNF or Javacode) Production '" +
+                                     ident + "()' of type void.", iasToken.beginLine,
+                                 iasToken.beginColumn);
+              else
+                Messages.softErr("Use in an assignment of the (BNF or Javacode) Production '" +
+                                     ident + "()' for which it has been requested in its " +
+                                     "declaration not to create the node.", iasToken.beginLine,
+                                 iasToken.beginColumn);
+            }
           }
         }
 
         if (ch.which == 0) {
           // $0 IdentifierAsString() $1 Arguments() $2 [ "!" ]
           // display messages
-          final NodeToken tk = ((IdentifierAsString) seq1.elementAt(0)).f0;
-          final String ident = tk.tokenImage;
-          final String val = gdbv.getProdHT().get(ident);
-          if (val == null) {
-            Messages.softErr("Use of an identifier '" + ident +
-                                 "' which is not a BNF Production or a JavaCodeProduction.",
-                             tk.beginLine, tk.beginColumn);
-          } else {
-            final String indProd = val.substring(0, 1);
-            // messages in decreasing severity order for proper displaying in the plugin
-            if (((NodeOptional) seq1.elementAt(2)).present()) {
-              if (JC_IND.equals(indProd)) {
-                if (!gdbv.getNsnHT().containsKey(ident))
-                  Messages.warning("Unnecessary no node creation indication ('!' character) as the " +
-                                       "JavaCodeProduction '" +
-                                       prod +
-                                       "()' is not indicated to " +
-                                       "be generated ('%' character).", tk.beginLine,
-                                   tk.beginColumn);
-                else
-                  Messages.info("The corresponding JTB node creation will NOT be generated here "
-                                + "(as requested here).", tk.beginLine, tk.beginColumn);
-              } else if (BNF_IND.equals(indProd)) {
-                if (gdbv.getNsnHT().containsKey(ident))
-                  Messages.warning("Unnecessary no node creation indication ('!' character) as the " +
-                                       "BNFProduction '" +
-                                       prod +
-                                       "()' is not indicated to " +
-                                       "be generated ('!' character).", tk.beginLine,
-                                   tk.beginColumn);
-                else
-                  Messages.info("The corresponding JTB node creation will NOT be generated here "
-                                + "(as requested here).", tk.beginLine, tk.beginColumn);
-              }
+          final NodeToken iasToken = ((IdentifierAsString) seq1.elementAt(0)).f0;
+          final String ident = iasToken.tokenImage;
+          // messages in decreasing severity order for proper displaying in the plugin
+          if (((NodeOptional) seq1.elementAt(2)).present())
+            if (opt.present()) {
+              Messages.softErr("Use in an assignment of a BNFProduction '" + ident +
+                               "()' for which it has been requested here " +
+                               "not to create the node.", iasToken.beginLine, iasToken.beginColumn);
+            } else {
+              Messages.info("The corresponding JTB node creation will NOT be generated here "
+                            + "(as requested here).", iasToken.beginLine, iasToken.beginColumn);
             }
-          }
+          if (gdfv.getNcnHT().get(ident) != null)
+            Messages.info("The corresponding JTB node creation will NOT be generated here "
+                              + "(as requested in the BNFProduction declaration).",
+                          iasToken.beginLine,
+                          iasToken.beginColumn);
         } else {
           // $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ] $2 [ "!" ]
           // display messages
@@ -905,9 +825,13 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
           }
           // messages in decreasing severity order for proper displaying in the plugin
           if (((NodeOptional) seq1.elementAt(2)).present())
-            Messages.info("The corresponding JTB node creation will NOT be generated here "
-                          + "(as requested here).", lnre, cnre);
-          if (tk != null && DONT_CREATE.equals(gdbv.getTokenHT().get(tk.tokenImage)))
+            if (opt.present())
+              Messages.softErr("Use in an assignment of a RegularExpression for which it has been "
+                               + "requested here not to create the node.", lnre, cnre);
+            else
+              Messages.info("The corresponding JTB node creation will NOT be generated here "
+                            + "(as requested here).", lnre, cnre);
+          if (tk != null && DONT_CREATE_NODE_STR.equals(gdfv.getTokenHT().get(tk.tokenImage)))
             Messages.info("The corresponding JTB node creation will NOT be generated here "
                           + "(as requested in the RegExprSpec declaration).", lnre, cnre);
         }
@@ -928,7 +852,7 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
         return;
 
       default:
-        Messages.hardErr("Invalid n.f0.which = " + String.valueOf(n.f0.which));
+        Messages.hardErr("invalid n.f0.which = " + String.valueOf(n.f0.which));
         return;
     }
   }
@@ -961,6 +885,39 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
       // #1 Block()
       ((NodeSequence) n.f5.node).elementAt(1).accept(this);
     }
+  }
+
+  /**
+   * Visits a {@link LocalLookahead} node, whose children are the following :
+   * <p>
+   * f0 -> [ IntegerLiteral() ]<br>
+   * f1 -> [ "," ]<br>
+   * f2 -> [ ExpansionChoices() ]<br>
+   * f3 -> [ "," ]<br>
+   * f4 -> [ #0 "{" #1 Expression() #2 "}" ]<br>
+   * 
+   * @param n - the node to visit
+   */
+  @Override
+  public void visit(@SuppressWarnings("unused") final LocalLookahead n) {
+    // should not be called !
+  }
+
+/**
+   * Visits the {@link RegularExpression node}<br>
+   * f0 -> . %0 StringLiteral()<br>
+   * .. .. | %1 #0 "<"<br>
+   * .. .. . .. #1 [ $0 [ "#" ]<br>
+   * .. .. . .. .. . $1 IdentifierAsString() $2 ":" ]<br>
+   * .. .. . .. #2 ComplexRegularExpressionChoices() #3 ">"<br>
+   * .. .. | %2 #0 "<" #1 IdentifierAsString() #2 ">"<br>
+   * .. .. | %3 #0 "<" #1 "EOF" #2 ">"<br>
+   * 
+   * @param n - the node to visit
+   */
+  @Override
+  public void visit(@SuppressWarnings("unused") final RegularExpression n) {
+    // should not be called !
   }
 
 }

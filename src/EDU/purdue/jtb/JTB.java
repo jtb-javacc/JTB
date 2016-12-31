@@ -52,7 +52,46 @@
  */
 package EDU.purdue.jtb;
 
-import static EDU.purdue.jtb.misc.Globals.*;
+import static EDU.purdue.jtb.misc.Globals.DEF_ND_DIR_NAME;
+import static EDU.purdue.jtb.misc.Globals.DEF_ND_PKG_NAME;
+import static EDU.purdue.jtb.misc.Globals.DEF_VIS_DIR_NAME;
+import static EDU.purdue.jtb.misc.Globals.DEF_VIS_PKG_NAME;
+import static EDU.purdue.jtb.misc.Globals.PROG_NAME;
+import static EDU.purdue.jtb.misc.Globals.SCRIPT_NAME;
+import static EDU.purdue.jtb.misc.Globals.VERSION;
+import static EDU.purdue.jtb.misc.Globals.astNodesDirName;
+import static EDU.purdue.jtb.misc.Globals.astNodesDirPath;
+import static EDU.purdue.jtb.misc.Globals.depthLevel;
+import static EDU.purdue.jtb.misc.Globals.descriptiveFieldNames;
+import static EDU.purdue.jtb.misc.Globals.iRetArguVisitor;
+import static EDU.purdue.jtb.misc.Globals.iRetVisitor;
+import static EDU.purdue.jtb.misc.Globals.iVoidArguVisitor;
+import static EDU.purdue.jtb.misc.Globals.iVoidVisitor;
+import static EDU.purdue.jtb.misc.Globals.inlineAcceptMethods;
+import static EDU.purdue.jtb.misc.Globals.javaDocComments;
+import static EDU.purdue.jtb.misc.Globals.jtbInputFileName;
+import static EDU.purdue.jtb.misc.Globals.jtbOutputFileName;
+import static EDU.purdue.jtb.misc.Globals.keepSpecialTokens;
+import static EDU.purdue.jtb.misc.Globals.language;
+import static EDU.purdue.jtb.misc.Globals.noOverwrite;
+import static EDU.purdue.jtb.misc.Globals.noSemanticCheck;
+import static EDU.purdue.jtb.misc.Globals.nodePrefix;
+import static EDU.purdue.jtb.misc.Globals.nodeSuffix;
+import static EDU.purdue.jtb.misc.Globals.nodesPackageName;
+import static EDU.purdue.jtb.misc.Globals.nodesSuperclass;
+import static EDU.purdue.jtb.misc.Globals.parentPointer;
+import static EDU.purdue.jtb.misc.Globals.printClassList;
+import static EDU.purdue.jtb.misc.Globals.printerToolkit;
+import static EDU.purdue.jtb.misc.Globals.retArguVisitor;
+import static EDU.purdue.jtb.misc.Globals.retVisitor;
+import static EDU.purdue.jtb.misc.Globals.schemeToolkit;
+import static EDU.purdue.jtb.misc.Globals.staticFlag;
+import static EDU.purdue.jtb.misc.Globals.varargs;
+import static EDU.purdue.jtb.misc.Globals.visitorsDirName;
+import static EDU.purdue.jtb.misc.Globals.visitorsDirPath;
+import static EDU.purdue.jtb.misc.Globals.visitorsPackageName;
+import static EDU.purdue.jtb.misc.Globals.voidArguVisitor;
+import static EDU.purdue.jtb.misc.Globals.voidVisitor;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -64,16 +103,37 @@ import java.util.Map;
 
 import EDU.purdue.jtb.misc.ClassInfo;
 import EDU.purdue.jtb.misc.DepthFirstVisitorsGenerator;
+import EDU.purdue.jtb.misc.DepthFirstVisitorsGeneratorForCpp;
+import EDU.purdue.jtb.misc.DepthFirstVisitorsGeneratorForJava;
 import EDU.purdue.jtb.misc.FileExistsException;
 import EDU.purdue.jtb.misc.FilesGenerator;
+import EDU.purdue.jtb.misc.FilesGeneratorForCpp;
+import EDU.purdue.jtb.misc.FilesGeneratorForJava;
+import EDU.purdue.jtb.misc.Globals;
+import EDU.purdue.jtb.misc.Globals.Language;
+import EDU.purdue.jtb.misc.IRetArguVisitorForCpp;
+import EDU.purdue.jtb.misc.IRetArguVisitorForJava;
 import EDU.purdue.jtb.misc.Messages;
+import EDU.purdue.jtb.misc.RetArguVisitorForCpp;
+import EDU.purdue.jtb.misc.RetArguVisitorForJava;
+import EDU.purdue.jtb.misc.RetVisitorForCpp;
+import EDU.purdue.jtb.misc.RetVisitorForJava;
 import EDU.purdue.jtb.misc.TreeDumperGenerator;
+import EDU.purdue.jtb.misc.TreeDumperGeneratorForCpp;
+import EDU.purdue.jtb.misc.TreeDumperGeneratorForJava;
 import EDU.purdue.jtb.misc.TreeFormatterGenerator;
+import EDU.purdue.jtb.misc.TreeFormatterGeneratorForCpp;
+import EDU.purdue.jtb.misc.TreeFormatterGeneratorForJava;
+import EDU.purdue.jtb.misc.VoidArguVisitorForCpp;
+import EDU.purdue.jtb.misc.VoidArguVisitorForJava;
+import EDU.purdue.jtb.misc.VoidVisitorForJava;
 import EDU.purdue.jtb.parser.JTBParser;
 import EDU.purdue.jtb.parser.Options;
 import EDU.purdue.jtb.parser.ParseException;
 import EDU.purdue.jtb.syntaxtree.INode;
 import EDU.purdue.jtb.visitor.Annotator;
+import EDU.purdue.jtb.visitor.AnnotatorForCpp;
+import EDU.purdue.jtb.visitor.AnnotatorForJava;
 import EDU.purdue.jtb.visitor.ClassesFinder;
 import EDU.purdue.jtb.visitor.GlobalDataBuilder;
 import EDU.purdue.jtb.visitor.SemanticChecker;
@@ -83,7 +143,10 @@ import EDU.purdue.jtb.visitor.SemanticChecker;
  * <p>
  * Class JTB contains the main() method of the program as well as related methods.
  * 
- * @author Kevin Tao, Wanjun Wang, Marc Mazas, Francis Andre
+ * @author Kevin Tao
+ * @author Wanjun Wang, wanjun@purdue.edu
+ * @author Marc Mazas
+ * @author Francis Andre, francis.andre.kampbell@orange.fr
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5<br>
  *          1.4.0 : 11/2009 : MMa : added input file options management
  * @version 1.4.0.3 : 02/2010 : MMa : added static flag
@@ -106,60 +169,19 @@ public class JTB {
   /** The input file options */
   private static Map<String, Object> jtbOpt     = null;
 
-  /** No error */
-  public static final int            OK         = 0;
-  /** Command line error */
-  public static final int            CL_ERR     = -1;
-  /** {@link GlobalDataBuilder} error */
-  public static final int            GDB_ERR    = -2;
-  /** {@link SemanticChecker} error */
-  public static final int            SC_ERR     = -4;
-  /** {@link ClassesFinder} error */
-  public static final int            CF_ERR     = -8;
-  /** {@link Annotator} error */
-  public static final int            ANN_ERR    = -16;
-  /** {@link FilesGenerator} error */
-  public static final int            FG_ERR     = -32;
-  /** {@link InvalCmdLineException} exception */
-  public static final int            CL_EX      = -1024;
-  /** {@link ParseException} exception */
-  public static final int            PARSE_EX   = -2046;
-  /** Other exception */
-  public static final int            OTHER_EX   = -4096;
-
   /**
    * Standard main method.
    * 
    * @param args - the command line arguments
    */
+  @SuppressWarnings("null")
   public static void main(final String args[]) {
-    do_main(args);
-  }
-
-  /**
-   * Non standard main method returning an error code.
-   * 
-   * @param args - the command line arguments
-   * @return the error code: <li>
-   *         <ul>
-   *         for specific types of errors: {@link #CL_ERR}, {@link #GDB_ERR}, {@link #SC_ERR},
-   *         {@link #CF_ERR}, {@link #ANN_ERR}, {@link #FG_ERR}, {@link #CL_EX}, {@link #PARSE_EX},
-   *         {@link #OTHER_EX}) or
-   *         </ul>
-   *         <ul>
-   *         0 if no error or
-   *         </ul>
-   *         <ul>
-   *         the number of errors
-   *         </ul>
-   */
-  public static int do_main(final String args[]) {
 
     try {
       // Get the command line arguments
       jtbOpt = Options.getOptions();
       if (!processCommandLine(args))
-        return CL_ERR;
+        return;
 
       // parse the input file
       System.err.println(progName + " version " + version);
@@ -177,13 +199,8 @@ public class JTB {
       //
       // Perform actions based on input file or command-line options
       //
-      Messages.resetCounts();
       final GlobalDataBuilder gdbv = new GlobalDataBuilder();
       root.accept(gdbv);
-      if (Messages.errorCount() > 0) {
-        Messages.printSummary();
-        return GDB_ERR;
-      }
 
       final ClassesFinder cfv = new ClassesFinder(gdbv);
       List<ClassInfo> classes;
@@ -196,7 +213,7 @@ public class JTB {
 
         if (Messages.errorCount() > 0) {
           Messages.printSummary();
-          return SC_ERR;
+          return;
         }
       }
       // create the classes list
@@ -205,24 +222,32 @@ public class JTB {
 
       if (Messages.errorCount() > 0) {
         Messages.printSummary();
-        return CF_ERR;
+        return;
       }
 
       if (printClassList) {
-        fg = new FilesGenerator(classes);
+        fg = new FilesGeneratorForJava(classes);
         System.out.println("\nThe classes generated and the fields each "
                            + "contains are as follows:\n");
         fg.outputFormattedNodesClassesList(new PrintWriter(System.out, true));
       }
 
       try {
-        final Annotator av = new Annotator(gdbv);
-        root.accept(av);
-        av.saveToFile(jtbOutputFileName);
+        Annotator anv = null;
+        switch (Globals.language) {
+          case java:
+            anv = new AnnotatorForJava(gdbv);
+            break;
+          case cpp:
+            anv = new AnnotatorForCpp(gdbv);
+            break;
+        }
+        root.accept(anv);
+        anv.saveToFile(jtbOutputFileName);
 
         if (Messages.errorCount() > 0) {
           Messages.printSummary();
-          return ANN_ERR;
+          return;
         }
 
         System.err.println(progName + ":  jj output file \"" + jtbOutputFileName + "\" generated.");
@@ -234,18 +259,25 @@ public class JTB {
       }
 
       if (fg == null) {
-        fg = new FilesGenerator(classes);
+        switch (Globals.language) {
+          case java:
+            fg = new FilesGeneratorForJava(classes);
+            break;
+          case cpp:
+            fg = new FilesGeneratorForCpp(classes);
+            break;
+        }
 
         if (Messages.errorCount() > 0) {
           Messages.printSummary();
-          return FG_ERR;
+          return;
         }
       }
 
       try {
-        FilesGenerator.genBaseNodesFiles();
+        fg.genBaseNodesFiles();
         System.err.println(progName + ":  base node class files " + "generated into directory \"" +
-                           nodesDirName + "\".");
+                           astNodesDirName + "\".");
       }
       catch (final FileExistsException e) {
         System.err.println(progName + ":  One or more of the base " +
@@ -255,7 +287,7 @@ public class JTB {
       try {
         fg.genNodesFiles();
         System.err.println(progName + ":  " + classes.size() + " syntax tree node class files " +
-                           "generated into directory \"" + nodesDirName + "\".");
+                           "generated into directory \"" + astNodesDirName + "\".");
       }
       catch (final FileExistsException e) {
         System.err.println(progName + ":  One or more of the generated " +
@@ -266,131 +298,159 @@ public class JTB {
 
       try {
         fg.genRetArguIVisitorFile();
-        System.err.println(progName + ":  Visitor interface \"" + iRetArguVisitor +
-                           ".java\" generated into directory \"" + visitorsDirName + "\".");
+        System.err.println(progName + ":  Visitor interface \"" + iRetArguVisitor.getOutfileName() +
+                           "\" generated into directory \"" + visitorsDirName + "\".");
       }
       catch (final FileExistsException e) {
         System.err.println(progName + ":  \"" + iRetArguVisitor +
-                           "\" already exists.  Won't overwrite.");
+                           " already exists.  Won't overwrite.");
       }
 
-      try {
-        fg.genVoidIVisitorFile();
-        System.err.println(progName + ":  Visitor interface \"" + iVoidVisitor +
-                           ".java\" generated into directory \"" + visitorsDirName + "\".");
-      }
-      catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + iVoidVisitor +
-                           "\" already exists.  Won't overwrite.");
-      }
+      if (language == Language.java)
+        try {
+          fg.genVoidIVisitorFile();
+          System.err.println(progName + ":  Visitor interface \"" + iVoidVisitor.getOutfileName() +
+                             "\" generated into directory \"" + visitorsDirName + "\".");
+        }
+        catch (final FileExistsException e) {
+          System.err.println(progName + ":  \"" + iVoidVisitor +
+                             " already exists.  Won't overwrite.");
+        }
 
-      try {
-        fg.genRetIVisitorFile();
-        System.err.println(progName + ":  Visitor interface \"" + iRetVisitor +
-                           ".java\" generated into directory \"" + visitorsDirName + "\".");
-      }
-      catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + iRetVisitor +
-                           "\" already exists.  Won't overwrite.");
-      }
+      if (language == Language.java)
+        try {
+          fg.genRetIVisitorFile();
+          System.err.println(progName + ":  Visitor interface \"" + iRetVisitor.getOutfileName() +
+                             "\" generated into directory \"" + visitorsDirName + "\".");
+        }
+        catch (final FileExistsException e) {
+          System.err.println(progName + ":  \"" + iRetVisitor +
+                             " already exists.  Won't overwrite.");
+        }
 
-      try {
-        fg.genVoidArguIVisitorFile();
-        System.err.println(progName + ":  Visitor interface \"" + iVoidArguVisitor +
-                           ".java\" generated into directory \"" + visitorsDirName + "\".");
-      }
-      catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + iVoidArguVisitor +
-                           "\" already exists.  Won't overwrite.");
-      }
+      if (language == Language.java)
+        try {
+          fg.genVoidArguIVisitorFile();
+          System.err.println(progName + ":  Visitor interface \"" +
+                             iVoidArguVisitor.getOutfileName() + "\" generated into directory \"" +
+                             visitorsDirName + "\".");
+        }
+        catch (final FileExistsException e) {
+          System.err.println(progName + ":  \"" + iVoidArguVisitor +
+                             " already exists.  Won't overwrite.");
+        }
 
-      final DepthFirstVisitorsGenerator dfvg = new DepthFirstVisitorsGenerator(classes, gdbv);
+      DepthFirstVisitorsGenerator dfvg = null;
+      switch (Globals.language) {
+        case java:
+          dfvg = new DepthFirstVisitorsGeneratorForJava(classes, gdbv);
+          break;
+        case cpp:
+          dfvg = new DepthFirstVisitorsGeneratorForCpp(classes, gdbv);
+          break;
+      }
 
       try {
         dfvg.genDepthFirstRetArguVisitorFile();
-        System.err.println(progName + ":  Visitor class \"" + dFRetArguVisitor +
-                           ".java\" generated into directory \"" + visitorsDirName + "\".");
+        System.err.println(progName + ":  Visitor class \"" + retArguVisitor.getOutfileName() +
+                           "\" generated into directory \"" + visitorsDirName + "\".");
       }
       catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + dFRetArguVisitor +
-                           ".java\" already exists.  Won't overwrite.");
+        System.err.println(progName + ":  \"" + retArguVisitor.getOutfileName() +
+                           " already exists.  Won't overwrite.");
       }
 
-      try {
-        dfvg.genDepthFirstRetVisitorFile();
-        System.err.println(progName + ":  Visitor class \"" + dFRetVisitor +
-                           ".java\" generated into directory \"" + visitorsDirName + "\".");
-      }
-      catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + dFRetVisitor +
-                           ".java\" already exists.  Won't overwrite.");
-      }
+      if (language == Language.java)
+        try {
+          dfvg.genDepthFirstRetVisitorFile();
+          System.err.println(progName + ":  Visitor class \"" + retVisitor.getOutfileName() +
+                             "\" generated into directory \"" + visitorsDirName + "\".");
+        }
+        catch (final FileExistsException e) {
+          System.err.println(progName + ":  \"" + retVisitor.getOutfileName() +
+                             " already exists.  Won't overwrite.");
+        }
 
-      try {
-        dfvg.genDepthFirstVoidArguVisitorFile();
-        System.err.println(progName + ":  Visitor class \"" + dFVoidArguVisitor +
-                           ".java\" generated into directory \"" + visitorsDirName + "\".");
-      }
-      catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + dFVoidArguVisitor +
-                           ".java\" already exists.  Won't overwrite.");
-      }
+      if (language == Language.java)
+        try {
+          dfvg.genDepthFirstVoidArguVisitorFile();
+          System.err.println(progName + ":  Visitor class \"" + voidArguVisitor.getOutfileName() +
+                             "\" generated into directory \"" + visitorsDirName + "\".");
+        }
+        catch (final FileExistsException e) {
+          System.err.println(progName + ":  \"" + voidArguVisitor.getOutfileName() +
+                             " already exists.  Won't overwrite.");
+        }
 
-      try {
-        dfvg.genDepthFirstVoidVisitorFile();
-        System.err.println(progName + ":  Visitor class \"" + dFVoidVisitor +
-                           ".java\" generated into directory \"" + visitorsDirName + "\".");
-      }
-      catch (final FileExistsException e) {
-        System.err.println(progName + ":  \"" + dFVoidVisitor +
-                           ".java\" already exists.  Won't overwrite.");
-      }
+      if (language == Language.java)
+        try {
+          dfvg.genDepthFirstVoidVisitorFile();
+          System.err.println(progName + ":  Visitor class \"" + voidVisitor.getOutfileName() +
+                             "\" generated into directory \"" + visitorsDirName + "\".");
+        }
+        catch (final FileExistsException e) {
+          System.err.println(progName + ":  \"" + voidVisitor.getOutfileName() +
+                             " already exists.  Won't overwrite.");
+        }
 
       System.err.println();
 
       if (printerToolkit) {
+        TreeDumperGenerator tdg = new TreeDumperGeneratorForJava();
+        switch (Globals.language) {
+          case java:
+            tdg = new TreeDumperGeneratorForJava();
+            break;
+          case cpp:
+            tdg = new TreeDumperGeneratorForCpp();
+            break;
+        }
         try {
-          final TreeDumperGenerator tdg = new TreeDumperGenerator();
           tdg.generateTreeDumper();
           tdg.saveToFile();
-          System.err.println(progName + ":  Visitor class \"" + TreeDumperGenerator.outFilename +
+          System.err.println(progName + ":  Visitor class \"" + tdg.outFilename() +
                              "\" generated into directory \"" + visitorsDirName + "\".");
         }
         catch (final FileExistsException e) {
-          System.err.println(progName + ":  \"" + TreeDumperGenerator.outFilename +
+          System.err.println(progName + ":  \"" + tdg.outFilename() +
                              "\" already exists.  Won't overwrite.");
         }
 
+        TreeFormatterGenerator tfg = null;
         try {
-          final TreeFormatterGenerator tfg = new TreeFormatterGenerator(classes);
+          switch (Globals.language) {
+            case java:
+              tfg = new TreeFormatterGeneratorForJava(classes);
+              break;
+            case cpp:
+              tfg = new TreeFormatterGeneratorForCpp(classes);
+              break;
+          }
           tfg.generateTreeFormatter();
           tfg.saveToFile();
-          System.err.println(progName + ":  Visitor class \"" + TreeFormatterGenerator.outFilename +
+          System.err.println(progName + ":  Visitor class \"" + tfg.outFilename() +
                              "\" generated into directory \"" + visitorsDirName + "\".");
         }
         catch (final FileExistsException e) {
-          System.err.println(progName + ":  \"" + TreeFormatterGenerator.outFilename +
+          System.err.println(progName + ":  \"" + tfg.outFilename() +
                              "\" already exists.  Won't overwrite.");
         }
         System.err.println();
       }
       if (Messages.errorCount() > 0 || Messages.warningCount() > 0)
         Messages.printSummary();
-      return Messages.errorCount();
     }
     catch (final InvalCmdLineException e) {
       System.err.println(progName + ":  " + e.getMessage());
-      return CL_EX;
+      return;
     }
     catch (final ParseException e) {
       System.err.println("\n" + e.getMessage() + "\n");
       System.err.println(progName + ":  Encountered error(s) during parsing.");
-      return PARSE_EX;
     }
     catch (final Exception e) {
       e.printStackTrace(System.err);
       Messages.hardErr(e);
-      return OTHER_EX;
     }
   }
 
@@ -414,7 +474,7 @@ public class JTB {
 
     javaDocComments = ((Boolean) jtbOpt.get("JTB_JD")).booleanValue();
 
-    nodesDirName = (String) jtbOpt.get("JTB_ND");
+    astNodesDirName = (String) jtbOpt.get("JTB_ND");
 
     nodesPackageName = (String) jtbOpt.get("JTB_NP");
 
@@ -443,7 +503,7 @@ public class JTB {
 
     str = (String) jtbOpt.get("JTB_D");
     if (!"".equals(str)) {
-      nodesDirName = str + "/" + DEF_ND_DIR_NAME;
+      astNodesDirName = str + "/" + DEF_ND_DIR_NAME;
       visitorsDirName = str + "/" + DEF_VIS_DIR_NAME;
     }
 
@@ -455,6 +515,28 @@ public class JTB {
 
     staticFlag = ((Boolean) jtbOpt.get("STATIC")).booleanValue();
 
+    str = (String) jtbOpt.get("OUTPUT_LANGUAGE");
+    if (!"".equals(str)) {
+      if (str.equalsIgnoreCase("c++"))
+        str = "cpp";
+      language = Language.valueOf(str);
+    }
+    switch (language) {
+      case java:
+        retArguVisitor = new RetArguVisitorForJava();
+        iRetArguVisitor = new IRetArguVisitorForJava();
+        retVisitor = new RetVisitorForJava();
+        voidArguVisitor = new VoidArguVisitorForJava();
+        voidVisitor = new VoidVisitorForJava();
+        break;
+      case cpp:
+        retArguVisitor = new RetArguVisitorForCpp();
+        iRetArguVisitor = new IRetArguVisitorForCpp();
+        retVisitor = new RetVisitorForCpp();
+        voidArguVisitor = new VoidArguVisitorForCpp();
+        voidVisitor = new VoidVisitorForJava();
+        break;
+    }
   }
 
   /**
@@ -506,10 +588,10 @@ public class JTB {
           if (i >= args.length || args[i].charAt(0) == '-')
             throw new InvalCmdLineException("Option \"-d\" must be followed by a directory name.");
           else {
-            nodesDirName = args[i] + "/" + DEF_ND_DIR_NAME;
+            astNodesDirName = args[i] + "/" + DEF_ND_DIR_NAME;
             visitorsDirName = args[i] + "/" + DEF_VIS_DIR_NAME;
             jtbOpt.put("JTB_D", args[i]);
-            jtbOpt.put("JTB_ND", nodesDirName);
+            jtbOpt.put("JTB_ND", astNodesDirName);
             jtbOpt.put("JTB_VD", visitorsDirName);
           }
         }
@@ -544,8 +626,8 @@ public class JTB {
           if (i >= args.length || args[i].charAt(0) == '-')
             throw new InvalCmdLineException("Option \"-nd\" must be followed by a directory name.");
           else {
-            nodesDirName = args[i];
-            jtbOpt.put("JTB_ND", nodesDirName);
+            astNodesDirName = args[i];
+            jtbOpt.put("JTB_ND", astNodesDirName);
           }
         }
 
@@ -687,12 +769,8 @@ public class JTB {
    */
   private static void convertPathsToAbsolute() {
     final String dir = inDir + File.separator;
-    final File ndn = new File(nodesDirName);
-    if (!ndn.isAbsolute())
-      nodesDirName = dir + nodesDirName;
-    final File vdn = new File(visitorsDirName);
-    if (!vdn.isAbsolute())
-      visitorsDirName = dir + visitorsDirName;
+    astNodesDirPath = new File(dir, astNodesDirName);
+    visitorsDirPath = new File(dir, visitorsDirName);
     final File jjf = new File(jtbOutputFileName);
     if (!jjf.isAbsolute())
       jtbOutputFileName = dir + jtbOutputFileName;
@@ -748,7 +826,9 @@ class InvalCmdLineException extends Exception {
   /** Default serialVersionUID */
   private static final long serialVersionUID = 1L;
 
-  /** Standard constructor */
+  /**
+   * Standard constructor with no argument.
+   */
   InvalCmdLineException() {
     super();
   }

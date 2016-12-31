@@ -65,32 +65,25 @@ import EDU.purdue.jtb.syntaxtree.NodeSequence;
  * The {@link ExpansionUnitTypeCounter} visitor counts the different types of the ExpansionUnits
  * found in an ExpansionChoices subtree, without descending further into the tree than the first
  * ExpansionUnit level.<br>
- * Note : may be {@link GlobalDataBuilder#isEuOk(ExpansionUnit)} should be used instead of this
- * visitor.
+ * May be {@link GlobalDataBuilder#isEuOk(ExpansionUnit)} should be used instead of this visitor.
  * 
  * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  * @version 1.4.7 : 09/2012 : MMa : added some comments, commented out unused getters
- * @version 1.4.8 : 11/2014 : MMa : added SuppressWarnings
  */
 public class ExpansionUnitTypeCounter extends DepthFirstVoidVisitor {
 
-  /** The number of lookaheads counter (ExpansionUnit type 0) */
-  @SuppressWarnings("unused")
+  /** Number of lookaheads counter (ExpansionUnit type 0) */
   private int numLookaheads = 0;
-  /** The number of blocks counter (ExpansionUnit type 1) */
-  @SuppressWarnings("unused")
+  /** Number of blocks counter (ExpansionUnit type 1) */
   private int numBlocks     = 0;
-  /** The number of "bracket options" counter (ExpansionUnit type 2) */
+  /** Number of "bracket options" counter (ExpansionUnit type 2) */
   private int numBrackets   = 0;
-  /** The number of try-catch-finally counter (ExpansionUnit type 3) */
+  /** Number of try-catch-finally counter (ExpansionUnit type 3) */
   private int numTCFs       = 0;
-  /** The number of "terms" counter (ExpansionUnit type 4) */
+  /** Number of "terms" counter (ExpansionUnit type 4) */
   private int numTerms      = 0;
-  /**
-   * The number of "BNF modifiers" (parenthesis with/without modifier) counter (ExpansionUnit type
-   * 5)
-   */
+  /** Number of "BNF modifiers" (parenthesis with/without modifier) counter (ExpansionUnit type 5) */
   private int numModifiers  = 0;
 
   /**
@@ -175,9 +168,7 @@ public class ExpansionUnitTypeCounter extends DepthFirstVoidVisitor {
         ++numModifiers;
         break;
       default:
-        final String msg = "Invalid n.f0.which = " + String.valueOf(n.f0.which);
-        Messages.hardErr(msg);
-        throw new InternalError(msg);
+        Messages.hardErr("which = " + String.valueOf(n.f0.which));
     }
   }
 
