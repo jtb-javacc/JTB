@@ -203,7 +203,7 @@
 			<fileset dir='${jtb_proj_dir}/src' />
 			<fileset dir='${jtb_proj_dir}/doc' />
 			<fileset dir='${jtb_proj_dir}'>
-				<include name='build*.xml' />
+				<include name='*.xml' />
 			</fileset>
 		</jar>
 	</target>
@@ -257,7 +257,6 @@
 			<fileset dir='${jtb_src_dir}/syntaxtree'>
 				<include name='*.java' />
 				<include name='*Visitor.java' />
-				<exclude name='IN*.java' />
 			</fileset>
 		</delete>
 		<delete>
