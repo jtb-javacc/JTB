@@ -253,19 +253,19 @@
 
 	<!-- Clean JTB generated files -->
 	<target name='clean_jtb_gen_files'>
-		<delete>
+		<delete failonerror='false'>
 			<fileset dir='${jtb_src_dir}/syntaxtree'>
 				<include name='*.java' />
 				<include name='*Visitor.java' />
 			</fileset>
 		</delete>
-		<delete>
+		<delete failonerror='false'>
 			<fileset dir='${jtb_src_dir}/visitor'>
 				<include name='Tree*.java' />
 				<include name='*Visitor.java' />
 			</fileset>
 		</delete>
-		<delete>
+		<delete failonerror='false'>
 			<fileset dir='${jtb_src_dir}'>
 				<include name='${jtb_out}.jj' />
 			</fileset>
