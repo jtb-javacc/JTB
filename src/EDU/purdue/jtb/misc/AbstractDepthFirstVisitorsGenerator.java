@@ -156,7 +156,7 @@ public abstract class AbstractDepthFirstVisitorsGenerator implements DepthFirstV
         .append(LS);
     sb.append(aSpc.spc).append("for (final Iterator<").append(iNode).append("> e = ")
       .append(genNodeVar).append(".elements(); e.hasNext();) {").append(LS);
-    aSpc.updateSpc(+1);
+    aSpc.update(+1);
     if (depthLevel)
       increaseDepthLevel(sb, aSpc);
     sb.append(aSpc.spc);
@@ -201,7 +201,7 @@ public abstract class AbstractDepthFirstVisitorsGenerator implements DepthFirstV
         .append(LS);
     sb.append(aSpc.spc).append("for (final Iterator<").append(iNode).append("> e = ")
       .append(genNodeVar).append(".elements(); e.hasNext();) {").append(LS);
-    aSpc.updateSpc(+1);
+    aSpc.update(+1);
     if (depthLevel)
       increaseDepthLevel(sb, aSpc);
     sb.append(aSpc.spc);
@@ -246,7 +246,7 @@ public abstract class AbstractDepthFirstVisitorsGenerator implements DepthFirstV
       aSb.append(", final ").append(varargs ? genArgusType : genArguType).append(' ')
          .append(genArguVar);
     aSb.append(") {").append(LS);
-    aSpc.updateSpc(+1);
+    aSpc.update(+1);
     if (aRet) {
       aSb.append(aSpc.spc).append("/* You have to adapt which data is returned")
          .append(" (result variables below are just examples) */").append(LS);
@@ -286,7 +286,7 @@ public abstract class AbstractDepthFirstVisitorsGenerator implements DepthFirstV
    * @param aSpc - the indentation
    */
    void baseNodeVisitMethodCloseBrace(final StringBuilder aSb, final Spacing aSpc) {
-    aSpc.updateSpc(-1);
+    aSpc.update(-1);
     aSb.append(aSpc.spc).append('}').append(LS);
   }
 

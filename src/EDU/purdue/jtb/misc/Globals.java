@@ -158,8 +158,7 @@ public class Globals {
   /** "Ret" visitor interface name (with return type and a user object argument) */
   public static VisitorClass        retVisitor;
   /** "Ret" visitor interface name (with return type and no user object argument) */
-
-public static final IVisitorClass iRetVisitor           = new IRetVisitorForJava();
+  public static final IVisitorClass iRetVisitor           = new IRetVisitorForJava();
 //  /** Depth First "Ret" visitor class name (with return type and no user object argument) */
 //  public static final String        dFRetVisitor          = "DepthFirstRetVisitor";
   /** Javadoc comment fragment for "Ret" visitor */
@@ -335,13 +334,6 @@ public static final IVisitorClass iVoidArguVisitor      = new IVoidArguVisitorFo
 
   public static File                astNodesDirPath       = new File(astNodesDirName);
   public static File                visitorsDirPath       = new File(visitorsDirName);
-  /**
-   * target generation language
-   */
-  public static enum Language {
-    java, cpp
-  }
-
   public static Language            language              = Language.java;
   public static String              jtbNamespace          = DEF_JTB_NAMESPACE;
   public static String              astNamespace          = DEF_AST_NAMESPACE;
