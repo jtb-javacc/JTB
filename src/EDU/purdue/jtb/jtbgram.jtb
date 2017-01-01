@@ -125,6 +125,7 @@ options
 PARSER_BEGIN(JTBParser)
 package EDU.purdue.jtb.parser;
 
+import EDU.purdue.jtb.misc.Language;
 import static EDU.purdue.jtb.parser.Options.*;
 import java.util.List;
 import java.util.ArrayList;
@@ -2078,6 +2079,12 @@ void ResultType(List<Token> tokens) :
   if (tokens == null) tokens = new ArrayList<Token>();
 }
 {
+/*
+  (
+    "void" [ "*" ]
+  | [ "const" ] Type() [ "*" | "&" ]
+  )
+*/
   (
     "void"
   | Type()

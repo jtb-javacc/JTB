@@ -2570,7 +2570,7 @@ void ArrayDimsAndInits() :
 | ("[" "]")+ ArrayInitializer()
 }
 
-void Statement() :{}{  LOOKAHEAD(2)  LabeledStatement()| AssertStatement()| Block(null)| EmptyStatement()| StatementExpression() ";"| SwitchStatement()| IfStatement()| WhileStatement()| DoStatement()| ForStatement()| BreakStatement()| ContinueStatement()| ReturnStatement()| ThrowStatement()| SynchronizedStatement()| TryStatement()}
+void Statement() :{}{  LOOKAHEAD(2)  LabeledStatement()| AssertStatement()| Block(null)| EmptyStatement()| StatementExpression() ";"| SwitchStatement()| IfStatement()| WhileStatement()| DoStatement()| ForStatement()| BreakStatement()| ContinueStatement()| ReturnStatement()| ThrowStatement()| SynchronizedStatement()| TryStatement()}
 void AssertStatement() :
 {}
 {
