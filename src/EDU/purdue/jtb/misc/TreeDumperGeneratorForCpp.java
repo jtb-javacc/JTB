@@ -260,7 +260,7 @@ public class TreeDumperGeneratorForCpp implements TreeDumperGenerator {
       sb.append("   */").append(LS);
     }
 
-    sb.append("   void printToken(const String& s) {").append(LS);
+    sb.append("   void printToken(const string& s) {").append(LS);
     sb.append("    for (int i = 0; i < s.length(); ++i) { ").append(LS);
     sb.append("      if (s.at(i) == '\\n') {").append(LS);
     sb.append("        ++curLine;").append(LS);

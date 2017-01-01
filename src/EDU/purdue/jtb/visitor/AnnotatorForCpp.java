@@ -81,27 +81,27 @@ public class AnnotatorForCpp extends Annotator {
       sb.append(LS);
       sb.append("class JTBToolkit {").append(LS);
       sb.append(LS);
-      sb.append("  static NodeToken makeNodeToken(final Token tok) {").append(LS);
-      sb.append("    final NodeToken node = new NodeToken(tok.image.intern(), tok.kind, tok.beginLine, tok.beginColumn, tok.endLine, tok.endColumn);")
+      sb.append("  static NodeToken makeNodeToken(const Token* tok) {").append(LS);
+      sb.append("    const NodeToken* node = new NodeToken(tok->image.intern(), tok->kind, tok->beginLine, tok->beginColumn, tok->endLine, tok->endColumn);")
         .append(LS);
-      sb.append("    if (tok.specialToken == null)").append(LS);
+      sb.append("    if (tok->specialToken == null)").append(LS);
       sb.append("      return node;").append(LS);
-      sb.append("    Token t = tok;").append(LS);
+      sb.append("    Token* t = tok;").append(LS);
       sb.append("    int nbt = 0;").append(LS);
-      sb.append("    while (t.specialToken != null) {").append(LS);
-      sb.append("      t = t.specialToken;").append(LS);
+      sb.append("    while (t->specialToken != null) {").append(LS);
+      sb.append("      t = t->specialToken;").append(LS);
       sb.append("      nbt++;").append(LS);
       sb.append("    }").append(LS);
-      sb.append("    final java.util.ArrayList<NodeToken> temp = new java.util.ArrayList<NodeToken>(nbt);")
+      sb.append("    vector<NodeToken*> temp(nbt);")
         .append(LS);
       sb.append("    t = tok;").append(LS);
-      sb.append("    while (t.specialToken != null) {").append(LS);
-      sb.append("      t = t.specialToken;").append(LS);
-      sb.append("      temp.add(new NodeToken(t.image.intern(), t.kind, t.beginLine, t.beginColumn, t.endLine, t.endColumn));")
+      sb.append("    while (t->specialToken != null) {").append(LS);
+      sb.append("      t = t->specialToken;").append(LS);
+      sb.append("      temp.add(new NodeToken(t->image.intern(), t->kind, t->beginLine, t->beginColumn, t->endLine, t->endColumn));")
         .append(LS);
       sb.append("    }").append(LS);
       sb.append("    for (int i = nbt - 1; i >= 0; --i)").append(LS);
-      sb.append("      node.addSpecial(temp.get(i));").append(LS);
+      sb.append("      node->addSpecial(temp.get(i));").append(LS);
       sb.append("    // node.trimSpecials();").append(LS);
       sb.append("    return node;").append(LS);
       sb.append("  }").append(LS);
