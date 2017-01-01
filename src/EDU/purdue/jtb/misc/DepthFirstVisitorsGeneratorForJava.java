@@ -330,7 +330,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
     }
     sb.append("public class ").append(aClDecl).append(" {").append(LS).append(LS);
 
-    spc.updateSpc(+1);
+    spc.update(+1);
 
     if (depthLevel) {
       if (javaDocComments) {
@@ -353,7 +353,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
     }
 
     // end of (visitor) class
-    spc.updateSpc(-1);
+    spc.update(-1);
     sb.append('}').append(LS);
 
     return sb;
@@ -393,7 +393,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
     sb.append(spc.spc).append("public ").append(aConsBeg).append(className).append(aConsEnd)
       .append(" {").append(LS);
 
-    spc.updateSpc(+1);
+    spc.update(+1);
 
     if (aRet)
       sb.append(spc.spc).append(genRetType).append(' ').append(genRetVar).append(" = null;")
@@ -433,9 +433,9 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
               sb.append(spc.spc).append("try");
             } else if ("{".equals(tcfStr)) {
               sb.append(" {").append(LS);
-              spc.updateSpc(+1);
+              spc.update(+1);
             } else if ("}".equals(tcfStr)) {
-              spc.updateSpc(-1);
+              spc.update(-1);
               sb.append(spc.spc).append('}').append(LS);
             } else if ("catch".equals(tcfStr)) {
               sb.append(spc.spc).append("catch");
@@ -471,7 +471,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
     if (aRet)
       sb.append(spc.spc).append("return ").append(genRetVar).append(';').append(LS);
 
-    spc.updateSpc(-1);
+    spc.update(-1);
     sb.append(spc.spc).append('}').append(LS).append(LS);
   }
 
@@ -573,7 +573,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
         .append(LS);
     sb.append(aSpc.spc).append("for (final Iterator<").append(iNode).append("> e = ")
       .append(genNodeVar).append(".elements(); e.hasNext();) {").append(LS);
-    aSpc.updateSpc(+1);
+    aSpc.update(+1);
     if (depthLevel)
       increaseDepthLevel(sb, aSpc);
     sb.append(aSpc.spc);
@@ -614,13 +614,13 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
 
     baseNodeVisitMethodBegin(sb, aSpc, aRet, aArgu, nodeListOpt);
     sb.append(aSpc.spc).append("if (").append(genNodeVar).append(".").append("present()) {").append(LS);
-    aSpc.updateSpc(+1);
+    aSpc.update(+1);
     if (aRet)
       sb.append(aSpc.spc).append(genRetType).append(' ').append(genRetVar).append(" = null;")
         .append(LS);
     sb.append(aSpc.spc).append("for (final Iterator<").append(iNode).append("> e = ")
       .append(genNodeVar).append(".elements(); e.hasNext();) {").append(LS);
-    aSpc.updateSpc(+1);
+    aSpc.update(+1);
     if (depthLevel)
       increaseDepthLevel(sb, aSpc);
     sb.append(aSpc.spc);
@@ -635,16 +635,16 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
     if (depthLevel)
       decreaseDepthLevel(sb, aSpc);
     sb.append(aSpc.spc).append('}').append(LS);
-    aSpc.updateSpc(-1);
+    aSpc.update(-1);
     sb.append(aSpc.spc).append("return");
     if (aRet)
       sb.append(' ').append(genRetVar);
     sb.append(';').append(LS);
-    aSpc.updateSpc(-1);
+    aSpc.update(-1);
     sb.append(aSpc.spc).append("} else").append(LS);
-    aSpc.updateSpc(+1);
+    aSpc.update(+1);
     sb.append(aSpc.spc).append("return").append(aRet ? " null" : "").append(';').append(LS);
-    aSpc.updateSpc(-1);
+    aSpc.update(-1);
     baseNodeVisitMethodCloseBrace(sb, aSpc);
 
     return sb;
@@ -667,7 +667,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
 
     baseNodeVisitMethodBegin(sb, aSpc, aRet, aArgu, nodeOpt);
     sb.append(aSpc.spc).append("if (").append(genNodeVar).append(".").append("present()) {").append(LS);
-    aSpc.updateSpc(+1);
+    aSpc.update(+1);
     if (depthLevel)
       increaseDepthLevel(sb, aSpc);
     sb.append(aSpc.spc);
@@ -683,11 +683,11 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
     if (aRet)
       sb.append(' ').append(genRetVar);
     sb.append(';').append(LS);
-    aSpc.updateSpc(-1);
+    aSpc.update(-1);
     sb.append(aSpc.spc).append("} else").append(LS);
-    aSpc.updateSpc(+1);
+    aSpc.update(+1);
     sb.append(aSpc.spc).append("return").append(aRet ? " null" : "").append(';').append(LS);
-    aSpc.updateSpc(-1);
+    aSpc.update(-1);
     baseNodeVisitMethodCloseBrace(sb, aSpc);
 
     return sb;
@@ -715,7 +715,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
         .append(LS);
     sb.append(aSpc.spc).append("for (final Iterator<").append(iNode).append("> e = ")
       .append(genNodeVar).append(".elements(); e.hasNext();) {").append(LS);
-    aSpc.updateSpc(+1);
+    aSpc.update(+1);
     if (depthLevel)
       increaseDepthLevel(sb, aSpc);
     sb.append(aSpc.spc);
@@ -822,7 +822,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
       aSb.append(", final ").append(varargs ? genArgusType : genArguType).append(' ')
          .append(genArguVar);
     aSb.append(") {").append(LS);
-    aSpc.updateSpc(+1);
+    aSpc.update(+1);
     if (aRet) {
       aSb.append(aSpc.spc).append("/* You have to adapt which data is returned")
          .append(" (result variables below are just examples) */").append(LS);
@@ -863,7 +863,7 @@ public class DepthFirstVisitorsGeneratorForJava extends AbstractDepthFirstVisito
    */
    @Override
   void baseNodeVisitMethodCloseBrace(final StringBuilder aSb, final Spacing aSpc) {
-    aSpc.updateSpc(-1);
+    aSpc.update(-1);
     aSb.append(aSpc.spc).append('}').append(LS);
   }
 

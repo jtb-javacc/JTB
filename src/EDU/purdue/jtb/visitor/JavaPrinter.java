@@ -517,7 +517,7 @@ public class JavaPrinter extends AbstractPrinter  {
   public void visit(final EnumBody n) {
     // f0 -> "{"
     n.f0.accept(this);
-    spc.updateSpc(+1);
+    spc.update(+1);
     oneNewLine(n);
     sb.append(spc.spc);
     // f1 -> [ #0 EnumConstant() #1 ( $0 "," $1 EnumConstant() )* ]
@@ -558,7 +558,7 @@ public class JavaPrinter extends AbstractPrinter  {
         }
       }
     }
-    spc.updateSpc(-1);
+    spc.update(-1);
     oneNewLine(n);
     sb.append(spc.spc);
     // f4 -> "}"
@@ -684,7 +684,7 @@ public class JavaPrinter extends AbstractPrinter  {
     // f1 -> ( ClassOrInterfaceBodyDeclaration() )*
     if (n.f1.present()) {
       oneNewLine(n, "a");
-      spc.updateSpc(+1);
+      spc.update(+1);
       oneNewLine(n, "b");
       sb.append(spc.spc);
       for (final Iterator<INode> e = n.f1.elements(); e.hasNext();) {
@@ -695,7 +695,7 @@ public class JavaPrinter extends AbstractPrinter  {
           sb.append(spc.spc);
         }
       }
-      spc.updateSpc(-1);
+      spc.update(-1);
     }
     sb.append(spc.spc);
     // f2 -> "}"
@@ -1009,7 +1009,7 @@ public class JavaPrinter extends AbstractPrinter  {
     sb.append(" ");
     // f4 -> "{"
     n.f4.accept(this);
-    spc.updateSpc(+1);
+    spc.update(+1);
     oneNewLine(n);
     sb.append(spc.spc);
     // f5 -> [ ExplicitConstructorInvocation() ]
@@ -1028,7 +1028,7 @@ public class JavaPrinter extends AbstractPrinter  {
         }
       }
     }
-    spc.updateSpc(-1);
+    spc.update(-1);
     oneNewLine(n);
     sb.append(spc.spc);
     // f7 -> "}"
@@ -2265,7 +2265,7 @@ public class JavaPrinter extends AbstractPrinter  {
     n.f0.accept(this);
     // f1 -> ( BlockStatement() )*
     if (n.f1.present()) {
-      spc.updateSpc(+1);
+      spc.update(+1);
       oneNewLine(n);
       sb.append(spc.spc);
       for (final Iterator<INode> e = n.f1.elements(); e.hasNext();) {
@@ -2276,7 +2276,7 @@ public class JavaPrinter extends AbstractPrinter  {
           sb.append(spc.spc);
         }
       }
-      spc.updateSpc(-1);
+      spc.update(-1);
       oneNewLine(n);
       sb.append(spc.spc);
     }
@@ -2439,7 +2439,7 @@ public class JavaPrinter extends AbstractPrinter  {
     sb.append(" ");
     // f4 -> "{"
     n.f4.accept(this);
-    spc.updateSpc(+1);
+    spc.update(+1);
     oneNewLine(n);
     sb.append(spc.spc);
     // ( #0 SwitchLabel() #1 ( BlockStatement() )* )*
@@ -2447,7 +2447,7 @@ public class JavaPrinter extends AbstractPrinter  {
       final NodeSequence seq = (NodeSequence) e.next();
       // #0 SwitchLabel()
       seq.elementAt(0).accept(this);
-      spc.updateSpc(+1);
+      spc.update(+1);
       // #1 ( BlockStatement() )*
       final NodeListOptional nlo = (NodeListOptional) seq.elementAt(1);
       if ((nlo).present()) {
@@ -2467,9 +2467,9 @@ public class JavaPrinter extends AbstractPrinter  {
         }
       }
       oneNewLine(n);
-      spc.updateSpc(-1);
+      spc.update(-1);
     }
-    spc.updateSpc(-1);
+    spc.update(-1);
     sb.append(spc.spc);
     // f6 -> "}"
     n.f6.accept(this);
@@ -2527,7 +2527,7 @@ public class JavaPrinter extends AbstractPrinter  {
     n.f3.accept(this);
     // f4 -> Statement()
     if (n.f4.f0.which != 2) { // if Statement() not a Block
-      spc.updateSpc(+1);
+      spc.update(+1);
       oneNewLine(n);
       sb.append(spc.spc);
     } else { // if Statement() is a Block
@@ -2535,7 +2535,7 @@ public class JavaPrinter extends AbstractPrinter  {
     }
     n.f4.accept(this);
     if (n.f4.f0.which != 2) // if Statement() not a Block
-      spc.updateSpc(-1);
+      spc.update(-1);
     // f5 -> [ #0 "else" #1 Statement() ]
     if (n.f5.present()) {
       if (n.f4.f0.which != 2) { // if Statement() not a Block
@@ -2550,12 +2550,12 @@ public class JavaPrinter extends AbstractPrinter  {
       final Statement st = (Statement) ((NodeSequence) n.f5.node).elementAt(1);
       if (st.f0.which != 2) {
         // else Statement() is not a Block()
-        spc.updateSpc(+1);
+        spc.update(+1);
         oneNewLine(n);
         sb.append(spc.spc);
         // Statement()
         st.f0.choice.accept(this);
-        spc.updateSpc(-1);
+        spc.update(-1);
         oneNewLine(n);
         sb.append(spc.spc);
       } else {
@@ -2717,12 +2717,12 @@ public class JavaPrinter extends AbstractPrinter  {
   void genStatement(final Statement n) {
     if (n.f0.which != 2) {
       // case Statement is not a %02 Block
-      spc.updateSpc(+1);
+      spc.update(+1);
       oneNewLine(n);
       sb.append(spc.spc);
       // Statement()
       n.accept(this);
-      spc.updateSpc(-1);
+      spc.update(-1);
       oneNewLine(n);
       sb.append(spc.spc);
     } else {
@@ -2893,12 +2893,12 @@ public class JavaPrinter extends AbstractPrinter  {
     n.f2.accept(this);
     // f3 -> ")"
     n.f3.accept(this);
-    spc.updateSpc(+1);
+    spc.update(+1);
     oneNewLine(n);
     sb.append(spc.spc);
     // f4 -> Block()
     n.f4.accept(this);
-    spc.updateSpc(-1);
+    spc.update(-1);
   }
 
   /**
@@ -3196,7 +3196,7 @@ public class JavaPrinter extends AbstractPrinter  {
     // f1 -> ( AnnotationTypeMemberDeclaration() )*
     if (n.f1.present()) {
       oneNewLine(n, "a");
-      spc.updateSpc(+1);
+      spc.update(+1);
       oneNewLine(n, "b");
       sb.append(spc.spc);
       for (final Iterator<INode> e = n.f1.elements(); e.hasNext();) {
@@ -3207,7 +3207,7 @@ public class JavaPrinter extends AbstractPrinter  {
           sb.append(spc.spc);
         }
       }
-      spc.updateSpc(-1);
+      spc.update(-1);
     }
     sb.append(spc.spc);
     // f2 -> "}"

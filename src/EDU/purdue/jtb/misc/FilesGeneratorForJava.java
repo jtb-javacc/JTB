@@ -145,7 +145,7 @@ public class FilesGeneratorForJava extends AbstractFilesGenerator {
       final String className = classInfo.getClassName();
 
       sb.append("class ").append(className).append(":").append(LS);
-      spc.updateSpc(+1);
+      spc.update(+1);
 
       final Iterator<String> types = classInfo.getFieldTypes().iterator();
       final Iterator<String> names = classInfo.getFieldNames().iterator();
@@ -154,7 +154,7 @@ public class FilesGeneratorForJava extends AbstractFilesGenerator {
         sb.append(spc.spc).append(types.next()).append(" ").append(names.next()).append(LS);
 
       sb.append(LS);
-      spc.updateSpc(-1);
+      spc.update(-1);
     }
     return sb;
   }
@@ -403,7 +403,7 @@ public class FilesGeneratorForJava extends AbstractFilesGenerator {
   void genAnyIVisitorEnd(final StringBuilder aSb, final String aConsBeg, final String aConsEnd,
                          final boolean aRet, final boolean aArgu) {
     final Spacing spc = new Spacing(INDENT_AMT);
-    spc.updateSpc(+1);
+    spc.update(+1);
     if (javaDocComments) {
       aSb.append(spc.spc).append("/*").append(LS);
       aSb.append(spc.spc).append(" * User grammar generated visit methods").append(LS);
@@ -430,7 +430,7 @@ public class FilesGeneratorForJava extends AbstractFilesGenerator {
       aSb.append(spc.spc).append("public ").append(aConsBeg).append(className).append(aConsEnd)
          .append(";").append(LS).append(LS);
     }
-    spc.updateSpc(-1);
+    spc.update(-1);
     aSb.append("}").append(LS);
   }
 

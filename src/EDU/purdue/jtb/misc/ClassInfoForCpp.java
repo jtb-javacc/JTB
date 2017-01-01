@@ -251,7 +251,7 @@ public class ClassInfoForCpp extends AbstractClassInfo {
     sb.append("public ");
     sb.append(iNode).append(intf.getClassParamType()).append(" {").append(LS);
     sb.append("public:").append(LS);
-    aSpc.updateSpc(+1);
+    aSpc.update(+1);
 
     /*
      * data fields declarations
@@ -310,20 +310,20 @@ public class ClassInfoForCpp extends AbstractClassInfo {
      */
 
     names = fieldNames.iterator();
-    aSpc.updateSpc(+1);
+    aSpc.update(+1);
     for (int count = 0; names.hasNext(); ++count) {
       final String nm = names.next();
       sb.append(aSpc.spc).append(nm).append(" = n").append(count).append(";").append(LS);
       if (parentPointer) {
         sb.append(aSpc.spc).append("if (").append(nm).append(" != null)").append(LS);
-        aSpc.updateSpc(+1);
+        aSpc.update(+1);
         sb.append(aSpc.spc).append(nm);
         sb.append("->").append("setParent(this);").append(LS);
-        aSpc.updateSpc(-1);
+        aSpc.update(-1);
       }
     }
 
-    aSpc.updateSpc(-1);
+    aSpc.update(-1);
     sb.append(aSpc.spc).append("}").append(LS);
 
     
@@ -391,7 +391,7 @@ public class ClassInfoForCpp extends AbstractClassInfo {
       int count = 0;
       names = fieldNames.iterator();
       inits = fieldInitializers.iterator();
-      aSpc.updateSpc(+1);
+      aSpc.update(+1);
       while (names.hasNext()) {
         final String nm = names.next();
         final String init = inits.next();
@@ -403,13 +403,13 @@ public class ClassInfoForCpp extends AbstractClassInfo {
         }
         if (parentPointer) {
           sb.append(aSpc.spc).append("if (").append(nm).append(" != null)").append(LS);
-          aSpc.updateSpc(+1);
+          aSpc.update(+1);
           sb.append(aSpc.spc).append("  ").append(nm);
           sb.append("->").append("setParent(this);").append(LS);
-          aSpc.updateSpc(-1);
+          aSpc.update(-1);
         }
       }
-      aSpc.updateSpc(-1);
+      aSpc.update(-1);
       sb.append(aSpc.spc).append("}").append(LS);
     }
 
@@ -437,9 +437,9 @@ public class ClassInfoForCpp extends AbstractClassInfo {
     sb.append(iRetArguVisitor.getClassParamType());
     sb.append("& vis, " + (varargs ? genArgusType : genArguType)).append(" argu) {")
       .append(LS);
-    aSpc.updateSpc(+1);
+    aSpc.update(+1);
     sb.append(aSpc.spc).append("return vis.visit(*this, argu...);").append(LS);
-    aSpc.updateSpc(-1);
+    aSpc.update(-1);
     sb.append(aSpc.spc).append("}").append(LS);
 
 //    sb.append(LS);
@@ -515,9 +515,9 @@ public class ClassInfoForCpp extends AbstractClassInfo {
       }
       sb.append(aSpc.spc).append("void setParent(const ").append(iNode).append(iRetArguVisitor.getClassParamType()).append("* n) {")
         .append(LS);
-      aSpc.updateSpc(+1);
+      aSpc.update(+1);
       sb.append(aSpc.spc).append("parent = n;").append(LS);
-      aSpc.updateSpc(-1);
+      aSpc.update(-1);
       sb.append(aSpc.spc).append("}").append(LS);
       sb.append(LS);
       if (javaDocComments) {
@@ -528,9 +528,9 @@ public class ClassInfoForCpp extends AbstractClassInfo {
         sb.append(aSpc.spc).append(" */").append(LS);
       }
       sb.append(aSpc.spc).append("const ").append(iNode).append(iRetArguVisitor.getClassParamType()).append("* getParent() {").append(LS);
-      aSpc.updateSpc(+1);
+      aSpc.update(+1);
       sb.append(aSpc.spc).append("return parent;").append(LS);
-      aSpc.updateSpc(-1);
+      aSpc.update(-1);
       sb.append(aSpc.spc).append("}").append(LS);
     }
     }
@@ -539,7 +539,7 @@ public class ClassInfoForCpp extends AbstractClassInfo {
      * end
      */
 
-    aSpc.updateSpc(-1);
+    aSpc.update(-1);
     sb.append(aSpc.spc).append(LS);
     sb.append(aSpc.spc).append("};").append(LS);
 

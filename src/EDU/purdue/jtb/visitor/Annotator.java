@@ -26,7 +26,7 @@ import java.util.List;
 
 import EDU.purdue.jtb.misc.FileExistsException;
 import EDU.purdue.jtb.misc.Globals;
-import EDU.purdue.jtb.misc.Globals.Language;
+import EDU.purdue.jtb.misc.Language;
 import EDU.purdue.jtb.misc.Messages;
 import EDU.purdue.jtb.misc.VarInfo;
 import EDU.purdue.jtb.misc.VarInfoFactory;
@@ -499,7 +499,7 @@ public abstract class Annotator extends JavaCCPrinter {
     // extra parenthesis needed !
     sb.append("(");
     oneNewLine(n, "genExpChWithChoices a");
-    spc.updateSpc(+1);
+    spc.update(+1);
     sb.append(spc.spc);
     ++bnfLvl;
     n.f0.accept(this);
@@ -509,12 +509,12 @@ public abstract class Annotator extends JavaCCPrinter {
       lnftfv.reset();
       n.f0.accept(lnftfv);
       Messages.info("Empty NodeChoice within a choice in '" + curProduction + "()'.", lnft, cnft);
-      spc.updateSpc(-1);
+      spc.update(-1);
       sb.setLength(sb.length() - INDENT_AMT);
     } else {
       genNewNodeChoiceVarDecl(ident, whichVal, total);
       oneNewLine(n, "genExpChWithChoices b");
-      spc.updateSpc(-1);
+      spc.update(-1);
       sb.append(spc.spc);
       ++whichVal;
     }
@@ -525,7 +525,7 @@ public abstract class Annotator extends JavaCCPrinter {
       // "|"
       seq.elementAt(0).accept(this);
       oneNewLine(n, "genExpChWithChoices c");
-      spc.updateSpc(+1);
+      spc.update(+1);
       sb.append(spc.spc);
       // Expansion()
       ++bnfLvl;
@@ -535,12 +535,12 @@ public abstract class Annotator extends JavaCCPrinter {
         lnft = ((NodeToken) seq.elementAt(0)).beginLine;
         cnft = ((NodeToken) seq.elementAt(0)).beginColumn;
         Messages.info("Empty NodeChoice within a choice in '" + curProduction + "()'.", lnft, cnft);
-        spc.updateSpc(-1);
+        spc.update(-1);
         sb.setLength(sb.length() - INDENT_AMT);
       } else {
         genNewNodeChoiceVarDecl(ident, whichVal, total);
         oneNewLine(n, "genExpChWithChoices d");
-        spc.updateSpc(-1);
+        spc.update(-1);
         sb.append(spc.spc);
         ++whichVal;
       }
@@ -708,7 +708,7 @@ public abstract class Annotator extends JavaCCPrinter {
     // "["
     seq.elementAt(0).accept(this);
     oneNewLine(n, "genBracketExpCh 1");
-    spc.updateSpc(+1);
+    spc.update(+1);
     sb.append(spc.spc);
     name = genNewVarName();
     VarInfo varInfo;
@@ -777,7 +777,7 @@ public abstract class Annotator extends JavaCCPrinter {
       finalActions(varInfo);
     }
     oneNewLine(n, "genBracketExpCh 4");
-    spc.updateSpc(-1);
+    spc.update(-1);
     sb.append(spc.spc);
     // "]"
     seq.elementAt(2).accept(this);
@@ -805,14 +805,14 @@ public abstract class Annotator extends JavaCCPrinter {
     sb.append(" ");
     // f1 -> "{"
     n.f1.accept(this);
-    spc.updateSpc(+1);
+    spc.update(+1);
     oneNewLine(n, "a");
     sb.append(spc.spc);
     // f2 -> ExpansionChoices()
     inEUT3 = true;
     n.f2.accept(this);
     inEUT3 = false;
-    spc.updateSpc(-1);
+    spc.update(-1);
     oneNewLine(n, "b");
     sb.append(spc.spc);
     // f3 -> "}"
@@ -874,7 +874,7 @@ public abstract class Annotator extends JavaCCPrinter {
     // "("
     seq.elementAt(0).accept(this);
     oneNewLine(n, "genParenExpCh 1");
-    spc.updateSpc(+1);
+    spc.update(+1);
     sb.append(spc.spc);
     // seq.elementAt(3) -> #3 ( &0 "+" | &1 "*" | &2 "?" )?
     if (!((NodeOptional) seq.elementAt(3)).present()) {
@@ -903,7 +903,7 @@ public abstract class Annotator extends JavaCCPrinter {
         finalActions(varInfo);
       }
       oneNewLine(n, "genParenExpCh 2");
-      spc.updateSpc(-1);
+      spc.update(-1);
       sb.append(spc.spc);
       // ")"
       seq.elementAt(2).accept(this);
@@ -979,7 +979,7 @@ public abstract class Annotator extends JavaCCPrinter {
         finalActions(varInfo);
       }
       oneNewLine(n, "genParenExpCh 6");
-      spc.updateSpc(-1);
+      spc.update(-1);
       sb.append(spc.spc);
       // ")"
       seq.elementAt(2).accept(this);
@@ -1141,7 +1141,7 @@ public abstract class Annotator extends JavaCCPrinter {
       sb.append(spc.spc);
       sb.append("{");
       oneNewLine(n, "g");
-      spc.updateSpc(+1);
+      spc.update(+1);
       sb.append(spc.spc);
       sb.append(reTokenName);
       sb.append(qualifier());
@@ -1156,7 +1156,7 @@ public abstract class Annotator extends JavaCCPrinter {
       sb.append("{ ").append(nodeName).append(" = ").append(makeNodeToken()).append("(")
         .append(reTokenName).append("); }");
       oneNewLine(n, "j");
-      spc.updateSpc(-1);
+      spc.update(-1);
       sb.append(spc.spc);
       sb.append("}");
       oneNewLine(n, "k");
@@ -1218,7 +1218,7 @@ public abstract class Annotator extends JavaCCPrinter {
     n.f0.accept(this);
     // f1 -> ( BlockStatement() )*
     if (n.f1.present()) {
-      spc.updateSpc(+1);
+      spc.update(+1);
       oneNewLine(n, "x");
       sb.append(spc.spc);
       for (final Iterator<INode> e = n.f1.elements(); e.hasNext();) {
@@ -1229,7 +1229,7 @@ public abstract class Annotator extends JavaCCPrinter {
           sb.append(spc.spc);
         }
       }
-      spc.updateSpc(-1);
+      spc.update(-1);
       oneNewLine(n, "z");
       sb.append(spc.spc);
     }
@@ -1386,7 +1386,7 @@ public abstract class Annotator extends JavaCCPrinter {
     sb.append(" ");
     // f4 -> "{"
     n.f4.accept(this);
-    spc.updateSpc(+1);
+    spc.update(+1);
     oneNewLine(n);
     sb.append(spc.spc);
     // f5 -> ( #0 SwitchLabel() #1 ( BlockStatement() )* )*
@@ -1394,7 +1394,7 @@ public abstract class Annotator extends JavaCCPrinter {
       final NodeSequence seq = (NodeSequence) e.next();
       // #0 SwitchLabel()
       sb.append(genJavaBranch(seq.elementAt(0)));
-      spc.updateSpc(+1);
+      spc.update(+1);
       // #1 ( BlockStatement() )* )*
       final NodeListOptional nlo = (NodeListOptional) seq.elementAt(1);
       if ((nlo).present()) {
@@ -1414,9 +1414,9 @@ public abstract class Annotator extends JavaCCPrinter {
         }
       }
       oneNewLine(n);
-      spc.updateSpc(-1);
+      spc.update(-1);
     }
-    spc.updateSpc(-1);
+    spc.update(-1);
     sb.append(spc.spc);
     // f6 -> "}"
     n.f6.accept(this);
@@ -1448,7 +1448,7 @@ public abstract class Annotator extends JavaCCPrinter {
     n.f3.accept(this);
     // f4 -> Statement()
     if (n.f4.f0.which != 2) { // if Statement() not a Block
-      spc.updateSpc(+1);
+      spc.update(+1);
       oneNewLine(n);
       sb.append(spc.spc);
     } else { // if Statement() is a Block
@@ -1456,7 +1456,7 @@ public abstract class Annotator extends JavaCCPrinter {
     }
     n.f4.accept(this);
     if (n.f4.f0.which != 2) // if Statement() not a Block
-      spc.updateSpc(-1);
+      spc.update(-1);
     // f5 -> [ #0 "else" #1 Statement() ]
     if (n.f5.present()) {
       if (n.f4.f0.which != 2) {// if Statement() not a Block
@@ -1471,12 +1471,12 @@ public abstract class Annotator extends JavaCCPrinter {
       final Statement st = (Statement) ((NodeSequence) n.f5.node).elementAt(1);
       if (st.f0.which != 2) {
         // else Statement() is not a Block()
-        spc.updateSpc(+1);
+        spc.update(+1);
         oneNewLine(n);
         sb.append(spc.spc);
         // #1 Statement()
         st.f0.choice.accept(this);
-        spc.updateSpc(-1);
+        spc.update(-1);
         oneNewLine(n);
         sb.append(spc.spc);
       } else {
@@ -1635,12 +1635,12 @@ public abstract class Annotator extends JavaCCPrinter {
   void genStatement(final Statement n) {
     if (n.f0.which != 2) {
       // case Statement is not a %02 Block()
-      spc.updateSpc(+1);
+      spc.update(+1);
       oneNewLine(n);
       sb.append(spc.spc);
       // Statement()
       n.accept(this);
-      spc.updateSpc(-1);
+      spc.update(-1);
       oneNewLine(n);
       sb.append(spc.spc);
     } else {
@@ -1709,12 +1709,12 @@ public abstract class Annotator extends JavaCCPrinter {
     sb.append(genJavaBranch(n.f2));
     // f3 -> ")"
     n.f3.accept(this);
-    spc.updateSpc(+1);
+    spc.update(+1);
     oneNewLine(n);
     sb.append(spc.spc);
     // f4 -> Block()
     n.f4.accept(this);
-    spc.updateSpc(-1);
+    spc.update(-1);
   }
 
   /**

@@ -192,7 +192,7 @@ public class AnnotatorForCpp extends Annotator {
     sb.append(spc.spc);
     // block left brace
     n.f7.f0.accept(this);
-    spc.updateSpc(+1);
+    spc.update(+1);
     oneNewLine(n, "b");
     sb.append(spc.spc);
     sb.append("// --- JTB generated node declarations ---");
@@ -223,7 +223,7 @@ public class AnnotatorForCpp extends Annotator {
         }
       }
     }
-    spc.updateSpc(-1);
+    spc.update(-1);
     oneNewLine(n, "h");
     sb.append(spc.spc);
     // block right brace
@@ -427,7 +427,7 @@ public class AnnotatorForCpp extends Annotator {
     // f8 -> "{"
     n.f8.accept(this);
     oneNewLine(n, "generateRHS a");
-    spc.updateSpc(+1);
+    spc.update(+1);
     sb.append(spc.spc);
     // outerVars will be set further down the tree in finalActions
     // f9 -> ExpansionChoices()
@@ -442,7 +442,7 @@ public class AnnotatorForCpp extends Annotator {
     }
     sb.append("); }");
     oneNewLine(n, "generateRHS b");
-    spc.updateSpc(-1);
+    spc.update(-1);
     sb.append(spc.spc);
     // f10 -> "}"
     n.f10.accept(this);

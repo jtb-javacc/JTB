@@ -437,7 +437,7 @@ public class TreeFormatterGeneratorForJava implements TreeFormatterGenerator {
     sb.append("  // User-generated visitor methods below").append(LS);
     sb.append("  //").append(LS).append(LS);
     final Spacing spc = new Spacing(INDENT_AMT);
-    spc.updateSpc(+1);
+    spc.update(+1);
 
     for (final Iterator<ClassInfo> e = classList.iterator(); e.hasNext();) {
       final ClassInfo cur = e.next();
@@ -453,7 +453,7 @@ public class TreeFormatterGeneratorForJava implements TreeFormatterGenerator {
       sb.append(spc.spc).append("public void visit");
       sb.append("(final ").append(className).append(" n) {").append(LS);
 
-      spc.updateSpc(+1);
+      spc.update(+1);
 
       final Iterator<String> names = cur.getFieldNames().iterator();
       final Iterator<String> types = cur.getFieldTypes().iterator();
@@ -467,26 +467,26 @@ public class TreeFormatterGeneratorForJava implements TreeFormatterGenerator {
             sb.append(spc.spc).append("processList(n.").append(name).append(");").append(LS);
           else if (type.equals(nodeListOpt)) {
             sb.append(spc.spc).append("if (n.").append(name).append(".").append("present()) {").append(LS);
-            spc.updateSpc(+1);
+            spc.update(+1);
             sb.append(spc.spc).append("processList(n.").append(name).append(");").append(LS);
-            spc.updateSpc(-1);
+            spc.update(-1);
             sb.append(spc.spc).append("}").append(LS);
           } else if (type.equals(nodeOpt)) {
             sb.append(spc.spc).append("if (n.").append(name).append(".").append("present()) {").append(LS);
-            spc.updateSpc(+1);
+            spc.update(+1);
             sb.append(spc.spc).append("n.").append(name).append(".").append("accept(this);").append(LS);
 
-            spc.updateSpc(-1);
+            spc.update(-1);
             sb.append(spc.spc).append("}").append(LS);
           } else
             sb.append(spc.spc).append("n.").append(name).append(".").append("accept(this);").append(LS);
       }
 
-      spc.updateSpc(-1);
+      spc.update(-1);
       sb.append(spc.spc).append("}").append(LS).append(LS);
     }
 
-    spc.updateSpc(-1);
+    spc.update(-1);
     sb.append(spc.spc).append("}").append(LS).append(LS);
 
     //

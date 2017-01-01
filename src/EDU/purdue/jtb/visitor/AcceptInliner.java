@@ -396,10 +396,10 @@ public class AcceptInliner extends JavaCCPrinter {
     type = iNode.getName();
     ref = var;
 
-    spc.updateSpc(+1);
+    spc.update(+1);
     sb.append(spc.spc).append("case 0:");
     oneNewLine(n, "case 0");
-    spc.updateSpc(+1);
+    spc.update(+1);
     outputSubComment("Choice a");
 
     // visit Expansion
@@ -417,7 +417,7 @@ public class AcceptInliner extends JavaCCPrinter {
 
     sb.append(spc.spc).append("break;");
     oneNewLine(n, "break 0");
-    spc.updateSpc(-1);
+    spc.update(-1);
 
     // f1 -> ( "|" Expansion() )* : generate other cases
     for (int i = 0; i < n.f1.size();) {
@@ -426,7 +426,7 @@ public class AcceptInliner extends JavaCCPrinter {
 
       sb.append(spc.spc).append("case ").append(i).append(":");
       oneNewLine(n, "case");
-      spc.updateSpc(+1);
+      spc.update(+1);
       outputSubComment("Choice b");
 
       // visit Expansion
@@ -441,21 +441,21 @@ public class AcceptInliner extends JavaCCPrinter {
 
       sb.append(spc.spc).append("break;");
       oneNewLine(n, "break n");
-      spc.updateSpc(-1);
+      spc.update(-1);
 
     }
 
     // generate default and end of switch
     sb.append(spc.spc).append("default:");
     oneNewLine(n, "default");
-    spc.updateSpc(+1);
+    spc.update(+1);
     sb.append(spc.spc).append("// should not occur !!!");
     oneNewLine(n, "should");
     sb.append(spc.spc).append("break;");
     oneNewLine(n, "break def");
-    spc.updateSpc(-1);
+    spc.update(-1);
 
-    spc.updateSpc(-1);
+    spc.update(-1);
     sb.append(spc.spc).append("}");
     oneNewLine(n, "}");
 
@@ -651,7 +651,7 @@ public class AcceptInliner extends JavaCCPrinter {
 
         sb.append(spc.spc).append("if (").append(var).append(depthFirstVisitorsGenerator.getQualifier()).append("present()) {");
         oneNewLine(n, "if");
-        spc.updateSpc(+1);
+        spc.update(+1);
         ref = var.concat(depthFirstVisitorsGenerator.getQualifier()).concat("node");
 
         // visit ExpansionChoices
@@ -662,7 +662,7 @@ public class AcceptInliner extends JavaCCPrinter {
         var = oldVar;
         type = oldType;
 
-        spc.updateSpc(-1);
+        spc.update(-1);
         sb.append(spc.spc).append("}");
         oneNewLine(n, "2_end");
         break;
@@ -793,7 +793,7 @@ public class AcceptInliner extends JavaCCPrinter {
               .append(loopIxStr).append(" < ").append(var1).append(".size(); i").append(loopIxStr)
               .append("++) {");
             oneNewLine(n, "for +");
-            spc.updateSpc(+1);
+            spc.update(+1);
 
             ref = var1.concat(".elementAt(i").concat(String.valueOf(loopIxStr)).concat(")");
             var = var.concat("Ei");
@@ -812,7 +812,7 @@ public class AcceptInliner extends JavaCCPrinter {
             type = oldType;
             loopIx = oldLoopIx;
 
-            spc.updateSpc(-1);
+            spc.update(-1);
             sb.append(spc.spc).append("}");
             oneNewLine(n, "}");
 
@@ -842,7 +842,7 @@ public class AcceptInliner extends JavaCCPrinter {
 
             sb.append(spc.spc).append("if (").append(var).append(depthFirstVisitorsGenerator.getQualifier()).append("present()) {");
             oneNewLine(n, "if");
-            spc.updateSpc(+1);
+            spc.update(+1);
 
             oldLoopIx = loopIx;
             loopIxStr = loopIx == 0 ? "" : String.valueOf(loopIx);
@@ -851,7 +851,7 @@ public class AcceptInliner extends JavaCCPrinter {
               .append(loopIxStr).append(" < ").append(var).append(".size(); i").append(loopIxStr)
               .append("++) {");
             oneNewLine(n, "for *");
-            spc.updateSpc(+1);
+            spc.update(+1);
 
             ref = var.concat(".elementAt(i").concat(String.valueOf(loopIxStr)).concat(")");
             var = var.concat("Mi");
@@ -871,11 +871,11 @@ public class AcceptInliner extends JavaCCPrinter {
             type = oldType;
             loopIx = oldLoopIx;
 
-            spc.updateSpc(-1);
+            spc.update(-1);
             sb.append(spc.spc).append("}");
             oneNewLine(n, "1}");
 
-            spc.updateSpc(-1);
+            spc.update(-1);
             sb.append(spc.spc).append("}");
             oneNewLine(n, "2}");
 
@@ -905,7 +905,7 @@ public class AcceptInliner extends JavaCCPrinter {
 
             sb.append(spc.spc).append("if (").append(var).append(depthFirstVisitorsGenerator.getQualifier()).append("present()) {");
             oneNewLine(n, "if");
-            spc.updateSpc(+1);
+            spc.update(+1);
             ref = var.concat(depthFirstVisitorsGenerator.getQualifier()).concat("node");
 
             // visit ExpansionChoices
@@ -916,7 +916,7 @@ public class AcceptInliner extends JavaCCPrinter {
             var = oldVar;
             type = oldType;
 
-            spc.updateSpc(-1);
+            spc.update(-1);
             sb.append(spc.spc).append("}");
             oneNewLine(n, "}");
           }
@@ -983,7 +983,7 @@ public class AcceptInliner extends JavaCCPrinter {
     skipTcfComment();
     sb.append(genJavaBranch(n.f1));
     oneNewLine(n);
-    spc.updateSpc(+1);
+    spc.update(+1);
     // f2 -> ExpansionChoices()
     if (tcfLvl > 0)
       outputTcfComment("ExpansionChoices");
@@ -991,7 +991,7 @@ public class AcceptInliner extends JavaCCPrinter {
     n.f2.accept(this);
 
     // f3 -> "}"
-    spc.updateSpc(-1);
+    spc.update(-1);
     skipTcfComment();
     sb.append(spc.spc).append(genJavaBranch(n.f3));
     oneNewLine(n);
