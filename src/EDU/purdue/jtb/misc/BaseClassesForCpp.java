@@ -1072,7 +1072,7 @@ class BaseClassesForCpp implements BaseClasses {
       sb.append("   * @return the token image").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  string toString() {").append(LS);
+    sb.append("  const string& toString() {").append(LS);
     sb.append("    return tokenImage;").append(LS);
     sb.append("  }").append(LS).append(LS);
 
