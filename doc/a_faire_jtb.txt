@@ -1,13 +1,24 @@
 A faire sur JTB
+- si 2 parsers sont dans le même package, la classe jtbtoolkit est définie 2 fois
+- générer des visiteurs avec les arguments supplémentaires si la production a des arguments
 - générer un visiteur de comptage (ou avec un pre et post hook)
-- voir indentation ) en toute fin de lookahead
+- générer un tableau de tous les noms de noeuds comme dans JJT
+- voir indentation ) en toute fin de lookahead ???
 - dans JavaCCPrinter.saveToFile(), tester et créer les répertoires intermédiaires si l'open se plante en FNFE
 - séparer les packages nécessaires à la grammaire de ceux nécessaires pour le générateur (misc / utils / parser / xxx)
 - voir les warnings dans parser
-- voir les ajouts faits par FA ou à faire pour JavaCC 6.x
+- voir les ajouts faits par FA ou à faire pour JavaCC 6+ et C++
 - vérifier avec et sans les commentaires de debug
 - vérifier avec les noms longs et les noms courts pour les variables intermédiaires (dans AcceptInliner)
 - vérifier avec et sans inline
+
+Fait sur JTB en 1.4.13
+- ajouté les options dans la grammaire pour une génération correcte directe sous Eclipse
+- ajouté des commentaires dans le fichier Token.java.save
+- corrigé le problème d'espace sur les modifiers de déclaration de variables locales (Annotator:VariableModifiers)
+
+Fait sur JTB en 1.4.12 (FA)
+- modifications fichiers xml et autres pour build et maven
 
 Fait sur JTB en 1.4.11
 - mis des espaces entre les '<' et '>' et les noms des tokens pour qu'ils s'affichent correctement dans les javadoc (< AMONG > au lieu de <AMONG>)

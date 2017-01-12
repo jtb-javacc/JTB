@@ -1,4 +1,12 @@
 ---------------
+Version 1.4.13
+---------------
+-> 12/01/2017
+- fixed printing a local variable declaration with a modifier
+- moved properties from build.xml to jtb.xml (dev)
+- added options to generate correctly the grammar in Eclipse (dev)
+
+---------------
 Version 1.4.12
 ---------------
 Publish JTB aa a maven artifact to Maven Central

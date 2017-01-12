@@ -112,6 +112,7 @@
 //               removed old invalid comments on missing node descriptors (they are in JJTree but not JTB)
 // ModMMa 12/2014 : 1.4.8 : added variables initialization code ;
 //                fixed the LOOKAHEAD in and modified ExplicitConstructorInvocation()
+// ModMMa 01/2017 : 1.4.13 : added default options for proper generation by the Eclipse plugin
 
 options
 {
@@ -123,6 +124,12 @@ options
 
 // ModMMa : kept (from JavaCC.jj, but it does not exist in jtbgram.jj)
   STATIC = false;
+
+// ModMMa : for proper generation by the Eclipse plugin besides the ant task
+  JTB_P = "EDU.purdue.jtb"; // nodes and visitors package
+  JTB_IA = true; // inline accepts (default true)
+  JTB_JD = true; // javadoc comments (default true)
+  JTB_TK = true; // special tokens (default true)
 
 // ModMMa : impossible to use it (too long, too big)
 //  DEBUG_LOOKAHEAD = true;

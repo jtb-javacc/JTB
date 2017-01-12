@@ -52,7 +52,19 @@
  */
 package EDU.purdue.jtb.visitor;
 
-import static EDU.purdue.jtb.misc.Globals.*;
+import static EDU.purdue.jtb.misc.Globals.DEBUG_CLASS_COMMENTS;
+import static EDU.purdue.jtb.misc.Globals.genFileHeaderComment;
+import static EDU.purdue.jtb.misc.Globals.getFixedName;
+import static EDU.purdue.jtb.misc.Globals.jjToken;
+import static EDU.purdue.jtb.misc.Globals.jtbRtPrefix;
+import static EDU.purdue.jtb.misc.Globals.keepSpecialTokens;
+import static EDU.purdue.jtb.misc.Globals.nodeChoice;
+import static EDU.purdue.jtb.misc.Globals.nodeList;
+import static EDU.purdue.jtb.misc.Globals.nodeListOpt;
+import static EDU.purdue.jtb.misc.Globals.nodeOpt;
+import static EDU.purdue.jtb.misc.Globals.nodeSeq;
+import static EDU.purdue.jtb.misc.Globals.nodeToken;
+import static EDU.purdue.jtb.misc.Globals.nodesPackageName;
 import static EDU.purdue.jtb.visitor.GlobalDataBuilder.BNF_IND;
 import static EDU.purdue.jtb.visitor.GlobalDataBuilder.DONT_CREATE;
 import static EDU.purdue.jtb.visitor.GlobalDataBuilder.JC_IND;
@@ -103,6 +115,7 @@ import EDU.purdue.jtb.syntaxtree.SwitchStatement;
 import EDU.purdue.jtb.syntaxtree.SynchronizedStatement;
 import EDU.purdue.jtb.syntaxtree.TryStatement;
 import EDU.purdue.jtb.syntaxtree.Type;
+import EDU.purdue.jtb.syntaxtree.VariableModifiers;
 import EDU.purdue.jtb.syntaxtree.WhileStatement;
 
 /**
@@ -128,7 +141,7 @@ import EDU.purdue.jtb.syntaxtree.WhileStatement;
  * When it wants to print a node and its subtree without annotating it, it uses an instance of the
  * {@link JavaCCPrinter} to visit the node.
  * <p>
- * 
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  * @version 1.4.0.2 : 01/2010 : MMa : fixed output of else in IfStatement
@@ -146,6 +159,7 @@ import EDU.purdue.jtb.syntaxtree.WhileStatement;
  * @version 1.4.9 : 01/2015 : MMa : fixed regression in {@link #bnfFinalActions(VarInfo)}
  * @version 1.4.11 : 03/2016 : MMa : fixed column numbers in warnings, and conditions for warning
  *          "Empty choice : a NodeChoice with a 'null' choice member ..."
+ * @version 1.4.13 : 01/2017 : MMa : fixed missing space in visiting VariableModifiers
  */
 public class Annotator extends JavaCCPrinter {
 
@@ -156,12 +170,12 @@ public class Annotator extends JavaCCPrinter {
   /** The counter for generated variables names */
   int                              varNum;
   /** The list of all variables to be declared */
-  List<VarInfo>                    varList            = new ArrayList<VarInfo>();
+  List<VarInfo>                    varList            = new ArrayList<>();
   /**
    * The list of all "outer" variables (production's children nodes) for the production default
    * constructor
    */
-  List<VarInfo>                    outerVars          = new ArrayList<VarInfo>();
+  List<VarInfo>                    outerVars          = new ArrayList<>();
   /** The RegularExpression generated token name */
   String                           reTokenName        = null;
   /** True to tell lower layers whether to create the RegularExpression node, false otherwise */
@@ -201,7 +215,7 @@ public class Annotator extends JavaCCPrinter {
 
   /**
    * Constructor which will allocate a default buffer and indentation.
-   * 
+   *
    * @param aGdbv - the global data builder visitor
    */
   public Annotator(final GlobalDataBuilder aGdbv) {
@@ -217,7 +231,7 @@ public class Annotator extends JavaCCPrinter {
 
   /**
    * Generates a new variable name (n0, n1, ...)
-   * 
+   *
    * @return the new variable name
    */
   final String genNewVarName() {
@@ -245,7 +259,7 @@ public class Annotator extends JavaCCPrinter {
 
   /**
    * Prints into a given buffer a node class comment, an extra given comment, and a new line.
-   * 
+   *
    * @param n the node for the node class comment
    * @param str the extra comment
    * @param aSb the buffer to print into
@@ -264,7 +278,7 @@ public class Annotator extends JavaCCPrinter {
   /**
    * Returns a node class comment (a //ann followed by the node class short name if global flag set,
    * nothing otherwise).
-   * 
+   *
    * @param n - the node for the node class comment
    * @return the node class comment
    */
@@ -284,7 +298,7 @@ public class Annotator extends JavaCCPrinter {
   /**
    * Returns a node class comment with an extra comment (a //ann followed by the node class short
    * name plus the extra comment if global flag set, nothing otherwise).
-   * 
+   *
    * @param n - the node for the node class comment
    * @param str - the extra comment
    * @return the node class comment
@@ -314,7 +328,7 @@ public class Annotator extends JavaCCPrinter {
    * f8 -> IdentifierAsString()<br>
    * f9 -> ")"<br>
    * f10 -> ( Production() )+<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -375,7 +389,7 @@ public class Annotator extends JavaCCPrinter {
    * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
    * f6 -> [ "%" ]<br>
    * f7 -> Block()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -456,7 +470,7 @@ public class Annotator extends JavaCCPrinter {
    * .. .. . #2 ( $0 "," $1 Name() )* ]<br>
    * f6 -> [ "%" ]<br>
    * f7 -> Block()<br>
-   * 
+   *
    * @param n - the node to process
    * @return the generated buffer
    */
@@ -500,7 +514,7 @@ public class Annotator extends JavaCCPrinter {
    * f8 -> "{"<br>
    * f9 -> ExpansionChoices()<br>
    * f10 -> "}"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -638,7 +652,7 @@ public class Annotator extends JavaCCPrinter {
    * f1 -> [ TypeArguments() ]<br>
    * f2 -> ( #0 "." #1 < IDENTIFIER ><br>
    * .. .. . #2 [ TypeArguments() ] )*<br>
-   * 
+   *
    * @param rt - the node to process
    */
   void getResultTypeSpecials(final ResultType rt) {
@@ -688,7 +702,7 @@ public class Annotator extends JavaCCPrinter {
    * f8 -> "{"<br>
    * f9 -> ExpansionChoices()<br>
    * f10 -> "}"<br>
-   * 
+   *
    * @param n - the node to process
    * @return the generated buffer
    */
@@ -723,7 +737,7 @@ public class Annotator extends JavaCCPrinter {
     return newSB;
   }
 
-/**
+  /**
    * Visits a {@link RegularExprProduction} node, whose children are the following :
    * <p>
    * f0 -> [ %0 #0 "<"<br>
@@ -755,7 +769,7 @@ public class Annotator extends JavaCCPrinter {
 
   /**
    * Common end-code for annotation methods
-   * 
+   *
    * @param varInfo - the variable to annotate
    */
   void bnfFinalActions(final VarInfo varInfo) {
@@ -772,14 +786,14 @@ public class Annotator extends JavaCCPrinter {
    * <p>
    * f0 -> Expansion()<br>
    * f1 -> ( #0 "|" #1 Expansion() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
   public void visit(final ExpansionChoices n) {
     if (!n.f1.present())
-      // f0 -> Expansion()
-      n.f0.accept(this);
+                        // f0 -> Expansion()
+                        n.f0.accept(this);
     else {
       final String name = genNewVarName();
       final VarInfo varInfo = new VarInfo(nodeChoice, name, "null");
@@ -795,7 +809,7 @@ public class Annotator extends JavaCCPrinter {
    * <p>
    * f0 -> Expansion()<br>
    * f1 -> ( #0 "|" #1 Expansion() )*<br>
-   * 
+   *
    * @param n - the node to process
    * @param varName - the NodeChoice variable name
    */
@@ -860,7 +874,7 @@ public class Annotator extends JavaCCPrinter {
 
   /**
    * Generates a new NodeChoice variable declaration.
-   * 
+   *
    * @param varName - the variable name
    * @param whichVal - the value of the which field
    * @param totalVal - the value of the total field
@@ -877,7 +891,7 @@ public class Annotator extends JavaCCPrinter {
    * <p>
    * f0 -> ( #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" )?<br>
    * f1 -> ( ExpansionUnit() )+<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -927,7 +941,7 @@ public class Annotator extends JavaCCPrinter {
    * <p>
    * f0 -> ( #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" )?<br>
    * f1 -> ( ExpansionUnit() )+<br>
-   * 
+   *
    * @param n - the node to process
    * @param ident - the identifier
    */
@@ -976,7 +990,7 @@ public class Annotator extends JavaCCPrinter {
 
   /**
    * Generates a new NodeSequence variable declaration.
-   * 
+   *
    * @param varName - the variable name
    * @param nbNodes - the number of nodes
    */
@@ -986,7 +1000,7 @@ public class Annotator extends JavaCCPrinter {
 
   /**
    * Returns the java block for adding a node to its parent.
-   * 
+   *
    * @param parentName - the parent node
    * @param varName - the node's variable name
    * @return the java block
@@ -1003,7 +1017,7 @@ public class Annotator extends JavaCCPrinter {
    * f2 -> [ ExpansionChoices() ]<br>
    * f3 -> [ "," ]<br>
    * f4 -> [ #0 "{" #1 Expression() #2 "}" ]<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1029,7 +1043,7 @@ public class Annotator extends JavaCCPrinter {
    * .. .. . .. #3 ( &0 "+"<br>
    * .. .. . .. .. | &1 "*"<br>
    * .. .. . .. .. | &2 "?" )?<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1196,7 +1210,7 @@ public class Annotator extends JavaCCPrinter {
    * Generates the bracketed expansion choices fragment<br>
    * (choice 2 of {@link Expansion Unit}.<br>
    * .. .. | %2 #0 "[" #1 ExpansionChoices() #2 "]"<br>
-   * 
+   *
    * @param n - the node to process
    */
   void genBracketExpCh(final ExpansionUnit n) {
@@ -1222,13 +1236,13 @@ public class Annotator extends JavaCCPrinter {
       // technically, we should only generate an error if it's not a choice,
       // but that greatly complicates things and an empty choice is probably useless
       final NodeToken tk = (NodeToken) seq.elementAt(0);
-      Messages.softErr("Empty BNF expansion in production '" + curProduction + "()'.",
-                       tk.beginLine, tk.beginColumn);
+      Messages.softErr("Empty BNF expansion in production '" + curProduction + "()'.", tk.beginLine,
+                       tk.beginColumn);
     } else {
       final ExpansionUnit firstExpUnit = (ExpansionUnit) list.nodes.get(0);
       if (extraVarsList == null)
-        // top level additional variables
-        varInfo = creNewVarInfoForBracket(name, true);
+                                // top level additional variables
+                                varInfo = creNewVarInfoForBracket(name, true);
       else {
         // nested additional variables
         varInfo = creNewVarInfoForBracket(name, false);
@@ -1294,7 +1308,7 @@ public class Annotator extends JavaCCPrinter {
    * f3 -> "}"<br>
    * f4 -> ( #0 "catch" #1 "(" #2 Name() #3 < IDENTIFIER > #4 ")" #5 Block() )*<br>
    * f5 -> [ #0 "finally" #1 Block() ]<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1361,7 +1375,7 @@ public class Annotator extends JavaCCPrinter {
    * .. .. . .. #3 ( &0 "+"<br>
    * .. .. . .. .. | &1 "*"<br>
    * .. .. . .. .. | &2 "?" )?<br>
-   * 
+   *
    * @param n - the node to process
    */
   void genParenExpCh(final ExpansionUnit n) {
@@ -1379,8 +1393,8 @@ public class Annotator extends JavaCCPrinter {
     if (!((NodeOptional) seq.elementAt(3)).present()) {
       // No BNF modifier present, so either generate a NodeChoice or a NodeSequence
       if (ec.f1.present())
-        // generate a NodeChoice
-        ec.accept(this);
+                          // generate a NodeChoice
+                          ec.accept(this);
       else {
         // generate a NodeSequence
         // count the number of ExpansionUnits of each type (choice)
@@ -1392,8 +1406,8 @@ public class Annotator extends JavaCCPrinter {
                            tk.beginLine, tk.beginColumn);
         }
         name = genNewVarName();
-        final VarInfo varInfo = inEUT3 ? new VarInfo(nodeSeq, name, "null") : new VarInfo(nodeSeq,
-                                                                                          name);
+        final VarInfo varInfo = inEUT3 ? new VarInfo(nodeSeq, name, "null")
+                                       : new VarInfo(nodeSeq, name);
         varList.add(varInfo);
         genExpSequence(ec.f0, name);
         bnfFinalActions(varInfo);
@@ -1425,8 +1439,8 @@ public class Annotator extends JavaCCPrinter {
       } else {
         final ExpansionUnit firstExpUnit = (ExpansionUnit) list.nodes.get(0);
         if (extraVarsList == null)
-          // top level additional variables
-          varInfo = creNewVarInfoForMod(ch, name, true);
+                                  // top level additional variables
+                                  varInfo = creNewVarInfoForMod(ch, name, true);
         else {
           // nested additional variables
           varInfo = creNewVarInfoForMod(ch, name, false);
@@ -1498,7 +1512,7 @@ public class Annotator extends JavaCCPrinter {
 
   /**
    * Common code for generating the ExpansionChoices in choices 2, 3 and 5 of ExpansionUnit.
-   * 
+   *
    * @param n - the node to process
    */
   void genExpChInExpUnit(final ExpansionChoices n) {
@@ -1508,7 +1522,7 @@ public class Annotator extends JavaCCPrinter {
     sb = jccpv.sb = tempSB;
     // put apart "extraVarsList", create a new "tempExtraVarsList" to generate a new list
     final List<VarInfo> tempExtraVarsList = extraVarsList;
-    extraVarsList = new ArrayList<VarInfo>();
+    extraVarsList = new ArrayList<>();
     // new buffer will be fed by this ExpansionChoices accept
     ++bnfLvl;
     n.accept(this);
@@ -1530,7 +1544,7 @@ public class Annotator extends JavaCCPrinter {
 
   /**
    * Generates a new NodeOptional or NodeList or NodeListOptional variable declaration.
-   * 
+   *
    * @param aSb - the buffer to print into
    * @param aVarInfo - the VarInfo variable
    */
@@ -1541,7 +1555,7 @@ public class Annotator extends JavaCCPrinter {
 
   /**
    * Creates a new VarInfo object (with the appropriate node type) for a given BNF modifier.
-   * 
+   *
    * @param modifier - the modifier (which directs the node type)
    * @param varName - the variable name to store
    * @param initialize - the need to initialize flag
@@ -1578,7 +1592,7 @@ public class Annotator extends JavaCCPrinter {
 
   /**
    * Creates a new VarInfo object for a NodeOptional node.
-   * 
+   *
    * @param varName - the variable name to store
    * @param initializer - the initializer presence flag
    * @return the new VarInfo object
@@ -1591,7 +1605,7 @@ public class Annotator extends JavaCCPrinter {
     }
   }
 
-/**
+  /**
    * Visits a {@link RegularExpression} node, whose children are the following :
    * <p>
    * f0 -> . %0 StringLiteral()<br>
@@ -1651,8 +1665,8 @@ public class Annotator extends JavaCCPrinter {
       if (opt.present()) {
         final NodeSequence seq1 = (NodeSequence) opt.node;
         if (((NodeOptional) seq1.elementAt(0)).present())
-          // $0 "#"
-          seq1.elementAt(0).accept(jccpv);
+                                                         // $0 "#"
+                                                         seq1.elementAt(0).accept(jccpv);
         // $1 IdentifierAsString()
         seq1.elementAt(1).accept(jccpv);
         sb.append(" ");
@@ -1729,7 +1743,7 @@ public class Annotator extends JavaCCPrinter {
    * f0 -> "{"<br>
    * f1 -> ( BlockStatement() )*<br>
    * f2 -> "}"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1763,7 +1777,7 @@ public class Annotator extends JavaCCPrinter {
    * f0 -> . %0 #0 LocalVariableDeclaration() #1 ";"<br>
    * .. .. | %1 Statement()<br>
    * .. .. | %2 ClassOrInterfaceDeclaration()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1784,7 +1798,7 @@ public class Annotator extends JavaCCPrinter {
    * f1 -> Type()<br>
    * f2 -> VariableDeclarator()<br>
    * f3 -> ( #0 "," #1 VariableDeclarator() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1800,6 +1814,27 @@ public class Annotator extends JavaCCPrinter {
     // f3 -> ( #0 "," #1 VariableDeclarator() )*
     if (n.f3.present()) {
       sb.append(genJavaBranch(n.f3));
+    }
+  }
+
+  /**
+   * Visits a {@link VariableModifiers} node, whose child is the following :
+   * <p>
+   * f0 -> ( ( %0 "final"<br>
+   * .. .. . | %1 Annotation() ) )*<br>
+   *
+   * @param n - the node to visit
+   */
+  @Override
+  public void visit(final VariableModifiers n) {
+    // f0 -> ( ( %0 "final"
+    // .. .. . | %1 Annotation() ) )*
+    if (n.f0.present()) {
+      for (final Iterator<INode> e = n.f0.elements(); e.hasNext();) {
+        e.next().accept(this);
+        // VariableModifiers print the last space if not empty
+        sb.append(" ");
+      }
     }
   }
 
@@ -1832,7 +1867,7 @@ public class Annotator extends JavaCCPrinter {
    * f1 -> [ TypeArguments() ]<br>
    * f2 -> ( #0 "." #1 < IDENTIFIER ><br>
    * .. .. . #2 [ TypeArguments() ] )*<br>
-   * 
+   *
    * @param ty - the node to process
    */
   void getTypeSpecials(final Type ty) {
@@ -1877,7 +1912,7 @@ public class Annotator extends JavaCCPrinter {
    * .. .. | %13 ThrowStatement()<br>
    * .. .. | %14 SynchronizedStatement()<br>
    * .. .. | %15 TryStatement()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1898,7 +1933,7 @@ public class Annotator extends JavaCCPrinter {
    * f1 -> Block()<br>
    * f2 -> ( #0 "catch" #1 "(" #2 FormalParameter() #3 ")" #4 Block() )*<br>
    * f3 -> [ #0 "finally" #1 Block() ]<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1944,7 +1979,7 @@ public class Annotator extends JavaCCPrinter {
    * f0 -> < IDENTIFIER ><br>
    * f1 -> ":"<br>
    * f2 -> Statement() <br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1970,7 +2005,7 @@ public class Annotator extends JavaCCPrinter {
    * f5 -> ( #0 SwitchLabel()<br>
    * .. .. . #1 ( BlockStatement() )* )*<br>
    * f6 -> "}"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2033,7 +2068,7 @@ public class Annotator extends JavaCCPrinter {
    * f3 -> ")"<br>
    * f4 -> Statement()<br>
    * f5 -> [ #0 "else" #1 Statement() ]<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2097,7 +2132,7 @@ public class Annotator extends JavaCCPrinter {
    * f2 -> Expression()<br>
    * f3 -> ")"<br>
    * f4 -> Statement()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2125,7 +2160,7 @@ public class Annotator extends JavaCCPrinter {
    * f4 -> Expression()<br>
    * f5 -> ")"<br>
    * f6 -> ";"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2158,7 +2193,7 @@ public class Annotator extends JavaCCPrinter {
    * .. .. . .. #4 [ ForUpdate() ] )<br>
    * f3 -> ")"<br>
    * f4 -> Statement()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2230,7 +2265,7 @@ public class Annotator extends JavaCCPrinter {
    * .. .. | %13 ThrowStatement()<br>
    * .. .. | %14 SynchronizedStatement()<br>
    * .. .. | %15 TryStatement()<br>
-   * 
+   *
    * @param n - the Statement node
    */
   void genStatement(final Statement n) {
@@ -2259,7 +2294,7 @@ public class Annotator extends JavaCCPrinter {
    * f0 -> "return"<br>
    * f1 -> [ Expression() ]<br>
    * f2 -> ";"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2296,7 +2331,7 @@ public class Annotator extends JavaCCPrinter {
    * f2 -> Expression()<br>
    * f3 -> ")"<br>
    * f4 -> Block()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2337,7 +2372,7 @@ public class Annotator extends JavaCCPrinter {
      * <p>
      * f0 -> Expansion()<br>
      * f1 -> ( #0 "|" #1 Expansion() )*<br>
-     * 
+     *
      * @param n - the node to visit
      */
     @Override
@@ -2352,7 +2387,7 @@ public class Annotator extends JavaCCPrinter {
      * <p>
      * f0 -> ( #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" )?<br>
      * f1 -> ( ExpansionUnit() )+<br>
-     * 
+     *
      * @param n - the node to visit
      */
     @Override
@@ -2363,8 +2398,8 @@ public class Annotator extends JavaCCPrinter {
         lnft = ((NodeToken) seq.elementAt(0)).beginLine;
         cnft = ((NodeToken) seq.elementAt(0)).beginColumn;
       } else
-        // f1 -> ( ExpansionUnit() )+
-        n.f1.accept(this);
+                          // f1 -> ( ExpansionUnit() )+
+                          n.f1.accept(this);
     }
 
     /**
@@ -2384,7 +2419,7 @@ public class Annotator extends JavaCCPrinter {
      * .. .. . .. #3 ( &0 "+"<br>
      * .. .. . .. .. | &1 "*"<br>
      * .. .. . .. .. | &2 "?" )?<br>
-     * 
+     *
      * @param n - the node to visit
      */
     @Override
@@ -2470,7 +2505,7 @@ public class Annotator extends JavaCCPrinter {
      * f0 -> "{"<br>
      * f1 -> ( BlockStatement() )*<br>
      * f2 -> "}"<br>
-     * 
+     *
      * @param n - the node to visit
      */
     @Override
@@ -2489,7 +2524,7 @@ public class Annotator extends JavaCCPrinter {
      * f3 -> "}"<br>
      * f4 -> ( #0 "catch" #1 "(" #2 Name() #3 < IDENTIFIER > #4 ")" #5 Block() )*<br>
      * f5 -> [ #0 "finally" #1 Block() ]<br>
-     * 
+     *
      * @param n - the node to visit
      */
     @Override
@@ -2499,7 +2534,7 @@ public class Annotator extends JavaCCPrinter {
       cnft = n.f0.beginColumn;
     }
 
-/**
+    /**
      * Visits a {@link RegularExpression} node, whose children are the following :
      * <p>
      * f0 -> . %0 StringLiteral()<br>
@@ -2532,7 +2567,8 @@ public class Annotator extends JavaCCPrinter {
 
   /**
    * The {@link CompilationUnitPrinter} visitor<br>
-   * determines if an import statement for the syntax tree package is needed in the grammar file,<br>
+   * determines if an import statement for the syntax tree package is needed in the grammar
+   * file,<br>
    * prints the compilation unit (with appropriate tool kit methods), inserting the import
    * statements if necessary.
    */
@@ -2540,7 +2576,7 @@ public class Annotator extends JavaCCPrinter {
 
     /**
      * Constructor, with a given buffer and a default indentation.
-     * 
+     *
      * @param aSb - the buffer to print into (will be allocated if null)
      * @param aSPC - the Spacing indentation object (will be allocated and set to a default if null)
      */
@@ -2554,7 +2590,7 @@ public class Annotator extends JavaCCPrinter {
 
     /**
      * Prints into the current buffer a node class comment and a new line.
-     * 
+     *
      * @param n - the node for the node class comment
      */
     @Override
@@ -2564,7 +2600,7 @@ public class Annotator extends JavaCCPrinter {
 
     /**
      * Prints into the current buffer a node class comment, an extra given comment, and a new line.
-     * 
+     *
      * @param n - the node for the node class comment
      * @param str - the extra comment
      */
@@ -2575,7 +2611,7 @@ public class Annotator extends JavaCCPrinter {
 
     /**
      * Prints twice into the current buffer a node class comment and a new line.
-     * 
+     *
      * @param n - the node for the node class comment
      */
     @Override
@@ -2587,7 +2623,7 @@ public class Annotator extends JavaCCPrinter {
     /**
      * Returns a node class comment (a //!! followed by the node class short name if global flag
      * set, nothing otherwise).
-     * 
+     *
      * @param n - the node for the node class comment
      * @return the node class comment
      */
@@ -2607,7 +2643,7 @@ public class Annotator extends JavaCCPrinter {
     /**
      * Returns a node class comment with an extra comment (a //!! followed by the node class short
      * name plus the extra comment if global flag set, nothing otherwise).
-     * 
+     *
      * @param n - the node for the node class comment
      * @param str - the extra comment
      * @return the node class comment
@@ -2629,7 +2665,7 @@ public class Annotator extends JavaCCPrinter {
      * f0 -> [ PackageDeclaration() ]<br>
      * f1 -> ( ImportDeclaration() )*<br>
      * f2 -> ( TypeDeclaration() )*<br>
-     * 
+     *
      * @param n - the node to visit
      */
     @Override
@@ -2702,7 +2738,7 @@ public class Annotator extends JavaCCPrinter {
      * f2 -> Name(null)<br>
      * f3 -> [ "." "*" ]<br>
      * f4 -> ";"<br>
-     * 
+     *
      * @param n - the node to process
      */
     void printImports(final NodeListOptional n) {
@@ -2739,7 +2775,7 @@ public class Annotator extends JavaCCPrinter {
      * f2 -> Name()<br>
      * f3 -> [ #0 "." #1 "*" ]<br>
      * f4 -> ";"<br>
-     * 
+     *
      * @param n - the node to visit
      */
     @Override
@@ -2768,7 +2804,7 @@ public class Annotator extends JavaCCPrinter {
      * f0 -> "{"<br>
      * f1 -> ( ClassOrInterfaceBodyDeclaration() )*<br>
      * f2 -> "}"<br>
-     * 
+     *
      * @param n - the node to visit
      */
     @Override
@@ -2827,7 +2863,7 @@ public class Annotator extends JavaCCPrinter {
      * Visits a {@link IdentifierAsString} node, whose children are the following :
      * <p>
      * f0 -> < IDENTIFIER ><br>
-     * 
+     *
      * @param n - the node to visit
      */
     @Override
@@ -2839,7 +2875,7 @@ public class Annotator extends JavaCCPrinter {
      * Visits a {@link StringLiteral} node, whose children are the following :
      * <p>
      * f0 -> < STRING_LITERAL ><br>
-     * 
+     *
      * @param n - the node to visit
      */
     @Override
