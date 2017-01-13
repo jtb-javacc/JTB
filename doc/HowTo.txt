@@ -1,19 +1,9 @@
-How to set up the admin & security requirements for the Java Net site
+How to build a new JTB version
 -----------------------------------------------------------------------------------------
-(for project admins) - Marc Mazas - Feb 2nd, 2011
+(for project admins) - Marc Mazas - Jan 13th, 2017
 
-svn.java.net : 192.9.164.103
+Update doc/a_faire_jtb.txt
+Update releases.notes
+See comments in build.xml : set paths & versions in the different files, run the different targets 
 
-- User must be granted svn access rights through the project admin site
-  (Project Manage this Project / Members)
-- User must generate on his workstation a pair of DSA or RSA keys 
- e.g.: through Eclipse / Window / Preferences / General / Network Connections
-                / SSH2 / Key Management / Generate DSA Keys
-  user must choose (and record) a pass phrase and save the keys on his workstation
-  (e.g. save private key under xxx.txt and public key under xxx.txt.pub ; they will be in OpenSSH format)
-- User must upload his public key to the Java Net site
- (through User / Profile / Edit My Profile / SSH Keys / Add public key and paste ;
-  the update may take some delay)
-- The load your private key into memory : run pageant.exe, View keys / Add key, type passphrase
-  If pageant is not started, you will get the following error : 
-  'PuTTY Fatal Error / Disconnected: No supported authentication methods available.' 
+

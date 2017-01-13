@@ -1,4 +1,9 @@
 ---------------
+Version 1.4.13 ??
+---------------
+-> xx/xx/2017
+- updated docs (releases.notes, README.md, pom.xml, doc/jtb_doc.html, doc/HowTo.txt), added doc/wiki/*
+
 Version 1.4.13
 ---------------
 -> 12/01/2017
@@ -9,7 +14,7 @@ Version 1.4.13
 ---------------
 Version 1.4.12
 ---------------
-Publish JTB aa a maven artifact to Maven Central
+Publish JTB as a maven artifact to Maven Central
 
 ---------------
 Version 1.4.11
