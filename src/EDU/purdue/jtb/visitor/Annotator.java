@@ -160,6 +160,7 @@ import EDU.purdue.jtb.syntaxtree.WhileStatement;
  * @version 1.4.11 : 03/2016 : MMa : fixed column numbers in warnings, and conditions for warning
  *          "Empty choice : a NodeChoice with a 'null' choice member ..."
  * @version 1.4.13 : 01/2017 : MMa : fixed missing space in visiting VariableModifiers
+ * @version 1.4.14 : 01/2017 : MMa : removed the JTBToolkit class
  */
 public class Annotator extends JavaCCPrinter {
 
@@ -212,6 +213,8 @@ public class Annotator extends JavaCCPrinter {
    * production under an ExpansionChoices
    */
   final ExpansionChoicesLineNumber lnftfv             = new ExpansionChoicesLineNumber();
+  /** The flag to print only once (in the parser main class) the makeNodeToken method */
+  boolean                          inParserMainClass  = true;
 
   /**
    * Constructor which will allocate a default buffer and indentation.
@@ -1651,7 +1654,7 @@ public class Annotator extends JavaCCPrinter {
       oneNewLine(n, "a");
       if (creThisNode) {
         sb.append(spc.spc);
-        sb.append("{ ").append(nodeName).append(" = JTBToolkit.makeNodeToken(").append(reTokenName)
+        sb.append("{ ").append(nodeName).append(" = makeNodeToken(").append(reTokenName)
           .append("); }");
         oneNewLine(n, "b");
       }
@@ -1682,7 +1685,7 @@ public class Annotator extends JavaCCPrinter {
       oneNewLine(n, "c");
       if (creThisNode) {
         sb.append(spc.spc);
-        sb.append("{ ").append(nodeName).append(" = JTBToolkit.makeNodeToken(").append(reTokenName)
+        sb.append("{ ").append(nodeName).append(" = makeNodeToken(").append(reTokenName)
           .append("); }");
         oneNewLine(n, "d");
       }
@@ -1701,7 +1704,7 @@ public class Annotator extends JavaCCPrinter {
       oneNewLine(n, "e");
       if (creThisNode) {
         sb.append(spc.spc);
-        sb.append("{ ").append(nodeName).append(" = JTBToolkit.makeNodeToken(").append(reTokenName)
+        sb.append("{ ").append(nodeName).append(" = makeNodeToken(").append(reTokenName)
           .append("); }");
         oneNewLine(n, "f");
       }
@@ -1724,7 +1727,7 @@ public class Annotator extends JavaCCPrinter {
       sb.append(reTokenName).append(".endColumn++;");
       oneNewLine(n, "i");
       sb.append(spc.spc);
-      sb.append("{ ").append(nodeName).append(" = JTBToolkit.makeNodeToken(").append(reTokenName)
+      sb.append("{ ").append(nodeName).append(" = makeNodeToken(").append(reTokenName)
         .append("); }");
       oneNewLine(n, "j");
       spc.updateSpc(-1);
@@ -2687,48 +2690,6 @@ public class Annotator extends JavaCCPrinter {
           }
         }
       }
-      // builds specials into tree
-      if (!keepSpecialTokens) {
-        sb.append(LS);
-        sb.append("class JTBToolkit {").append(LS);
-        sb.append(LS);
-        sb.append("  static NodeToken makeNodeToken(final Token t) {").append(LS);
-        sb.append("    return new NodeToken(t.image.intern(), t.kind, t.beginLine, t.beginColumn, t.endLine, t.endColumn);")
-          .append(LS);
-        sb.append("  }").append(LS);
-        sb.append("}");
-        oneNewLine(n);
-      } else {
-        sb.append(LS);
-        sb.append("class JTBToolkit {").append(LS);
-        sb.append(LS);
-        sb.append("  static NodeToken makeNodeToken(final Token tok) {").append(LS);
-        sb.append("    final NodeToken node = new NodeToken(tok.image.intern(), tok.kind, tok.beginLine, tok.beginColumn, tok.endLine, tok.endColumn);")
-          .append(LS);
-        sb.append("    if (tok.specialToken == null)").append(LS);
-        sb.append("      return node;").append(LS);
-        sb.append("    Token t = tok;").append(LS);
-        sb.append("    int nbt = 0;").append(LS);
-        sb.append("    while (t.specialToken != null) {").append(LS);
-        sb.append("      t = t.specialToken;").append(LS);
-        sb.append("      nbt++;").append(LS);
-        sb.append("    }").append(LS);
-        sb.append("    final java.util.ArrayList<NodeToken> temp = new java.util.ArrayList<NodeToken>(nbt);")
-          .append(LS);
-        sb.append("    t = tok;").append(LS);
-        sb.append("    while (t.specialToken != null) {").append(LS);
-        sb.append("      t = t.specialToken;").append(LS);
-        sb.append("      temp.add(new NodeToken(t.image.intern(), t.kind, t.beginLine, t.beginColumn, t.endLine, t.endColumn));")
-          .append(LS);
-        sb.append("    }").append(LS);
-        sb.append("    for (int i = nbt - 1; i >= 0; --i)").append(LS);
-        sb.append("      node.addSpecial(temp.get(i));").append(LS);
-        sb.append("    // node.trimSpecials();").append(LS);
-        sb.append("    return node;").append(LS);
-        sb.append("  }").append(LS);
-        sb.append("}");
-        oneNewLine(n);
-      }
     }
 
     /**
@@ -2811,11 +2772,54 @@ public class Annotator extends JavaCCPrinter {
     public void visit(final ClassOrInterfaceBody n) {
       // f0 -> "{"
       n.f0.accept(this);
+      // add method
+      if (inParserMainClass) {
+        inParserMainClass = false;
+        sb.append(LS).append(LS);
+        sb.append("  /**").append(LS);
+        sb.append("   * Make a new NodeToken.").append(LS);
+        sb.append("   *").append(LS);
+        sb.append("   * @param tok - the (JavaCC) token").append(LS);
+        sb.append("   * @return the (JTB) Nodetoken").append(LS);
+        sb.append("   */").append(LS);
+        if (!keepSpecialTokens) {
+          sb.append("  static NodeToken makeNodeToken(final Token tok) {").append(LS);
+          sb.append("    return new NodeToken(t.image.intern(), tok.kind, tok.beginLine, tok.beginColumn, tok.endLine, tok.endColumn);")
+            .append(LS);
+          sb.append("  }");
+        } else {
+          sb.append("  static NodeToken makeNodeToken(final Token tok) {").append(LS);
+          sb.append("    final NodeToken node = new NodeToken(tok.image.intern(), tok.kind, tok.beginLine, tok.beginColumn, tok.endLine, tok.endColumn);")
+            .append(LS);
+          sb.append("    if (tok.specialToken == null)").append(LS);
+          sb.append("      return node;").append(LS);
+          sb.append("    Token t = tok;").append(LS);
+          sb.append("    int nbt = 0;").append(LS);
+          sb.append("    while (t.specialToken != null) {").append(LS);
+          sb.append("      t = t.specialToken;").append(LS);
+          sb.append("      nbt++;").append(LS);
+          sb.append("    }").append(LS);
+          sb.append("    final java.util.ArrayList<NodeToken> temp = new java.util.ArrayList<NodeToken>(nbt);")
+            .append(LS);
+          sb.append("    t = tok;").append(LS);
+          sb.append("    while (t.specialToken != null) {").append(LS);
+          sb.append("      t = t.specialToken;").append(LS);
+          sb.append("      temp.add(new NodeToken(t.image.intern(), t.kind, t.beginLine, t.beginColumn, t.endLine, t.endColumn));")
+            .append(LS);
+          sb.append("    }").append(LS);
+          sb.append("    for (int i = nbt - 1; i >= 0; --i)").append(LS);
+          sb.append("      node.addSpecial(temp.get(i));").append(LS);
+          sb.append("    // node.trimSpecials();").append(LS);
+          sb.append("    return node;").append(LS);
+          sb.append("  }");
+        }
+        oneNewLine(n);
+      }
       // add return variables declarations
       final int rvds = gdbv.getRetVarDecl().size();
       if (rvds > 0) {
         spc.updateSpc(+1);
-        twoNewLines(n);
+        oneNewLine(n);
         sb.append(spc.spc);
         sb.append("/* --- JTB generated return variables declarations --- */");
         twoNewLines(n);

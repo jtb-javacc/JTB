@@ -4,6 +4,7 @@ Version 1.4.14  ??
 -> xx/xx/2017
 - updated docs (releases.notes, README.md, pom.xml, doc/jtb_doc.html, doc/HowTo.txt), added doc/wiki/*
 - removed some warnings and used try-with-resource
+- suppressed the JTBToolkit class generated in the parser's file but after the parser's class
 
 Version 1.4.13
 ---------------

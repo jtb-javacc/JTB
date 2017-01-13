@@ -1,6 +1,5 @@
 A faire sur JTB
 - voir Token.template dans JavaFiles et autres
-- si 2 parsers sont dans le même package, la classe jtbtoolkit est définie 2 fois
 - générer des visiteurs avec les arguments supplémentaires si la production a des arguments
 - générer un visiteur de comptage (ou avec un pre et post hook)
 - générer un tableau de tous les noms de noeuds comme dans JJT
@@ -16,6 +15,7 @@ A faire sur JTB
 Fait sur JTB en 1.4.14
 - créé les pages wiki, mis à jour les différents fichiers de docs et autres
 - ajouté des annotations pour supprimer des warnings et utilisé des try-with-resource
+- supprimé la classe JTBToolkit générée avec le parseur
 
 Fait sur JTB en 1.4.13
 - ajouté les options dans la grammaire pour une génération correcte directe sous Eclipse
