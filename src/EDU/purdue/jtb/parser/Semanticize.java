@@ -38,11 +38,13 @@ import java.util.List;
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  * @version 1.4.8 : 12/2014 : MMa : modified warning message about ignored LOOKAHEAD
  * @version 1.4.8 : 12/2014 : MMa : improved javadoc
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings
  */
+@SuppressWarnings("javadoc")
 public class Semanticize extends JavaCCGlobals {
 
-  static List<List<RegExprSpec_>> removeList = new ArrayList<List<RegExprSpec_>>();
-  static List<Object>             itemList   = new ArrayList<Object>();
+  static List<List<RegExprSpec_>> removeList = new ArrayList<>();
+  static List<Object>             itemList   = new ArrayList<>();
 
   static void prepareToRemove(final List<RegExprSpec_> vec, final Object item) {
     removeList.add(vec);
@@ -62,8 +64,8 @@ public class Semanticize extends JavaCCGlobals {
     if (JavaCCErrors.get_error_count() != 0)
       throw new MetaParseException();
     if (Options.getLookahead() > 1 && !Options.getForceLaCheck() && Options.getSanityCheck()) {
-      JavaCCErrors.warning("Lookahead adequacy checking not being performed since option LOOKAHEAD "
-                           + "is more than 1.  Set option FORCE_LA_CHECK to true to force checking.");
+      JavaCCErrors.warning("Lookahead adequacy checking not being performed since option LOOKAHEAD " +
+                           "is more than 1.  Set option FORCE_LA_CHECK to true to force checking.");
     }
     /*
      * The following walks the entire parse tree to convert all LOOKAHEAD's
@@ -116,12 +118,12 @@ public class Semanticize extends JavaCCGlobals {
           // JavaCCErrors.semantic_error(res.rexp, "Badly placed <EOF>.");
           if (tp.lexStates != null)
             JavaCCErrors.semantic_error(res.rexp,
-                                        "EOF action/state change must be specified for all states, "
-                                            + "i.e., <*>TOKEN:.");
+                                        "EOF action/state change must be specified for all states, " +
+                                                  "i.e., <*>TOKEN:.");
           if (tp.kind != TokenProduction.TOKEN)
             JavaCCErrors.semantic_error(res.rexp,
-                                        "EOF action/state change can be specified only in a "
-                                            + "TOKEN specification.");
+                                        "EOF action/state change can be specified only in a " +
+                                                  "TOKEN specification.");
           if (nextStateForEof != null || actForEof != null)
             JavaCCErrors.semantic_error(res.rexp,
                                         "Duplicate action/state change specification for <EOF>.");
@@ -129,18 +131,19 @@ public class Semanticize extends JavaCCGlobals {
           nextStateForEof = res.nextState;
           prepareToRemove(respecs, res);
         } else if (tp.isExplicit && Options.getUserTokenManager()) {
-          JavaCCErrors.warning(res.rexp, "Ignoring regular expression specification since "
-                                         + "option USER_TOKEN_MANAGER has been set to true.");
-        } else if (tp.isExplicit && !Options.getUserTokenManager() && res.rexp instanceof RJustName) {
+          JavaCCErrors.warning(res.rexp, "Ignoring regular expression specification since " +
+                                         "option USER_TOKEN_MANAGER has been set to true.");
+        } else if (tp.isExplicit && !Options.getUserTokenManager() &&
+                   res.rexp instanceof RJustName) {
           JavaCCErrors.warning(res.rexp,
                                "Ignoring free-standing regular expression reference.  " +
-                                   "If you really want this, you must give it a different label as <NEWLABEL:<" +
-                                   res.rexp.label + ">>.");
+                                         "If you really want this, you must give it a different label as <NEWLABEL:<" +
+                                         res.rexp.label + ">>.");
           prepareToRemove(respecs, res);
         } else if (!tp.isExplicit && res.rexp.private_rexp) {
           JavaCCErrors.semantic_error(res.rexp,
-                                      "Private (#) regular expression cannot be defined within "
-                                          + "grammar productions.");
+                                      "Private (#) regular expression cannot be defined within " +
+                                                "grammar productions.");
         }
       }
     }
@@ -159,14 +162,15 @@ public class Semanticize extends JavaCCGlobals {
           final String s = res.rexp.label;
           final Object obj = named_tokens_table.put(s, res.rexp);
           if (obj != null) {
-            JavaCCErrors.semantic_error(res.rexp, "Multiply defined lexical token name \"" + s +
-                                                  "\".");
+            JavaCCErrors.semantic_error(res.rexp,
+                                        "Multiply defined lexical token name \"" + s + "\".");
           } else {
             ordered_named_tokens.add(res.rexp);
           }
           if (lexstate_S2I.get(s) != null) {
-            JavaCCErrors.semantic_error(res.rexp, "Lexical token name \"" + s +
-                                                  "\" is the same as " + "that of a lexical state.");
+            JavaCCErrors.semantic_error(res.rexp,
+                                        "Lexical token name \"" + s + "\" is the same as " +
+                                                  "that of a lexical state.");
           }
         }
       }
@@ -211,7 +215,7 @@ public class Semanticize extends JavaCCGlobals {
               if (sl.ordinal == 0) {
                 sl.ordinal = tokenCount++;
               }
-              table2 = new Hashtable<String, RegularExpression_>();
+              table2 = new Hashtable<>();
               table2.put(sl.image, sl);
               table[i].put(sl.image.toUpperCase(), table2);
             } else if (hasIgnoreCase(table2, sl.image)) { // hasIgnoreCase sets "other" if it is found.
@@ -219,8 +223,7 @@ public class Semanticize extends JavaCCGlobals {
               if (!sl.tpContext.isExplicit) {
                 // inline BNF string is used earlier with an IGNORE_CASE.
                 JavaCCErrors.semantic_error(sl,
-                                            "String \"" +
-                                                sl.image +
+                                            "String \"" + sl.image +
                                                 "\" can never be matched due to presence of more general " +
                                                 "(IGNORE_CASE) regular expression at line " +
                                                 other.getLine() + ", column " + other.getColumn() +
@@ -272,12 +275,14 @@ public class Semanticize extends JavaCCGlobals {
                   JavaCCErrors.semantic_error(sl, "Duplicate definition of string token \"" +
                                                   sl.image + "\".");
                 } else {
-                  JavaCCErrors.semantic_error(sl, "Duplicate definition of string token \"" +
-                                                  sl.image + "\" in lexical state \"" +
-                                                  tp.lexStates[i] + "\".");
+                  JavaCCErrors.semantic_error(sl,
+                                              "Duplicate definition of string token \"" + sl.image +
+                                                  "\" in lexical state \"" + tp.lexStates[i] +
+                                                  "\".");
                 }
               } else if (re.tpContext.kind != TokenProduction.TOKEN) {
-                JavaCCErrors.semantic_error(sl, "String token \"" + sl.image +
+                JavaCCErrors.semantic_error(sl,
+                                            "String token \"" + sl.image +
                                                 "\" has been defined as a \"" +
                                                 TokenProduction.kindImage[re.tpContext.kind] +
                                                 "\" token.");
@@ -382,8 +387,9 @@ public class Semanticize extends JavaCCGlobals {
           final RegExprSpec_ res = (it1.next());
           final Integer ii = new Integer(res.rexp.ordinal);
           if (names_of_tokens.get(ii) == null) {
-            JavaCCErrors.warning(res.rexp, "Unlabeled regular expression cannot be referred to by "
-                                           + "user generated token manager.");
+            JavaCCErrors.warning(res.rexp,
+                                 "Unlabeled regular expression cannot be referred to by " +
+                                           "user generated token manager.");
           }
         }
       }
@@ -627,7 +633,8 @@ public class Semanticize extends JavaCCGlobals {
         }
       }
     } else if (rexp instanceof RChoice) {
-      for (final Iterator<RegularExpression_> it = ((RChoice) rexp).getChoices().iterator(); it.hasNext();) {
+      for (final Iterator<RegularExpression_> it = ((RChoice) rexp).getChoices()
+                                                                   .iterator(); it.hasNext();) {
         if (rexpWalk(it.next())) {
           return true;
         }
@@ -734,13 +741,13 @@ public class Semanticize extends JavaCCGlobals {
         if (la.getAmount() != 0) {
           if (la.getActionTokens().size() != 0) {
             JavaCCErrors.warning(la,
-                                 "Encountered LOOKAHEAD(...) at a non-choice location.  "
-                                     + "Only semantic lookahead will be considered here.  "
-                                     + "But check the generated code and report to support in case of doubt.");
+                                 "Encountered LOOKAHEAD(...) at a non-choice location.  " +
+                                     "Only semantic lookahead will be considered here.  " +
+                                     "But check the generated code and report to support in case of doubt.");
           } else {
             JavaCCErrors.warning(la,
-                                 "Encountered LOOKAHEAD(...) at a non-choice location.  This will be ignored."
-                                     + "But check the generated code and report to support in case of doubt.");
+                                 "Encountered LOOKAHEAD(...) at a non-choice location.  This will be ignored." +
+                                     "But check the generated code and report to support in case of doubt.");
           }
         }
         // Now we have moved the lookahead into the singleton choice. Now create
@@ -844,17 +851,20 @@ public class Semanticize extends JavaCCGlobals {
         }
       } else if (e instanceof OneOrMore) {
         final OneOrMore exp = (OneOrMore) e;
-        if (Options.getForceLaCheck() || (implicitLA(exp.expansion) && Options.getLookahead() == 1)) {
+        if (Options.getForceLaCheck() ||
+            (implicitLA(exp.expansion) && Options.getLookahead() == 1)) {
           LookaheadCalc.ebnfCalc(exp, exp.expansion);
         }
       } else if (e instanceof ZeroOrMore) {
         final ZeroOrMore exp = (ZeroOrMore) e;
-        if (Options.getForceLaCheck() || (implicitLA(exp.expansion) && Options.getLookahead() == 1)) {
+        if (Options.getForceLaCheck() ||
+            (implicitLA(exp.expansion) && Options.getLookahead() == 1)) {
           LookaheadCalc.ebnfCalc(exp, exp.expansion);
         }
       } else if (e instanceof ZeroOrOne) {
         final ZeroOrOne exp = (ZeroOrOne) e;
-        if (Options.getForceLaCheck() || (implicitLA(exp.expansion) && Options.getLookahead() == 1)) {
+        if (Options.getForceLaCheck() ||
+            (implicitLA(exp.expansion) && Options.getLookahead() == 1)) {
           LookaheadCalc.ebnfCalc(exp, exp.expansion);
         }
       }
@@ -875,8 +885,8 @@ public class Semanticize extends JavaCCGlobals {
   }
 
   public static void reInit() {
-    removeList = new ArrayList<List<RegExprSpec_>>();
-    itemList = new ArrayList<Object>();
+    removeList = new ArrayList<>();
+    itemList = new ArrayList<>();
     other = null;
     loopString = null;
   }

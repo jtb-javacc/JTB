@@ -40,10 +40,11 @@ import java.util.List;
 
 /**
  * Generates the Constants file.
- * 
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  * @version 1.4.8 : 12/2014 : MMa : improved javadoc ; moved to imports static
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings
  */
 public class OtherFilesGen extends JavaCCGlobals {
 
@@ -84,11 +85,11 @@ public class OtherFilesGen extends JavaCCGlobals {
       final File file = new File(Options.getOutputDirectory(), cu_name + "Constants.java");
       out = new PrintWriter(new BufferedWriter(new FileWriter(file), 4 * 8192));
     }
-    catch (final java.io.IOException e) {
+    catch (@SuppressWarnings("unused") final java.io.IOException e) {
       JavaCCErrors.semantic_error("Could not open file " + cu_name + "Constants.java for writing.");
       throw new Error();
     }
-    final List<String> tn = new ArrayList<String>(toolNames);
+    final List<String> tn = new ArrayList<>(toolNames);
     tn.add(toolName);
     out.println("/* " + getIdString(tn, cu_name + "Constants.java") + " */");
     if (cu_to_insertion_point_1.size() != 0 && cu_to_insertion_point_1.get(0).kind == PACKAGE) {
@@ -143,7 +144,7 @@ public class OtherFilesGen extends JavaCCGlobals {
         re = res.rexp;
         if (re instanceof RStringLiteral) {
           out.println("    \"\\\"" + add_escapes(add_escapes(((RStringLiteral) re).image)) +
-                       "\\\"\",");
+                      "\\\"\",");
         } else if (!re.label.equals("")) {
           out.println("    \"<" + re.label + ">\",");
         } else {

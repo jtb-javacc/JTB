@@ -31,10 +31,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings javadoc
  */
+@SuppressWarnings("javadoc")
 public class LookaheadCalc extends JavaCCGlobals {
 
   static MatchInfo overlap(final List<MatchInfo> v1, final List<MatchInfo> v2) {
@@ -82,24 +83,20 @@ public class LookaheadCalc extends JavaCCGlobals {
     for (int i = 0; i < m.firstFreeLoc; i++) {
       if (m.match[i] == 0) {
         ret += " <EOF>";
-      }
-      else {
+      } else {
         final RegularExpression_ re = rexps_of_tokens.get(new Integer(m.match[i]));
         if (re instanceof RStringLiteral) {
           ret += " \"" + add_escapes(((RStringLiteral) re).image) + "\"";
-        }
-        else if (re.label != null && !re.label.equals("")) {
+        } else if (re.label != null && !re.label.equals("")) {
           ret += " <" + re.label + ">";
-        }
-        else {
+        } else {
           ret += " <token of kind " + i + ">";
         }
       }
     }
     if (m.firstFreeLoc == 0) {
       return "";
-    }
-    else {
+    } else {
       return ret.substring(1);
     }
   }
@@ -122,20 +119,20 @@ public class LookaheadCalc extends JavaCCGlobals {
       MatchInfo.laLimit = la;
       LookaheadWalk.considerSemanticLA = !Options.getForceLaCheck();
       for (int i = first; i < ch.getChoices().size() - 1; i++) {
-        LookaheadWalk.sizeLimitedMatches = new ArrayList<MatchInfo>();
+        LookaheadWalk.sizeLimitedMatches = new ArrayList<>();
         m = new MatchInfo();
         m.firstFreeLoc = 0;
-        v = new ArrayList<MatchInfo>();
+        v = new ArrayList<>();
         v.add(m);
         LookaheadWalk.genFirstSet(v, ch.getChoices().get(i));
         dbl[i] = LookaheadWalk.sizeLimitedMatches;
       }
       LookaheadWalk.considerSemanticLA = false;
       for (int i = first + 1; i < ch.getChoices().size(); i++) {
-        LookaheadWalk.sizeLimitedMatches = new ArrayList<MatchInfo>();
+        LookaheadWalk.sizeLimitedMatches = new ArrayList<>();
         m = new MatchInfo();
         m.firstFreeLoc = 0;
-        v = new ArrayList<MatchInfo>();
+        v = new ArrayList<>();
         v.add(m);
         LookaheadWalk.genFirstSet(v, ch.getChoices().get(i));
         dbr[i] = LookaheadWalk.sizeLimitedMatches;
@@ -144,16 +141,12 @@ public class LookaheadCalc extends JavaCCGlobals {
         for (int i = first; i < ch.getChoices().size() - 1; i++) {
           final Expansion_ exp = ch.getChoices().get(i);
           if (Semanticize.emptyExpansionExists(exp)) {
-            JavaCCErrors
-                        .warning(
-                                 exp,
-                                 "This choice can expand to the empty token sequence "
-                                     + "and will therefore always be taken in favor of the choices appearing later.");
+            JavaCCErrors.warning(exp, "This choice can expand to the empty token sequence " +
+                                      "and will therefore always be taken in favor of the choices appearing later.");
             break;
-          }
-          else if (javaCodeCheck(dbl[i])) {
-            JavaCCErrors.warning(exp, "JAVACODE non-terminal will force this choice to be taken "
-                                      + "in favor of the choices appearing later.");
+          } else if (javaCodeCheck(dbl[i])) {
+            JavaCCErrors.warning(exp, "JAVACODE non-terminal will force this choice to be taken " +
+                                      "in favor of the choices appearing later.");
             break;
           }
         }
@@ -188,8 +181,7 @@ public class LookaheadCalc extends JavaCCGlobals {
         System.err.println("         A common prefix is: " + image(overlapInfo[i]));
         System.err.println("         Consider using a lookahead of " + minLA[i] +
                            " or more for earlier expansion.");
-      }
-      else if (minLA[i] > 1) {
+      } else if (minLA[i] > 1) {
         JavaCCErrors.warning("Choice conflict involving two expansions at");
         System.err.print("         line " + (ch.getChoices().get(i)).getLine());
         System.err.print(", column " + (ch.getChoices().get(i)).getColumn());
@@ -231,11 +223,9 @@ public class LookaheadCalc extends JavaCCGlobals {
   private static String image(final Expansion_ exp) {
     if (exp instanceof OneOrMore) {
       return "(...)+";
-    }
-    else if (exp instanceof ZeroOrMore) {
+    } else if (exp instanceof ZeroOrMore) {
       return "(...)*";
-    }
-    else /* if (exp instanceof ZeroOrOne) */{
+    } else /* if (exp instanceof ZeroOrOne) */ {
       return "[...]";
     }
   }
@@ -247,27 +237,24 @@ public class LookaheadCalc extends JavaCCGlobals {
     int la;
     for (la = 1; la <= Options.getOtherAmbiguityCheck(); la++) {
       MatchInfo.laLimit = la;
-      LookaheadWalk.sizeLimitedMatches = new ArrayList<MatchInfo>();
+      LookaheadWalk.sizeLimitedMatches = new ArrayList<>();
       m = new MatchInfo();
       m.firstFreeLoc = 0;
-      v = new ArrayList<MatchInfo>();
+      v = new ArrayList<>();
       v.add(m);
       LookaheadWalk.considerSemanticLA = !Options.getForceLaCheck();
       LookaheadWalk.genFirstSet(v, nested);
       first = LookaheadWalk.sizeLimitedMatches;
-      LookaheadWalk.sizeLimitedMatches = new ArrayList<MatchInfo>();
+      LookaheadWalk.sizeLimitedMatches = new ArrayList<>();
       LookaheadWalk.considerSemanticLA = false;
       LookaheadWalk.genFollowSet(v, exp, Expansion_.nextGenerationIndex++);
       follow = LookaheadWalk.sizeLimitedMatches;
       if (la == 1) {
         if (javaCodeCheck(first)) {
-          JavaCCErrors
-                      .warning(
-                               nested,
-                               "JAVACODE non-terminal within " +
-                                   image(exp) +
-                                   " construct will force this construct to be entered in favor of " +
-                                   "expansions occurring after construct.");
+          JavaCCErrors.warning(nested,
+                               "JAVACODE non-terminal within " + image(exp) +
+                                       " construct will force this construct to be entered in favor of " +
+                                       "expansions occurring after construct.");
         }
       }
       if ((m = overlap(first, follow)) == null) {
@@ -278,17 +265,14 @@ public class LookaheadCalc extends JavaCCGlobals {
     if (la > Options.getOtherAmbiguityCheck()) {
       JavaCCErrors.warning("Choice conflict in " + image(exp) + " construct " + "at line " +
                            exp.getLine() + ", column " + exp.getColumn() + ".");
-      System.err
-                .println("         Expansion_ nested within construct and expansion following construct");
+      System.err.println("         Expansion_ nested within construct and expansion following construct");
       System.err.println("         have common prefixes, one of which is: " + image(m1));
       System.err.println("         Consider using a lookahead of " + la +
                          " or more for nested expansion.");
-    }
-    else if (la > 1) {
+    } else if (la > 1) {
       JavaCCErrors.warning("Choice conflict in " + image(exp) + " construct " + "at line " +
                            exp.getLine() + ", column " + exp.getColumn() + ".");
-      System.err
-                .println("         Expansion_ nested within construct and expansion following construct");
+      System.err.println("         Expansion_ nested within construct and expansion following construct");
       System.err.println("         have common prefixes, one of which is: " + image(m1));
       System.err.println("         Consider using a lookahead of " + la + " for nested expansion.");
     }

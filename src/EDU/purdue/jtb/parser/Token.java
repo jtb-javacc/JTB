@@ -12,8 +12,9 @@ package EDU.purdue.jtb.parser;
  *
  * @author Marc Mazas
  * @version 1.4.13 : 01/2017 : MMa : added this header comment
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings; added GTToken serialVersionUID
  */
-
+@SuppressWarnings("javadoc")
 public class Token implements java.io.Serializable {
 
   /**
@@ -127,6 +128,12 @@ public class Token implements java.io.Serializable {
    * Greater than Token.
    */
   public static class GTToken extends Token {
+
+    /**
+     * The version identifier for this Serializable class. Increment only if the <i>serialized</i>
+     * form of the class changes.
+     */
+    private static final long serialVersionUID = 1L;
 
     public GTToken(final int ki, final String im) {
       super(ki, im);

@@ -49,11 +49,13 @@ import java.security.NoSuchAlgorithmException;
  * <li>Checking any existing file's creation options (if the file can not be overwritten).</li>
  * <li></li>
  * </ul>
- * 
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  * @version 1.4.8 : 12/2014 : MMa : improved javadoc
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings; used try-with-resource
  */
+@SuppressWarnings("javadoc")
 public class OutputFile {
 
   private static final String MD5_LINE_PART_1  = "/* JavaCC - OriginalChecksum=";
@@ -69,7 +71,7 @@ public class OutputFile {
 
   /**
    * Create a new OutputFile.
-   * 
+   *
    * @param fl the file to write to.
    * @param compVers the minimum compatible JavaCC version.
    * @param opt if the file already exists, and cannot be overwritten, this is a list of options
@@ -81,44 +83,47 @@ public class OutputFile {
     compatibleVersion = compVers;
     options = opt;
     if (fl.exists()) {
-      // Generate the checksum of the file, and compare with any value
-      // stored
-      // in the file.
-      final BufferedReader br = new BufferedReader(new FileReader(fl));
-      MessageDigest digest;
-      try {
-        digest = MessageDigest.getInstance("MD5");
-      }
-      catch (final NoSuchAlgorithmException e) {
-        throw (IOException) (new IOException("No MD5 implementation").initCause(e));
-      }
-      final DigestOutputStream digestStream = new DigestOutputStream(new NullOutputStream(), digest);
-      final PrintWriter lpw = new PrintWriter(digestStream);
-      String line;
-      String existingMD5 = null;
-      while ((line = br.readLine()) != null) {
-        if (line.startsWith(MD5_LINE_PART_1)) {
-          existingMD5 = line.replaceAll(MD5_LINE_PART_1q, "").replaceAll(MD5_LINE_PART_2q, "");
-        } else {
-          lpw.println(line);
+      // Generate the checksum of the file, and compare with any value  stored in the file.
+      try (BufferedReader br = new BufferedReader(new FileReader(fl))) {
+        MessageDigest digest;
+        try {
+          digest = MessageDigest.getInstance("MD5");
         }
-      }
-      lpw.close();
-      final String calculatedDigest = toHexString(digestStream.getMessageDigest().digest());
-      if (existingMD5 == null || !existingMD5.equals(calculatedDigest)) {
-        // No checksum in file, or checksum differs.
-        needToWrite = false;
-        if (compVers != null) {
-          checkVersion(fl, compVers);
+        catch (final NoSuchAlgorithmException e) {
+          throw (IOException) (new IOException("No MD5 implementation").initCause(e));
         }
-        if (opt != null) {
-          checkOptions(fl, opt);
+        try (DigestOutputStream digestStream = new DigestOutputStream(new NullOutputStream(),
+                                                                      digest)) {
+          try (PrintWriter lpw = new PrintWriter(digestStream)) {
+            String line;
+            String existingMD5 = null;
+            while ((line = br.readLine()) != null) {
+              if (line.startsWith(MD5_LINE_PART_1)) {
+                existingMD5 = line.replaceAll(MD5_LINE_PART_1q, "").replaceAll(MD5_LINE_PART_2q,
+                                                                               "");
+              } else {
+                lpw.println(line);
+              }
+            }
+            lpw.close();
+            final String calculatedDigest = toHexString(digestStream.getMessageDigest().digest());
+            if (existingMD5 == null || !existingMD5.equals(calculatedDigest)) {
+              // No checksum in file, or checksum differs.
+              needToWrite = false;
+              if (compVers != null) {
+                checkVersion(fl, compVers);
+              }
+              if (opt != null) {
+                checkOptions(fl, opt);
+              }
+            } else {
+              // The file has not been altered since JavaCC created it.
+              // Rebuild it.
+              System.out.println("File \"" + fl.getName() + "\" is being rebuilt.");
+              needToWrite = true;
+            }
+          }
         }
-      } else {
-        // The file has not been altered since JavaCC created it.
-        // Rebuild it.
-        System.out.println("File \"" + fl.getName() + "\" is being rebuilt.");
-        needToWrite = true;
       }
     } else {
       // File does not exist
@@ -135,15 +140,14 @@ public class OutputFile {
 
   /**
    * Output a warning if the file was created with an incompatible version of JavaCC.
-   * 
+   *
    * @param fl - the file
    * @param versionId - the version
    */
   private void checkVersion(final File fl, final String versionId) {
     final String firstLine = "/* " + JavaCCGlobals.getIdString(toolName, fl.getName()) +
                              " Version ";
-    try {
-      final BufferedReader reader = new BufferedReader(new FileReader(fl));
+    try (BufferedReader reader = new BufferedReader(new FileReader(fl))) {
       String line;
       while ((line = reader.readLine()) != null) {
         if (line.startsWith(firstLine)) {
@@ -158,25 +162,24 @@ public class OutputFile {
       }
       // If no version line is found, do not output the warning.
     }
-    catch (final FileNotFoundException e1) {
+    catch (@SuppressWarnings("unused") final FileNotFoundException e1) {
       // This should never happen
       JavaCCErrors.semantic_error("Could not open file " + fl.getName() + " for writing.");
       throw new Error();
     }
-    catch (final IOException e2) {
+    catch (@SuppressWarnings("unused") final IOException e2) {
     }
   }
 
   /**
    * Read the options line from the file and compare to the options currently in use. Output a
    * warning if they are different.
-   * 
+   *
    * @param fl - the file
    * @param opt - the options
    */
   private static void checkOptions(final File fl, final String[] opt) {
-    try {
-      final BufferedReader reader = new BufferedReader(new FileReader(fl));
+    try (BufferedReader reader = new BufferedReader(new FileReader(fl))) {
       String line;
       while ((line = reader.readLine()) != null) {
         if (line.startsWith("/* JavaCCOptions:")) {
@@ -190,12 +193,12 @@ public class OutputFile {
         }
       }
     }
-    catch (final FileNotFoundException e1) {
+    catch (@SuppressWarnings("unused") final FileNotFoundException e1) {
       // This should never happen
       JavaCCErrors.semantic_error("Could not open file " + fl.getName() + " for writing.");
       throw new Error();
     }
-    catch (final IOException e2) {
+    catch (@SuppressWarnings("unused") final IOException e2) {
     }
     // Not found so cannot check
   }
@@ -255,7 +258,8 @@ public class OutputFile {
   }
 
   private final static char[] HEX_DIGITS = new char[] {
-      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+                                                        '0', '1', '2', '3', '4', '5', '6', '7', '8',
+                                                        '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
   private static final String toHexString(final byte[] bytes) {
     final StringBuilder sb = new StringBuilder(32);

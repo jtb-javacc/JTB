@@ -52,7 +52,44 @@
  */
 package EDU.purdue.jtb.misc;
 
-import static EDU.purdue.jtb.misc.Globals.*;
+import static EDU.purdue.jtb.misc.Globals.INDENT_AMT;
+import static EDU.purdue.jtb.misc.Globals.LS;
+import static EDU.purdue.jtb.misc.Globals.dFRetArguVisitor;
+import static EDU.purdue.jtb.misc.Globals.dFRetVisitor;
+import static EDU.purdue.jtb.misc.Globals.dFVoidArguVisitor;
+import static EDU.purdue.jtb.misc.Globals.dFVoidVisitor;
+import static EDU.purdue.jtb.misc.Globals.depthLevel;
+import static EDU.purdue.jtb.misc.Globals.genArguType;
+import static EDU.purdue.jtb.misc.Globals.genArguVar;
+import static EDU.purdue.jtb.misc.Globals.genArgusType;
+import static EDU.purdue.jtb.misc.Globals.genDepthLevelVar;
+import static EDU.purdue.jtb.misc.Globals.genFileHeaderComment;
+import static EDU.purdue.jtb.misc.Globals.genNodeVar;
+import static EDU.purdue.jtb.misc.Globals.genRetType;
+import static EDU.purdue.jtb.misc.Globals.genRetVar;
+import static EDU.purdue.jtb.misc.Globals.iNode;
+import static EDU.purdue.jtb.misc.Globals.iRetArguVisitor;
+import static EDU.purdue.jtb.misc.Globals.iRetVisitor;
+import static EDU.purdue.jtb.misc.Globals.iVoidArguVisitor;
+import static EDU.purdue.jtb.misc.Globals.iVoidVisitor;
+import static EDU.purdue.jtb.misc.Globals.inlineAcceptMethods;
+import static EDU.purdue.jtb.misc.Globals.javaDocComments;
+import static EDU.purdue.jtb.misc.Globals.noOverwrite;
+import static EDU.purdue.jtb.misc.Globals.nodeChoice;
+import static EDU.purdue.jtb.misc.Globals.nodeList;
+import static EDU.purdue.jtb.misc.Globals.nodeListOpt;
+import static EDU.purdue.jtb.misc.Globals.nodeOpt;
+import static EDU.purdue.jtb.misc.Globals.nodeSeq;
+import static EDU.purdue.jtb.misc.Globals.nodeTCF;
+import static EDU.purdue.jtb.misc.Globals.nodeToken;
+import static EDU.purdue.jtb.misc.Globals.nodesPackageName;
+import static EDU.purdue.jtb.misc.Globals.retArguVisitorCmt;
+import static EDU.purdue.jtb.misc.Globals.retVisitorCmt;
+import static EDU.purdue.jtb.misc.Globals.varargs;
+import static EDU.purdue.jtb.misc.Globals.visitorsDirName;
+import static EDU.purdue.jtb.misc.Globals.visitorsPackageName;
+import static EDU.purdue.jtb.misc.Globals.voidArguVisitorCmt;
+import static EDU.purdue.jtb.misc.Globals.voidVisitorCmt;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -76,7 +113,7 @@ import EDU.purdue.jtb.visitor.GlobalDataBuilder;
  * Class {@link DepthFirstVisitorsGenerator} contains methods to generate the different
  * DepthFirstXXXVisitor visitors classes files.<br>
  * It must be constructed with the list of the grammar {@link ClassInfo} classes.<br>
- * 
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  * @version 1.4.3.1 : 20/04/2009 : MMa : removed unnecessary @SuppressWarnings("unused") in
@@ -88,6 +125,7 @@ import EDU.purdue.jtb.visitor.GlobalDataBuilder;
  * @version 1.4.8 : 10/2012 : MMa : tuned javadoc comments for nodes with no child<br>
  *          1.4.8 : 11/2014 : MMa : added @Override on generated visit methods,<br>
  *          and @SuppressWarnings("unused") on unused parameters
+ * @version 1.4.14 : 01/2017 : MMa : used try-with-resource
  */
 public class DepthFirstVisitorsGenerator {
 
@@ -112,7 +150,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Constructor. Creates the visitor directory if it does not exist.
-   * 
+   *
    * @param classes - the classes list
    * @param aGdbv - the global data builder visitor
    */
@@ -136,19 +174,18 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Generates the DepthFirstRetArguVisitor file.
-   * 
+   *
    * @throws FileExistsException if file exists and no overwrite option set
    * @throws IOException if IO problem
    */
   public void genDepthFirstRetArguVisitorFile() throws FileExistsException, IOException {
     final String outFilename = dFRetArguVisitor + ".java";
-    try {
-      final File file = new File(visitorDir, outFilename);
-      if (noOverwrite && file.exists())
-        throw new FileExistsException(outFilename);
-      final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), BR_BUF_SZ));
+
+    final File file = new File(visitorDir, outFilename);
+    if (noOverwrite && file.exists())
+      throw new FileExistsException(outFilename);
+    try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), BR_BUF_SZ))) {
       out.print(genDepthFirstRetArguVisitor());
-      out.close();
     }
     catch (final IOException e) {
       final String msg = "Could not generate " + outFilename;
@@ -159,19 +196,17 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Generates the DepthFirstRetVisitor file.
-   * 
+   *
    * @throws FileExistsException if file exists and no overwrite option set
    * @throws IOException if IO problem
    */
   public void genDepthFirstRetVisitorFile() throws FileExistsException, IOException {
     final String outFilename = dFRetVisitor + ".java";
-    try {
-      final File file = new File(visitorDir, outFilename);
-      if (noOverwrite && file.exists())
-        throw new FileExistsException(outFilename);
-      final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), BR_BUF_SZ));
+    final File file = new File(visitorDir, outFilename);
+    if (noOverwrite && file.exists())
+      throw new FileExistsException(outFilename);
+    try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), BR_BUF_SZ))) {
       out.print(genDepthFirstRetVisitor());
-      out.close();
     }
     catch (final IOException e) {
       final String msg = "Could not generate " + outFilename;
@@ -182,19 +217,18 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Generates the DepthFirstVoidArguVisitor file.
-   * 
+   *
    * @throws FileExistsException if file exists and no overwrite option set
    * @throws IOException if IO problem
    */
   public void genDepthFirstVoidArguVisitorFile() throws FileExistsException, IOException {
     final String outFilename = dFVoidArguVisitor + ".java";
-    try {
-      final File file = new File(visitorDir, outFilename);
-      if (noOverwrite && file.exists())
-        throw new FileExistsException(outFilename);
-      final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), BR_BUF_SZ));
+    final File file = new File(visitorDir, outFilename);
+    if (noOverwrite && file.exists())
+      throw new FileExistsException(outFilename);
+    try (final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file),
+                                                                    BR_BUF_SZ))) {
       out.print(genDepthFirstVoidArguVisitor());
-      out.close();
     }
     catch (final IOException e) {
       final String msg = "Could not generate " + outFilename;
@@ -205,19 +239,17 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Generates the DepthFirstVoidVisitor file.
-   * 
+   *
    * @throws FileExistsException if file exists and no overwrite option set
    * @throws IOException if IO problem
    */
   public void genDepthFirstVoidVisitorFile() throws FileExistsException, IOException {
     final String outFilename = dFVoidVisitor + ".java";
-    try {
-      final File file = new File(visitorDir, outFilename);
-      if (noOverwrite && file.exists())
-        throw new FileExistsException(outFilename);
-      final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), BR_BUF_SZ));
+    final File file = new File(visitorDir, outFilename);
+    if (noOverwrite && file.exists())
+      throw new FileExistsException(outFilename);
+    try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), BR_BUF_SZ))) {
       out.print(genDepthFirstVoidVisitor());
-      out.close();
     }
     catch (final IOException e) {
       final String msg = "Could not generate " + outFilename;
@@ -232,7 +264,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Generates a DepthFirstRetArguVisitor class source.
-   * 
+   *
    * @return the buffer with the DepthFirstRetArguVisitor class source
    */
   public StringBuilder genDepthFirstRetArguVisitor() {
@@ -251,7 +283,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Generates a DepthFirstRetVisitor class source.
-   * 
+   *
    * @return the buffer with the DepthFirstRetArguVisitor class source
    */
   public StringBuilder genDepthFirstRetVisitor() {
@@ -266,7 +298,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Generates a DepthFirstVoidArguVisitor class source.
-   * 
+   *
    * @return the buffer with the DepthFirstRetArguVisitor class source
    */
   public StringBuilder genDepthFirstVoidArguVisitor() {
@@ -284,7 +316,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Generates a DepthFirstVoidVisitor class source.
-   * 
+   *
    * @return the buffer with the DepthFirstRetArguVisitor class source
    */
   public StringBuilder genDepthFirstVoidVisitor() {
@@ -296,7 +328,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Common method to generate all the DepthFirst visitors.
-   * 
+   *
    * @param aComment - a visitor type that will be inserted in the class comment
    * @param aClDecl - the class declaration
    * @param aConsBeg - the beginning of the visit methods
@@ -366,26 +398,24 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Generates a user node class visit method.
-   * 
+   *
    * @param aClassInfo - the class data for the node to visit
    * @param aConsBeg - the beginning of the visit methods
    * @param aConsEnd - the end of the visit methods
    * @param aRet - true if there is a user return parameter type, false otherwise
    * @param aArgu - true if there is a user argument parameter type, false otherwise
    */
-  void userNodeVisitMethod(final ClassInfo aClassInfo, final String aConsBeg,
-                           final String aConsEnd, final boolean aRet, final boolean aArgu) {
+  void userNodeVisitMethod(final ClassInfo aClassInfo, final String aConsBeg, final String aConsEnd,
+                           final boolean aRet, final boolean aArgu) {
     final ClassInfo ci = aClassInfo;
     final String className = ci.className;
 
     if (javaDocComments) {
       sb.append(spc.spc).append("/**").append(LS);
       sb.append(spc.spc).append(" * Visits a {@link ").append(className).append("} node, ");
-      sb.append(ci.astEcNode == null
-                                    ? "with no child :"
-                                    : ci.fieldNames.size() == 1
-                                                               ? "whose child is the following :"
-                                                               : "whose children are the following :")
+      sb.append(ci.astEcNode == null ? "with no child :"
+                                     : ci.fieldNames.size() == 1 ? "whose child is the following :"
+                                                                 : "whose children are the following :")
         .append(LS);
       sb.append(spc.spc).append(" * <p>").append(LS);
       // generate the javadoc for the class fields, with indentation of 1
@@ -495,7 +525,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Generates the base nodes classes visit methods.
-   * 
+   *
    * @param aSb - the buffer to output into (will be allocated if null)
    * @param aSpc - the indentation
    * @param aRet - true if there is a user return parameter type, false otherwise
@@ -535,7 +565,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Generates the base node {@link NodeChoice} visit method.
-   * 
+   *
    * @param aSb - the buffer to output into (will be allocated if null)
    * @param aSpc - the indentation
    * @param aRet - true if there is a user return parameter type, false otherwise
@@ -571,7 +601,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Generates the base node {@link NodeList} visit method.
-   * 
+   *
    * @param aSb - the buffer to output into (will be allocated if null)
    * @param aSpc - the indentation
    * @param aRet - true if there is a user return parameter type, false otherwise
@@ -616,7 +646,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Generates the base node {@link NodeListOptional} visit method.
-   * 
+   *
    * @param aSb - the buffer to output into (will be allocated if null)
    * @param aSpc - the indentation
    * @param aRet - true if there is a user return parameter type, false otherwise
@@ -669,7 +699,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Generates the base node {@link NodeOptional} visit method.
-   * 
+   *
    * @param aSb - the buffer to output into (will be allocated if null)
    * @param aSpc - the indentation
    * @param aRet - true if there is a user return parameter type, false otherwise
@@ -712,7 +742,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Generates the base node {@link NodeSequence} visit method.
-   * 
+   *
    * @param aSb - the buffer to output into (will be allocated if null)
    * @param aSpc - the indentation
    * @param aRet - true if there is a user return parameter type, false otherwise
@@ -757,7 +787,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Generates the base node {@link NodeToken} visit method.
-   * 
+   *
    * @param aSb - the buffer to output into (will be allocated if null)
    * @param aSpc - the indentation
    * @param aRet - true if there is a user return parameter type, false otherwise
@@ -788,7 +818,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Generates the base node {@link NodeTCF} visit method.
-   * 
+   *
    * @param aSb - the buffer to output into (will be allocated if null)
    * @param aSpc - the indentation
    * @param aRet - true if there is a user return parameter type, false otherwise
@@ -819,7 +849,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Outputs the beginning of a visit method for a base node.
-   * 
+   *
    * @param aSb - the buffer to output into (will be allocated if null)
    * @param aSpc - the indentation
    * @param aRet - true if there is a user return parameter type, false otherwise
@@ -853,7 +883,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Outputs the visit method javadoc comment for a base node.
-   * 
+   *
    * @param aSb - the buffer to output into (will be allocated if null)
    * @param aSpc - the indentation
    * @param aRet - true if there is a user return parameter type, false otherwise
@@ -879,7 +909,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Outputs the closing of a brace.
-   * 
+   *
    * @param aSb - the buffer to output into (will be allocated if null)
    * @param aSpc - the indentation
    */
@@ -890,7 +920,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Output code to decrease the depth level.
-   * 
+   *
    * @param aSb - the buffer to output into (will be allocated if null)
    * @param aSpc - the indentation
    */
@@ -900,7 +930,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Output code to increase the depth level.
-   * 
+   *
    * @param aSb - the buffer to output into (will be allocated if null)
    * @param aSpc - the indentation
    */
@@ -910,7 +940,7 @@ public class DepthFirstVisitorsGenerator {
 
   /**
    * Estimates the visitors files size.
-   * 
+   *
    * @return the estimated size
    */
   int sbBufferSize() {

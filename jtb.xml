@@ -15,8 +15,8 @@
 	<property name="jtb-src" value="src" />
 
 	<!-- JTB versions : 4 places : here, version.properties, pom.xml & misc.Globals.java !!! -->
-	<property name="jtb_last_version" value="1.4.12" />
-	<property name="jtb_curr_version" value="1.4.13" />
+	<property name="jtb_last_version" value="1.4.13" />
+	<property name="jtb_curr_version" value="1.4.14" />
 	<property file="version.properties" />
 	<!-- property name="vp_version" value="${version.major}.${version.minor}.${version.patch}-SNAPSHOT" / -->
 	<property name="vp_version" value="${version.major}.${version.minor}.${version.patch}" />

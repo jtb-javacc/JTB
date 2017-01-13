@@ -53,7 +53,36 @@
  */
 package EDU.purdue.jtb.misc;
 
-import static EDU.purdue.jtb.misc.Globals.*;
+import static EDU.purdue.jtb.misc.Globals.INDENT_AMT;
+import static EDU.purdue.jtb.misc.Globals.LS;
+import static EDU.purdue.jtb.misc.Globals.genArguType;
+import static EDU.purdue.jtb.misc.Globals.genArgusType;
+import static EDU.purdue.jtb.misc.Globals.genFileHeaderComment;
+import static EDU.purdue.jtb.misc.Globals.genRetType;
+import static EDU.purdue.jtb.misc.Globals.iNode;
+import static EDU.purdue.jtb.misc.Globals.iNodeList;
+import static EDU.purdue.jtb.misc.Globals.iRetArguVisitor;
+import static EDU.purdue.jtb.misc.Globals.iRetVisitor;
+import static EDU.purdue.jtb.misc.Globals.iVoidArguVisitor;
+import static EDU.purdue.jtb.misc.Globals.iVoidVisitor;
+import static EDU.purdue.jtb.misc.Globals.javaDocComments;
+import static EDU.purdue.jtb.misc.Globals.noOverwrite;
+import static EDU.purdue.jtb.misc.Globals.nodeChoice;
+import static EDU.purdue.jtb.misc.Globals.nodeList;
+import static EDU.purdue.jtb.misc.Globals.nodeListOpt;
+import static EDU.purdue.jtb.misc.Globals.nodeOpt;
+import static EDU.purdue.jtb.misc.Globals.nodeSeq;
+import static EDU.purdue.jtb.misc.Globals.nodeTCF;
+import static EDU.purdue.jtb.misc.Globals.nodeToken;
+import static EDU.purdue.jtb.misc.Globals.nodesDirName;
+import static EDU.purdue.jtb.misc.Globals.nodesPackageName;
+import static EDU.purdue.jtb.misc.Globals.retArguVisitorCmt;
+import static EDU.purdue.jtb.misc.Globals.retVisitorCmt;
+import static EDU.purdue.jtb.misc.Globals.varargs;
+import static EDU.purdue.jtb.misc.Globals.visitorsDirName;
+import static EDU.purdue.jtb.misc.Globals.visitorsPackageName;
+import static EDU.purdue.jtb.misc.Globals.voidArguVisitorCmt;
+import static EDU.purdue.jtb.misc.Globals.voidVisitorCmt;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -67,7 +96,7 @@ import java.util.List;
  * Class FilesGenerator contains methods to generate the grammar (user) nodes java files, the base
  * nodes java files, the visitor interfaces and the default visitors classes files.<br>
  * It must be constructed with the list of the grammar {@link ClassInfo} classes.
- * 
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5<br>
  *          1.4.0 : 11/2009 : MMa : fixed directories creation errors
@@ -75,6 +104,7 @@ import java.util.List;
  * @version 1.4.7 : 09/2012 : MMa : added missing generated visit methods (NodeChoice and NodeTCF)
  * @version 1.4.8 : 10/2012 : MMa : tuned javadoc comments for nodes with no child<br>
  *          1.4.8 : 10/2014 : MMa : fixed NPE on classes without fields
+ * @version 1.4.14 : 01/2017 : MMa : used try-with-resource
  */
 public class FilesGenerator {
 
@@ -87,7 +117,7 @@ public class FilesGenerator {
 
   /**
    * Constructor. Creates the nodes and visitors directories if they do not exist.
-   * 
+   *
    * @param aClasses - the list of {@link ClassInfo} classes instances
    */
   public FilesGenerator(final List<ClassInfo> aClasses) {
@@ -115,7 +145,7 @@ public class FilesGenerator {
 
   /**
    * Outputs the formatted nodes classes list.
-   * 
+   *
    * @param out - a PrintWriter to output on
    */
   public void outputFormattedNodesClassesList(final PrintWriter out) {
@@ -126,7 +156,7 @@ public class FilesGenerator {
 
   /**
    * Formats the nodes classes list.
-   * 
+   *
    * @param aSb - a buffer, used if not null
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the formatted nodes classes list
@@ -161,7 +191,7 @@ public class FilesGenerator {
 
   /**
    * Generates nodes (classes source) files.
-   * 
+   *
    * @throws FileExistsException if file exists
    * @throws IOException if IO problem
    */
@@ -175,9 +205,9 @@ public class FilesGenerator {
         exists = true;
         break;
       }
-      final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 2048));
-      out.print(genNodeClass(null, ci));
-      out.close();
+      try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 2048))) {
+        out.print(genNodeClass(null, ci));
+      }
     }
     if (noOverwrite && exists)
       throw new FileExistsException("Some of the generated nodes classes files exist");
@@ -185,7 +215,7 @@ public class FilesGenerator {
 
   /**
    * Generates a node class source string.
-   * 
+   *
    * @param aSb - a buffer, used if not null
    * @param aClassInfo - the class to generate the source string
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
@@ -215,7 +245,7 @@ public class FilesGenerator {
 
   /**
    * Generates the base nodes source files.
-   * 
+   *
    * @throws FileExistsException - if one or more files exist and no overwrite flag has been set
    * @throws IOException if IO problem
    */
@@ -243,32 +273,32 @@ public class FilesGenerator {
   }
 
   /**
-   * Fills a class file given its class source. It adds the file header comment
-   * ("Generated by JTB version").
-   * 
+   * Fills a class file given its class source. It adds the file header comment ("Generated by JTB
+   * version").
+   *
    * @param fileName - the class file name
    * @param classSource - the class source
    * @throws IOException - if any IO Exception
    * @return false if the file exists and the no overwrite flag is set, true otherwise
    */
-  public static boolean fillFile(final String fileName, final StringBuilder classSource)
-                                                                                        throws IOException {
+  public static boolean fillFile(final String fileName,
+                                 final StringBuilder classSource) throws IOException {
     final File file = new File(nodesDirName, fileName);
 
     if (noOverwrite && file.exists())
       return false;
 
-    final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 2048));
-    out.println(genFileHeaderComment());
-    out.print(classSource);
-    out.close();
+    try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 2048))) {
+      out.println(genFileHeaderComment());
+      out.print(classSource);
+    }
     return true;
   }
 
   /**
    * Generates the "RetArgu" IVisitor interface source (with return type and a user object
    * argument).
-   * 
+   *
    * @param aSb - a buffer, used if not null
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the visitor class source
@@ -289,7 +319,7 @@ public class FilesGenerator {
 
   /**
    * Generates the "Ret" IVisitor interface source (with return type and no user object argument).
-   * 
+   *
    * @param aSb - a buffer, used if not null
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the visitor class source
@@ -311,7 +341,7 @@ public class FilesGenerator {
   /**
    * Generates the "VoidArgu" IVisitor interface source (with no return type and a user object
    * argument).
-   * 
+   *
    * @param aSb - a buffer, used if not null
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the visitor class source
@@ -333,7 +363,7 @@ public class FilesGenerator {
   /**
    * Generates the "Void" IVisitor interface source (with no return type and no user object
    * argument).
-   * 
+   *
    * @param aSb - a buffer, used if not null
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the visitor class source
@@ -354,7 +384,7 @@ public class FilesGenerator {
 
   /**
    * Generates the start for all visitor interfaces.
-   * 
+   *
    * @param aSb - the buffer to output into (must be non null)
    * @param aComment - the target visitors names to insert in the interface comment
    * @param aIntf - the interface name
@@ -382,7 +412,7 @@ public class FilesGenerator {
 
   /**
    * Generates the end for all visitor interfaces.
-   * 
+   *
    * @param aSb - the buffer to output into (must be non null)
    * @param aConsBeg - the beginning of the visit methods
    * @param aConsEnd - the end of the visit methods
@@ -404,11 +434,9 @@ public class FilesGenerator {
       if (javaDocComments) {
         aSb.append(spc.spc).append("/**").append(LS);
         aSb.append(spc.spc).append(" * Visits a {@link ").append(className).append("} node, ");
-        aSb.append(ci.astEcNode == null
-                                       ? "with no child :"
-                                       : ci.fieldNames.size() == 1
-                                                                  ? "whose child is the following :"
-                                                                  : "whose children are the following :")
+        aSb.append(ci.astEcNode == null ? "with no child :"
+                                        : ci.fieldNames.size() == 1 ? "whose child is the following :"
+                                                                    : "whose children are the following :")
            .append(LS);
         aSb.append(spc.spc).append(" * <p>").append(LS);
         // generate the javadoc for the class fields, with indentation of 1
@@ -430,7 +458,7 @@ public class FilesGenerator {
 
   /**
    * Generates the "RetArgu" IVisitor (interface source) file.
-   * 
+   *
    * @throws FileExistsException - if the file already exists and the no overwrite flag has been set
    * @throws IOException if IO problem
    */
@@ -441,9 +469,9 @@ public class FilesGenerator {
       if (noOverwrite && file.exists())
         throw new FileExistsException(iRetArguVisitor + ".java");
 
-      final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 1500));
-      out.print(genRetArguIVisitor(null));
-      out.close();
+      try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 1500))) {
+        out.print(genRetArguIVisitor(null));
+      }
     }
     catch (final IOException e) {
       Messages.hardErr(e);
@@ -453,7 +481,7 @@ public class FilesGenerator {
 
   /**
    * Generates the "Ret" IVisitor (interface source) file.
-   * 
+   *
    * @throws FileExistsException - if the file already exists and the no overwrite flag has been set
    * @throws IOException if IO problem
    */
@@ -464,9 +492,9 @@ public class FilesGenerator {
       if (noOverwrite && file.exists())
         throw new FileExistsException(iRetVisitor + ".java");
 
-      final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 1500));
-      out.print(genRetIVisitor(null));
-      out.close();
+      try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 1500))) {
+        out.print(genRetIVisitor(null));
+      }
     }
     catch (final IOException e) {
       Messages.hardErr(e);
@@ -476,7 +504,7 @@ public class FilesGenerator {
 
   /**
    * Generates the "VoidArgu" IVisitor (interface source) file.
-   * 
+   *
    * @throws FileExistsException - if the file already exists and the no overwrite flag has been set
    * @throws IOException if IO problem
    */
@@ -487,9 +515,9 @@ public class FilesGenerator {
       if (noOverwrite && file.exists())
         throw new FileExistsException(iVoidArguVisitor + ".java");
 
-      final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 1500));
-      out.print(genVoidArguIVisitor(null));
-      out.close();
+      try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 1500))) {
+        out.print(genVoidArguIVisitor(null));
+      }
     }
     catch (final IOException e) {
       Messages.hardErr(e);
@@ -499,7 +527,7 @@ public class FilesGenerator {
 
   /**
    * Generates the "Void" IVisitor (interface source) file.
-   * 
+   *
    * @throws FileExistsException - if the file already exists and the no overwrite flag has been set
    * @throws IOException if IO problem
    */
@@ -510,9 +538,9 @@ public class FilesGenerator {
       if (noOverwrite && file.exists())
         throw new FileExistsException(iVoidVisitor + ".java");
 
-      final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 1500));
-      out.print(genVoidIVisitor(null));
-      out.close();
+      try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), 1500))) {
+        out.print(genVoidIVisitor(null));
+      }
     }
     catch (final IOException e) {
       Messages.hardErr(e);
@@ -522,7 +550,7 @@ public class FilesGenerator {
 
   /**
    * Generates the base "RetArgu" visit methods.
-   * 
+   *
    * @param aSb - a buffer, used if not null
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the base visitor methods source
@@ -556,7 +584,7 @@ public class FilesGenerator {
 
   /**
    * Generates the base "Ret" visit methods.
-   * 
+   *
    * @param aSb - a buffer, used if not null
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the base visitor methods source
@@ -590,7 +618,7 @@ public class FilesGenerator {
 
   /**
    * Generates the base "VoidArgu" visit methods.
-   * 
+   *
    * @param aSb - a buffer, used if not null
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the base visitor methods source
@@ -624,7 +652,7 @@ public class FilesGenerator {
 
   /**
    * Generates the base "Void" visit methods.
-   * 
+   *
    * @param aSb - a buffer, used if not null
    * @return StringBuilder the given one if not null, or a new allocated one if null, completed with
    *         the base visitor methods source
@@ -658,7 +686,7 @@ public class FilesGenerator {
 
   /**
    * Generates the class parameter types.
-   * 
+   *
    * @param ret - true if there is a user return parameter type, false otherwise
    * @param arg - true if there is a user argument parameter type, false otherwise
    * @return the class parameter types string
@@ -681,7 +709,7 @@ public class FilesGenerator {
 
   /**
    * Generates the beginning of the visit methods.
-   * 
+   *
    * @param arg - true if there is a user argument parameter type, false otherwise
    * @return the beginning of the visit methods
    */
@@ -695,7 +723,7 @@ public class FilesGenerator {
 
   /**
    * Generates the end of the visit methods.
-   * 
+   *
    * @param arg - true if there is a user argument parameter type, false otherwise
    * @return the end of the visit methods
    */

@@ -39,7 +39,9 @@ import java.util.List;
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  * @version 1.4.8 : 12/2014 : MMa : improved javadoc
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings
  */
+@SuppressWarnings("javadoc")
 public class ParseEngine extends JavaCCGlobals {
 
   static private java.io.PrintWriter               out;
@@ -61,9 +63,9 @@ public class ParseEngine extends JavaCCGlobals {
    * optimization and the hashtable makes it look like we do not need the flag "phase3done" any
    * more. But this has not been removed yet.
    */
-  static private List<Lookahead>                   phase2list  = new ArrayList<Lookahead>();
-  static private List<Phase3Data>                  phase3list  = new ArrayList<Phase3Data>();
-  static private Hashtable<Expansion_, Phase3Data> phase3table = new Hashtable<Expansion_, Phase3Data>();
+  static private List<Lookahead>                   phase2list  = new ArrayList<>();
+  static private List<Phase3Data>                  phase3list  = new ArrayList<>();
+  static private Hashtable<Expansion_, Phase3Data> phase3table = new Hashtable<>();
 
   /**
    * The phase 1 routines generates their output into String's and dumps these String's once for
@@ -138,7 +140,7 @@ public class ParseEngine extends JavaCCGlobals {
   /**
    * Sets up the array "firstSet" above based on the Expansion_ argument passed to it. Since this is
    * a recursive function, it assumes that "firstSet" has been reset before the first call.
-   * 
+   *
    * @param exp - the expansion node
    */
   static private void genFirstSet(final Expansion_ exp) {
@@ -203,7 +205,7 @@ public class ParseEngine extends JavaCCGlobals {
   private static void dumpLookaheads(final Lookahead[] conds, final String[] actions) {
     for (int i = 0; i < conds.length; i++) {
       System.err.println("Lookahead: " + i);
-      System.err.println(conds[i].dump(0, new HashSet<Object>()));
+      System.err.println(conds[i].dump(0, new HashSet<>()));
       System.err.println();
     }
   }
@@ -218,12 +220,11 @@ public class ParseEngine extends JavaCCGlobals {
    * else if (f(conds[1]) actions[1] . . . else actions[action.length-1].<br>
    * A particular action entry ("actions[i]") can be null, in which case, a noop is generated for
    * that action.
-   * 
+   *
    * @param conds - the lookahead conditions
    * @param actions - the lookahead actions
    * @return the corresponding java code
    */
-  @SuppressWarnings("fallthrough")
   // for           case NOOPENSTM:
   static String buildLookaheadChecker(final Lookahead[] conds, final String[] actions) {
 
@@ -280,6 +281,10 @@ public class ParseEngine extends JavaCCGlobals {
               maskVals.add(tokenMask);
               retval.append("\n" + "if (");
               indentAmt++;
+              break;
+            default:
+              // ModMMa 01/2017 default case added to avoid warning
+              break;
           }
           printTokenSetup((la.getActionTokens().get(0)));
           for (final Iterator<Token> it = la.getActionTokens().iterator(); it.hasNext();) {
@@ -315,6 +320,7 @@ public class ParseEngine extends JavaCCGlobals {
             case OPENIF:
               retval.append("\u0002\n" + "} else {\u0001");
               // Control flows through to next case.
+              //$FALL-THROUGH$
             case NOOPENSTM:
               retval.append("\n" + "switch (");
               if (Options.getCacheTokens()) {
@@ -331,6 +337,11 @@ public class ParseEngine extends JavaCCGlobals {
                 tokenMask[i] = 0;
               }
               // Don't need to do anything if state is OPENSWITCH.
+              break;
+            default:
+              // ModMMa 01/2017 default case added to avoid warning and allocation added to avoid the potential null pointer access warning
+              tokenMask = new int[0];
+              break;
           }
           for (int i = 0; i < tokenCount; i++) {
             if (firstSet[i]) {
@@ -385,6 +396,10 @@ public class ParseEngine extends JavaCCGlobals {
             maskVals.add(tokenMask);
             retval.append("\n" + "if (");
             indentAmt++;
+            break;
+          default:
+            // ModMMa 01/2017 default case added to avoid warning
+            break;
         }
         jj2index++;
         // At this point, la.la_expansion.internal_name must be "".
@@ -430,6 +445,10 @@ public class ParseEngine extends JavaCCGlobals {
           maskindex++;
         }
         retval.append(actions[index]);
+        break;
+      default:
+        // ModMMa 01/2017 default case added to avoid warning
+        break;
     }
     for (int i = 0; i < indentAmt; i++) {
       retval.append("\u0002\n}");
@@ -614,8 +633,8 @@ public class ParseEngine extends JavaCCGlobals {
       final Choice e_nrw = (Choice) e;
       conds = new Lookahead[e_nrw.getChoices().size()];
       actions = new String[e_nrw.getChoices().size() + 1];
-      actions[e_nrw.getChoices().size()] = "\n" + "jj_consume_token(-1);\n"
-                                           + "throw new ParseException();";
+      actions[e_nrw.getChoices().size()] = "\n" + "jj_consume_token(-1);\n" +
+                                           "throw new ParseException();";
       // In previous line, the "throw" never throws an exception since the
       // evaluation of jj_consume_token(-1) causes ParseException to be
       // thrown first.
@@ -921,7 +940,8 @@ public class ParseEngine extends JavaCCGlobals {
       final NonTerminal e_nrw = (NonTerminal) e;
       final NormalProduction ntprod = (production_table.get(e_nrw.getName()));
       if (ntprod instanceof JavaCodeProduction_) {
-        out.println("    if (true) { jj_la = 0; jj_scanpos = jj_lastpos; " + genReturn(false) + "}");
+        out.println("    if (true) { jj_la = 0; jj_scanpos = jj_lastpos; " + genReturn(false) +
+                    "}");
       } else {
         final Expansion_ ntexp = ntprod.getExpansion();
         //out.println("    if (jj_3" + ntexp.internal_name + "()) " + genReturn(true));
@@ -1203,9 +1223,9 @@ public class ParseEngine extends JavaCCGlobals {
     gensymindex = 0;
     indentamt = 0;
     jj2LA = false;
-    phase2list = new ArrayList<Lookahead>();
-    phase3list = new ArrayList<Phase3Data>();
-    phase3table = new Hashtable<Expansion_, Phase3Data>();
+    phase2list = new ArrayList<>();
+    phase3list = new ArrayList<>();
+    phase3table = new Hashtable<>();
     firstSet = null;
     xsp_declared = false;
     jj3_expansion = null;
@@ -1229,7 +1249,7 @@ class Phase3Data {
 
   /**
    * Constructor with parameters
-   * 
+   *
    * @param e - the node
    * @param c - the number of tokens
    */

@@ -32,11 +32,13 @@ import java.util.List;
 
 /**
  * Utilities.
- * 
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  * @version 1.4.8 : 12/2014 : MMa : improved javadoc
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings
  */
+@SuppressWarnings("javadoc")
 public abstract class JavaCCParserInternals extends JavaCCGlobals {
 
   /** Initializes */
@@ -57,7 +59,7 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
 
   /**
    * Compares the second id with the first one and raises a parse error if not identical.
-   * 
+   *
    * @param t - the token to pass to the error
    * @param id1 - the first id to compare
    * @param id2 - the second id to compare
@@ -125,8 +127,8 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     rexprlist.add(p);
     if (Options.getUserTokenManager()) {
       if (p.lexStates == null || p.lexStates.length != 1 || !p.lexStates[0].equals("DEFAULT")) {
-        JavaCCErrors.warning(p, "Ignoring lexical state specifications since option "
-                                + "USER_TOKEN_MANAGER has been set to true.");
+        JavaCCErrors.warning(p, "Ignoring lexical state specifications since option " +
+                                "USER_TOKEN_MANAGER has been set to true.");
       }
     }
     if (p.lexStates == null) {
@@ -155,8 +157,8 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     } else {
       token_mgr_decls = decls;
       if (Options.getUserTokenManager()) {
-        JavaCCErrors.warning(t, "Ignoring declarations in \"TOKEN_MGR_DECLS\" since option "
-                                + "USER_TOKEN_MANAGER has been set to true.");
+        JavaCCErrors.warning(t, "Ignoring declarations in \"TOKEN_MGR_DECLS\" since option " +
+                                "USER_TOKEN_MANAGER has been set to true.");
       }
     }
   }
@@ -166,7 +168,7 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
       final TokenProduction p = new TokenProduction();
       p.isExplicit = false;
       p.lexStates = new String[] {
-        "DEFAULT" };
+                                   "DEFAULT" };
       p.kind = TokenProduction.TOKEN;
       final RegExprSpec_ res = new RegExprSpec_();
       res.rexp = r;
@@ -290,8 +292,9 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
             }
           }
         }
-        JavaCCErrors.parse_error(t, "Encountered non-hex character '" + ch + "' at position " +
-                                    index + " of string " +
+        JavaCCErrors.parse_error(t,
+                                 "Encountered non-hex character '" + ch + "' at position " + index +
+                                    " of string " +
                                     "- Unicode escape must have 4 hex digits after it.");
         return buff.toString();
       }
@@ -311,16 +314,16 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     }
   }
 
-  static protected char character_descriptor_assign(final Token t, final String s, final String left) {
+  static protected char character_descriptor_assign(final Token t, final String s,
+                                                    final String left) {
     if (s.length() != 1) {
       JavaCCErrors.parse_error(t, "String in character list may contain only one character.");
       return ' ';
     } else if ((left.charAt(0)) > (s.charAt(0))) {
       JavaCCErrors.parse_error(t,
-                               "Right end of character range \'" +
-                                   s +
-                                   "\' has a lower ordinal value than the left end of character range \'" +
-                                   left + "\'.");
+                               "Right end of character range \'" + s +
+                                  "\' has a lower ordinal value than the left end of character range \'" +
+                                  left + "\'.");
       return left.charAt(0);
     } else {
       return s.charAt(0);

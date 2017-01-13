@@ -52,7 +52,43 @@
  */
 package EDU.purdue.jtb;
 
-import static EDU.purdue.jtb.misc.Globals.*;
+import static EDU.purdue.jtb.misc.Globals.DEF_ND_DIR_NAME;
+import static EDU.purdue.jtb.misc.Globals.DEF_ND_PKG_NAME;
+import static EDU.purdue.jtb.misc.Globals.DEF_VIS_DIR_NAME;
+import static EDU.purdue.jtb.misc.Globals.DEF_VIS_PKG_NAME;
+import static EDU.purdue.jtb.misc.Globals.PROG_NAME;
+import static EDU.purdue.jtb.misc.Globals.SCRIPT_NAME;
+import static EDU.purdue.jtb.misc.Globals.VERSION;
+import static EDU.purdue.jtb.misc.Globals.dFRetArguVisitor;
+import static EDU.purdue.jtb.misc.Globals.dFRetVisitor;
+import static EDU.purdue.jtb.misc.Globals.dFVoidArguVisitor;
+import static EDU.purdue.jtb.misc.Globals.dFVoidVisitor;
+import static EDU.purdue.jtb.misc.Globals.depthLevel;
+import static EDU.purdue.jtb.misc.Globals.descriptiveFieldNames;
+import static EDU.purdue.jtb.misc.Globals.iRetArguVisitor;
+import static EDU.purdue.jtb.misc.Globals.iRetVisitor;
+import static EDU.purdue.jtb.misc.Globals.iVoidArguVisitor;
+import static EDU.purdue.jtb.misc.Globals.iVoidVisitor;
+import static EDU.purdue.jtb.misc.Globals.inlineAcceptMethods;
+import static EDU.purdue.jtb.misc.Globals.javaDocComments;
+import static EDU.purdue.jtb.misc.Globals.jtbInputFileName;
+import static EDU.purdue.jtb.misc.Globals.jtbOutputFileName;
+import static EDU.purdue.jtb.misc.Globals.keepSpecialTokens;
+import static EDU.purdue.jtb.misc.Globals.noOverwrite;
+import static EDU.purdue.jtb.misc.Globals.noSemanticCheck;
+import static EDU.purdue.jtb.misc.Globals.nodePrefix;
+import static EDU.purdue.jtb.misc.Globals.nodeSuffix;
+import static EDU.purdue.jtb.misc.Globals.nodesDirName;
+import static EDU.purdue.jtb.misc.Globals.nodesPackageName;
+import static EDU.purdue.jtb.misc.Globals.nodesSuperclass;
+import static EDU.purdue.jtb.misc.Globals.parentPointer;
+import static EDU.purdue.jtb.misc.Globals.printClassList;
+import static EDU.purdue.jtb.misc.Globals.printerToolkit;
+import static EDU.purdue.jtb.misc.Globals.schemeToolkit;
+import static EDU.purdue.jtb.misc.Globals.staticFlag;
+import static EDU.purdue.jtb.misc.Globals.varargs;
+import static EDU.purdue.jtb.misc.Globals.visitorsDirName;
+import static EDU.purdue.jtb.misc.Globals.visitorsPackageName;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -82,7 +118,7 @@ import EDU.purdue.jtb.visitor.SemanticChecker;
  * Java Tree Builder (JTB) Driver.
  * <p>
  * Class JTB contains the main() method of the program as well as related methods.
- * 
+ *
  * @author Kevin Tao, Wanjun Wang, Marc Mazas, Francis Andre
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5<br>
  *          1.4.0 : 11/2009 : MMa : added input file options management
@@ -90,6 +126,7 @@ import EDU.purdue.jtb.visitor.SemanticChecker;
  * @version 1.4.5 : 12/2010 : MMa : convert nodes and visitors output directories to absolute paths
  * @version 1.4.6 : 01/2011 : FA : added -va and -npfx and -nsfx options
  * @version 1.4.7 : 09/2012 : MMa : some renamings ; added the use of the {@link GlobalDataBuilder}
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings for unused exceptions
  */
 public class JTB {
 
@@ -129,7 +166,7 @@ public class JTB {
 
   /**
    * Standard main method.
-   * 
+   *
    * @param args - the command line arguments
    */
   public static void main(final String args[]) {
@@ -138,9 +175,10 @@ public class JTB {
 
   /**
    * Non standard main method returning an error code.
-   * 
+   *
    * @param args - the command line arguments
-   * @return the error code: <li>
+   * @return the error code:
+   *         <li>
    *         <ul>
    *         for specific types of errors: {@link #CL_ERR}, {@link #GDB_ERR}, {@link #SC_ERR},
    *         {@link #CF_ERR}, {@link #ANN_ERR}, {@link #FG_ERR}, {@link #CL_EX}, {@link #PARSE_EX},
@@ -153,6 +191,7 @@ public class JTB {
    *         the number of errors
    *         </ul>
    */
+  @SuppressWarnings("unused")
   public static int do_main(final String args[]) {
 
     try {
@@ -210,8 +249,8 @@ public class JTB {
 
       if (printClassList) {
         fg = new FilesGenerator(classes);
-        System.out.println("\nThe classes generated and the fields each "
-                           + "contains are as follows:\n");
+        System.out.println("\nThe classes generated and the fields each " +
+                           "contains are as follows:\n");
         fg.outputFormattedNodesClassesList(new PrintWriter(System.out, true));
       }
 
@@ -460,11 +499,12 @@ public class JTB {
   /**
    * Processes command line arguments, putting options in the options object (to be overwritten by
    * input file options).
-   * 
+   *
    * @param args - the command line arguments
    * @return true if successful, false otherwise
    * @throws InvalCmdLineException - if any problem with command line arguments
    */
+  @SuppressWarnings("unused")
   private static boolean processCommandLine(final String[] args) throws InvalCmdLineException {
     boolean returnVal = false;
 
@@ -702,17 +742,8 @@ public class JTB {
    * Displays program usage.
    */
   private static void printHelp() {
-    System.out.print(progName +
-                     " version " +
-                     version +
-                     "\n" +
-                     "\n" +
-                     "Usage: " +
-                     scriptName +
-                     " [OPTIONS] " +
-                     "[inputfile]\n" +
-                     "\n" +
-                     "Standard options:\n" +
+    System.out.print(progName + " version " + version + "\n" + "\n" + "Usage: " + scriptName +
+                     " [OPTIONS] " + "[inputfile]\n" + "\n" + "Standard options:\n" +
                      "  -cl         Print a list of the classes generated to standard out.\n" +
                      "  -d dir     \"-d dir\" is short for (and overwrites) \"-nd dir/syntaxtree -vd dir/visitor\".\n" +
                      "  -dl         Generate depth level info.\n" +
@@ -755,7 +786,7 @@ class InvalCmdLineException extends Exception {
 
   /**
    * Standard constructor with a message.
-   * 
+   *
    * @param s - the exception message
    */
   InvalCmdLineException(final String s) {

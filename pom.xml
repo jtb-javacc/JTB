@@ -6,7 +6,7 @@
 	
 	<groupId>edu.purdue.cs</groupId>
 	<artifactId>jtb</artifactId>
-	<version>1.4.13</version>
+	<version>1.4.14</version>
 	
 	<name>JTB: JavaCC Tree Builder</name>
 	

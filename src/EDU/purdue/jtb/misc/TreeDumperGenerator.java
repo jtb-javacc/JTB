@@ -52,7 +52,14 @@
  */
 package EDU.purdue.jtb.misc;
 
-import static EDU.purdue.jtb.misc.Globals.*;
+import static EDU.purdue.jtb.misc.Globals.LS;
+import static EDU.purdue.jtb.misc.Globals.dFVoidVisitor;
+import static EDU.purdue.jtb.misc.Globals.genFileHeaderComment;
+import static EDU.purdue.jtb.misc.Globals.noOverwrite;
+import static EDU.purdue.jtb.misc.Globals.nodeToken;
+import static EDU.purdue.jtb.misc.Globals.nodesPackageName;
+import static EDU.purdue.jtb.misc.Globals.visitorsDirName;
+import static EDU.purdue.jtb.misc.Globals.visitorsPackageName;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -64,9 +71,10 @@ import java.io.PrintWriter;
  * Class TreeDumperBuilder generates the TreeDumper visitor which simply prints all the tokens in
  * the tree at the locations given in their beginLine and beginColumn member variables.<br>
  * Similar to {@link FilesGenerator} class.
- * 
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
+ * @version 1.4.14 : 01/2017 : MMa : used try-with-resource
  */
 public class TreeDumperGenerator {
 
@@ -92,7 +100,7 @@ public class TreeDumperGenerator {
 
   /**
    * Saves the current buffer in the output file (global variable).
-   * 
+   *
    * @throws FileExistsException - if the file exists and the noOverwrite flag is set
    * @throws IOException if IO problem
    */
@@ -103,9 +111,10 @@ public class TreeDumperGenerator {
       if (noOverwrite && file.exists())
         throw new FileExistsException(outFilename);
 
-      final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), sb.length()));
-      out.print(sb);
-      out.close();
+      try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file),
+                                                                sb.length()))) {
+        out.print(sb);
+      }
     }
     catch (final IOException e) {
       Messages.hardErr(e);
@@ -117,7 +126,7 @@ public class TreeDumperGenerator {
 
   /**
    * Generates the tree dumper visitor source in its file.<br>
-   * 
+   *
    * @throws FileExistsException - if the file exists and the no overwrite flag has been set
    */
   public void generateTreeDumper() throws FileExistsException {
@@ -158,8 +167,8 @@ public class TreeDumperGenerator {
     sb.append("   *").append(LS);
     sb.append("   * @param o - the output Writer to write to").append(LS);
     sb.append("   */").append(LS);
-    sb.append("  public TreeDumper(final Writer o)  { out = new PrintWriter(o, true); }")
-      .append(LS).append(LS);
+    sb.append("  public TreeDumper(final Writer o)  { out = new PrintWriter(o, true); }").append(LS)
+      .append(LS);
 
     sb.append("  /**").append(LS);
     sb.append("   * Constructor using the given OutputStream as its output location.").append(LS);
@@ -218,7 +227,8 @@ public class TreeDumperGenerator {
     sb.append("    //").append(LS);
     sb.append("    if (printSpecials && n.numSpecials() > 0)").append(LS);
     sb.append("      for (final Iterator<" + nodeToken +
-                  "> e = n.specialTokens.iterator(); e.hasNext();)").append(LS);
+              "> e = n.specialTokens.iterator(); e.hasNext();)")
+      .append(LS);
     sb.append("        visit(e.next());").append(LS).append(LS);
     sb.append("    //").append(LS);
     sb.append("    // Handle startAtNextToken option").append(LS);

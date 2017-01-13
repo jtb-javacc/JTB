@@ -42,11 +42,12 @@ import EDU.purdue.jtb.utils.JavaFileGenerator;
 
 /**
  * Generate CharStream, TokenManager and Exceptions.
- * 
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  * @version 1.4.8 : 12/2014 : MMa : improved javadoc ; changed versions from 4.2.j.m to 5.0 ; moved
  *          to imports static
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings; used try-with-resource
  */
 public class JavaFiles extends JavaCCGlobals {
 
@@ -97,7 +98,7 @@ public class JavaFiles extends JavaCCGlobals {
    * Read the version from the comment in the specified file. This method does not try to recover
    * from invalid comment syntax, but rather returns version 0.0 (which will always be taken to mean
    * the file is out of date).
-   * 
+   *
    * @param fn - the file name
    * @return the version
    * @since 4.1
@@ -111,13 +112,11 @@ public class JavaFiles extends JavaCCGlobals {
         final String majorVersion = Version.version.replaceAll("[^0-9.]+.*", "");
         return Double.parseDouble(majorVersion);
       }
-      catch (final NumberFormatException e) {
+      catch (@SuppressWarnings("unused") final NumberFormatException e) {
         return 0.0; // Should never happen
       }
     }
-    BufferedReader reader = null;
-    try {
-      reader = new BufferedReader(new FileReader(file));
+    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
       String str;
       double version = 0.0;
       // Although the version comment should be the first line, sometimes the
@@ -132,7 +131,7 @@ public class JavaFiles extends JavaCCGlobals {
             try {
               version = Double.parseDouble(str);
             }
-            catch (final NumberFormatException nfe) {
+            catch (@SuppressWarnings("unused") final NumberFormatException nfe) {
               // Ignore - leave version as 0.0
             }
           }
@@ -141,17 +140,8 @@ public class JavaFiles extends JavaCCGlobals {
       }
       return version;
     }
-    catch (final IOException ioe) {
+    catch (@SuppressWarnings("unused") final IOException ioe) {
       return 0.0;
-    }
-    finally {
-      if (reader != null) {
-        try {
-          reader.close();
-        }
-        catch (final IOException e) {
-        }
-      }
     }
   }
 
@@ -162,33 +152,34 @@ public class JavaFiles extends JavaCCGlobals {
     try {
       final File file = new File(Options.getOutputDirectory(), "JavaCharStream.java");
       final OutputFile outputFile = new OutputFile(file, charStreamVersion, new String[] {
-          "STATIC", "SUPPORT_CLASS_VISIBILITY_PUBLIC" });
+                                                                                           "STATIC",
+                                                                                           "SUPPORT_CLASS_VISIBILITY_PUBLIC" });
       if (!outputFile.needToWrite) {
         return;
       }
-      final PrintWriter out = outputFile.getPrintWriter();
-      if (cu_to_insertion_point_1.size() != 0 && (cu_to_insertion_point_1.get(0)).kind == PACKAGE) {
-        for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
-          if ((cu_to_insertion_point_1.get(i)).kind == SEMICOLON) {
-            cline = ((cu_to_insertion_point_1.get(0))).beginLine;
-            ccol = ((cu_to_insertion_point_1.get(0))).beginColumn;
-            for (int j = 0; j <= i; j++) {
-              printToken((cu_to_insertion_point_1.get(j)), out);
+      try (PrintWriter out = outputFile.getPrintWriter()) {
+        if (cu_to_insertion_point_1.size() != 0 &&
+            (cu_to_insertion_point_1.get(0)).kind == PACKAGE) {
+          for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
+            if ((cu_to_insertion_point_1.get(i)).kind == SEMICOLON) {
+              cline = ((cu_to_insertion_point_1.get(0))).beginLine;
+              ccol = ((cu_to_insertion_point_1.get(0))).beginColumn;
+              for (int j = 0; j <= i; j++) {
+                printToken((cu_to_insertion_point_1.get(j)), out);
+              }
+              out.println("");
+              out.println("");
+              break;
             }
-            out.println("");
-            out.println("");
-            break;
           }
         }
+        final String prefix = (Options.getStatic() ? "static " : "");
+        final Map<String, Object> options = new HashMap<>(Options.getOptions());
+        options.put("PREFIX", prefix);
+        final JavaFileGenerator generator = new JavaFileGenerator("/templates/JavaCharStream.template",
+                                                                  options);
+        generator.generate(out);
       }
-      final String prefix = (Options.getStatic() ? "static " : "");
-      final Map<String, Object> options = new HashMap<String, Object>(Options.getOptions());
-      options.put("PREFIX", prefix);
-      final JavaFileGenerator generator = new JavaFileGenerator(
-                                                                "/templates/JavaCharStream.template",
-                                                                options);
-      generator.generate(out);
-      out.close();
     }
     catch (final IOException e) {
       System.err.println("Failed to create JavaCharStream " + e);
@@ -204,33 +195,34 @@ public class JavaFiles extends JavaCCGlobals {
     try {
       final File file = new File(Options.getOutputDirectory(), "SimpleCharStream.java");
       final OutputFile outputFile = new OutputFile(file, charStreamVersion, new String[] {
-          "STATIC", "SUPPORT_CLASS_VISIBILITY_PUBLIC" });
+                                                                                           "STATIC",
+                                                                                           "SUPPORT_CLASS_VISIBILITY_PUBLIC" });
       if (!outputFile.needToWrite) {
         return;
       }
-      final PrintWriter out = outputFile.getPrintWriter();
-      if (cu_to_insertion_point_1.size() != 0 && (cu_to_insertion_point_1.get(0)).kind == PACKAGE) {
-        for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
-          if ((cu_to_insertion_point_1.get(i)).kind == SEMICOLON) {
-            cline = ((cu_to_insertion_point_1.get(0))).beginLine;
-            ccol = ((cu_to_insertion_point_1.get(0))).beginColumn;
-            for (int j = 0; j <= i; j++) {
-              printToken((cu_to_insertion_point_1.get(j)), out);
+      try (PrintWriter out = outputFile.getPrintWriter()) {
+        if (cu_to_insertion_point_1.size() != 0 &&
+            (cu_to_insertion_point_1.get(0)).kind == PACKAGE) {
+          for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
+            if ((cu_to_insertion_point_1.get(i)).kind == SEMICOLON) {
+              cline = ((cu_to_insertion_point_1.get(0))).beginLine;
+              ccol = ((cu_to_insertion_point_1.get(0))).beginColumn;
+              for (int j = 0; j <= i; j++) {
+                printToken((cu_to_insertion_point_1.get(j)), out);
+              }
+              out.println("");
+              out.println("");
+              break;
             }
-            out.println("");
-            out.println("");
-            break;
           }
         }
+        final String prefix = (Options.getStatic() ? "static " : "");
+        final Map<String, Object> options = new HashMap<>(Options.getOptions());
+        options.put("PREFIX", prefix);
+        final JavaFileGenerator generator = new JavaFileGenerator("/templates/SimpleCharStream.template",
+                                                                  options);
+        generator.generate(out);
       }
-      final String prefix = (Options.getStatic() ? "static " : "");
-      final Map<String, Object> options = new HashMap<String, Object>(Options.getOptions());
-      options.put("PREFIX", prefix);
-      final JavaFileGenerator generator = new JavaFileGenerator(
-                                                                "/templates/SimpleCharStream.template",
-                                                                options);
-      generator.generate(out);
-      out.close();
     }
     catch (final IOException e) {
       System.err.println("Failed to create SimpleCharStream " + e);
@@ -246,29 +238,31 @@ public class JavaFiles extends JavaCCGlobals {
     try {
       final File file = new File(Options.getOutputDirectory(), "CharStream.java");
       final OutputFile outputFile = new OutputFile(file, charStreamVersion, new String[] {
-          "STATIC", "SUPPORT_CLASS_VISIBILITY_PUBLIC" });
+                                                                                           "STATIC",
+                                                                                           "SUPPORT_CLASS_VISIBILITY_PUBLIC" });
       if (!outputFile.needToWrite) {
         return;
       }
-      final PrintWriter out = outputFile.getPrintWriter();
-      if (cu_to_insertion_point_1.size() != 0 && (cu_to_insertion_point_1.get(0)).kind == PACKAGE) {
-        for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
-          if ((cu_to_insertion_point_1.get(i)).kind == SEMICOLON) {
-            cline = ((cu_to_insertion_point_1.get(0))).beginLine;
-            ccol = ((cu_to_insertion_point_1.get(0))).beginColumn;
-            for (int j = 0; j <= i; j++) {
-              printToken((cu_to_insertion_point_1.get(j)), out);
+      try (PrintWriter out = outputFile.getPrintWriter()) {
+        if (cu_to_insertion_point_1.size() != 0 &&
+            (cu_to_insertion_point_1.get(0)).kind == PACKAGE) {
+          for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
+            if ((cu_to_insertion_point_1.get(i)).kind == SEMICOLON) {
+              cline = ((cu_to_insertion_point_1.get(0))).beginLine;
+              ccol = ((cu_to_insertion_point_1.get(0))).beginColumn;
+              for (int j = 0; j <= i; j++) {
+                printToken((cu_to_insertion_point_1.get(j)), out);
+              }
+              out.println("");
+              out.println("");
+              break;
             }
-            out.println("");
-            out.println("");
-            break;
           }
         }
+        final JavaFileGenerator generator = new JavaFileGenerator("/templates/CharStream.template",
+                                                                  Options.getOptions());
+        generator.generate(out);
       }
-      final JavaFileGenerator generator = new JavaFileGenerator("/templates/CharStream.template",
-                                                                Options.getOptions());
-      generator.generate(out);
-      out.close();
     }
     catch (final IOException e) {
       System.err.println("Failed to create CharStream " + e);
@@ -284,30 +278,30 @@ public class JavaFiles extends JavaCCGlobals {
     try {
       final File file = new File(Options.getOutputDirectory(), "ParseException.java");
       final OutputFile outputFile = new OutputFile(file, parseExceptionVersion, new String[] {
-        "KEEP_LINE_COL" });
+                                                                                               "KEEP_LINE_COL" });
       if (!outputFile.needToWrite) {
         return;
       }
-      final PrintWriter out = outputFile.getPrintWriter();
-      if (cu_to_insertion_point_1.size() != 0 && (cu_to_insertion_point_1.get(0)).kind == PACKAGE) {
-        for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
-          if ((cu_to_insertion_point_1.get(i)).kind == SEMICOLON) {
-            cline = ((cu_to_insertion_point_1.get(0))).beginLine;
-            ccol = ((cu_to_insertion_point_1.get(0))).beginColumn;
-            for (int j = 0; j <= i; j++) {
-              printToken((cu_to_insertion_point_1.get(j)), out);
+      try (PrintWriter out = outputFile.getPrintWriter()) {
+        if (cu_to_insertion_point_1.size() != 0 &&
+            (cu_to_insertion_point_1.get(0)).kind == PACKAGE) {
+          for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
+            if ((cu_to_insertion_point_1.get(i)).kind == SEMICOLON) {
+              cline = ((cu_to_insertion_point_1.get(0))).beginLine;
+              ccol = ((cu_to_insertion_point_1.get(0))).beginColumn;
+              for (int j = 0; j <= i; j++) {
+                printToken((cu_to_insertion_point_1.get(j)), out);
+              }
+              out.println("");
+              out.println("");
+              break;
             }
-            out.println("");
-            out.println("");
-            break;
           }
         }
+        final JavaFileGenerator generator = new JavaFileGenerator("/templates/ParseException.template",
+                                                                  Options.getOptions());
+        generator.generate(out);
       }
-      final JavaFileGenerator generator = new JavaFileGenerator(
-                                                                "/templates/ParseException.template",
-                                                                Options.getOptions());
-      generator.generate(out);
-      out.close();
     }
     catch (final IOException e) {
       System.err.println("Failed to create ParseException " + e);
@@ -326,26 +320,26 @@ public class JavaFiles extends JavaCCGlobals {
       if (!outputFile.needToWrite) {
         return;
       }
-      final PrintWriter out = outputFile.getPrintWriter();
-      if (cu_to_insertion_point_1.size() != 0 && (cu_to_insertion_point_1.get(0)).kind == PACKAGE) {
-        for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
-          if ((cu_to_insertion_point_1.get(i)).kind == SEMICOLON) {
-            cline = ((cu_to_insertion_point_1.get(0))).beginLine;
-            ccol = ((cu_to_insertion_point_1.get(0))).beginColumn;
-            for (int j = 0; j <= i; j++) {
-              printToken((cu_to_insertion_point_1.get(j)), out);
+      try (PrintWriter out = outputFile.getPrintWriter()) {
+        if (cu_to_insertion_point_1.size() != 0 &&
+            (cu_to_insertion_point_1.get(0)).kind == PACKAGE) {
+          for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
+            if ((cu_to_insertion_point_1.get(i)).kind == SEMICOLON) {
+              cline = ((cu_to_insertion_point_1.get(0))).beginLine;
+              ccol = ((cu_to_insertion_point_1.get(0))).beginColumn;
+              for (int j = 0; j <= i; j++) {
+                printToken((cu_to_insertion_point_1.get(j)), out);
+              }
+              out.println("");
+              out.println("");
+              break;
             }
-            out.println("");
-            out.println("");
-            break;
           }
         }
+        final JavaFileGenerator generator = new JavaFileGenerator("/templates/TokenMgrError.template",
+                                                                  Options.getOptions());
+        generator.generate(out);
       }
-      final JavaFileGenerator generator = new JavaFileGenerator(
-                                                                "/templates/TokenMgrError.template",
-                                                                Options.getOptions());
-      generator.generate(out);
-      out.close();
     }
     catch (final IOException e) {
       System.err.println("Failed to create TokenMgrError " + e);
@@ -356,7 +350,7 @@ public class JavaFiles extends JavaCCGlobals {
 
   /**
    * Generates the Token class.
-   * 
+   *
    * @param pn - the parser name
    */
   // ModMMa : modified for Token.template with GTToken
@@ -365,37 +359,40 @@ public class JavaFiles extends JavaCCGlobals {
     try {
       final File file = new File(Options.getOutputDirectory(), "Token.java");
       final OutputFile outputFile = new OutputFile(file, tokenVersion, new String[] {
-          "TOKEN_EXTENDS", "KEEP_LINE_COL", "SUPPORT_CLASS_VISIBILITY_PUBLIC" });
+                                                                                      "TOKEN_EXTENDS",
+                                                                                      "KEEP_LINE_COL",
+                                                                                      "SUPPORT_CLASS_VISIBILITY_PUBLIC" });
       if (!outputFile.needToWrite) {
         return;
       }
-      final PrintWriter out = outputFile.getPrintWriter();
-      if (cu_to_insertion_point_1.size() != 0 && (cu_to_insertion_point_1.get(0)).kind == PACKAGE) {
-        for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
-          if ((cu_to_insertion_point_1.get(i)).kind == SEMICOLON) {
-            cline = ((cu_to_insertion_point_1.get(0))).beginLine;
-            ccol = ((cu_to_insertion_point_1.get(0))).beginColumn;
-            for (int j = 0; j <= i; j++) {
-              printToken((cu_to_insertion_point_1.get(j)), out);
+      try (PrintWriter out = outputFile.getPrintWriter()) {
+        if (cu_to_insertion_point_1.size() != 0 &&
+            (cu_to_insertion_point_1.get(0)).kind == PACKAGE) {
+          for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
+            if ((cu_to_insertion_point_1.get(i)).kind == SEMICOLON) {
+              cline = ((cu_to_insertion_point_1.get(0))).beginLine;
+              ccol = ((cu_to_insertion_point_1.get(0))).beginColumn;
+              for (int j = 0; j <= i; j++) {
+                printToken((cu_to_insertion_point_1.get(j)), out);
+              }
+              out.println("");
+              out.println("");
+              break;
             }
-            out.println("");
-            out.println("");
-            break;
           }
         }
+        // ModMMa : added for Token.template with GTToken
+        final Map<String, Object> options = new HashMap<>(Options.getOptions());
+        options.put("PARSER_NAME", pn);
+
+        // ModMMa : modified for Token.template with GTToken
+        final JavaFileGenerator generator = new JavaFileGenerator(
+                                                                  //          "/templates/Token.template", Options.getOptions());
+                                                                  "/templates/Token.template",
+                                                                  options);
+
+        generator.generate(out);
       }
-      // ModMMa : added for Token.template with GTToken
-      final Map<String, Object> options = new HashMap<String, Object>(Options.getOptions());
-      options.put("PARSER_NAME", pn);
-
-      // ModMMa : modified for Token.template with GTToken
-      final JavaFileGenerator generator = new JavaFileGenerator(
-                                                                //          "/templates/Token.template", Options.getOptions());
-                                                                "/templates/Token.template",
-                                                                options);
-
-      generator.generate(out);
-      out.close();
     }
     catch (final IOException e) {
       System.err.println("Failed to create Token " + e);
@@ -411,29 +408,30 @@ public class JavaFiles extends JavaCCGlobals {
     try {
       final File file = new File(Options.getOutputDirectory(), "TokenManager.java");
       final OutputFile outputFile = new OutputFile(file, tokenManagerVersion, new String[] {
-        "SUPPORT_CLASS_VISIBILITY_PUBLIC" });
+                                                                                             "SUPPORT_CLASS_VISIBILITY_PUBLIC" });
       if (!outputFile.needToWrite) {
         return;
       }
-      final PrintWriter out = outputFile.getPrintWriter();
-      if (cu_to_insertion_point_1.size() != 0 && (cu_to_insertion_point_1.get(0)).kind == PACKAGE) {
-        for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
-          if ((cu_to_insertion_point_1.get(i)).kind == SEMICOLON) {
-            cline = ((cu_to_insertion_point_1.get(0))).beginLine;
-            ccol = ((cu_to_insertion_point_1.get(0))).beginColumn;
-            for (int j = 0; j <= i; j++) {
-              printToken((cu_to_insertion_point_1.get(j)), out);
+      try (PrintWriter out = outputFile.getPrintWriter()) {
+        if (cu_to_insertion_point_1.size() != 0 &&
+            (cu_to_insertion_point_1.get(0)).kind == PACKAGE) {
+          for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
+            if ((cu_to_insertion_point_1.get(i)).kind == SEMICOLON) {
+              cline = ((cu_to_insertion_point_1.get(0))).beginLine;
+              ccol = ((cu_to_insertion_point_1.get(0))).beginColumn;
+              for (int j = 0; j <= i; j++) {
+                printToken((cu_to_insertion_point_1.get(j)), out);
+              }
+              out.println("");
+              out.println("");
+              break;
             }
-            out.println("");
-            out.println("");
-            break;
           }
         }
+        final JavaFileGenerator generator = new JavaFileGenerator("/templates/TokenManager.template",
+                                                                  Options.getOptions());
+        generator.generate(out);
       }
-      final JavaFileGenerator generator = new JavaFileGenerator("/templates/TokenManager.template",
-                                                                Options.getOptions());
-      generator.generate(out);
-      out.close();
     }
     catch (final IOException e) {
       System.err.println("Failed to create TokenManager " + e);

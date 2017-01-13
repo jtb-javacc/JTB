@@ -97,7 +97,7 @@ import EDU.purdue.jtb.syntaxtree.*;
  * other formatting preferences), but is indeed merged with printing keywords
  * </ul>
  * TODO : extract / refactor methods for custom formatting<br>
- * 
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  * @version 1.4.3 : 03/2010 : MMa : fixed output of else in IfStatement
@@ -107,6 +107,7 @@ import EDU.purdue.jtb.syntaxtree.*;
  *          VariableModifiers() IndentifierAsString())
  * @version 1.4.8 : 11/2014 : MMa : followed changes in jtbgram.jtb (on
  *          ClassOrInterfaceBodyDeclaration(), ExplicitConstructorInvocation())
+ * @version 1.4.14 : 01/2017 : MMa : used try-with-resource
  */
 public class JavaPrinter extends DepthFirstVoidVisitor {
 
@@ -121,7 +122,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
 
   /**
    * Constructor with a given buffer and indentation.
-   * 
+   *
    * @param aSb - the buffer to print into (will be allocated if null)
    * @param aSPC - the Spacing indentation object (will be allocated and set to a default if null)
    */
@@ -131,7 +132,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
 
   /**
    * Resets the buffer and the indentation.
-   * 
+   *
    * @param aSb - the buffer to print into (will be allocated if null)
    * @param aSPC - the Spacing indentation object (will be allocated and set to a default if null)
    */
@@ -153,7 +154,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
 
   /**
    * Constructor with a given buffer and which will allocate a default indentation.
-   * 
+   *
    * @param aSb - the buffer to print into (will be allocated if null)
    */
   public JavaPrinter(final StringBuilder aSb) {
@@ -162,7 +163,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
 
   /**
    * Constructor with a given indentation which will allocate a default buffer.
-   * 
+   *
    * @param aSPC - the Spacing indentation object
    */
   public JavaPrinter(final Spacing aSPC) {
@@ -171,7 +172,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
 
   /**
    * Saves the current buffer to an output file.
-   * 
+   *
    * @param outFile - the output file
    * @throws FileExistsException - if the file exists and the noOverwrite flag is set
    * @throws IOException if IO problem
@@ -182,10 +183,10 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
       if (noOverwrite && file.exists())
         throw new FileExistsException(outFile);
       else {
-        final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file),
-                                                                   sb.length()));
-        out.print(sb);
-        out.close();
+        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file),
+                                                                  sb.length()))) {
+          out.print(sb);
+        }
       }
     }
     catch (final IOException e) {
@@ -200,7 +201,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
 
   /**
    * Visits a NodeToken.
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -218,7 +219,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
 
   /**
    * Prints into the current buffer a node class comment and a new line.
-   * 
+   *
    * @param n - the node for the node class comment
    */
   void oneNewLine(final INode n) {
@@ -227,7 +228,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
 
   /**
    * Prints into the current buffer a node class comment, an extra given comment, and a new line.
-   * 
+   *
    * @param n - the node for the node class comment
    * @param str - the extra comment
    */
@@ -237,7 +238,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
 
   /**
    * Prints twice into the current buffer a node class comment and a new line.
-   * 
+   *
    * @param n - the node for the node class comment
    */
   void twoNewLines(final INode n) {
@@ -247,7 +248,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
 
   /**
    * Prints three times into the current buffer a node class comment and a new line.
-   * 
+   *
    * @param n - the node for the node class comment
    */
   void threeNewLines(final INode n) {
@@ -259,7 +260,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
   /**
    * Returns a node class comment with an extra comment (a //jvp followed by the node class short
    * name if global flag set, nothing otherwise).
-   * 
+   *
    * @param n - the node to process
    * @return the comment
    */
@@ -280,7 +281,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
   /**
    * Returns a node class comment with an extra comment (a //jvp followed by the node class short
    * name plus the extra comment if global flag set, nothing otherwise).
-   * 
+   *
    * @param n - the node to process
    * @param str - the string to add to the comment
    * @return the comment
@@ -303,7 +304,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> [ PackageDeclaration() ]<br>
    * f1 -> ( ImportDeclaration() )*<br>
    * f2 -> ( TypeDeclaration() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -338,7 +339,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> "package"<br>
    * f1 -> Name()<br>
    * f2 -> ";"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -360,7 +361,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f2 -> Name()<br>
    * f3 -> [ #0 "." #1 "*" ]<br>
    * f4 -> ";"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -417,7 +418,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * .. .. . .. #1 ( &0 ClassOrInterfaceDeclaration()<br>
    * .. .. . .. .. | &1 EnumDeclaration()<br>
    * .. .. . .. .. | &2 AnnotationTypeDeclaration() )<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -445,7 +446,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f3 -> [ ExtendsList() ]<br>
    * f4 -> [ ImplementsList() ]<br>
    * f5 -> ClassOrInterfaceBody()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -481,7 +482,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> "extends"<br>
    * f1 -> ClassOrInterfaceType()<br>
    * f2 -> ( #0 "," #1 ClassOrInterfaceType() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -511,7 +512,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> "implements"<br>
    * f1 -> ClassOrInterfaceType()<br>
    * f2 -> ( #0 "," #1 ClassOrInterfaceType() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -542,7 +543,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f1 -> < IDENTIFIER ><br>
    * f2 -> [ ImplementsList() ]<br>
    * f3 -> EnumBody()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -572,7 +573,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f3 -> [ #0 ";"<br>
    * .. .. . #1 ( ClassOrInterfaceBodyDeclaration() )* ]<br>
    * f4 -> "}"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -587,7 +588,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
       final NodeSequence seq = (NodeSequence) n.f1.node;
       // #0 EnumConstant()
       seq.elementAt(0).accept(this);
-      // #1 ( $0 "," $1 EnumConstant() )* 
+      // #1 ( $0 "," $1 EnumConstant() )*
       final NodeListOptional nlo = (NodeListOptional) seq.elementAt(1);
       if (nlo.present()) {
         for (final Iterator<INode> e = nlo.elements(); e.hasNext();) {
@@ -634,7 +635,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f1 -> < IDENTIFIER ><br>
    * f2 -> [ Arguments() ]<br>
    * f3 -> [ ClassOrInterfaceBody() ]<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -651,7 +652,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
       n.f3.accept(this);
   }
 
-/**
+  /**
    * Visits a {@link TypeParameters} node, whose children are the following :
    * <p>
    * f0 -> "<"<br>
@@ -687,7 +688,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> < IDENTIFIER ><br>
    * f1 -> [ TypeBound() ]<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -706,7 +707,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> "extends"<br>
    * f1 -> ClassOrInterfaceType()<br>
    * f2 -> ( #0 "&" #1 ClassOrInterfaceType() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -736,7 +737,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> "{"<br>
    * f1 -> ( ClassOrInterfaceBodyDeclaration() )*<br>
    * f2 -> "}"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -789,7 +790,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * .. .. . .. .. | &4 FieldDeclaration()<br>
    * .. .. . .. .. | &5 MethodDeclaration() )<br>
    * .. .. | %2 ";"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -816,7 +817,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f1 -> VariableDeclarator()<br>
    * f2 -> ( #0 "," #1 VariableDeclarator() )*<br>
    * f3 -> ";"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -846,7 +847,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> VariableDeclaratorId()<br>
    * f1 -> [ #0 "=" #1 VariableInitializer() ]<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -869,7 +870,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> < IDENTIFIER ><br>
    * f1 -> ( #0 "[" #1 "]" )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -893,7 +894,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> . %0 ArrayInitializer()<br>
    * .. .. | %1 Expression()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -910,7 +911,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * .. .. . #1 ( $0 "," $1 VariableInitializer() )* ]<br>
    * f2 -> [ "," ]<br>
    * f3 -> "}"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -939,7 +940,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f3 -> [ #0 "throws" #1 NameList() ]<br>
    * f4 -> ( %0 Block()<br>
    * .. .. | %1 ";" )<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -973,7 +974,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> < IDENTIFIER ><br>
    * f1 -> FormalParameters()<br>
    * f2 -> ( #0 "[" #1 "]" )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1000,7 +1001,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f1 -> [ #0 FormalParameter()<br>
    * .. .. . #1 ( $0 "," $1 FormalParameter() )* ]<br>
    * f2 -> ")"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1033,7 +1034,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f1 -> Type()<br>
    * f2 -> [ "..." ]<br>
    * f3 -> VariableDeclaratorId()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1062,7 +1063,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f5 -> [ ExplicitConstructorInvocation() ]<br>
    * f6 -> ( BlockStatement() )*<br>
    * f7 -> "}"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1114,7 +1115,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
     n.f7.accept(this);
   }
 
-/**
+  /**
    * Visits a {@link ExplicitConstructorInvocation} node, whose child is the following :
    * <p>
    * f0 -> ( %0 #0 [ $0 "<" $1 ReferenceType()<br>
@@ -1193,7 +1194,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
             sb.append(" ");
             break;
           case 1:
-            // $0 "super" $1 Arguments() $2 ";" 
+            // $0 "super" $1 Arguments() $2 ";"
             final NodeSequence seq2 = (NodeSequence) ich1;
             seq2.elementAt(0).accept(this);
             sb.append(" ");
@@ -1216,7 +1217,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
         seq1.elementAt(0).accept(this);
         // #1 "."
         seq1.elementAt(1).accept(this);
-        // "super" 
+        // "super"
         seq1.elementAt(2).accept(this);
         // #3 Arguments()
         seq1.elementAt(3).accept(this);
@@ -1293,7 +1294,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> [ "static" ]<br>
    * f1 -> Block()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1312,7 +1313,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> . %0 ReferenceType()<br>
    * .. .. | %1 PrimitiveType()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1327,7 +1328,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * .. .. . .. #1 ( $0 "[" $1 "]" )+<br>
    * .. .. | %1 #0 ClassOrInterfaceType()<br>
    * .. .. . .. #1 ( $0 "[" $1 "]" )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1370,7 +1371,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f1 -> [ TypeArguments() ]<br>
    * f2 -> ( #0 "." #1 < IDENTIFIER ><br>
    * .. .. . #2 [ TypeArguments() ] )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1394,7 +1395,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
     }
   }
 
-/**
+  /**
    * Visits a {@link TypeArguments} node, whose children are the following :
    * <p>
    * f0 -> "<"<br>
@@ -1432,7 +1433,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> . %0 ReferenceType()<br>
    * .. .. | %1 #0 "?"<br>
    * .. .. . .. #1 [ WildcardBounds() ]<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1459,7 +1460,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> . %0 #0 "extends" #1 ReferenceType()<br>
    * .. .. | %1 #0 "super" #1 ReferenceType()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1483,7 +1484,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * .. .. | %5 "long"<br>
    * .. .. | %6 "float"<br>
    * .. .. | %7 "double"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1497,7 +1498,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> ( %0 "void"<br>
    * .. .. | %1 Type() )<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1511,7 +1512,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> JavaIdentifier()<br>
    * f1 -> ( #0 "." #1 JavaIdentifier() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1535,7 +1536,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> Name()<br>
    * f1 -> ( #0 "," #1 Name() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1560,7 +1561,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> ConditionalExpression()<br>
    * f1 -> [ #0 AssignmentOperator() #1 Expression() ]<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1594,7 +1595,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * .. .. | %09 "&="<br>
    * .. .. | %10 "^="<br>
    * .. .. | %11 "|="<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1608,7 +1609,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> ConditionalOrExpression()<br>
    * f1 -> [ #0 "?" #1 Expression() #2 ":" #3 Expression() ]<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1638,7 +1639,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> ConditionalAndExpression()<br>
    * f1 -> ( #0 "||" #1 ConditionalAndExpression() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1664,7 +1665,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> InclusiveOrExpression()<br>
    * f1 -> ( #0 "&&" #1 InclusiveOrExpression() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1690,7 +1691,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> ExclusiveOrExpression()<br>
    * f1 -> ( #0 "|" #1 ExclusiveOrExpression() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1716,7 +1717,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> AndExpression()<br>
    * f1 -> ( #0 "^" #1 AndExpression() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1742,7 +1743,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> EqualityExpression()<br>
    * f1 -> ( #0 "&" #1 EqualityExpression() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1769,7 +1770,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> InstanceOfExpression()<br>
    * f1 -> ( #0 ( %0 "=="<br>
    * .. .. . .. | %1 "!=" ) #1 InstanceOfExpression() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1795,7 +1796,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> RelationalExpression()<br>
    * f1 -> [ #0 "instanceof" #1 Type() ]<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1813,7 +1814,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
     }
   }
 
-/**
+  /**
    * Visits a {@link RelationalExpression} node, whose children are the following :
    * <p>
    * f0 -> ShiftExpression()<br>
@@ -1842,13 +1843,13 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
     }
   }
 
-/**
+  /**
    * Visits a {@link ShiftExpression} node, whose children are the following :
    * <p>
- * f0 -> AdditiveExpression()<br>
- * f1 -> ( #0 ( %0 "<<"<br>
- * .. .. . .. | %1 RUnsignedShift()<br>
- * .. .. . .. | %2 RSignedShift() ) #1 AdditiveExpression() )*<br>
+   * f0 -> AdditiveExpression()<br>
+   * f1 -> ( #0 ( %0 "<<"<br>
+   * .. .. . .. | %1 RUnsignedShift()<br>
+   * .. .. . .. | %2 RSignedShift() ) #1 AdditiveExpression() )*<br>
    *
    * @param n - the node to visit
    */
@@ -1876,7 +1877,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> MultiplicativeExpression()<br>
    * f1 -> ( #0 ( %0 "+"<br>
    * .. .. . .. | %1 "-" ) #1 MultiplicativeExpression() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1904,7 +1905,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f1 -> ( #0 ( %0 "*"<br>
    * .. .. . .. | %1 "/"<br>
    * .. .. . .. | %2 "%" ) #1 UnaryExpression() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1933,7 +1934,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * .. .. | %1 PreIncrementExpression()<br>
    * .. .. | %2 PreDecrementExpression()<br>
    * .. .. | %3 UnaryExpressionNotPlusMinus()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1946,8 +1947,8 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
       // #1 UnaryExpression()
       seq.elementAt(1).accept(this);
     } else
-      // %1 PreIncrementExpression() | %2 PreDecrementExpression() | %3 UnaryExpressionNotPlusMinus()
-      n.f0.accept(this);
+                         // %1 PreIncrementExpression() | %2 PreDecrementExpression() | %3 UnaryExpressionNotPlusMinus()
+                         n.f0.accept(this);
   }
 
   /**
@@ -1955,7 +1956,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> "++"<br>
    * f1 -> PrimaryExpression()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1971,7 +1972,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> "--"<br>
    * f1 -> PrimaryExpression()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -1989,7 +1990,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * .. .. . .. .. | &1 "!" ) #1 UnaryExpression()<br>
    * .. .. | %1 CastExpression()<br>
    * .. .. | %2 PostfixExpression()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2002,8 +2003,8 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
       // #1 UnaryExpression()
       seq.elementAt(1).accept(this);
     } else
-      // %1 CastExpression() | %2 PostfixExpression()
-      n.f0.accept(this);
+                         // %1 CastExpression() | %2 PostfixExpression()
+                         n.f0.accept(this);
   }
 
   /**
@@ -2020,7 +2021,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * .. .. . .. .. | &5 "super"<br>
    * .. .. . .. .. | &6 "new"<br>
    * .. .. . .. .. | &7 Literal() )<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2034,7 +2035,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> PrimaryExpression()<br>
    * f1 -> [ %0 "++"<br>
    * .. .. | %1 "--" ]<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2050,7 +2051,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> . %0 #0 "(" #1 Type() #2 ")" #3 UnaryExpression()<br>
    * .. .. | %1 #0 "(" #1 Type() #2 ")" #3 UnaryExpressionNotPlusMinus()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2071,7 +2072,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> PrimaryPrefix()<br>
    * f1 -> ( PrimarySuffix() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2092,7 +2093,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> "."<br>
    * f1 -> TypeArguments()<br>
    * f2 -> < IDENTIFIER ><br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2115,7 +2116,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * .. .. | %4 AllocationExpression()<br>
    * .. .. | %5 #0 ResultType() #1 "." #2 "class"<br>
    * .. .. | %6 Name()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2129,8 +2130,8 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
       // #2 < IDENTIFIER > | #2 ")" | #2 "class"
       (((NodeSequence) n.f0.choice).elementAt(2)).accept(this);
     } else
-      // %0 Literal() | %1 "this" | %4 AllocationExpression() | %6 Name()
-      n.f0.choice.accept(this);
+                                                               // %0 Literal() | %1 "this" | %4 AllocationExpression() | %6 Name()
+                                                               n.f0.choice.accept(this);
   }
 
   /**
@@ -2142,7 +2143,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * .. .. | %3 #0 "[" #1 Expression() #2 "]"<br>
    * .. .. | %4 #0 "." #1 < IDENTIFIER ><br>
    * .. .. | %5 Arguments()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2162,8 +2163,8 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
       // #2 "]"
       ((NodeSequence) n.f0.choice).elementAt(2).accept(this);
     } else
-      // %2 MemberSelector()
-      n.f0.accept(this);
+                                // %2 MemberSelector()
+                                n.f0.accept(this);
   }
 
   /**
@@ -2175,7 +2176,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * .. .. | %3 < STRING_LITERAL ><br>
    * .. .. | %4 BooleanLiteral()<br>
    * .. .. | %5 NullLiteral()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2193,7 +2194,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * Visits a {@link IntegerLiteral} node, whose children are the following :
    * <p>
    * f0 -> < INTEGER_LITERAL ><br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2206,7 +2207,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> . %0 "true"<br>
    * .. .. | %1 "false"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2218,7 +2219,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * Visits a {@link StringLiteral} node, whose children are the following :
    * <p>
    * f0 -> < STRING_LITERAL ><br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2230,7 +2231,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * Visits a {@link NullLiteral} node, whose children are the following :
    * <p>
    * f0 -> "null"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2244,7 +2245,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> "("<br>
    * f1 -> [ ArgumentList() ]<br>
    * f2 -> ")"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2263,7 +2264,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> Expression()<br>
    * f1 -> ( #0 "," #1 Expression() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2292,7 +2293,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * .. .. . .. #3 ( &0 ArrayDimsAndInits()<br>
    * .. .. . .. .. | &1 $0 Arguments()<br>
    * .. .. . .. .. . .. $1 [ ClassOrInterfaceBody() ] )<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2339,7 +2340,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> . %0 #0 ( $0 "[" $1 Expression() $2 "]" )+<br>
    * .. .. . .. #1 ( $0 "[" $1 "]" )*<br>
    * .. .. | %1 #0 ( $0 "[" $1 "]" )+ #1 ArrayInitializer()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2403,7 +2404,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * .. .. | %13 ThrowStatement()<br>
    * .. .. | %14 SynchronizedStatement()<br>
    * .. .. | %15 TryStatement()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2425,7 +2426,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f1 -> Expression()<br>
    * f2 -> [ #0 ":" #1 Expression() ]<br>
    * f3 -> ";"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2453,7 +2454,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> < IDENTIFIER ><br>
    * f1 -> ":"<br>
    * f2 -> Statement()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2474,7 +2475,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> "{"<br>
    * f1 -> ( BlockStatement() )*<br>
    * f2 -> "}"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2508,7 +2509,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> . %0 #0 LocalVariableDeclaration() #1 ";"<br>
    * .. .. | %1 Statement()<br>
    * .. .. | %2 ClassOrInterfaceDeclaration()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2530,7 +2531,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f1 -> Type()<br>
    * f2 -> VariableDeclarator()<br>
    * f3 -> ( #0 "," #1 VariableDeclarator() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2577,7 +2578,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * Visits a {@link EmptyStatement} node, whose children are the following :
    * <p>
    * f0 -> ";"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2595,14 +2596,14 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * .. .. . .. #1 [ &0 "++"<br>
    * .. .. . .. .. | &1 "--"<br>
    * .. .. . .. .. | &2 $0 AssignmentOperator() $1 Expression() ]<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
   public void visit(final StatementExpression n) {
     if (n.f0.which < 2)
-      // %0 PreIncrementExpression() | %1 PreDecrementExpression()
-      n.f0.accept(this);
+                       // %0 PreIncrementExpression() | %1 PreDecrementExpression()
+                       n.f0.accept(this);
     else {
       //%2 #0 PrimaryExpression() #1 [ &0 "++" | &1 "--" | &2 $0 AssignmentOperator() $1 Expression() ]
       // #0 PrimaryExpression()
@@ -2613,8 +2614,8 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
         // &0 "++" | &1 "--" | &2 $0 AssignmentOperator() $1 Expression()
         final NodeChoice ch = (NodeChoice) opt.node;
         if (ch.which <= 1)
-          // &0 "++" | &1 "--"
-          ch.choice.accept(this);
+                          // &0 "++" | &1 "--"
+                          ch.choice.accept(this);
         else {
           // &2 $0 AssignmentOperator() $1 Expression()
           final NodeSequence seq1 = (NodeSequence) ch.choice;
@@ -2640,7 +2641,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f5 -> ( #0 SwitchLabel()<br>
    * .. .. . #1 ( BlockStatement() )* )*<br>
    * f6 -> "}"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2699,7 +2700,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> . %0 #0 "case" #1 Expression() #2 ":"<br>
    * .. .. | %1 #0 "default" #1 ":"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2729,7 +2730,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f3 -> ")"<br>
    * f4 -> Statement()<br>
    * f5 -> [ #0 "else" #1 Statement() ]<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2793,7 +2794,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f2 -> Expression()<br>
    * f3 -> ")"<br>
    * f4 -> Statement()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2821,7 +2822,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f4 -> Expression()<br>
    * f5 -> ")"<br>
    * f6 -> ";"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2854,7 +2855,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * .. .. . .. #4 [ ForUpdate() ] )<br>
    * f3 -> ")"<br>
    * f4 -> Statement()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2930,7 +2931,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * .. .. | %13 ThrowStatement()<br>
    * .. .. | %14 SynchronizedStatement()<br>
    * .. .. | %15 TryStatement()<br>
-   * 
+   *
    * @param n - the Statement node
    */
   void genStatement(final Statement n) {
@@ -2958,7 +2959,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> . %0 LocalVariableDeclaration()<br>
    * .. .. | %1 StatementExpressionList()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2972,7 +2973,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> StatementExpression()<br>
    * f1 -> ( #0 "," #1 StatementExpression() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -2995,7 +2996,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * Visits a {@link ForUpdate} node, whose children are the following :
    * <p>
    * f0 -> StatementExpressionList()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3010,7 +3011,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> "break"<br>
    * f1 -> [ < IDENTIFIER > ]<br>
    * f2 -> ";"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3032,7 +3033,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> "continue"<br>
    * f1 -> [ < IDENTIFIER > ]<br>
    * f2 -> ";"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3054,7 +3055,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> "return"<br>
    * f1 -> [ Expression() ]<br>
    * f2 -> ";"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3076,7 +3077,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> "throw"<br>
    * f1 -> Expression()<br>
    * f2 -> ";"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3098,7 +3099,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f2 -> Expression()<br>
    * f3 -> ")"<br>
    * f4 -> Block()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3127,7 +3128,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f1 -> Block()<br>
    * f2 -> ( #0 "catch" #1 "(" #2 FormalParameter() #3 ")" #4 Block() )*<br>
    * f3 -> [ #0 "finally" #1 Block() ]<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3172,7 +3173,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * Visits a {@link RUnsignedShift} node, whose children are the following :
    * <p>
    * f0 -> ">>>"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3186,7 +3187,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * Visits a {@link RSignedShift} node, whose children are the following :
    * <p>
    * f0 -> ">>"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3202,7 +3203,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> . %0 NormalAnnotation()<br>
    * .. .. | %1 SingleMemberAnnotation()<br>
    * .. .. | %2 MarkerAnnotation()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3219,7 +3220,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f2 -> "("<br>
    * f3 -> [ MemberValuePairs() ]<br>
    * f4 -> ")"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3242,7 +3243,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> "@"<br>
    * f1 -> Name()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3261,7 +3262,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f2 -> "("<br>
    * f3 -> MemberValue()<br>
    * f4 -> ")"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3283,7 +3284,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> MemberValuePair()<br>
    * f1 -> ( #0 "," #1 MemberValuePair() )*<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3309,7 +3310,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> < IDENTIFIER ><br>
    * f1 -> "="<br>
    * f2 -> MemberValue()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3330,7 +3331,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> . %0 Annotation()<br>
    * .. .. | %1 MemberValueArrayInitializer()<br>
    * .. .. | %2 ConditionalExpression()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3346,7 +3347,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f2 -> ( #0 "," #1 MemberValue() )*<br>
    * f3 -> [ "," ]<br>
    * f4 -> "}"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3382,7 +3383,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f1 -> "interface"<br>
    * f2 -> < IDENTIFIER ><br>
    * f3 -> AnnotationTypeBody()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3405,7 +3406,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * f0 -> "{"<br>
    * f1 -> ( AnnotationTypeMemberDeclaration() )*<br>
    * f2 -> "}"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3445,7 +3446,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * .. .. . .. .. | &3 AnnotationTypeDeclaration()<br>
    * .. .. . .. .. | &4 FieldDeclaration() )<br>
    * .. .. | %1 ";"<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override
@@ -3496,7 +3497,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * <p>
    * f0 -> "default"<br>
    * f1 -> MemberValue()<br>
-   * 
+   *
    * @param n - the node to visit
    */
   @Override

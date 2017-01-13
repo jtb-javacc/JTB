@@ -73,7 +73,38 @@ import EDU.purdue.jtb.misc.JavaBranchPrinter;
 import EDU.purdue.jtb.misc.Messages;
 import EDU.purdue.jtb.misc.Spacing;
 import EDU.purdue.jtb.misc.UnicodeConverter;
-import EDU.purdue.jtb.syntaxtree.*;
+import EDU.purdue.jtb.syntaxtree.AccessModifier;
+import EDU.purdue.jtb.syntaxtree.BNFProduction;
+import EDU.purdue.jtb.syntaxtree.BooleanLiteral;
+import EDU.purdue.jtb.syntaxtree.CharacterDescriptor;
+import EDU.purdue.jtb.syntaxtree.CharacterList;
+import EDU.purdue.jtb.syntaxtree.ComplexRegularExpression;
+import EDU.purdue.jtb.syntaxtree.ComplexRegularExpressionChoices;
+import EDU.purdue.jtb.syntaxtree.ComplexRegularExpressionUnit;
+import EDU.purdue.jtb.syntaxtree.Expansion;
+import EDU.purdue.jtb.syntaxtree.ExpansionChoices;
+import EDU.purdue.jtb.syntaxtree.ExpansionUnit;
+import EDU.purdue.jtb.syntaxtree.ExpansionUnitTCF;
+import EDU.purdue.jtb.syntaxtree.INode;
+import EDU.purdue.jtb.syntaxtree.IdentifierAsString;
+import EDU.purdue.jtb.syntaxtree.IntegerLiteral;
+import EDU.purdue.jtb.syntaxtree.JavaCCInput;
+import EDU.purdue.jtb.syntaxtree.JavaCCOptions;
+import EDU.purdue.jtb.syntaxtree.JavaCodeProduction;
+import EDU.purdue.jtb.syntaxtree.LocalLookahead;
+import EDU.purdue.jtb.syntaxtree.NodeChoice;
+import EDU.purdue.jtb.syntaxtree.NodeListOptional;
+import EDU.purdue.jtb.syntaxtree.NodeOptional;
+import EDU.purdue.jtb.syntaxtree.NodeSequence;
+import EDU.purdue.jtb.syntaxtree.NodeToken;
+import EDU.purdue.jtb.syntaxtree.OptionBinding;
+import EDU.purdue.jtb.syntaxtree.Production;
+import EDU.purdue.jtb.syntaxtree.RegExprKind;
+import EDU.purdue.jtb.syntaxtree.RegExprSpec;
+import EDU.purdue.jtb.syntaxtree.RegularExprProduction;
+import EDU.purdue.jtb.syntaxtree.RegularExpression;
+import EDU.purdue.jtb.syntaxtree.StringLiteral;
+import EDU.purdue.jtb.syntaxtree.TokenManagerDecls;
 
 /**
  * The {@link JavaCCPrinter} visitor reprints (with indentation) the JavaCC grammar JavaCC specific
@@ -100,6 +131,7 @@ import EDU.purdue.jtb.syntaxtree.*;
  * @version 1.4.8 : 10/2012 : MMa : updated for JavaCodeProduction class generation if requested
  *          1.4.8 : 12/2014 : MMa : fixed commenting specials in JTB options ;<br>
  *          improved specials printing
+ * @version 1.4.14 : 01/2017 : MMa : used try-with-resource
  */
 public class JavaCCPrinter extends DepthFirstVoidVisitor {
 
@@ -198,10 +230,10 @@ public class JavaCCPrinter extends DepthFirstVoidVisitor {
       if (noOverwrite && file.exists()) {
         throw new FileExistsException(outFile);
       } else {
-        final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file),
-                                                                   sb.length()));
-        out.print(sb);
-        out.close();
+        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file),
+                                                                  sb.length()))) {
+          out.print(sb);
+        }
       }
     }
     catch (final IOException e) {

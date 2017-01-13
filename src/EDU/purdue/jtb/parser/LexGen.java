@@ -27,7 +27,15 @@
  */
 package EDU.purdue.jtb.parser;
 
-import static EDU.purdue.jtb.parser.JavaCCParserConstants.*;
+import static EDU.purdue.jtb.parser.JavaCCParserConstants.ABSTRACT;
+import static EDU.purdue.jtb.parser.JavaCCParserConstants.CLASS;
+import static EDU.purdue.jtb.parser.JavaCCParserConstants.FINAL;
+import static EDU.purdue.jtb.parser.JavaCCParserConstants.IDENTIFIER;
+import static EDU.purdue.jtb.parser.JavaCCParserConstants.IMPORT;
+import static EDU.purdue.jtb.parser.JavaCCParserConstants.INTERFACE;
+import static EDU.purdue.jtb.parser.JavaCCParserConstants.PACKAGE;
+import static EDU.purdue.jtb.parser.JavaCCParserConstants.PUBLIC;
+import static EDU.purdue.jtb.parser.JavaCCParserConstants.SEMICOLON;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -40,11 +48,13 @@ import java.util.Map;
 
 /**
  * Generate lexer.
- * 
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  * @version 1.4.8 : 12/2014 : MMa : moved to imports static
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings
  */
+@SuppressWarnings("javadoc")
 public class LexGen extends JavaCCGlobals {
 
   static private PrintWriter                      out;
@@ -52,7 +62,7 @@ public class LexGen extends JavaCCGlobals {
   static private String                           tokMgrClassName;
 
   // Hashtable of vectors
-  static Hashtable<String, List<TokenProduction>> allTpsForState  = new Hashtable<String, List<TokenProduction>>();
+  static Hashtable<String, List<TokenProduction>> allTpsForState  = new Hashtable<>();
   public static int                               lexStateIndex   = 0;
   static int[]                                    kinds;
   public static int                               maxOrdinal      = 1;
@@ -61,7 +71,7 @@ public class LexGen extends JavaCCGlobals {
   public static int[]                             lexStates;
   public static boolean[]                         ignoreCase;
   public static Action[]                          actions;
-  public static Map<String, NfaState>             initStates      = new Hashtable<String, NfaState>();
+  public static Map<String, NfaState>             initStates      = new Hashtable<>();
   public static int                               stateSetSize;
   public static int                               maxLexStates;
   public static String[]                          lexStateName;
@@ -93,6 +103,7 @@ public class LexGen extends JavaCCGlobals {
   public static RegularExpression_                curRE;
   public static boolean                           keepLineCol;
 
+  @SuppressWarnings("unused")
   static void PrintClassHead() {
     int i, j;
 
@@ -100,7 +111,7 @@ public class LexGen extends JavaCCGlobals {
       final File tmp = new File(Options.getOutputDirectory(), tokMgrClassName + ".java");
       out = new java.io.PrintWriter(new java.io.BufferedWriter(new java.io.FileWriter(tmp),
                                                                12 * 8192));
-      final List<String> tn = new ArrayList<String>(toolNames);
+      final List<String> tn = new ArrayList<>(toolNames);
       tn.add(toolName);
 
       out.println("/* " + getIdString(tn, tokMgrClassName + ".java") + " */");
@@ -261,7 +272,7 @@ public class LexGen extends JavaCCGlobals {
       for (i = 0; i < tp.lexStates.length; i++) {
         if ((tps = allTpsForState.get(tp.lexStates[i])) == null) {
           tmpLexStateName[maxLexStates++] = tp.lexStates[i];
-          allTpsForState.put(tp.lexStates[i], tps = new ArrayList<TokenProduction>());
+          allTpsForState.put(tp.lexStates[i], tps = new ArrayList<>());
         }
 
         tps.add(tp);
@@ -285,7 +296,7 @@ public class LexGen extends JavaCCGlobals {
     actions = new Action[maxOrdinal];
     actions[0] = actForEof;
     hasTokenActions = actForEof != null;
-    initStates = new Hashtable<String, NfaState>();
+    initStates = new Hashtable<>();
     canMatchAnyChar = new int[maxLexStates];
     canLoop = new boolean[maxLexStates];
     stateHasActions = new boolean[maxLexStates];
@@ -323,13 +334,14 @@ public class LexGen extends JavaCCGlobals {
     singlesToSkip[lexStateIndex].kind = kind;
   }
 
+  @SuppressWarnings("incomplete-switch")
   public static void start() {
     if (!Options.getBuildTokenManager() || Options.getUserTokenManager() ||
         JavaCCErrors.get_error_count() > 0)
       return;
 
     keepLineCol = Options.getKeepLineColumn();
-    final List<RegularExpression_> choices = new ArrayList<RegularExpression_>();
+    final List<RegularExpression_> choices = new ArrayList<>();
     Enumeration<String> e;
     TokenProduction tp;
     int i, j;
@@ -579,25 +591,26 @@ public class LexGen extends JavaCCGlobals {
 
       hasLoop = true;
       if (len == 0)
-        JavaCCErrors.warning(rexprs[initMatch[i]],
-                             "Regular expression" +
-                                 ((rexprs[initMatch[i]].label.equals(""))
-                                                                         ? ""
-                                                                         : (" for " + rexprs[initMatch[i]].label)) +
-                                 " can be matched by the empty string (\"\") in lexical state " +
-                                 lexStateName[i] + ". This can result in an endless loop of " +
-                                 "empty string matches.");
+        JavaCCErrors.warning(rexprs[initMatch[i]], "Regular expression" +
+                                                   ((rexprs[initMatch[i]].label.equals("")) ? ""
+                                                                                            : (" for " +
+                                                                                               rexprs[initMatch[i]].label)) +
+                                                   " can be matched by the empty string (\"\") in lexical state " +
+                                                   lexStateName[i] +
+                                                   ". This can result in an endless loop of " +
+                                                   "empty string matches.");
       else {
-        JavaCCErrors.warning(rexprs[initMatch[i]],
-                             "Regular expression" +
-                                 ((rexprs[initMatch[i]].label.equals(""))
-                                                                         ? ""
-                                                                         : (" for " + rexprs[initMatch[i]].label)) +
-                                 " can be matched by the empty string (\"\") in lexical state " +
-                                 lexStateName[i] + ". This regular expression along with the " +
-                                 "regular expressions at " + reList + " forms the cycle \n   " +
-                                 cycle + "\ncontaining regular expressions with empty matches." +
-                                 " This can result in an endless loop of empty string matches.");
+        JavaCCErrors.warning(rexprs[initMatch[i]], "Regular expression" +
+                                                   ((rexprs[initMatch[i]].label.equals("")) ? ""
+                                                                                            : (" for " +
+                                                                                               rexprs[initMatch[i]].label)) +
+                                                   " can be matched by the empty string (\"\") in lexical state " +
+                                                   lexStateName[i] +
+                                                   ". This regular expression along with the " +
+                                                   "regular expressions at " + reList +
+                                                   " forms the cycle \n   " + cycle +
+                                                   "\ncontaining regular expressions with empty matches." +
+                                                   " This can result in an endless loop of empty string matches.");
       }
     }
   }
@@ -695,7 +708,8 @@ public class LexGen extends JavaCCGlobals {
 
     out.println(staticString + "protected " + charStreamName + " input_stream;");
 
-    out.println(staticString + "private final int[] jjrounds = " + "new int[" + stateSetSize + "];");
+    out.println(staticString + "private final int[] jjrounds = " + "new int[" + stateSetSize +
+                "];");
     out.println(staticString + "private final int[] jjstateSet = " + "new int[" +
                 (2 * stateSetSize) + "];");
 
@@ -722,16 +736,16 @@ public class LexGen extends JavaCCGlobals {
 
     if (Options.getStatic() && !Options.getUserCharStream()) {
       out.println("   if (input_stream != null)");
-      out.println("      throw new TokenMgrError(\"ERROR: Second call to constructor of static lexer. "
-                  + "You must use ReInit() to initialize the static variables.\", TokenMgrError.STATIC_LEXER_ERROR);");
+      out.println("      throw new TokenMgrError(\"ERROR: Second call to constructor of static lexer. " +
+                  "You must use ReInit() to initialize the static variables.\", TokenMgrError.STATIC_LEXER_ERROR);");
     } else if (!Options.getUserCharStream()) {
       if (Options.getJavaUnicodeEscape())
         out.println("   if (JavaCharStream.staticFlag)");
       else
         out.println("   if (SimpleCharStream.staticFlag)");
 
-      out.println("      throw new Error(\"ERROR: Cannot use a static CharStream class with a "
-                  + "non-static lexical analyzer.\");");
+      out.println("      throw new Error(\"ERROR: Cannot use a static CharStream class with a " +
+                  "non-static lexical analyzer.\");");
     }
 
     out.println("   input_stream = stream;");
@@ -787,8 +801,8 @@ public class LexGen extends JavaCCGlobals {
     out.println(staticString + "public void SwitchTo(int lexState)");
     out.println("{");
     out.println("   if (lexState >= " + lexStateName.length + " || lexState < 0)");
-    out.println("      throw new TokenMgrError(\"Error: Ignoring invalid lexical state : \""
-                + " + lexState + \". State unchanged.\", TokenMgrError.INVALID_LEXICAL_STATE);");
+    out.println("      throw new TokenMgrError(\"Error: Ignoring invalid lexical state : \"" +
+                " + lexState + \". State unchanged.\", TokenMgrError.INVALID_LEXICAL_STATE);");
     out.println("   else");
     out.println("      curLexState = lexState;");
     out.println("}");
@@ -1073,15 +1087,15 @@ public class LexGen extends JavaCCGlobals {
 
       if (Options.getDebugTokenManager()) {
         if (Options.getJavaUnicodeEscape() || Options.getUserCharStream())
-          out.println("    debugStream.println("
-                      + "\"****** FOUND A \" + tokenImage[jjmatchedKind] + \" MATCH "
-                      + "(\" + TokenMgrError.addEscapes(new String(input_stream.GetSuffix(jjmatchedPos + 1))) + "
-                      + "\") ******\\n\");");
+          out.println("    debugStream.println(" +
+                      "\"****** FOUND A \" + tokenImage[jjmatchedKind] + \" MATCH " +
+                      "(\" + TokenMgrError.addEscapes(new String(input_stream.GetSuffix(jjmatchedPos + 1))) + " +
+                      "\") ******\\n\");");
         else
-          out.println("    debugStream.println("
-                      + "\"****** FOUND A \" + tokenImage[jjmatchedKind] + \" MATCH "
-                      + "(\" + TokenMgrError.addEscapes(new String(input_stream.GetSuffix(jjmatchedPos + 1))) + "
-                      + "\") ******\\n\");");
+          out.println("    debugStream.println(" +
+                      "\"****** FOUND A \" + tokenImage[jjmatchedKind] + \" MATCH " +
+                      "(\" + TokenMgrError.addEscapes(new String(input_stream.GetSuffix(jjmatchedPos + 1))) + " +
+                      "\") ******\\n\");");
       }
 
       if (hasSkip || hasMore || hasSpecial) {
@@ -1206,8 +1220,7 @@ public class LexGen extends JavaCCGlobals {
       out.println(prefix + "      input_stream.backup(1);");
       out.println(prefix + "      error_after = curPos <= 1 ? \"\" : input_stream.GetImage();");
       out.println(prefix + "   }");
-      out.println(prefix +
-                  "   throw new TokenMgrError(" +
+      out.println(prefix + "   throw new TokenMgrError(" +
                   "EOFSeen, curLexState, error_line, error_column, error_after, curChar, TokenMgrError.LEXICAL_ERROR);");
     }
 
@@ -1232,8 +1245,8 @@ public class LexGen extends JavaCCGlobals {
         continue;
 
       for (;;) {
-        if (((act = actions[i]) == null || act.getActionTokens() == null || act.getActionTokens()
-                                                                               .size() == 0) &&
+        if (((act = actions[i]) == null || act.getActionTokens() == null ||
+             act.getActionTokens().size() == 0) &&
             !canLoop[lexStates[i]])
           continue Outer;
 
@@ -1247,10 +1260,10 @@ public class LexGen extends JavaCCGlobals {
                       "] == input_stream.getBeginLine() &&");
           out.println("                jjemptyColNo[" + lexStates[i] +
                       "] == input_stream.getBeginColumn())");
-          out.println("               throw new TokenMgrError("
-                      + "(\"Error: Bailing out of infinite loop caused by repeated empty string matches "
-                      + "at line \" + input_stream.getBeginLine() + \", "
-                      + "column \" + input_stream.getBeginColumn() + \".\"), TokenMgrError.LOOP_DETECTED);");
+          out.println("               throw new TokenMgrError(" +
+                      "(\"Error: Bailing out of infinite loop caused by repeated empty string matches " +
+                      "at line \" + input_stream.getBeginLine() + \", " +
+                      "column \" + input_stream.getBeginColumn() + \".\"), TokenMgrError.LOOP_DETECTED);");
           out.println("            jjemptyLineNo[" + lexStates[i] +
                       "] = input_stream.getBeginLine();");
           out.println("            jjemptyColNo[" + lexStates[i] +
@@ -1303,8 +1316,8 @@ public class LexGen extends JavaCCGlobals {
         continue;
 
       for (;;) {
-        if (((act = actions[i]) == null || act.getActionTokens() == null || act.getActionTokens()
-                                                                               .size() == 0) &&
+        if (((act = actions[i]) == null || act.getActionTokens() == null ||
+             act.getActionTokens().size() == 0) &&
             !canLoop[lexStates[i]])
           continue Outer;
 
@@ -1318,10 +1331,10 @@ public class LexGen extends JavaCCGlobals {
                       "] == input_stream.getBeginLine() &&");
           out.println("                jjemptyColNo[" + lexStates[i] +
                       "] == input_stream.getBeginColumn())");
-          out.println("               throw new TokenMgrError("
-                      + "(\"Error: Bailing out of infinite loop caused by repeated empty string matches "
-                      + "at line \" + input_stream.getBeginLine() + \", "
-                      + "column \" + input_stream.getBeginColumn() + \".\"), TokenMgrError.LOOP_DETECTED);");
+          out.println("               throw new TokenMgrError(" +
+                      "(\"Error: Bailing out of infinite loop caused by repeated empty string matches " +
+                      "at line \" + input_stream.getBeginLine() + \", " +
+                      "column \" + input_stream.getBeginColumn() + \".\"), TokenMgrError.LOOP_DETECTED);");
           out.println("            jjemptyLineNo[" + lexStates[i] +
                       "] = input_stream.getBeginLine();");
           out.println("            jjemptyColNo[" + lexStates[i] +
@@ -1376,8 +1389,8 @@ public class LexGen extends JavaCCGlobals {
         continue;
 
       for (;;) {
-        if (((act = actions[i]) == null || act.getActionTokens() == null || act.getActionTokens()
-                                                                               .size() == 0) &&
+        if (((act = actions[i]) == null || act.getActionTokens() == null ||
+             act.getActionTokens().size() == 0) &&
             !canLoop[lexStates[i]])
           continue Outer;
 
@@ -1391,10 +1404,10 @@ public class LexGen extends JavaCCGlobals {
                       "] == input_stream.getBeginLine() &&");
           out.println("                jjemptyColNo[" + lexStates[i] +
                       "] == input_stream.getBeginColumn())");
-          out.println("               throw new TokenMgrError("
-                      + "(\"Error: Bailing out of infinite loop caused by repeated empty string matches "
-                      + "at line \" + input_stream.getBeginLine() + \", "
-                      + "column \" + input_stream.getBeginColumn() + \".\"), TokenMgrError.LOOP_DETECTED);");
+          out.println("               throw new TokenMgrError(" +
+                      "(\"Error: Bailing out of infinite loop caused by repeated empty string matches " +
+                      "at line \" + input_stream.getBeginLine() + \", " +
+                      "column \" + input_stream.getBeginColumn() + \".\"), TokenMgrError.LOOP_DETECTED);");
           out.println("            jjemptyLineNo[" + lexStates[i] +
                       "] = input_stream.getBeginLine();");
           out.println("            jjemptyColNo[" + lexStates[i] +
@@ -1442,7 +1455,7 @@ public class LexGen extends JavaCCGlobals {
     out = null;
     staticString = null;
     tokMgrClassName = null;
-    allTpsForState = new Hashtable<String, List<TokenProduction>>();
+    allTpsForState = new Hashtable<>();
     lexStateIndex = 0;
     kinds = null;
     maxOrdinal = 1;
@@ -1451,7 +1464,7 @@ public class LexGen extends JavaCCGlobals {
     lexStates = null;
     ignoreCase = null;
     actions = null;
-    initStates = new Hashtable<String, NfaState>();
+    initStates = new Hashtable<>();
     stateSetSize = 0;
     maxLexStates = 0;
     lexStateName = null;

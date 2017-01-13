@@ -52,7 +52,20 @@
  */
 package EDU.purdue.jtb.misc;
 
-import static EDU.purdue.jtb.misc.Globals.*;
+import static EDU.purdue.jtb.misc.Globals.INDENT_AMT;
+import static EDU.purdue.jtb.misc.Globals.LS;
+import static EDU.purdue.jtb.misc.Globals.dFVoidVisitor;
+import static EDU.purdue.jtb.misc.Globals.genFileHeaderComment;
+import static EDU.purdue.jtb.misc.Globals.iNode;
+import static EDU.purdue.jtb.misc.Globals.iNodeList;
+import static EDU.purdue.jtb.misc.Globals.javaDocComments;
+import static EDU.purdue.jtb.misc.Globals.nodeList;
+import static EDU.purdue.jtb.misc.Globals.nodeListOpt;
+import static EDU.purdue.jtb.misc.Globals.nodeOpt;
+import static EDU.purdue.jtb.misc.Globals.nodeToken;
+import static EDU.purdue.jtb.misc.Globals.nodesPackageName;
+import static EDU.purdue.jtb.misc.Globals.visitorsDirName;
+import static EDU.purdue.jtb.misc.Globals.visitorsPackageName;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -74,11 +87,12 @@ import java.util.List;
  * useful, JTB will not overwrite this file automatically.<br>
  * JTB will take this precaution for the other files only if the "-ow" command-line parameter is
  * used.
- * 
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  * @version 1.4.3 : 03/2010 : MMa : fixed output of constructor
  * @version 1.4.8 : 10/2014 : MMa : fixed NPE on classes without fields
+ * @version 1.4.14 : 01/2017 : MMa : used try-with-resource
  */
 public class TreeFormatterGenerator {
 
@@ -96,7 +110,7 @@ public class TreeFormatterGenerator {
   /**
    * Constructor with a given list of classes. Will create the visitors directory if it does not
    * exist.
-   * 
+   *
    * @param classes - the list of classes
    */
   public TreeFormatterGenerator(final List<ClassInfo> classes) {
@@ -112,7 +126,7 @@ public class TreeFormatterGenerator {
    * Saves the current buffer in the output file (global variable).<br>
    * Since the user is expected to edit and customize this file, this method will never overwrite
    * the file if it exists, regardless of the global no overwrite flag.
-   * 
+   *
    * @throws FileExistsException - if the file exists
    * @throws IOException if IO problem
    */
@@ -123,9 +137,10 @@ public class TreeFormatterGenerator {
       if (file.exists())
         throw new FileExistsException(outFilename);
 
-      final PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file), sb.length()));
-      out.print(sb);
-      out.close();
+      try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file),
+                                                                sb.length()))) {
+        out.print(sb);
+      }
     }
     catch (final IOException e) {
       Messages.hardErr(e);
@@ -137,7 +152,7 @@ public class TreeFormatterGenerator {
 
   /**
    * Generates the tree formatter visitor source in its file.<br>
-   * 
+   *
    * @throws FileExistsException - if the file exists
    */
   public void generateTreeFormatter() throws FileExistsException {
@@ -217,7 +232,8 @@ public class TreeFormatterGenerator {
 
     sb.append("  /**").append(LS);
     sb.append("   * Accepts a " + iNodeList +
-                  " object and performs a format command (if non null)<br>").append(LS);
+              " object and performs a format command (if non null)<br>")
+      .append(LS);
     sb.append("   * between each node in the list (but not after the last node).").append(LS);
     sb.append("   *").append(LS);
     sb.append("   * @param n - the node list to process").append(LS);
@@ -365,7 +381,8 @@ public class TreeFormatterGenerator {
     sb.append("    //").append(LS);
     sb.append("    if (n.numSpecials() > 0)").append(LS);
     sb.append("      for (final Iterator<" + nodeToken +
-                  "> e = n.specialTokens.iterator(); e.hasNext();) {").append(LS);
+              "> e = n.specialTokens.iterator(); e.hasNext();) {")
+      .append(LS);
     sb.append("       NodeToken special = e.next();").append(LS).append(LS);
     sb.append("       //").append(LS);
     sb.append("       // Place the token").append(LS);
@@ -392,7 +409,8 @@ public class TreeFormatterGenerator {
     sb.append("   * @param aColumn - the insertion column number").append(LS);
     sb.append("   */").append(LS);
     sb.append("  private void placeToken(final " + nodeToken +
-                  " n, final int aLine, final int aColumn) {").append(LS);
+              " n, final int aLine, final int aColumn) {")
+      .append(LS);
     sb.append("    final int length = n.tokenImage.length();").append(LS);
     sb.append("    int line = aLine;").append(LS);
     sb.append("    int column = aColumn;").append(LS).append(LS);

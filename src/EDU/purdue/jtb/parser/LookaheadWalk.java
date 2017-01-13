@@ -34,7 +34,9 @@ import java.util.List;
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  * @version 1.4.8 : 12/2014 : MMa : improved javadoc
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings javadoc
  */
+@SuppressWarnings("javadoc")
 public final class LookaheadWalk {
 
   public static boolean         considerSemanticLA;
@@ -44,7 +46,8 @@ public final class LookaheadWalk {
   private LookaheadWalk() {
   }
 
-  private static void listAppend(final List<MatchInfo> vToAppendTo, final List<MatchInfo> vToAppend) {
+  private static void listAppend(final List<MatchInfo> vToAppendTo,
+                                 final List<MatchInfo> vToAppend) {
     for (int i = 0; i < vToAppend.size(); i++) {
       vToAppendTo.add(vToAppend.get(i));
     }
@@ -53,7 +56,7 @@ public final class LookaheadWalk {
   public static List<MatchInfo> genFirstSet(final List<MatchInfo> partialMatches,
                                             final Expansion_ exp) {
     if (exp instanceof RegularExpression_) {
-      final List<MatchInfo> retval = new ArrayList<MatchInfo>();
+      final List<MatchInfo> retval = new ArrayList<>();
       for (int i = 0; i < partialMatches.size(); i++) {
         final MatchInfo m = partialMatches.get(i);
         final MatchInfo mnew = new MatchInfo();
@@ -72,12 +75,12 @@ public final class LookaheadWalk {
     } else if (exp instanceof NonTerminal) {
       final NormalProduction prod = ((NonTerminal) exp).getProd();
       if (prod instanceof JavaCodeProduction_) {
-        return new ArrayList<MatchInfo>();
+        return new ArrayList<>();
       } else {
         return genFirstSet(partialMatches, prod.getExpansion());
       }
     } else if (exp instanceof Choice) {
-      final List<MatchInfo> retval = new ArrayList<MatchInfo>();
+      final List<MatchInfo> retval = new ArrayList<>();
       final Choice ch = (Choice) exp;
       for (int i = 0; i < ch.getChoices().size(); i++) {
         final List<MatchInfo> v = genFirstSet(partialMatches, ch.getChoices().get(i));
@@ -94,7 +97,7 @@ public final class LookaheadWalk {
       }
       return v;
     } else if (exp instanceof OneOrMore) {
-      final List<MatchInfo> retval = new ArrayList<MatchInfo>();
+      final List<MatchInfo> retval = new ArrayList<>();
       List<MatchInfo> v = partialMatches;
       final OneOrMore om = (OneOrMore) exp;
       while (true) {
@@ -105,7 +108,7 @@ public final class LookaheadWalk {
       }
       return retval;
     } else if (exp instanceof ZeroOrMore) {
-      final List<MatchInfo> retval = new ArrayList<MatchInfo>();
+      final List<MatchInfo> retval = new ArrayList<>();
       listAppend(retval, partialMatches);
       List<MatchInfo> v = partialMatches;
       final ZeroOrMore zm = (ZeroOrMore) exp;
@@ -117,7 +120,7 @@ public final class LookaheadWalk {
       }
       return retval;
     } else if (exp instanceof ZeroOrOne) {
-      final List<MatchInfo> retval = new ArrayList<MatchInfo>();
+      final List<MatchInfo> retval = new ArrayList<>();
       listAppend(retval, partialMatches);
       listAppend(retval, genFirstSet(partialMatches, ((ZeroOrOne) exp).expansion));
       return retval;
@@ -125,9 +128,9 @@ public final class LookaheadWalk {
       return genFirstSet(partialMatches, ((TryBlock) exp).exp);
     } else if (considerSemanticLA && exp instanceof Lookahead &&
                ((Lookahead) exp).getActionTokens().size() != 0) {
-      return new ArrayList<MatchInfo>();
+      return new ArrayList<>();
     } else {
-      final List<MatchInfo> retval = new ArrayList<MatchInfo>();
+      final List<MatchInfo> retval = new ArrayList<>();
       listAppend(retval, partialMatches);
       return retval;
     }
@@ -149,17 +152,17 @@ public final class LookaheadWalk {
   public static List<MatchInfo> genFollowSet(final List<MatchInfo> partialMatches,
                                              final Expansion_ exp, final long generation) {
     if (exp.myGeneration == generation) {
-      return new ArrayList<MatchInfo>();
+      return new ArrayList<>();
     }
     // System.out.println("*** Parent: " + exp.parent);
     exp.myGeneration = generation;
     if (exp.parent == null) {
-      final List<MatchInfo> retval = new ArrayList<MatchInfo>();
+      final List<MatchInfo> retval = new ArrayList<>();
       listAppend(retval, partialMatches);
       return retval;
     } else if (exp.parent instanceof NormalProduction) {
       final List<Object> parents = ((NormalProduction) exp.parent).getParents();
-      final List<MatchInfo> retval = new ArrayList<MatchInfo>();
+      final List<MatchInfo> retval = new ArrayList<>();
       // System.out.println("1; gen: " + generation + "; exp: " + exp);
       for (int i = 0; i < parents.size(); i++) {
         final List<MatchInfo> v = genFollowSet(partialMatches, (Expansion_) parents.get(i),
@@ -175,8 +178,8 @@ public final class LookaheadWalk {
         if (v.size() == 0)
           return v;
       }
-      List<MatchInfo> v1 = new ArrayList<MatchInfo>();
-      List<MatchInfo> v2 = new ArrayList<MatchInfo>();
+      List<MatchInfo> v1 = new ArrayList<>();
+      List<MatchInfo> v2 = new ArrayList<>();
       listSplit(v, partialMatches, v1, v2);
       if (v1.size() != 0) {
         // System.out.println("2; gen: " + generation + "; exp: " + exp);
@@ -189,7 +192,7 @@ public final class LookaheadWalk {
       listAppend(v2, v1);
       return v2;
     } else if (exp.parent instanceof OneOrMore || exp.parent instanceof ZeroOrMore) {
-      final List<MatchInfo> moreMatches = new ArrayList<MatchInfo>();
+      final List<MatchInfo> moreMatches = new ArrayList<>();
       listAppend(moreMatches, partialMatches);
       List<MatchInfo> v = partialMatches;
       while (true) {
@@ -198,8 +201,8 @@ public final class LookaheadWalk {
           break;
         listAppend(moreMatches, v);
       }
-      List<MatchInfo> v1 = new ArrayList<MatchInfo>();
-      List<MatchInfo> v2 = new ArrayList<MatchInfo>();
+      List<MatchInfo> v1 = new ArrayList<>();
+      List<MatchInfo> v2 = new ArrayList<>();
       listSplit(moreMatches, partialMatches, v1, v2);
       if (v1.size() != 0) {
         // System.out.println("4; gen: " + generation + "; exp: " + exp);

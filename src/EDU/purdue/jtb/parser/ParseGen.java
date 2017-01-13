@@ -41,14 +41,15 @@ import java.util.List;
 
 /**
  * Generate the parser.
- * 
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  * @version 1.4.8 : 12/2014 : MMa : moved to imports static
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings
  */
 public class ParseGen extends JavaCCGlobals {
 
-  /** The PrintWriter */
+  /** The PrintWriter. */
   static private PrintWriter out;
 
   /**
@@ -66,11 +67,11 @@ public class ParseGen extends JavaCCGlobals {
         final File file = new File(Options.getOutputDirectory(), cu_name + ".java");
         out = new PrintWriter(new BufferedWriter(new FileWriter(file), 4 * 8192));
       }
-      catch (final IOException e) {
+      catch (@SuppressWarnings("unused") final IOException e) {
         JavaCCErrors.semantic_error("Could not open file " + cu_name + ".java for writing.");
         throw new Error();
       }
-      final List<String> tn = new ArrayList<String>(toolNames);
+      final List<String> tn = new ArrayList<>(toolNames);
       tn.add(toolName);
       out.println("/* " + getIdString(tn, cu_name + ".java") + " */");
       boolean implementsExists = false;
@@ -139,7 +140,8 @@ public class ParseGen extends JavaCCGlobals {
       }
       if (Options.getErrorReporting()) {
         out.println("  " + staticOpt() + "private int jj_gen;");
-        out.println("  " + staticOpt() + "final private int[] jj_la1 = new int[" + maskindex + "];");
+        out.println("  " + staticOpt() + "final private int[] jj_la1 = new int[" + maskindex +
+                    "];");
         final int tokenMaskSize = (tokenCount - 1) / 32 + 1;
         for (int i = 0; i < tokenMaskSize; i++)
           out.println("  static private int[] jj_la1_" + i + ";");
@@ -172,8 +174,8 @@ public class ParseGen extends JavaCCGlobals {
           if (Options.getStatic()) {
             out.println("    if (jj_initialized_once) {");
             out.println("      System.out.println(\"ERROR: Second call to constructor of static parser.  \");");
-            out.println("      System.out.println(\"       You must either use ReInit() "
-                        + "or set the JavaCC option STATIC to false\");");
+            out.println("      System.out.println(\"       You must either use ReInit() " +
+                        "or set the JavaCC option STATIC to false\");");
             out.println("      System.out.println(\"       during parser generation.\");");
             out.println("      throw new Error();");
             out.println("    }");
@@ -232,8 +234,8 @@ public class ParseGen extends JavaCCGlobals {
           if (Options.getStatic()) {
             out.println("    if (jj_initialized_once) {");
             out.println("      System.out.println(\"ERROR: Second call to constructor of static parser.  \");");
-            out.println("      System.out.println(\"       You must either use ReInit() or "
-                        + "set the JavaCC option STATIC to false\");");
+            out.println("      System.out.println(\"       You must either use ReInit() or " +
+                        "set the JavaCC option STATIC to false\");");
             out.println("      System.out.println(\"       during parser generation.\");");
             out.println("      throw new Error();");
             out.println("    }");
@@ -241,21 +243,21 @@ public class ParseGen extends JavaCCGlobals {
           }
           if (Options.getJavaUnicodeEscape()) {
             if (!Options.getGenerateChainedException()) {
-              out.println("    try { jj_input_stream = new JavaCharStream(stream, encoding, 1, 1); } "
-                          + "catch(java.io.UnsupportedEncodingException e) {"
-                          + " throw new RuntimeException(e.getMessage()); }");
+              out.println("    try { jj_input_stream = new JavaCharStream(stream, encoding, 1, 1); } " +
+                          "catch(java.io.UnsupportedEncodingException e) {" +
+                          " throw new RuntimeException(e.getMessage()); }");
             } else {
-              out.println("    try { jj_input_stream = new JavaCharStream(stream, encoding, 1, 1); } "
-                          + "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
+              out.println("    try { jj_input_stream = new JavaCharStream(stream, encoding, 1, 1); } " +
+                          "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
             }
           } else {
             if (!Options.getGenerateChainedException()) {
-              out.println("    try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } "
-                          + "catch(java.io.UnsupportedEncodingException e) { "
-                          + "throw new RuntimeException(e.getMessage()); }");
+              out.println("    try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } " +
+                          "catch(java.io.UnsupportedEncodingException e) { " +
+                          "throw new RuntimeException(e.getMessage()); }");
             } else {
-              out.println("    try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } "
-                          + "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
+              out.println("    try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } " +
+                          "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
             }
           }
           if (Options.getTokenManagerUsesParser() && !Options.getStatic()) {
@@ -280,19 +282,20 @@ public class ParseGen extends JavaCCGlobals {
           out.println("  }");
           out.println("");
           out.println("  /** Reinitialize. */");
-          out.println("  " + staticOpt() + "public void ReInit(final java.io.InputStream stream) {");
+          out.println("  " + staticOpt() +
+                      "public void ReInit(final java.io.InputStream stream) {");
           out.println("     ReInit(stream, null);");
           out.println("  }");
           out.println("  /** Reinitialize. */");
           out.println("  " + staticOpt() +
                       "public void ReInit(final java.io.InputStream stream, final String encoding) {");
           if (!Options.getGenerateChainedException()) {
-            out.println("    try { jj_input_stream.ReInit(stream, encoding, 1, 1); } "
-                        + "catch(java.io.UnsupportedEncodingException e) { "
-                        + "throw new RuntimeException(e.getMessage()); }");
+            out.println("    try { jj_input_stream.ReInit(stream, encoding, 1, 1); } " +
+                        "catch(java.io.UnsupportedEncodingException e) { " +
+                        "throw new RuntimeException(e.getMessage()); }");
           } else {
-            out.println("    try { jj_input_stream.ReInit(stream, encoding, 1, 1); } "
-                        + "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
+            out.println("    try { jj_input_stream.ReInit(stream, encoding, 1, 1); } " +
+                        "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
           }
           out.println("    " + tsClassOrVar + ".ReInit(jj_input_stream);");
           out.println("    token = new Token();");
@@ -318,8 +321,8 @@ public class ParseGen extends JavaCCGlobals {
           if (Options.getStatic()) {
             out.println("    if (jj_initialized_once) {");
             out.println("      System.out.println(\"ERROR: Second call to constructor of static parser. \");");
-            out.println("      System.out.println(\"       You must either use ReInit() or "
-                        + "set the JavaCC option STATIC to false\");");
+            out.println("      System.out.println(\"       You must either use ReInit() or " +
+                        "set the JavaCC option STATIC to false\");");
             out.println("      System.out.println(\"       during parser generation.\");");
             out.println("      throw new Error();");
             out.println("    }");
@@ -389,8 +392,8 @@ public class ParseGen extends JavaCCGlobals {
       if (Options.getStatic()) {
         out.println("    if (jj_initialized_once) {");
         out.println("      System.out.println(\"ERROR: Second call to constructor of static parser. \");");
-        out.println("      System.out.println(\"       You must either use ReInit() or "
-                    + "set the JavaCC option STATIC to false\");");
+        out.println("      System.out.println(\"       You must either use ReInit() or " +
+                    "set the JavaCC option STATIC to false\");");
         out.println("      System.out.println(\"       during parser generation.\");");
         out.println("      throw new Error();");
         out.println("    }");
@@ -651,12 +654,12 @@ public class ParseGen extends JavaCCGlobals {
           out.println("    int line = errortok.beginLine, column = errortok.beginColumn;");
         out.println("    String mess = (errortok.kind == 0) ? tokenImage[0] : errortok.image;");
         if (Options.getKeepLineColumn())
-          out.println("    return new ParseException("
-                      + "\"Parse error at line \" + line + \", column \" + column + \".  "
-                      + "Encountered: \" + mess);");
+          out.println("    return new ParseException(" +
+                      "\"Parse error at line \" + line + \", column \" + column + \".  " +
+                      "Encountered: \" + mess);");
         else
-          out.println("    return new ParseException(\"Parse error at <unknown location>.  "
-                      + "Encountered: \" + mess);");
+          out.println("    return new ParseException(\"Parse error at <unknown location>.  " +
+                      "Encountered: \" + mess);");
         out.println("  }");
       }
       out.println("");
@@ -697,8 +700,8 @@ public class ParseGen extends JavaCCGlobals {
         out.println("      if (t.kind != 0 && !tokenImage[t.kind].equals(\"\\\"\" + t.image + \"\\\"\")) {");
         out.println("        System.out.print(\": \\\"\" + t.image + \"\\\"\");");
         out.println("      }");
-        out.println("      System.out.println(\" at line \" + t.beginLine + "
-                    + "\" column \" + t.beginColumn + \">\" + where);");
+        out.println("      System.out.println(\" at line \" + t.beginLine + " +
+                    "\" column \" + t.beginColumn + \">\" + where);");
         out.println("    }");
         out.println("  }");
         out.println("");
@@ -709,8 +712,8 @@ public class ParseGen extends JavaCCGlobals {
         out.println("      if (t1.kind != 0 && !tokenImage[t1.kind].equals(\"\\\"\" + t1.image + \"\\\"\")) {");
         out.println("        System.out.print(\": \\\"\" + t1.image + \"\\\"\");");
         out.println("      }");
-        out.println("      System.out.println(\" at line \" + t1.beginLine + \""
-                    + " column \" + t1.beginColumn + \">; Expected token: <\" + tokenImage[t2] + \">\");");
+        out.println("      System.out.println(\" at line \" + t1.beginLine + \"" +
+                    " column \" + t1.beginColumn + \">; Expected token: <\" + tokenImage[t2] + \">\");");
         out.println("    }");
         out.println("  }");
         out.println("");

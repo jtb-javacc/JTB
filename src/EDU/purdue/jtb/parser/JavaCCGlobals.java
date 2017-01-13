@@ -28,6 +28,9 @@
 package EDU.purdue.jtb.parser;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,10 +43,11 @@ import java.util.Map;
  * This package contains data created as a result of parsing and semanticizing a JavaCC input file.
  * This data is what is used by the back-ends of JavaCC as well as any other back-end of JavaCC
  * related tools such as JJTree.
- * 
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  * @version 1.4.8 : 12/2014 : MMa : improved javadoc
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings; used try-with-resource
  */
 public class JavaCCGlobals {
 
@@ -75,7 +79,7 @@ public class JavaCCGlobals {
 
   /**
    * This prints the banner line when the various tools are invoked.
-   * 
+   *
    * @param fullName - the tool full name
    * @param ver - the tool version
    */
@@ -96,43 +100,43 @@ public class JavaCCGlobals {
    * This is a list of tokens that appear after "PARSER_BEGIN(name)" all the way until (but not
    * including) the opening brace "{" of the class "name".
    */
-  static public List<Token>                                                           cu_to_insertion_point_1   = new ArrayList<Token>();
+  static public List<Token>                                                           cu_to_insertion_point_1   = new ArrayList<>();
 
   /**
    * This is the list of all tokens that appear after the tokens in "cu_to_insertion_point_1" and
    * until (but not including) the closing brace "}" of the class "name".
    */
-  static public List<Token>                                                           cu_to_insertion_point_2   = new ArrayList<Token>();
+  static public List<Token>                                                           cu_to_insertion_point_2   = new ArrayList<>();
 
   /**
    * This is the list of all tokens that appear after the tokens in "cu_to_insertion_point_2" and
    * until "PARSER_END(name)".
    */
-  static public List<Token>                                                           cu_from_insertion_point_2 = new ArrayList<Token>();
+  static public List<Token>                                                           cu_from_insertion_point_2 = new ArrayList<>();
 
   /**
    * A list of all grammar productions - normal and JAVACODE - in the order they appear in the input
    * file. Each entry here will be a subclass of "NormalProduction".
    */
-  static public List<NormalProduction>                                                bnfproductions            = new ArrayList<NormalProduction>();
+  static public List<NormalProduction>                                                bnfproductions            = new ArrayList<>();
 
   /**
    * A symbol table of all grammar productions - normal and JAVACODE. The symbol table is indexed by
    * the name of the left hand side non-terminal. Its contents are of type "NormalProduction".
    */
-  static public Map<String, NormalProduction>                                         production_table          = new HashMap<String, NormalProduction>();
+  static public Map<String, NormalProduction>                                         production_table          = new HashMap<>();
 
   /**
    * A mapping of lexical state strings to their integer internal representation. Integers are
    * stored as java.lang.Integer's.
    */
-  static public Map<String, Integer>                                                  lexstate_S2I              = new Hashtable<String, Integer>();
+  static public Map<String, Integer>                                                  lexstate_S2I              = new Hashtable<>();
 
   /**
    * A mapping of the internal integer representations of lexical states to their strings. Integers
    * are stored as java.lang.Integer's.
    */
-  static public Hashtable<Integer, String>                                            lexstate_I2S              = new Hashtable<Integer, String>();
+  static public Hashtable<Integer, String>                                            lexstate_I2S              = new Hashtable<>();
 
   /**
    * The declarations to be inserted into the TokenManager class.
@@ -143,7 +147,7 @@ public class JavaCCGlobals {
    * The list of all TokenProductions from the input file. This list includes implicit
    * TokenProductions that are created for uses of regular expressions within BNF productions.
    */
-  static public List<TokenProduction>                                                 rexprlist                 = new ArrayList<TokenProduction>();
+  static public List<TokenProduction>                                                 rexprlist                 = new ArrayList<>();
 
   /**
    * The total number of distinct tokens. This is therefore one more than the largest assigned token
@@ -156,13 +160,13 @@ public class JavaCCGlobals {
    * The index to the table is the image of the label and the contents of the table are of type
    * "RegularExpression_".
    */
-  static public Map<String, RegularExpression_>                                       named_tokens_table        = new HashMap<String, RegularExpression_>();
+  static public Map<String, RegularExpression_>                                       named_tokens_table        = new HashMap<>();
 
   /**
    * Contains the same entries as "named_tokens_table", but this is an ordered list which is ordered
    * by the order of appearance in the input file.
    */
-  static public List<RegularExpression_>                                              ordered_named_tokens      = new ArrayList<RegularExpression_>();
+  static public List<RegularExpression_>                                              ordered_named_tokens      = new ArrayList<>();
 
   /**
    * A mapping of ordinal values (represented as objects of type "Integer") to the corresponding
@@ -170,13 +174,13 @@ public class JavaCCGlobals {
    * token corresponding to this entry. If there are multiple labels representing the same ordinal
    * value, then only one label is stored.
    */
-  static public Map<Integer, String>                                                  names_of_tokens           = new HashMap<Integer, String>();
+  static public Map<Integer, String>                                                  names_of_tokens           = new HashMap<>();
 
   /**
    * A mapping of ordinal values (represented as objects of type "Integer") to the corresponding
    * RegularExpression_'s.
    */
-  static public Map<Integer, RegularExpression_>                                      rexps_of_tokens           = new HashMap<Integer, RegularExpression_>();
+  static public Map<Integer, RegularExpression_>                                      rexps_of_tokens           = new HashMap<>();
 
   /**
    * This is a three-level symbol table that contains all simple tokens (those that are defined
@@ -186,7 +190,7 @@ public class JavaCCGlobals {
    * hashtable. This third level hashtable contains the actual string of the simple token and maps
    * it to its RegularExpression_.
    */
-  static public Map<String, Hashtable<String, Hashtable<String, RegularExpression_>>> simple_tokens_table       = new Hashtable<String, Hashtable<String, Hashtable<String, RegularExpression_>>>();
+  static public Map<String, Hashtable<String, Hashtable<String, RegularExpression_>>> simple_tokens_table       = new Hashtable<>();
 
   /** Mask index shared between ParseEngine and ParseGen */
   static protected int                                                                maskindex                 = 0;
@@ -195,7 +199,7 @@ public class JavaCCGlobals {
   /** True if lookahead needed, false otherwise */
   public static boolean                                                               lookaheadNeeded;
   /** Mask values shared between ParseEngine and ParseGen */
-  static protected List<int[]>                                                        maskVals                  = new ArrayList<int[]>();
+  static protected List<int[]>                                                        maskVals                  = new ArrayList<>();
 
   /** The {@link Action} on end of file */
   static Action                                                                       actForEof;
@@ -210,7 +214,7 @@ public class JavaCCGlobals {
    * @return the identifying string for the file name, given a toolname used to generate it
    */
   public static String getIdString(final String tn, final String fn) {
-    final List<String> tns = new ArrayList<String>();
+    final List<String> tns = new ArrayList<>();
     tns.add(tn);
     return getIdString(tns, fn);
   }
@@ -258,7 +262,7 @@ public class JavaCCGlobals {
    * @return - a list of toolnames from the string splitted around ':' and '&'
    */
   private static List<String> makeToolNameList(final String str) {
-    final List<String> retVal = new ArrayList<String>();
+    final List<String> retVal = new ArrayList<>();
 
     int limit1 = str.indexOf('\n');
     if (limit1 == -1)
@@ -304,11 +308,9 @@ public class JavaCCGlobals {
    */
   public static List<String> getToolNames(final String fn) {
     final char[] buf = new char[256];
-    java.io.FileReader stream = null;
     int read, total = 0;
 
-    try {
-      stream = new java.io.FileReader(fn);
+    try (FileReader stream = new FileReader(fn)) {
 
       for (;;)
         if ((read = stream.read(buf, total, buf.length - total)) != -1) {
@@ -319,27 +321,19 @@ public class JavaCCGlobals {
 
       return makeToolNameList(new String(buf, 0, total));
     }
-    catch (final java.io.FileNotFoundException e1) {
+    catch (@SuppressWarnings("unused") final FileNotFoundException e1) {
     }
-    catch (final java.io.IOException e2) {
+    catch (@SuppressWarnings("unused") final IOException e2) {
       if (total > 0)
         return makeToolNameList(new String(buf, 0, total));
     }
-    finally {
-      if (stream != null)
-        try {
-          stream.close();
-        }
-        catch (final Exception e3) {
-        }
-    }
 
-    return new ArrayList<String>();
+    return new ArrayList<>();
   }
 
   /**
    * Creates an output directory.
-   * 
+   *
    * @param outputDir - the output directory to be created
    */
   public static void createOutputDir(final File outputDir) {
@@ -438,7 +432,7 @@ public class JavaCCGlobals {
 
   /**
    * Sets up line and column information for a given token.
-   * 
+   *
    * @param t - a token
    */
   static protected void printTokenSetup(final Token t) {
@@ -451,7 +445,7 @@ public class JavaCCGlobals {
 
   /**
    * Prints a token on a {@link PrintWriter} without the specials.
-   * 
+   *
    * @param t - a token
    * @param out - a {@link PrintWriter}
    */
@@ -479,7 +473,7 @@ public class JavaCCGlobals {
 
   /**
    * Prints a token on a {@link PrintWriter} including the specials.
-   * 
+   *
    * @param t - a token
    * @param out - a {@link PrintWriter}
    */
@@ -498,7 +492,7 @@ public class JavaCCGlobals {
 
   /**
    * Prints a list of tokens on a {@link PrintWriter} without the specials.
-   * 
+   *
    * @param list - a tokens list
    * @param out - a {@link PrintWriter}
    */
@@ -515,7 +509,7 @@ public class JavaCCGlobals {
 
   /**
    * Prints the leading specials of a token on a {@link PrintWriter}.
-   * 
+   *
    * @param t - a token
    * @param out - a {@link PrintWriter}
    */
@@ -538,7 +532,7 @@ public class JavaCCGlobals {
 
   /**
    * Prints the trailing specials of a token on a {@link PrintWriter}.
-   * 
+   *
    * @param t - a token
    * @param out - a {@link PrintWriter}
    */
@@ -636,24 +630,24 @@ public class JavaCCGlobals {
     jjtreeGenerated = false;
     toolNames = null;
     cu_name = null;
-    cu_to_insertion_point_1 = new ArrayList<Token>();
-    cu_to_insertion_point_2 = new ArrayList<Token>();
-    cu_from_insertion_point_2 = new ArrayList<Token>();
-    bnfproductions = new ArrayList<NormalProduction>();
-    production_table = new HashMap<String, NormalProduction>();
-    lexstate_S2I = new Hashtable<String, Integer>();
-    lexstate_I2S = new Hashtable<Integer, String>();
+    cu_to_insertion_point_1 = new ArrayList<>();
+    cu_to_insertion_point_2 = new ArrayList<>();
+    cu_from_insertion_point_2 = new ArrayList<>();
+    bnfproductions = new ArrayList<>();
+    production_table = new HashMap<>();
+    lexstate_S2I = new Hashtable<>();
+    lexstate_I2S = new Hashtable<>();
     token_mgr_decls = null;
-    rexprlist = new ArrayList<TokenProduction>();
+    rexprlist = new ArrayList<>();
     tokenCount = 0;
-    named_tokens_table = new HashMap<String, RegularExpression_>();
-    ordered_named_tokens = new ArrayList<RegularExpression_>();
-    names_of_tokens = new HashMap<Integer, String>();
-    rexps_of_tokens = new HashMap<Integer, RegularExpression_>();
-    simple_tokens_table = new Hashtable<String, Hashtable<String, Hashtable<String, RegularExpression_>>>();
+    named_tokens_table = new HashMap<>();
+    ordered_named_tokens = new ArrayList<>();
+    names_of_tokens = new HashMap<>();
+    rexps_of_tokens = new HashMap<>();
+    simple_tokens_table = new Hashtable<>();
     maskindex = 0;
     jj2index = 0;
-    maskVals = new ArrayList<int[]>();
+    maskVals = new ArrayList<>();
     cline = 0;
     ccol = 0;
     actForEof = null;
