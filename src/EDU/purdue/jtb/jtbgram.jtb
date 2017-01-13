@@ -113,6 +113,7 @@
 // ModMMa 12/2014 : 1.4.8 : added variables initialization code ;
 //                fixed the LOOKAHEAD in and modified ExplicitConstructorInvocation()
 // ModMMa 01/2017 : 1.4.13 : added default options for proper generation by the Eclipse plugin
+// ModMMa 01/2017 : 1.4.14 : changed AllocationExpression() and added EmptyTypeArguments()
 
 options
 {
@@ -2045,6 +2046,12 @@ void TypeArguments() :
   ">"
 }
 
+void EmptyTypeArguments() :
+{}
+{
+  "<" ">"
+}
+
 void TypeArgument() :
 {}
 {
@@ -2516,7 +2523,7 @@ void AllocationExpression() :
 {
   LOOKAHEAD(2)
   "new" PrimitiveType() ArrayDimsAndInits()
-| "new" ClassOrInterfaceType() [ TypeArguments() ]
+| "new" ClassOrInterfaceType() [ LOOKAHEAD(2) EmptyTypeArguments() | TypeArguments() ]
   (
     ArrayDimsAndInits()
   | Arguments(null) [ ClassOrInterfaceBody(false, null) ]

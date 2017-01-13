@@ -16,6 +16,8 @@ Fait sur JTB en 1.4.14
 - créé les pages wiki, mis à jour les différents fichiers de docs et autres
 - ajouté des annotations pour supprimer des warnings et utilisé des try-with-resource
 - supprimé la classe JTBToolkit générée avec le parseur
+- rajouté la nature JavaCC au projet
+- modifié AllocationExpression pour prendre en compte EmptyTypeArguments
 
 Fait sur JTB en 1.4.13
 - ajouté les options dans la grammaire pour une génération correcte directe sous Eclipse

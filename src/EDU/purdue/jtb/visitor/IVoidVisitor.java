@@ -798,6 +798,16 @@ public interface IVoidVisitor {
   public void visit(final TypeArguments n);
 
   /**
+   * Visits a {@link EmptyTypeArguments} node, whose children are the following :
+   * <p>
+   * f0 -> "<"<br>
+   * f1 -> ">"<br>
+   *
+   * @param n - the node to visit
+   */
+  public void visit(final EmptyTypeArguments n);
+
+  /**
    * Visits a {@link TypeArgument} node, whose child is the following :
    * <p>
    * f0 -> . %0 ReferenceType()<br>
@@ -1260,7 +1270,8 @@ public interface IVoidVisitor {
    * <p>
    * f0 -> . %0 #0 "new" #1 PrimitiveType() #2 ArrayDimsAndInits()<br>
    * .. .. | %1 #0 "new" #1 ClassOrInterfaceType()<br>
-   * .. .. . .. #2 [ TypeArguments() ]<br>
+   * .. .. . .. #2 [ &0 EmptyTypeArguments()<br>
+   * .. .. . .. .. | &1 TypeArguments() ]<br>
    * .. .. . .. #3 ( &0 ArrayDimsAndInits()<br>
    * .. .. . .. .. | &1 $0 Arguments()<br>
    * .. .. . .. .. . .. $1 [ ClassOrInterfaceBody() ] )<br>

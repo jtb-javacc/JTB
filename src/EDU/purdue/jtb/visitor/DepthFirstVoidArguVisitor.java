@@ -3085,6 +3085,25 @@ public class DepthFirstVoidArguVisitor<A> implements IVoidArguVisitor<A> {
   }
 
   /**
+   * Visits a {@link EmptyTypeArguments} node, whose children are the following :
+   * <p>
+   * f0 -> "<"<br>
+   * f1 -> ">"<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument
+   */
+  @Override
+  public void visit(final EmptyTypeArguments n, final A argu) {
+    // f0 -> "<"
+    final NodeToken n0 = n.f0;
+    n0.accept(this, argu);
+    // f1 -> ">"
+    final NodeToken n1 = n.f1;
+    n1.accept(this, argu);
+  }
+
+  /**
    * Visits a {@link TypeArgument} node, whose child is the following :
    * <p>
    * f0 -> . %0 ReferenceType()<br>
@@ -4755,7 +4774,8 @@ public class DepthFirstVoidArguVisitor<A> implements IVoidArguVisitor<A> {
    * <p>
    * f0 -> . %0 #0 "new" #1 PrimitiveType() #2 ArrayDimsAndInits()<br>
    * .. .. | %1 #0 "new" #1 ClassOrInterfaceType()<br>
-   * .. .. . .. #2 [ TypeArguments() ]<br>
+   * .. .. . .. #2 [ &0 EmptyTypeArguments()<br>
+   * .. .. . .. .. | &1 TypeArguments() ]<br>
    * .. .. . .. #3 ( &0 ArrayDimsAndInits()<br>
    * .. .. . .. .. | &1 $0 Arguments()<br>
    * .. .. . .. .. . .. $1 [ ClassOrInterfaceBody() ] )<br>
@@ -4767,7 +4787,8 @@ public class DepthFirstVoidArguVisitor<A> implements IVoidArguVisitor<A> {
   public void visit(final AllocationExpression n, final A argu) {
     // f0 -> . %0 #0 "new" #1 PrimitiveType() #2 ArrayDimsAndInits()
     // .. .. | %1 #0 "new" #1 ClassOrInterfaceType()
-    // .. .. . .. #2 [ TypeArguments() ]
+    // .. .. . .. #2 [ &0 EmptyTypeArguments()
+    // .. .. . .. .. | &1 TypeArguments() ]
     // .. .. . .. #3 ( &0 ArrayDimsAndInits()
     // .. .. . .. .. | &1 $0 Arguments()
     // .. .. . .. .. . .. $1 [ ClassOrInterfaceBody() ] )
@@ -4789,7 +4810,8 @@ public class DepthFirstVoidArguVisitor<A> implements IVoidArguVisitor<A> {
         break;
       case 1:
         // %1 #0 "new" #1 ClassOrInterfaceType()
-        // .. #2 [ TypeArguments() ]
+        // .. #2 [ &0 EmptyTypeArguments()
+        // .. .. | &1 TypeArguments() ]
         // .. #3 ( &0 ArrayDimsAndInits()
         // .. .. | &1 $0 Arguments()
         // .. .. .. $1 [ ClassOrInterfaceBody() ] )
@@ -4800,27 +4822,42 @@ public class DepthFirstVoidArguVisitor<A> implements IVoidArguVisitor<A> {
         // #1 ClassOrInterfaceType()
         final INode seq6 = seq4.elementAt(1);
         seq6.accept(this, argu);
-        // #2 [ TypeArguments() ]
+        // #2 [ &0 EmptyTypeArguments()
+        // .. | &1 TypeArguments() ]
         final INode seq7 = seq4.elementAt(2);
         final NodeOptional opt = (NodeOptional) seq7;
         if (opt.present()) {
-          opt.accept(this, argu);
+          final NodeChoice nch1 = (NodeChoice) opt.node;
+          final INode ich1 = nch1.choice;
+          switch (nch1.which) {
+            case 0:
+              // &0 EmptyTypeArguments()
+              ich1.accept(this, argu);
+              break;
+            case 1:
+              // &1 TypeArguments()
+              ich1.accept(this, argu);
+              break;
+            default:
+              // should not occur !!!
+              break;
+          }
         }
         // #3 ( &0 ArrayDimsAndInits()
         // .. | &1 $0 Arguments()
         // .. .. $1 [ ClassOrInterfaceBody() ] )
         final INode seq8 = seq4.elementAt(3);
-        final NodeChoice nch1 = (NodeChoice) seq8;
-        final INode ich1 = nch1.choice;
-        switch (nch1.which) {
+        final NodeChoice nch2 = (NodeChoice) seq8;
+        final INode ich2 = nch2.choice;
+        switch (nch2.which) {
           case 0:
             // &0 ArrayDimsAndInits()
-            ich1.accept(this, argu);
+            ich2.accept(this, argu);
             break;
           case 1:
             // &1 $0 Arguments()
             // .. $1 [ ClassOrInterfaceBody() ]
-            final NodeSequence seq9 = (NodeSequence) ich1;
+            final NodeSequence seq9 = (NodeSequence) ich2;
             // $0 Arguments()
             final INode seq10 = seq9.elementAt(0);
             seq10.accept(this, argu);

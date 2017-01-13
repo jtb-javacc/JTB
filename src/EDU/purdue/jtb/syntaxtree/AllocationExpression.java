@@ -8,7 +8,8 @@ import EDU.purdue.jtb.visitor.*;
  * Corresponding grammar:<br>
  * f0 -> . %0 #0 "new" #1 PrimitiveType() #2 ArrayDimsAndInits()<br>
  * .. .. | %1 #0 "new" #1 ClassOrInterfaceType()<br>
- * .. .. . .. #2 [ TypeArguments() ]<br>
+ * .. .. . .. #2 [ &0 EmptyTypeArguments()<br>
+ * .. .. . .. .. | &1 TypeArguments() ]<br>
  * .. .. . .. #3 ( &0 ArrayDimsAndInits()<br>
  * .. .. . .. .. | &1 $0 Arguments()<br>
  * .. .. . .. .. . .. $1 [ ClassOrInterfaceBody() ] )<br>

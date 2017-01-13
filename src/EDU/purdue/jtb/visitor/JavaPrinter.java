@@ -2285,11 +2285,12 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
   }
 
   /**
-   * Visits a {@link AllocationExpression} node, whose children are the following :
+   * Visits a {@link AllocationExpression} node, whose child is the following :
    * <p>
    * f0 -> . %0 #0 "new" #1 PrimitiveType() #2 ArrayDimsAndInits()<br>
    * .. .. | %1 #0 "new" #1 ClassOrInterfaceType()<br>
-   * .. .. . .. #2 [ TypeArguments() ]<br>
+   * .. .. . .. #2 [ &0 EmptyTypeArguments()<br>
+   * .. .. . .. .. | &1 TypeArguments() ]<br>
    * .. .. . .. #3 ( &0 ArrayDimsAndInits()<br>
    * .. .. . .. .. | &1 $0 Arguments()<br>
    * .. .. . .. .. . .. $1 [ ClassOrInterfaceBody() ] )<br>
@@ -2306,14 +2307,19 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
       seq.elementAt(1).accept(this);
       seq.elementAt(2).accept(this);
     } else {
-      // %1 #0 "new" #1 ClassOrInterfaceType() #2 [ TypeArguments() ]
-      //    #3 ( &0 ArrayDimsAndInits() | &1 $0 Arguments() $1 [ ClassOrInterfaceBody() ] )
+      // %1 #0 "new" #1 ClassOrInterfaceType()
+      // .. #2 [ &0 EmptyTypeArguments()
+      // .. .. | &1 TypeArguments() ]
+      // .. #3 ( &0 ArrayDimsAndInits()
+      // .. .. | &1 $0 Arguments()
+      // .. .. .. $1 [ ClassOrInterfaceBody() ] )
       // #0 "new"
       seq.elementAt(0).accept(this);
       sb.append(" ");
       // #1 ClassOrInterfaceType()
       seq.elementAt(1).accept(this);
-      // #2 [ TypeArguments() ]
+      // #2 [ &0 EmptyTypeArguments()
+      // .. | &1 TypeArguments() ]
       if (((NodeOptional) seq.elementAt(2)).present()) {
         seq.elementAt(2).accept(this);
       }

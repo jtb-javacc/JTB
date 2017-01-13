@@ -926,6 +926,18 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final TypeArguments n, final A argu);
 
   /**
+   * Visits a {@link EmptyTypeArguments} node, whose children are the following :
+   * <p>
+   * f0 -> "<"<br>
+   * f1 -> ">"<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument
+   * @return the user return information
+   */
+  public R visit(final EmptyTypeArguments n, final A argu);
+
+  /**
    * Visits a {@link TypeArgument} node, whose child is the following :
    * <p>
    * f0 -> . %0 ReferenceType()<br>
@@ -1468,7 +1480,8 @@ public interface IRetArguVisitor<R, A> {
    * <p>
    * f0 -> . %0 #0 "new" #1 PrimitiveType() #2 ArrayDimsAndInits()<br>
    * .. .. | %1 #0 "new" #1 ClassOrInterfaceType()<br>
-   * .. .. . .. #2 [ TypeArguments() ]<br>
+   * .. .. . .. #2 [ &0 EmptyTypeArguments()<br>
+   * .. .. . .. .. | &1 TypeArguments() ]<br>
    * .. .. . .. #3 ( &0 ArrayDimsAndInits()<br>
    * .. .. . .. .. | &1 $0 Arguments()<br>
    * .. .. . .. .. . .. $1 [ ClassOrInterfaceBody() ] )<br>
