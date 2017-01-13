@@ -1,0 +1,39 @@
+nvironment:<p>
+JTB 1.4.7+ is meant to be used as a front end for JavaCC 5.0+, with a 1.6.0+ JDK, and so is command line by nature.<br>
+But it has been integrated within the <a href="https://sourceforge.net/projects/eclipse-javacc">JavaCC Eclipse Plugin<a>, which embeds the latest
+ JTB version each time the plugin is released, and avoids running the tool on the command line.<br>
+ It also exists as a Maven artifact in Maven Central (edu.purdue.cs.jtb).<p>
+
+On the command line:<p>
+<font color="red"><code>java -jar jtb-1.4.x.jar -h</code></font> : to view all available options<br>
+<font color="red"><code>java -jar jtb-1.4.x.jar [CL_Option] -si</code></font> : to use system.in as the input file<br>
+<font color="red"><code>java -jar jtb-1.4.x.jar [CL_Option] [input-file]</code></font> : to use input-file as the input file<br>
+<br>
+In the input file options section:<p>
+<font color="red"><code>options {(JTB_BOOL_OPT=(true|false); | JTB_STR_OPT="str";)*}</code></font><br>
+<br>
+Options are the following:<p>
+<table>
+<tr><td><font color="red">CL_Option</font></td><td><font color="red">JTB_Option</font></td><td><font color="red">Description</font></td></tr>
+<tr><td>-cl      </td><td>JTB_CL=(true|false)</td><td>Print a list of the classes generated to standard out</td></tr>
+<tr><td>-d dir   </td><td>JTB_D="dir"        </td><td>Short for (and overwrites) "-nd dir/syntaxtree -vd dir/visitor"</td></tr>
+<tr><td>-dl      </td><td>JTB_DL=(true|false)</td><td>Generate depth level info</td></tr>
+<tr><td>-e       </td><td>JTB_E=(true|false) </td><td>Suppress JTB semantic error checking</td></tr>
+<tr><td>-f       </td><td>JTB_F=(true|false) </td><td>Use descriptive node class field names</td></tr>
+<tr><td>-h       </td><td>N/A                </td><td>Display this help message and quit</td></tr>
+<tr><td>-ia      </td><td>JTB_IA=(true|false)</td><td>Inline visitors accept methods on base classes</td></tr>
+<tr><td>-jd      </td><td>JTB_JD=(true|false)</td><td>Generate JavaDoc-friendly comments in the nodes and visitor</td></tr>
+<tr><td>-nd dir  </td><td>JTB_ND="dir"       </td><td>Use dir as the package for the syntax tree nodes</td></tr>
+<tr><td>-np pkg  </td><td>JTB_NP="pkg"       </td><td>Use pkg as the package for the syntax tree nodes</td></tr>
+<tr><td>-ns class</td><td>JTB_NS="class"     </td><td>Use class as the class which all node classes will extend</td></tr>
+<tr><td>-o file  </td><td>JTB_o="file"       </td><td>Use file as the filename for the annotated output grammar</td></tr>
+<tr><td>-p pkg   </td><td>JTB_P="pkg"        </td><td>Short for (and overwrites) "-np pkg.syntaxtree -vp pkg.visitor"</td></tr>
+<tr><td>-pp      </td><td>JTB_PP=(true|false)</td><td>Generate parent pointers in all node classes</td></tr>
+<tr><td>-printer </td><td>JTB_PRINTER        </td><td>Generate a syntax tree dumping visitor</td></tr>
+<tr><td>-si      </td><td>N/A                </td><td>Read from standard input rather than a file</td></tr>
+<tr><td>-scheme  </td><td>JTB_SCHEME         </td><td>Generate Scheme records representing the grammar and a Scheme tree building visitor</td></tr>
+<tr><td>-tk      </td><td>JTB_TK=(true|false)</td><td>Generate special tokens into the tree</td></tr>
+<tr><td>-vd dir  </td><td>JTB_VD="dir"       </td><td>Use dir as the package for the default visitor classes</td></tr>
+<tr><td>-vp pkg  </td><td>JTB_VP="pkg"       </td><td>Use pkg as the package for the default visitor classes</td></tr>
+<tr><td>-w       </td><td>JTB_W=(true|false )</td><td>Do not overwrite existing files</td></tr>
+</table>

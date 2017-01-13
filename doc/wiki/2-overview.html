@@ -1,0 +1,42 @@
+<h2>Overview</h2>
+<font color="red">JTB</font> (Java Tree Builder) is a syntax tree builder and visitors generator to be used
+ in front of <a href="http://javacc.org">JavaCC (Java Compiler Compiler)</a>.<br>
+
+It takes a JavaCC grammar file as input (you just have to change the extension from
+ "<font color="red">.jj</font>" to "<font color="red">.jtb</font>" and add a few options) and it automatically
+ generates the following:
+<ul>
+<li>a set of syntax tree classes based on the productions in the grammar,
+ utilizing the Visitor design pattern;</li>
+<li>four interfaces: <font color="red">IVoidVisitor</font>, <font color="red">IVoidArguVisitor</font>,
+ <font color="red">IRetVisitor</font>, <font color="red">IRetArguVisitor</font>;</li>
+<li>four depth-first visitors: <font color="red">DepthFirstVoidVisitor</font>,
+ <font color="red">DepthFirstVoidArguVisitor</font>,
+ <font color="red">DepthFirstRetVisitor</font>, <font color="red">DepthFirstRetArguVisitor</font>,
+ whose default methods simply visit the children of the current node;</li>
+<li>a JavaCC grammar "<font color="red">.jj</font>" file (<font color="red">jtb.out.jj</font> by default),
+ with the proper annotations to build the syntax tree during parsing (which then must be compiled with JavaCC).</li>
+</ul>
+
+New visitors, which subclass any generated one, can then override the default methods and perform various
+ operations on and manipulate the generated syntax tree.<p>
+ 
+JTB can be compared to JJTree in the following way:<ul>
+<li>in JJTree you explicitly define the nodes you want to build; in JTB it builds by default all of them
+ (but you can tell not to build some of them),</li>
+<li>JJTree generates only interfaces for visitors and you have to code the visitors, so you "fill" them;
+ JTB generates interfaces and "full" visitors (i.e. with all the code to visit the tree), so you just
+ "modify" them, sometimes just "reducing" them (for not visiting branches), so in a sense it is faster to
+ develop on an already generated - bullet proof - code,</li>
+<li>in JJTree, you are tempted to tune the tree, i.e. define only the nodes you need, but if you want to
+ develop different visitors, you have to think about all the nodes you want to traverse for the different
+ purposes and so you may find yourself sometimes having to enrich the grammar and  defeat what you have
+ previously done; in JTB you have all the tree right from the beginning so adding a new visitor is not
+ disruptive,</li>
+ <li>JTB can "inline" the accept methods, i.e. it generates for a node the code to work directly on its
+ children, which is usually the right place to take decisions and to reduce the control logic (otherwise
+ you usually have to access the fathers and check their types),</li>
+<li>JJTree may be more adequate when only small trees and few visitors are needed; JTB may be more adequate
+ when you have to work on the entire tree and build many visitors.</li>
+</ul>
+
