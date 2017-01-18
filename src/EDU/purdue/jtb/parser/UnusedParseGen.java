@@ -40,28 +40,29 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Generate the parser.
+ * Generate the parser.<br>
+ * Not used by JTB.
  *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  * @version 1.4.8 : 12/2014 : MMa : moved to imports static
- * @version 1.4.14 : 01/2017 : MMa : added suppress warnings
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings ; renamed class
  */
-public class ParseGen extends JavaCCGlobals {
+public class UnusedParseGen extends JavaCCGlobals {
 
   /** The PrintWriter. */
   static private PrintWriter out;
 
   /**
    * @return the compilation unit name
-   * @throws MetaParseException - in case of parse or semantic error
+   * @throws UnusedMetaParseException - in case of parse or semantic error
    */
   // ModMMa : modified for Token.template with GTToken
   //static public void start() throws MetaParseException {
-  static public String start() throws MetaParseException {
+  static public String start() throws UnusedMetaParseException {
     Token t = null;
     if (JavaCCErrors.get_error_count() != 0)
-      throw new MetaParseException();
+      throw new UnusedMetaParseException();
     if (Options.getBuildParser()) {
       try {
         final File file = new File(Options.getOutputDirectory(), cu_name + ".java");
@@ -104,7 +105,7 @@ public class ParseGen extends JavaCCGlobals {
       }
       out.println("");
       out.println("");
-      ParseEngine.build(out);
+      UnusedParseEngine.build(out);
       if (Options.getStatic()) {
         out.println("  static private boolean jj_initialized_once = false;");
       }

@@ -16,7 +16,7 @@ public class NodeOptional implements INode {
   public INode node;
 
   /** The serial version UID */
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1414L;
 
   /**
    * Initializes an empty {@link NodeOptional}.

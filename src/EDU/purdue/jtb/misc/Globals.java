@@ -70,6 +70,7 @@ import EDU.purdue.jtb.syntaxtree.NodeToken;
  * @version 1.4.0 : 05-11/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  * @version 1.4.1 : 02/2010 : MMa : added static flag
  * @version 1.4.6 : 01/2011 : FA/MMa : added -va and -npfx and -nsfx options
+ * @version 1.4.14 : 01/2017 : MMa : SERIAL_UID set to the product version number (without dots)
  */
 public class Globals {
 
@@ -81,10 +82,10 @@ public class Globals {
   public static final boolean DEBUG_CLASS_COMMENTS         = false;
   /** Turns on / off debugging class comment printing */
   public static final boolean DEBUG_FIELD_AND_SUB_COMMENTS = false;
-  /** The program version */
+  /** The program version (set also SERIAL_UID) */
   public static final String  VERSION                      = "1.4.14";
-  /** The serial uid version */
-  public static final long    SERIAL_UID                   = 1L;
+  /** The serial uid version (same as VERSION without the dots) */
+  public static final long    SERIAL_UID                   = 1414L;
   /** The java program name */
   public static final String  PROG_NAME                    = "JTB";
   /** The shell script name */

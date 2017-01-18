@@ -29,13 +29,15 @@
 package EDU.purdue.jtb.parser;
 
 /**
- * Thrown when there is a mis-configuration or a bug.
+ * Thrown when there is a mis-configuration or a bug.<br>
+ * Not used by JTB.
  *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
+ * @version 1.4.14 : 01/2017 : MMa : renamed class
  */
-public class MetaParseException extends ParseException
-{
+public class UnusedMetaParseException extends ParseException {
+
   /** Default serialVersionUID */
   private static final long serialVersionUID = 1L;
 }

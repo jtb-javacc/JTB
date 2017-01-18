@@ -22,7 +22,7 @@ public class NodeChoice implements INode {
   public int total;
 
   /** The serial version UID */
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1414L;
 
   /**
    * Constructs the {@link NodeChoice} with a given node and non standard (-1) which choice and total number of choices.

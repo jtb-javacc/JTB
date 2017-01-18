@@ -820,8 +820,9 @@ public class LexGen extends JavaCCGlobals {
   }
 
   static void DumpFillToken() {
-    final double tokenVersion = JavaFiles.getVersion("Token.java");
-    final boolean hasBinaryNewToken = tokenVersion > 4.09;
+    // ModMMa 18/01/2017 : suppressed as obsolete
+    //    final double tokenVersion = JavaFiles.getVersion("Token.java");
+    //    final boolean hasBinaryNewToken = tokenVersion > 4.09;
 
     out.println(staticString + "protected Token jjFillToken()");
     out.println("{");
@@ -875,12 +876,13 @@ public class LexGen extends JavaCCGlobals {
     if (Options.getTokenFactory().length() > 0) {
       out.println("   t = " + Options.getTokenFactory() +
                   ".newToken(jjmatchedKind, curTokenImage);");
-    } else if (hasBinaryNewToken) {
+      // ModMMa 18/01/2017 modified as obsolete
+    } else /*if (hasBinaryNewToken)*/ {
       out.println("   t = Token.newToken(jjmatchedKind, curTokenImage);");
-    } else {
-      out.println("   t = Token.newToken(jjmatchedKind);");
-      out.println("   t.kind = jjmatchedKind;");
-      out.println("   t.image = curTokenImage;");
+      //    } else {
+      //      out.println("   t = Token.newToken(jjmatchedKind);");
+      //      out.println("   t.kind = jjmatchedKind;");
+      //      out.println("   t.image = curTokenImage;");
     }
 
     if (keepLineCol) {

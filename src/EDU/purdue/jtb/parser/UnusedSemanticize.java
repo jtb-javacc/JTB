@@ -34,14 +34,16 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * Not used by JTB.
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  * @version 1.4.8 : 12/2014 : MMa : modified warning message about ignored LOOKAHEAD
  * @version 1.4.8 : 12/2014 : MMa : improved javadoc
- * @version 1.4.14 : 01/2017 : MMa : added suppress warnings
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings ; renamed class
  */
 @SuppressWarnings("javadoc")
-public class Semanticize extends JavaCCGlobals {
+public class UnusedSemanticize extends JavaCCGlobals {
 
   static List<List<RegExprSpec_>> removeList = new ArrayList<>();
   static List<Object>             itemList   = new ArrayList<>();
@@ -60,9 +62,9 @@ public class Semanticize extends JavaCCGlobals {
     itemList.clear();
   }
 
-  static public void start() throws MetaParseException {
+  static public void start() throws UnusedMetaParseException {
     if (JavaCCErrors.get_error_count() != 0)
-      throw new MetaParseException();
+      throw new UnusedMetaParseException();
     if (Options.getLookahead() > 1 && !Options.getForceLaCheck() && Options.getSanityCheck()) {
       JavaCCErrors.warning("Lookahead adequacy checking not being performed since option LOOKAHEAD " +
                            "is more than 1.  Set option FORCE_LA_CHECK to true to force checking.");
@@ -74,7 +76,7 @@ public class Semanticize extends JavaCCGlobals {
      * can be evaluated during other lookahead evaluations.
      */
     for (final Iterator<NormalProduction> it = bnfproductions.iterator(); it.hasNext();) {
-      ExpansionTreeWalker.postOrderWalk(it.next().getExpansion(), new LookaheadFixer());
+      UnusedExpansionTreeWalker.postOrderWalk(it.next().getExpansion(), new UnusedLookaheadFixer());
     }
     /*
      * The following loop populates "production_table"
@@ -91,7 +93,8 @@ public class Semanticize extends JavaCCGlobals {
      * non-terminals on RHS's are defined on the LHS.
      */
     for (final Iterator<NormalProduction> it = bnfproductions.iterator(); it.hasNext();) {
-      ExpansionTreeWalker.preOrderWalk(it.next().getExpansion(), new ProductionDefinedChecker());
+      UnusedExpansionTreeWalker.preOrderWalk(it.next().getExpansion(),
+                                             new UnusedProductionDefinedChecker());
     }
     /*
      * The following loop ensures that all target lexical states are
@@ -324,14 +327,14 @@ public class Semanticize extends JavaCCGlobals {
      * true.  Instead the following block of code is executed.
      */
     if (!Options.getUserTokenManager()) {
-      final FixRJustNames frjn = new FixRJustNames();
+      final UnusedFixRJustNames frjn = new UnusedFixRJustNames();
       for (final Iterator<TokenProduction> it = rexprlist.iterator(); it.hasNext();) {
         final TokenProduction tp = (it.next());
         final List<RegExprSpec_> respecs = tp.respecs;
         for (final Iterator<RegExprSpec_> it1 = respecs.iterator(); it1.hasNext();) {
           final RegExprSpec_ res = (it1.next());
           frjn.root = res.rexp;
-          ExpansionTreeWalker.preOrderWalk(res.rexp, frjn);
+          UnusedExpansionTreeWalker.preOrderWalk(res.rexp, frjn);
           if (res.rexp instanceof RJustName) {
             prepareToRemove(respecs, res);
           }
@@ -395,7 +398,7 @@ public class Semanticize extends JavaCCGlobals {
       }
     }
     if (JavaCCErrors.get_error_count() != 0)
-      throw new MetaParseException();
+      throw new UnusedMetaParseException();
     // The following code sets the value of the "emptyPossible" field of NormalProduction
     // nodes. This field is initialized to false, and then the entire list of
     // productions is processed. This is repeated as long as at least one item
@@ -417,7 +420,8 @@ public class Semanticize extends JavaCCGlobals {
       // The following code checks that all ZeroOrMore, ZeroOrOne, and OneOrMore nodes
       // do not contain expansions that can expand to the empty token list.
       for (final Iterator<NormalProduction> it = bnfproductions.iterator(); it.hasNext();) {
-        ExpansionTreeWalker.preOrderWalk((it.next()).getExpansion(), new EmptyChecker());
+        UnusedExpansionTreeWalker.preOrderWalk((it.next()).getExpansion(),
+                                               new UnusedEmptyChecker());
       }
       // The following code goes through the productions and adds pointers to other
       // productions that it can expand to without consuming any tokens. Once this is
@@ -464,12 +468,13 @@ public class Semanticize extends JavaCCGlobals {
        */
       if (JavaCCErrors.get_error_count() == 0) {
         for (final Iterator<NormalProduction> it = bnfproductions.iterator(); it.hasNext();) {
-          ExpansionTreeWalker.preOrderWalk((it.next()).getExpansion(), new LookaheadChecker());
+          UnusedExpansionTreeWalker.preOrderWalk((it.next()).getExpansion(),
+                                                 new UnusedLookaheadChecker());
         }
       }
     } // matches "if (Options.getSanityCheck()) {"
     if (JavaCCErrors.get_error_count() != 0)
-      throw new MetaParseException();
+      throw new UnusedMetaParseException();
   }
 
   public static RegularExpression_ other;
@@ -663,7 +668,7 @@ public class Semanticize extends JavaCCGlobals {
    * Objects of this class are created from class Semanticize to work on references to regular
    * expressions from RJustName's.
    */
-  static class FixRJustNames extends JavaCCGlobals implements ITreeWalkerOp {
+  static class UnusedFixRJustNames extends JavaCCGlobals implements UnusedITreeWalkerOp {
 
     public RegularExpression_ root;
 
@@ -696,7 +701,7 @@ public class Semanticize extends JavaCCGlobals {
     }
   }
 
-  static class LookaheadFixer extends JavaCCGlobals implements ITreeWalkerOp {
+  static class UnusedLookaheadFixer extends JavaCCGlobals implements UnusedITreeWalkerOp {
 
     /** {@inheritDoc } */
     @Override
@@ -766,7 +771,7 @@ public class Semanticize extends JavaCCGlobals {
     }
   }
 
-  static class ProductionDefinedChecker extends JavaCCGlobals implements ITreeWalkerOp {
+  static class UnusedProductionDefinedChecker extends JavaCCGlobals implements UnusedITreeWalkerOp {
 
     /** {@inheritDoc } */
     @Override
@@ -794,7 +799,7 @@ public class Semanticize extends JavaCCGlobals {
     }
   }
 
-  static class EmptyChecker extends JavaCCGlobals implements ITreeWalkerOp {
+  static class UnusedEmptyChecker extends JavaCCGlobals implements UnusedITreeWalkerOp {
 
     /** {@inheritDoc } */
     @Override
@@ -810,17 +815,17 @@ public class Semanticize extends JavaCCGlobals {
     @Override
     public void action(final Expansion_ e) {
       if (e instanceof OneOrMore) {
-        if (Semanticize.emptyExpansionExists(((OneOrMore) e).expansion)) {
+        if (UnusedSemanticize.emptyExpansionExists(((OneOrMore) e).expansion)) {
           JavaCCErrors.semantic_error(e,
                                       "Expansion_ within \"(...)+\" can be matched by empty string.");
         }
       } else if (e instanceof ZeroOrMore) {
-        if (Semanticize.emptyExpansionExists(((ZeroOrMore) e).expansion)) {
+        if (UnusedSemanticize.emptyExpansionExists(((ZeroOrMore) e).expansion)) {
           JavaCCErrors.semantic_error(e,
                                       "Expansion_ within \"(...)*\" can be matched by empty string.");
         }
       } else if (e instanceof ZeroOrOne) {
-        if (Semanticize.emptyExpansionExists(((ZeroOrOne) e).expansion)) {
+        if (UnusedSemanticize.emptyExpansionExists(((ZeroOrOne) e).expansion)) {
           JavaCCErrors.semantic_error(e,
                                       "Expansion_ within \"(...)?\" can be matched by empty string.");
         }
@@ -828,7 +833,7 @@ public class Semanticize extends JavaCCGlobals {
     }
   }
 
-  static class LookaheadChecker extends JavaCCGlobals implements ITreeWalkerOp {
+  static class UnusedLookaheadChecker extends JavaCCGlobals implements UnusedITreeWalkerOp {
 
     /** {@inheritDoc } */
     @Override
@@ -847,25 +852,25 @@ public class Semanticize extends JavaCCGlobals {
     public void action(final Expansion_ e) {
       if (e instanceof Choice) {
         if (Options.getLookahead() == 1 || Options.getForceLaCheck()) {
-          LookaheadCalc.choiceCalc((Choice) e);
+          UnusedLookaheadCalc.choiceCalc((Choice) e);
         }
       } else if (e instanceof OneOrMore) {
         final OneOrMore exp = (OneOrMore) e;
         if (Options.getForceLaCheck() ||
             (implicitLA(exp.expansion) && Options.getLookahead() == 1)) {
-          LookaheadCalc.ebnfCalc(exp, exp.expansion);
+          UnusedLookaheadCalc.ebnfCalc(exp, exp.expansion);
         }
       } else if (e instanceof ZeroOrMore) {
         final ZeroOrMore exp = (ZeroOrMore) e;
         if (Options.getForceLaCheck() ||
             (implicitLA(exp.expansion) && Options.getLookahead() == 1)) {
-          LookaheadCalc.ebnfCalc(exp, exp.expansion);
+          UnusedLookaheadCalc.ebnfCalc(exp, exp.expansion);
         }
       } else if (e instanceof ZeroOrOne) {
         final ZeroOrOne exp = (ZeroOrOne) e;
         if (Options.getForceLaCheck() ||
             (implicitLA(exp.expansion) && Options.getLookahead() == 1)) {
-          LookaheadCalc.ebnfCalc(exp, exp.expansion);
+          UnusedLookaheadCalc.ebnfCalc(exp, exp.expansion);
         }
       }
     }

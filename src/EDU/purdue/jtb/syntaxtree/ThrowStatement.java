@@ -22,7 +22,7 @@ public class ThrowStatement implements INode {
   public NodeToken f2;
 
   /** The serial version UID */
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1414L;
 
   /**
    * Constructs the node with all its children nodes.

@@ -39,7 +39,7 @@ public class SwitchStatement implements INode {
   public NodeToken f6;
 
   /** The serial version UID */
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1414L;
 
   /**
    * Constructs the node with all its children nodes.

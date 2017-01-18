@@ -35,14 +35,15 @@ import java.util.Map;
 /**
  * Generates boiler-plate files from templates.<br>
  * Only very basic template processing is supplied - if we need something more sophisticated I
- * suggest we use a third-party library.
+ * suggest we use a third-party library.<br>
+ * Not used in JTB.
  *
  * @author Paul Cager, Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  * @version 1.4.8 : 12/2014 : MMa : improved javadoc
- * @version 1.4.14 : 01/2017 : MMa : used try-with-resource
+ * @version 1.4.14 : 01/2017 : MMa : used try-with-resource ; renamed as unused
  */
-public class JavaFileGenerator {
+public class UnusedJavaFileGenerator {
 
   /**
    * Constructor with parameters
@@ -50,7 +51,7 @@ public class JavaFileGenerator {
    * @param tn - the name of the template. E.g. "/templates/Token.template".
    * @param opt - the processing options in force, such as "STATIC=yes"
    */
-  public JavaFileGenerator(final String tn, final Map<String, Object> opt) {
+  public UnusedJavaFileGenerator(final String tn, final Map<String, Object> opt) {
     templateName = tn;
     options = opt;
   }
@@ -298,7 +299,7 @@ public class JavaFileGenerator {
     map.put("trueArg", Boolean.TRUE);
     map.put("stringValue", "someString");
     try (PrintWriter out = new PrintWriter(args[1])) {
-      new JavaFileGenerator(args[0], map).generate(out);
+      new UnusedJavaFileGenerator(args[0], map).generate(out);
     }
   }
 }

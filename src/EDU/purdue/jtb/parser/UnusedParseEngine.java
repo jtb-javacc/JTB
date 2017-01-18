@@ -36,13 +36,15 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * Not used by JTB.
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  * @version 1.4.8 : 12/2014 : MMa : improved javadoc
- * @version 1.4.14 : 01/2017 : MMa : added suppress warnings
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings ; renamed class
  */
 @SuppressWarnings("javadoc")
-public class ParseEngine extends JavaCCGlobals {
+public class UnusedParseEngine extends JavaCCGlobals {
 
   static private java.io.PrintWriter               out;
   static private int                               gensymindex = 0;
@@ -109,7 +111,7 @@ public class ParseEngine extends JavaCCGlobals {
           return false;
         } else if (javaCodeCheck((units[i]))) {
           return true;
-        } else if (!Semanticize.emptyExpansionExists(units[i])) {
+        } else if (!UnusedSemanticize.emptyExpansionExists(units[i])) {
           return false;
         }
       }
@@ -175,7 +177,7 @@ public class ParseEngine extends JavaCCGlobals {
         } else {
           genFirstSet((seq.units.get(i)));
         }
-        if (!Semanticize.emptyExpansionExists((seq.units.get(i)))) {
+        if (!UnusedSemanticize.emptyExpansionExists((seq.units.get(i)))) {
           break;
         }
       }
@@ -245,7 +247,7 @@ public class ParseEngine extends JavaCCGlobals {
       la = conds[index];
       jj2LA = false;
 
-      if ((la.getAmount() == 0) || Semanticize.emptyExpansionExists(la.getLaExpansion()) ||
+      if ((la.getAmount() == 0) || UnusedSemanticize.emptyExpansionExists(la.getLaExpansion()) ||
           javaCodeCheck(la.getLaExpansion())) {
 
         // This handles the following cases:

@@ -31,15 +31,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Not used by JTB.
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
- * @version 1.4.14 : 01/2017 : MMa : added suppress warnings javadoc
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings javadoc ; renamed class
  */
 @SuppressWarnings("javadoc")
-public class LookaheadCalc extends JavaCCGlobals {
+public class UnusedLookaheadCalc extends JavaCCGlobals {
 
-  static MatchInfo overlap(final List<MatchInfo> v1, final List<MatchInfo> v2) {
-    MatchInfo m1, m2, m3;
+  static UnusedMatchInfo overlap(final List<UnusedMatchInfo> v1, final List<UnusedMatchInfo> v2) {
+    UnusedMatchInfo m1, m2, m3;
     int size;
     boolean diff;
     for (int i = 0; i < v1.size(); i++) {
@@ -69,7 +71,7 @@ public class LookaheadCalc extends JavaCCGlobals {
     return null;
   }
 
-  static boolean javaCodeCheck(final List<MatchInfo> v) {
+  static boolean javaCodeCheck(final List<UnusedMatchInfo> v) {
     for (int i = 0; i < v.size(); i++) {
       if (v.get(i).firstFreeLoc == 0) {
         return true;
@@ -78,7 +80,7 @@ public class LookaheadCalc extends JavaCCGlobals {
     return false;
   }
 
-  static String image(final MatchInfo m) {
+  static String image(final UnusedMatchInfo m) {
     String ret = "";
     for (int i = 0; i < m.firstFreeLoc; i++) {
       if (m.match[i] == 0) {
@@ -107,40 +109,40 @@ public class LookaheadCalc extends JavaCCGlobals {
     // dbl[i] and dbr[i] are lists of size limited matches for choice i
     // of ch. dbl ignores matches with semantic lookaheads (when force_la_check
     // is false), while dbr ignores semantic lookahead.
-    final List<MatchInfo>[] dbl = new ArrayList[ch.getChoices().size()];
-    final List<MatchInfo>[] dbr = new ArrayList[ch.getChoices().size()];
+    final List<UnusedMatchInfo>[] dbl = new ArrayList[ch.getChoices().size()];
+    final List<UnusedMatchInfo>[] dbr = new ArrayList[ch.getChoices().size()];
     final int[] minLA = new int[ch.getChoices().size() - 1];
-    final MatchInfo[] overlapInfo = new MatchInfo[ch.getChoices().size() - 1];
+    final UnusedMatchInfo[] overlapInfo = new UnusedMatchInfo[ch.getChoices().size() - 1];
     final int[] other = new int[ch.getChoices().size() - 1];
-    MatchInfo m;
-    List<MatchInfo> v;
+    UnusedMatchInfo m;
+    List<UnusedMatchInfo> v;
     boolean overlapDetected;
     for (int la = 1; la <= Options.getChoiceAmbiguityCheck(); la++) {
-      MatchInfo.laLimit = la;
-      LookaheadWalk.considerSemanticLA = !Options.getForceLaCheck();
+      UnusedMatchInfo.laLimit = la;
+      UnusedLookaheadWalk.considerSemanticLA = !Options.getForceLaCheck();
       for (int i = first; i < ch.getChoices().size() - 1; i++) {
-        LookaheadWalk.sizeLimitedMatches = new ArrayList<>();
-        m = new MatchInfo();
+        UnusedLookaheadWalk.sizeLimitedMatches = new ArrayList<>();
+        m = new UnusedMatchInfo();
         m.firstFreeLoc = 0;
         v = new ArrayList<>();
         v.add(m);
-        LookaheadWalk.genFirstSet(v, ch.getChoices().get(i));
-        dbl[i] = LookaheadWalk.sizeLimitedMatches;
+        UnusedLookaheadWalk.genFirstSet(v, ch.getChoices().get(i));
+        dbl[i] = UnusedLookaheadWalk.sizeLimitedMatches;
       }
-      LookaheadWalk.considerSemanticLA = false;
+      UnusedLookaheadWalk.considerSemanticLA = false;
       for (int i = first + 1; i < ch.getChoices().size(); i++) {
-        LookaheadWalk.sizeLimitedMatches = new ArrayList<>();
-        m = new MatchInfo();
+        UnusedLookaheadWalk.sizeLimitedMatches = new ArrayList<>();
+        m = new UnusedMatchInfo();
         m.firstFreeLoc = 0;
         v = new ArrayList<>();
         v.add(m);
-        LookaheadWalk.genFirstSet(v, ch.getChoices().get(i));
-        dbr[i] = LookaheadWalk.sizeLimitedMatches;
+        UnusedLookaheadWalk.genFirstSet(v, ch.getChoices().get(i));
+        dbr[i] = UnusedLookaheadWalk.sizeLimitedMatches;
       }
       if (la == 1) {
         for (int i = first; i < ch.getChoices().size() - 1; i++) {
           final Expansion_ exp = ch.getChoices().get(i);
-          if (Semanticize.emptyExpansionExists(exp)) {
+          if (UnusedSemanticize.emptyExpansionExists(exp)) {
             JavaCCErrors.warning(exp, "This choice can expand to the empty token sequence " +
                                       "and will therefore always be taken in favor of the choices appearing later.");
             break;
@@ -232,23 +234,23 @@ public class LookaheadCalc extends JavaCCGlobals {
 
   public static void ebnfCalc(final Expansion_ exp, final Expansion_ nested) {
     // exp is one of OneOrMore, ZeroOrMore, ZeroOrOne
-    MatchInfo m, m1 = null;
-    List<MatchInfo> v, first, follow;
+    UnusedMatchInfo m, m1 = null;
+    List<UnusedMatchInfo> v, first, follow;
     int la;
     for (la = 1; la <= Options.getOtherAmbiguityCheck(); la++) {
-      MatchInfo.laLimit = la;
-      LookaheadWalk.sizeLimitedMatches = new ArrayList<>();
-      m = new MatchInfo();
+      UnusedMatchInfo.laLimit = la;
+      UnusedLookaheadWalk.sizeLimitedMatches = new ArrayList<>();
+      m = new UnusedMatchInfo();
       m.firstFreeLoc = 0;
       v = new ArrayList<>();
       v.add(m);
-      LookaheadWalk.considerSemanticLA = !Options.getForceLaCheck();
-      LookaheadWalk.genFirstSet(v, nested);
-      first = LookaheadWalk.sizeLimitedMatches;
-      LookaheadWalk.sizeLimitedMatches = new ArrayList<>();
-      LookaheadWalk.considerSemanticLA = false;
-      LookaheadWalk.genFollowSet(v, exp, Expansion_.nextGenerationIndex++);
-      follow = LookaheadWalk.sizeLimitedMatches;
+      UnusedLookaheadWalk.considerSemanticLA = !Options.getForceLaCheck();
+      UnusedLookaheadWalk.genFirstSet(v, nested);
+      first = UnusedLookaheadWalk.sizeLimitedMatches;
+      UnusedLookaheadWalk.sizeLimitedMatches = new ArrayList<>();
+      UnusedLookaheadWalk.considerSemanticLA = false;
+      UnusedLookaheadWalk.genFollowSet(v, exp, Expansion_.nextGenerationIndex++);
+      follow = UnusedLookaheadWalk.sizeLimitedMatches;
       if (la == 1) {
         if (javaCodeCheck(first)) {
           JavaCCErrors.warning(nested,

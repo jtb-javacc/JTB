@@ -8,7 +8,7 @@
 	<artifactId>jtb</artifactId>
 	<version>1.4.14</version>
 	
-	<name>JTB: JavaCC Tree Builder</name>
+	<name>JTB: Java Tree Builder</name>
 	
 	<url>https://github.com/jtb-javacc/JTB</url>
 	

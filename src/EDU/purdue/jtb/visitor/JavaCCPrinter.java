@@ -107,9 +107,9 @@ import EDU.purdue.jtb.syntaxtree.StringLiteral;
 import EDU.purdue.jtb.syntaxtree.TokenManagerDecls;
 
 /**
- * The {@link JavaCCPrinter} visitor reprints (with indentation) the JavaCC grammar JavaCC specific
- * productions.<br>
- * (The JavaCC grammar Java productions are handled by the {@link JavaPrinter} visitor.)
+ * The {@link JavaCCPrinter} visitor reprints (with indentation) the JavaCC grammar's JavaCC
+ * specific productions.<br>
+ * (The JavaCC grammar's Java productions are handled by the {@link JavaPrinter} visitor.)
  * <p>
  * Implementation notes :
  * <ul>

@@ -8,7 +8,7 @@ package EDU.purdue.jtb.syntaxtree;
 public class NodeTCF extends NodeToken {
 
   /** The serial version UID */
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1414L;
 
   /**
    * Initializes a {@link NodeTCF} with a given string and no position information.

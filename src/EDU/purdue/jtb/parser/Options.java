@@ -60,7 +60,7 @@ import java.util.Set;
  *          1.4.0 : 11/2009 : MMa : added JTB options
  * @version 1.4.6 : 01/2011 : FA/MMa : added JTB_VA and JTB_NPFX and JTB_NSFX options
  * @version 1.4.8 : 12/2014 : MMa : improved javadoc
- * @version 1.4.14 : 01/2017 : MMa : added suppress warnings
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings ; fixed StringBuffer option
  */
 public class Options {
 
@@ -701,13 +701,13 @@ public class Options {
   }
 
   /**
-   * @return the "StringBuilder" or "StringBuilder" string
+   * @return the "StringBuilder" or "StringBuffer" string
    */
   public static String stringBufOrBuild() {
     if (getGenerateStringBuilder()) {
       return "StringBuilder";
     } else {
-      return "StringBuilder";
+      return "StringBuffer";
     }
   }
 }

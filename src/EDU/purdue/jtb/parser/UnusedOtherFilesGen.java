@@ -39,14 +39,17 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Generates the Constants file.
+ * Generates the invariant files (TokenMgrError.java, ParseException.java,Token.java,
+ * TokenManager.java, CharStream.java, JavaCharStream.java, SimpleCharStream.java) and the
+ * 'Parser'Constants.java.<br>
+ * Not used by JTB.
  *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  * @version 1.4.8 : 12/2014 : MMa : improved javadoc ; moved to imports static
- * @version 1.4.14 : 01/2017 : MMa : added suppress warnings
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings ; renamed class
  */
-public class OtherFilesGen extends JavaCCGlobals {
+public class UnusedOtherFilesGen extends JavaCCGlobals {
 
   /** The JavaCC option */
   public static boolean      keepLineCol;
@@ -56,29 +59,29 @@ public class OtherFilesGen extends JavaCCGlobals {
 
   /**
    * @param pn - the parser name
-   * @throws MetaParseException - in case of parse or semantic error
+   * @throws UnusedMetaParseException - in case of parse or semantic error
    */
   // ModMMa : modified for Token.template with GTToken
   //static public void start() throws MetaParseException {
-  static public void start(final String pn) throws MetaParseException {
+  static public void start(final String pn) throws UnusedMetaParseException {
     Token t = null;
     keepLineCol = Options.getKeepLineColumn();
     if (JavaCCErrors.get_error_count() != 0)
-      throw new MetaParseException();
-    JavaFiles.gen_TokenMgrError();
-    JavaFiles.gen_ParseException();
+      throw new UnusedMetaParseException();
+    UnusedJavaFiles.gen_TokenMgrError();
+    UnusedJavaFiles.gen_ParseException();
     // ModMMa : modified for Token.template with GTToken
     //  JavaFiles.gen_Token();
-    JavaFiles.gen_Token(pn);
+    UnusedJavaFiles.gen_Token(pn);
     if (Options.getUserTokenManager()) {
-      JavaFiles.gen_TokenManager();
+      UnusedJavaFiles.gen_TokenManager();
     } else if (Options.getUserCharStream()) {
-      JavaFiles.gen_CharStream();
+      UnusedJavaFiles.gen_CharStream();
     } else {
       if (Options.getJavaUnicodeEscape()) {
-        JavaFiles.gen_JavaCharStream();
+        UnusedJavaFiles.gen_JavaCharStream();
       } else {
-        JavaFiles.gen_SimpleCharStream();
+        UnusedJavaFiles.gen_SimpleCharStream();
       }
     }
     try {

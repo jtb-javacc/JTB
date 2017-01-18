@@ -38,8 +38,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * This class handles the creation and maintenance of the boiler-plate classes, such as Token.java,
- * JavaCharStream.java etc. It is responsible for:
+ * This class handles the creation and maintenance of the boiler-plate (invariant) classes,
+ * (TokenMgrError.java, ParseException.java,Token.java, TokenManager.java, CharStream.java,
+ * JavaCharStream.java, SimpleCharStream.java).<br>
+ * It is responsible for:
  * <ul>
  * <li>Writing the JavaCC header lines to the file.</li>
  * <li>Writing the checksum line.</li>
@@ -49,14 +51,16 @@ import java.security.NoSuchAlgorithmException;
  * <li>Checking any existing file's creation options (if the file can not be overwritten).</li>
  * <li></li>
  * </ul>
+ * <br>
+ * Not used by JTB.
  *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  * @version 1.4.8 : 12/2014 : MMa : improved javadoc
- * @version 1.4.14 : 01/2017 : MMa : added suppress warnings; used try-with-resource
+ * @version 1.4.14 : 01/2017 : MMa : added suppress warnings; used try-with-resource ; renamed class
  */
 @SuppressWarnings("javadoc")
-public class OutputFile {
+public class UnusedOutputFile {
 
   private static final String MD5_LINE_PART_1  = "/* JavaCC - OriginalChecksum=";
   private static final String MD5_LINE_PART_1q = "/\\* JavaCC - OriginalChecksum=";
@@ -78,7 +82,8 @@ public class OutputFile {
    *          (such s STATIC=false) to check for changes.
    * @throws IOException - if problem
    */
-  public OutputFile(final File fl, final String compVers, final String[] opt) throws IOException {
+  public UnusedOutputFile(final File fl, final String compVers,
+                          final String[] opt) throws IOException {
     file = fl;
     compatibleVersion = compVers;
     options = opt;
@@ -132,7 +137,7 @@ public class OutputFile {
     }
   }
 
-  public OutputFile(final File fl) throws IOException {
+  public UnusedOutputFile(final File fl) throws IOException {
     this(fl, null, null);
   }
 
@@ -303,7 +308,7 @@ public class OutputFile {
     /** {@inheritDoc} */
     @Override
     public void close() {
-      OutputFile.this.close();
+      UnusedOutputFile.this.close();
     }
   }
 

@@ -28,13 +28,15 @@
 package EDU.purdue.jtb.parser;
 
 /**
- * Describes a match, within a given lookahead.
- * 
+ * Describes a match, within a given lookahead.<br>
+ * Not used by JTB.
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  * @version 1.4.8 : 12/2014 : MMa : improved javadoc
+ * @version 1.4.14 : 01/2017 : MMa : renamed class
  */
-public class MatchInfo {
+public class UnusedMatchInfo {
 
   /** The lookahead maximum depth reached */
   public static int laLimit;

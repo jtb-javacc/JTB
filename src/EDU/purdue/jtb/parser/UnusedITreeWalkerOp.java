@@ -28,17 +28,20 @@
 package EDU.purdue.jtb.parser;
 
 /**
- * Objects of this type are passed to the tree walker routines in {@link ExpansionTreeWalker}.
- * 
+ * Objects of this type are passed to the tree walker routines in
+ * {@link UnusedExpansionTreeWalker}.<br>
+ * Not used by JTB.
+ *
  * @author Marc Mazas
  * @version 1.4.8 : 12/2014 : renamed from TreeWalkerOp ; improved javadoc
+ * @version 1.4.14 : 01/2017 : MMa : renamed class
  */
-public interface ITreeWalkerOp {
+public interface UnusedITreeWalkerOp {
 
   /**
    * When called at a particular node, this specifies to the tree walker if it should visit more
    * nodes under this node.
-   * 
+   *
    * @param e - the expansion node
    * @return true to visit more nodes, false otherwise
    */
@@ -46,7 +49,7 @@ public interface ITreeWalkerOp {
 
   /**
    * When a node is visited, this method is invoked with the node as parameter.
-   * 
+   *
    * @param e - the expansion node
    */
   void action(Expansion_ e);

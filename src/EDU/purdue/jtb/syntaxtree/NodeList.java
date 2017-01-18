@@ -23,7 +23,7 @@ public class NodeList implements INodeList {
   private int allocNb = 0;
 
   /** The serial version UID */
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1414L;
 
   /**
    * Initializes an empty list of nodes with a default first allocation.

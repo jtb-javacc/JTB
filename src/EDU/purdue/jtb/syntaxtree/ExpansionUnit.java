@@ -27,7 +27,7 @@ public class ExpansionUnit implements INode {
   public NodeChoice f0;
 
   /** The serial version UID */
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1414L;
 
   /**
    * Constructs the node with its child node.

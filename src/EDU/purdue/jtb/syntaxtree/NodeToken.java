@@ -36,7 +36,7 @@ public class NodeToken implements INode {
   public int kind;
 
   /** The serial version UID */
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1414L;
 
   /** The OS line separator */
   public static final String LS = System.getProperty("line.separator");

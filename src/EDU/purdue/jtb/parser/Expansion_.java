@@ -33,10 +33,11 @@ import java.util.Set;
 /**
  * Describes expansions - entities that may occur on the right hand sides of productions. This is
  * the base class of a bunch of other more specific classes.
- * 
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  * @version 1.4.8 : 12/2014 : MMa : improved javadoc ; removed overriding hashCode() method
+ * @version 1.4.14 : 01/2017 : MMa : renamed class
  */
 public class Expansion_ {
 
@@ -76,10 +77,12 @@ public class Expansion_ {
    * The ordinal of this node with respect to its parent.
    */
   int                ordinal;
+  // ModMMa 18/01/2017 these 3 fields are used in unused classes for JTB generation,
+  // so they can be removed when the unused classes are deleted
   /**
    * To avoid right-recursive loops when calculating follow sets, we use a generation number which
    * indicates if this expansion was visited by
-   * {@link LookaheadWalk#genFollowSet(List, Expansion_, long)} in the same generation. New
+   * {@link UnusedLookaheadWalk#genFollowSet(List, Expansion_, long)} in the same generation. New
    * generations are obtained by incrementing the static counter {@link #nextGenerationIndex}, and
    * the current generation is stored in the non-static variable {@link #myGeneration}.
    */
@@ -87,19 +90,19 @@ public class Expansion_ {
   /**
    * To avoid right-recursive loops when calculating follow sets, we use a generation number which
    * indicates if this expansion was visited by
-   * {@link LookaheadWalk#genFollowSet(List, Expansion_, long)} in the same generation. New
+   * {@link UnusedLookaheadWalk#genFollowSet(List, Expansion_, long)} in the same generation. New
    * generations are obtained by incrementing the static counter {@link #nextGenerationIndex}, and
    * the current generation is stored in the non-static variable {@link #myGeneration}.
    */
   public long        myGeneration        = 0;
   /**
-   * This flag is used for bookkeeping by the minimumSize method in class {@link ParseEngine}.
+   * This flag is used for bookkeeping by the minimumSize method in class {@link UnusedParseEngine}.
    */
   public boolean     inMinimumSize       = false;
 
   /** Reinitializes */
   public static void reInit() {
-    nextGenerationIndex = 1;
+    //    nextGenerationIndex = 1;
   }
 
   /**
@@ -138,8 +141,8 @@ public class Expansion_ {
    */
   public StringBuilder dump(final int indent,
                             @SuppressWarnings("unused") final Set<Object> alreadyDumped) {
-    final StringBuilder value = dumpPrefix(indent).append(System.identityHashCode(this))
-                                                  .append(" ").append(getSimpleName());
+    final StringBuilder value = dumpPrefix(indent).append(System.identityHashCode(this)).append(" ")
+                                                  .append(getSimpleName());
     return value;
   }
 
@@ -180,19 +183,19 @@ public class Expansion_ {
    * Subclasses enum type
    */
   public enum EXP_TYPE {
-    @SuppressWarnings("javadoc")
-    CHOICE, @SuppressWarnings("javadoc")
-    SEQUENCE, @SuppressWarnings("javadoc")
-    ONE_OR_MORE, @SuppressWarnings("javadoc")
-    ZERO_OR_MORE, @SuppressWarnings("javadoc")
-    ZERO_OR_ONE, @SuppressWarnings("javadoc")
-    LOOKAHEAD, @SuppressWarnings("javadoc")
-    TRY_BLOCK, @SuppressWarnings("javadoc")
-    R_CHOICE, @SuppressWarnings("javadoc")
-    R_SEQUENCE, @SuppressWarnings("javadoc")
-    R_ONE_OR_MORE, @SuppressWarnings("javadoc")
-    R_ZERO_OR_MORE, @SuppressWarnings("javadoc")
-    R_ZERO_OR_ONE, @SuppressWarnings("javadoc")
-    R_REPETITION_RANGE
+                        @SuppressWarnings("javadoc")
+                        CHOICE, @SuppressWarnings("javadoc")
+                        SEQUENCE, @SuppressWarnings("javadoc")
+                        ONE_OR_MORE, @SuppressWarnings("javadoc")
+                        ZERO_OR_MORE, @SuppressWarnings("javadoc")
+                        ZERO_OR_ONE, @SuppressWarnings("javadoc")
+                        LOOKAHEAD, @SuppressWarnings("javadoc")
+                        TRY_BLOCK, @SuppressWarnings("javadoc")
+                        R_CHOICE, @SuppressWarnings("javadoc")
+                        R_SEQUENCE, @SuppressWarnings("javadoc")
+                        R_ONE_OR_MORE, @SuppressWarnings("javadoc")
+                        R_ZERO_OR_MORE, @SuppressWarnings("javadoc")
+                        R_ZERO_OR_ONE, @SuppressWarnings("javadoc")
+                        R_REPETITION_RANGE
   };
 }

@@ -32,31 +32,34 @@ import java.util.Iterator;
 import EDU.purdue.jtb.parser.Expansion_.EXP_TYPE;
 
 /**
- * A set of routines that walk down the Expansion_ tree in various ways.
- * 
+ * A set of routines that walk down the Expansion_ tree in various ways.<br>
+ * Not used by JTB.
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  * @version 1.4.8 : 12/2014 : MMa : improved javadoc
+ * @version 1.4.14 : 01/2017 : MMa : renamed class
  */
-public final class ExpansionTreeWalker {
+public final class UnusedExpansionTreeWalker {
 
   /** Standard constructor */
-  private ExpansionTreeWalker() {
+  private UnusedExpansionTreeWalker() {
   }
 
   /**
    * Visits the nodes of the tree rooted at the first parameter in pre-order. i.e., it executes
-   * {@link ITreeWalkerOp#action(Expansion_)} on the second parameter first and then visits the
-   * children.
-   * 
+   * {@link UnusedITreeWalkerOp#action(Expansion_)} on the second parameter first and then visits
+   * the children.
+   *
    * @param node - the {@link Expansion_} node
-   * @param opObj - the {@link ITreeWalkerOp} object
+   * @param opObj - the {@link UnusedITreeWalkerOp} object
    */
-  static void preOrderWalk(final Expansion_ node, final ITreeWalkerOp opObj) {
+  static void preOrderWalk(final Expansion_ node, final UnusedITreeWalkerOp opObj) {
     opObj.action(node);
     if (opObj.goDeeper(node)) {
       if (node.expType == EXP_TYPE.CHOICE) {
-        for (final Iterator<Expansion_> it = ((Choice) node).getChoices().iterator(); it.hasNext();) {
+        for (final Iterator<Expansion_> it = ((Choice) node).getChoices()
+                                                            .iterator(); it.hasNext();) {
           preOrderWalk(it.next(), opObj);
         }
       } else if (node.expType == EXP_TYPE.SEQUENCE) {
@@ -71,13 +74,15 @@ public final class ExpansionTreeWalker {
         preOrderWalk(((ZeroOrOne) node).expansion, opObj);
       } else if (node.expType == EXP_TYPE.LOOKAHEAD) {
         final Expansion_ nested_e = ((Lookahead) node).getLaExpansion();
-        if (!(nested_e.expType == EXP_TYPE.SEQUENCE && (((Sequence) nested_e).units.get(0)) == node)) {
+        if (!(nested_e.expType == EXP_TYPE.SEQUENCE &&
+              (((Sequence) nested_e).units.get(0)) == node)) {
           preOrderWalk(nested_e, opObj);
         }
       } else if (node.expType == EXP_TYPE.TRY_BLOCK) {
         preOrderWalk(((TryBlock) node).exp, opObj);
       } else if (node.expType == EXP_TYPE.R_CHOICE) {
-        for (final Iterator<RegularExpression_> it = ((RChoice) node).getChoices().iterator(); it.hasNext();) {
+        for (final Iterator<RegularExpression_> it = ((RChoice) node).getChoices()
+                                                                     .iterator(); it.hasNext();) {
           preOrderWalk(it.next(), opObj);
         }
       } else if (node.expType == EXP_TYPE.R_SEQUENCE) {
@@ -98,16 +103,17 @@ public final class ExpansionTreeWalker {
 
   /**
    * Visits the nodes of the tree rooted at the first parameter in post-order. i.e., it visits the
-   * children first and then executes {@link ITreeWalkerOp#action(Expansion_)} on the second
+   * children first and then executes {@link UnusedITreeWalkerOp#action(Expansion_)} on the second
    * parameter.
-   * 
+   *
    * @param node - the {@link Expansion_} node
-   * @param opObj - the {@link ITreeWalkerOp} object
+   * @param opObj - the {@link UnusedITreeWalkerOp} object
    */
-  static void postOrderWalk(final Expansion_ node, final ITreeWalkerOp opObj) {
+  static void postOrderWalk(final Expansion_ node, final UnusedITreeWalkerOp opObj) {
     if (opObj.goDeeper(node)) {
       if (node.expType == EXP_TYPE.CHOICE) {
-        for (final Iterator<Expansion_> it = ((Choice) node).getChoices().iterator(); it.hasNext();) {
+        for (final Iterator<Expansion_> it = ((Choice) node).getChoices()
+                                                            .iterator(); it.hasNext();) {
           postOrderWalk(it.next(), opObj);
         }
       } else if (node.expType == EXP_TYPE.SEQUENCE) {
@@ -122,13 +128,15 @@ public final class ExpansionTreeWalker {
         postOrderWalk(((ZeroOrOne) node).expansion, opObj);
       } else if (node.expType == EXP_TYPE.LOOKAHEAD) {
         final Expansion_ nested_e = ((Lookahead) node).getLaExpansion();
-        if (!(nested_e.expType == EXP_TYPE.SEQUENCE && (((Sequence) nested_e).units.get(0)) == node)) {
+        if (!(nested_e.expType == EXP_TYPE.SEQUENCE &&
+              (((Sequence) nested_e).units.get(0)) == node)) {
           postOrderWalk(nested_e, opObj);
         }
       } else if (node.expType == EXP_TYPE.TRY_BLOCK) {
         postOrderWalk(((TryBlock) node).exp, opObj);
       } else if (node.expType == EXP_TYPE.R_CHOICE) {
-        for (final Iterator<RegularExpression_> it = ((RChoice) node).getChoices().iterator(); it.hasNext();) {
+        for (final Iterator<RegularExpression_> it = ((RChoice) node).getChoices()
+                                                                     .iterator(); it.hasNext();) {
           postOrderWalk(it.next(), opObj);
         }
       } else if (node.expType == EXP_TYPE.R_SEQUENCE) {

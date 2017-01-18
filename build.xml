@@ -17,7 +17,7 @@
    Here is how to use targets, to build and test a new version :
    - in jtb.xml, check / set jtb_last_version to the stable version (the one using jtb-xxx.jar)
       and jtb_curr_version to the new version (the one which will produce new_jtb-yyy.jar)
-   - in misc.Globals.java, set version to the same as jtb_curr_version
+   - in misc.Globals.java, set VERSION to the same as jtb_curr_version and SERIAL_ID also (without the dots)
    - make code modifications
    - run build_new_jtb_jar : it will create the new jar (jtb_new_jar) using the stable one (jtb_ok_jar)
    - if ok run test_generate_all : it will regenerate the files using the new jar (jtb_new_jar)

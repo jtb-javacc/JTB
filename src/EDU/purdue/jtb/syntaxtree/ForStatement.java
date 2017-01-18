@@ -35,7 +35,7 @@ public class ForStatement implements INode {
   public Statement f4;
 
   /** The serial version UID */
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1414L;
 
   /**
    * Constructs the node with all its children nodes.
