@@ -123,7 +123,7 @@ public class Options {
     optionValues.put("BUILD_PARSER", Boolean.TRUE);
     optionValues.put("BUILD_TOKEN_MANAGER", Boolean.TRUE);
     optionValues.put("CACHE_TOKENS", Boolean.FALSE);
-    optionValues.put("CHOICE_AMBIGUITY_CHECK", new Integer(2));
+    optionValues.put("CHOICE_AMBIGUITY_CHECK", Integer.valueOf(2));
     optionValues.put("COMMON_TOKEN_ACTION", Boolean.FALSE);
     optionValues.put("DEBUG_LOOKAHEAD", Boolean.FALSE);
     optionValues.put("DEBUG_PARSER", Boolean.FALSE);
@@ -139,10 +139,10 @@ public class Options {
     optionValues.put("JAVA_UNICODE_ESCAPE", Boolean.FALSE);
     optionValues.put("JDK_VERSION", "1.5");
     optionValues.put("KEEP_LINE_COLUMN", Boolean.TRUE);
-    optionValues.put("LOOKAHEAD", new Integer(1));
+    optionValues.put("LOOKAHEAD", Integer.valueOf(1));
     optionValues.put("NODE_PREFIX", "");
     optionValues.put("NODE_SUFFIX", "");
-    optionValues.put("OTHER_AMBIGUITY_CHECK", new Integer(1));
+    optionValues.put("OTHER_AMBIGUITY_CHECK", Integer.valueOf(1));
     optionValues.put("OUTPUT_DIRECTORY", ".");
     optionValues.put("SANITY_CHECK", Boolean.TRUE);
     optionValues.put("STATIC", Boolean.TRUE);
@@ -156,19 +156,19 @@ public class Options {
     // JTB Options (with default values or command line arguments)
     // -h & -si are not managed in an input file
     if (optionValues.get("JTB_CL") == null)
-      optionValues.put("JTB_CL", new Boolean(printClassList));
+      optionValues.put("JTB_CL", Boolean.valueOf(printClassList));
     if (optionValues.get("JTB_D") == null)
       optionValues.put("JTB_D", "");
     if (optionValues.get("JTB_DL") == null)
-      optionValues.put("JTB_DL", new Boolean(depthLevel));
+      optionValues.put("JTB_DL", Boolean.valueOf(depthLevel));
     if (optionValues.get("JTB_E") == null)
-      optionValues.put("JTB_E", new Boolean(noSemanticCheck));
+      optionValues.put("JTB_E", Boolean.valueOf(noSemanticCheck));
     if (optionValues.get("JTB_F") == null)
-      optionValues.put("JTB_F", new Boolean(descriptiveFieldNames));
+      optionValues.put("JTB_F", Boolean.valueOf(descriptiveFieldNames));
     if (optionValues.get("JTB_IA") == null)
-      optionValues.put("JTB_IA", new Boolean(inlineAcceptMethods));
+      optionValues.put("JTB_IA", Boolean.valueOf(inlineAcceptMethods));
     if (optionValues.get("JTB_JD") == null)
-      optionValues.put("JTB_JD", new Boolean(javaDocComments));
+      optionValues.put("JTB_JD", Boolean.valueOf(javaDocComments));
     if (optionValues.get("JTB_ND") == null)
       optionValues.put("JTB_ND", nodesDirName);
     if (optionValues.get("JTB_NP") == null)
@@ -184,13 +184,13 @@ public class Options {
     if (optionValues.get("JTB_P") == null)
       optionValues.put("JTB_P", "");
     if (optionValues.get("JTB_PP") == null)
-      optionValues.put("JTB_PP", new Boolean(parentPointer));
+      optionValues.put("JTB_PP", Boolean.valueOf(parentPointer));
     if (optionValues.get("JTB_PRINTER") == null)
-      optionValues.put("JTB_PRINTER", new Boolean(printerToolkit));
+      optionValues.put("JTB_PRINTER", Boolean.valueOf(printerToolkit));
     if (optionValues.get("JTB_SCHEME") == null)
-      optionValues.put("JTB_SCHEME", new Boolean(schemeToolkit));
+      optionValues.put("JTB_SCHEME", Boolean.valueOf(schemeToolkit));
     if (optionValues.get("JTB_TK") == null)
-      optionValues.put("JTB_TK", new Boolean(keepSpecialTokens));
+      optionValues.put("JTB_TK", Boolean.valueOf(keepSpecialTokens));
     if (optionValues.get("JTB_VA") == null)
       optionValues.put("JTB_VA", Boolean.FALSE);
     if (optionValues.get("JTB_VD") == null)
@@ -198,7 +198,7 @@ public class Options {
     if (optionValues.get("JTB_VP") == null)
       optionValues.put("JTB_VP", visitorsPackageName);
     if (optionValues.get("JTB_W") == null)
-      optionValues.put("JTB_W", new Boolean(noOverwrite));
+      optionValues.put("JTB_W", Boolean.valueOf(noOverwrite));
   }
 
   /**
@@ -349,7 +349,7 @@ public class Options {
             System.out.println("Warning: Bad option value in \"" + arg + "\" will be ignored.");
             return;
           }
-          val = new Integer(i);
+          val = Integer.valueOf(i);
         }
         catch (final NumberFormatException e) {
           val = s.substring(index + 1);

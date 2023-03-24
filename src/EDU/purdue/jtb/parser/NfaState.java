@@ -842,7 +842,7 @@ public class NfaState {
 
           if (!AllBitsSet(tmp))
             out.println("static final long[] jjbitVec" + lohiByteCnt + " = " + tmp);
-          lohiByteTab.put(tmp, ind = new Integer(lohiByteCnt++));
+          lohiByteTab.put(tmp, ind = Integer.valueOf(lohiByteCnt++));
         }
 
         tmpIndices[cnt++] = ind.intValue();
@@ -855,7 +855,7 @@ public class NfaState {
 
           if (!AllBitsSet(tmp))
             out.println("static final long[] jjbitVec" + lohiByteCnt + " = " + tmp);
-          lohiByteTab.put(tmp, ind = new Integer(lohiByteCnt++));
+          lohiByteTab.put(tmp, ind = Integer.valueOf(lohiByteCnt++));
         }
 
         tmpIndices[cnt++] = ind.intValue();
@@ -894,13 +894,13 @@ public class NfaState {
 
           if (!AllBitsSet(tmp))
             out.println("static final long[] jjbitVec" + lohiByteCnt + " = " + tmp);
-          lohiByteTab.put(tmp, ind = new Integer(lohiByteCnt++));
+          lohiByteTab.put(tmp, ind = Integer.valueOf(lohiByteCnt++));
         }
 
         if (loByteVec == null)
           loByteVec = new Vector<Integer>();
 
-        loByteVec.add(new Integer(i));
+        loByteVec.add(Integer.valueOf(i));
         loByteVec.add(ind);
       }
     }
@@ -987,7 +987,7 @@ public class NfaState {
                           stateSetString);
 
     if (nameSet.length == 1) {
-      stateNameToReturn = new Integer(nameSet[0]);
+      stateNameToReturn = Integer.valueOf(nameSet[0]);
       stateNameForComposite.put(stateSetString, stateNameToReturn);
       return nameSet[0];
     }
@@ -1029,7 +1029,7 @@ public class NfaState {
     } else
       tmp = nameSet[toRet];
 
-    stateNameToReturn = new Integer(tmp);
+    stateNameToReturn = Integer.valueOf(tmp);
     stateNameForComposite.put(stateSetString, stateNameToReturn);
     compositeStateTable.put(stateSetString, nameSet);
 

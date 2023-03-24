@@ -41,7 +41,7 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
 
   /** Initializes */
   static protected void initialize() {
-    final Integer i = new Integer(0);
+    final Integer i = Integer.valueOf(0);
     lexstate_S2I.put("DEFAULT", i);
     lexstate_I2S.put(i, "DEFAULT");
     simple_tokens_table.put("DEFAULT",
@@ -140,7 +140,7 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
         }
       }
       if (lexstate_S2I.get(p.lexStates[i]) == null) {
-        ii = new Integer(nextFreeLexState++);
+        ii = Integer.valueOf(nextFreeLexState++);
         lexstate_S2I.put(p.lexStates[i], ii);
         lexstate_I2S.put(ii, p.lexStates[i]);
         simple_tokens_table.put(p.lexStates[i],

@@ -340,7 +340,7 @@ public class ParseEngine extends JavaCCGlobals {
                 final int j1 = i / 32;
                 final int j2 = i % 32;
                 tokenMask[j1] |= 1 << j2;
-                final String s = (names_of_tokens.get(new Integer(i)));
+                final String s = (names_of_tokens.get(Integer.valueOf(i)));
                 if (s == null) {
                   retval.append(i);
                 } else {
@@ -566,7 +566,7 @@ public class ParseEngine extends JavaCCGlobals {
       }
       final String tail = e_nrw.rhsToken == null ? ");" : ")." + e_nrw.rhsToken.image + ";";
       if (e_nrw.label.equals("")) {
-        final Object label = names_of_tokens.get(new Integer(e_nrw.ordinal));
+        final Object label = names_of_tokens.get(Integer.valueOf(e_nrw.ordinal));
         if (label != null) {
           retval += "jj_consume_token(" + (String) label + tail;
         } else {
@@ -903,7 +903,7 @@ public class ParseEngine extends JavaCCGlobals {
     if (e instanceof RegularExpression_) {
       final RegularExpression_ e_nrw = (RegularExpression_) e;
       if (e_nrw.label.equals("")) {
-        final Object label = names_of_tokens.get(new Integer(e_nrw.ordinal));
+        final Object label = names_of_tokens.get(Integer.valueOf(e_nrw.ordinal));
         if (label != null) {
           out.println("    if (jj_scan_token(" + (String) label + ")) " + genReturn(true));
         } else {

@@ -300,10 +300,10 @@ public class Semanticize extends JavaCCGlobals {
           res.rexp.ordinal = tokenCount++;
         }
         if (!(res.rexp instanceof RJustName) && !res.rexp.label.equals("")) {
-          names_of_tokens.put(new Integer(res.rexp.ordinal), res.rexp.label);
+          names_of_tokens.put(Integer.valueOf(res.rexp.ordinal), res.rexp.label);
         }
         if (!(res.rexp instanceof RJustName)) {
-          rexps_of_tokens.put(new Integer(res.rexp.ordinal), res.rexp);
+          rexps_of_tokens.put(Integer.valueOf(res.rexp.ordinal), res.rexp);
         }
       }
     }
@@ -357,7 +357,7 @@ public class Semanticize extends JavaCCGlobals {
               jn.ordinal = tokenCount++;
               named_tokens_table.put(jn.label, jn);
               ordered_named_tokens.add(jn);
-              names_of_tokens.put(new Integer(jn.ordinal), jn.label);
+              names_of_tokens.put(Integer.valueOf(jn.ordinal), jn.label);
             } else {
               jn.ordinal = rexp.ordinal;
               prepareToRemove(respecs, res);
@@ -380,7 +380,7 @@ public class Semanticize extends JavaCCGlobals {
         final List<RegExprSpec_> respecs = tp.respecs;
         for (final Iterator<RegExprSpec_> it1 = respecs.iterator(); it1.hasNext();) {
           final RegExprSpec_ res = (it1.next());
-          final Integer ii = new Integer(res.rexp.ordinal);
+          final Integer ii = Integer.valueOf(res.rexp.ordinal);
           if (names_of_tokens.get(ii) == null) {
             JavaCCErrors.warning(res.rexp, "Unlabeled regular expression cannot be referred to by "
                                            + "user generated token manager.");

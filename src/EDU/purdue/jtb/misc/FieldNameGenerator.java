@@ -122,11 +122,11 @@ public class FieldNameGenerator {
       Integer suffix = nameTable.get(prefix);
 
       if (suffix == null) {
-        suffix = new Integer(0);
+        suffix = Integer.valueOf(0);
         nameTable.put(prefix, suffix);
         return prefix;
       } else {
-        suffix = new Integer(suffix.intValue() + 1);
+        suffix = Integer.valueOf(suffix.intValue() + 1);
         nameTable.put(prefix, suffix);
         return prefix + suffix.toString();
       }
