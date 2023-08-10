@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='utf-8' ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<title>How_to_build</title>
+		<style type="text/css">* {
+			
+  font-family: arial,helvetica,sans-serif;			
+  font-size:11pt;			
+  color:#006666;			
+}			
+h1 {			
+  font-size:14pt;			
+  color: red;			
+}			
+h2 {			
+  font-size:12pt;			
+  color: blue;			
+}			
+h3 {			
+  font-size:12pt;			
+  color: green;			
+}			
+h4 {			
+  font-size:11pt;			
+  color: maroon;			
+}			
+table {			
+  font-size:10pt;			
+}			
+code {			
+  font-family: courier new;			
+  font-size: 100%;			
+  color: maroon;			
+}			
+.GreenYellow {			
+  background-color: GreenYellow;			
+}			
+.NavajoWhite {			
+  background-color: NavajoWhite;			
+}			
+.PaleTurquoise {			
+  background-color: PaleTurquoise;			
+}			
+.Plum {			
+  background-color: Plum;			
+}			
+.green {			
+  color: green;			
+}			
+.red {			
+  color: red;			
+}			
+.bold-red {			
+  color: red;			
+  font-weight: bold;			
+}			
+ </style>
+	</head>
+	<body>
+		<h1 id="java-tree-builder-jtb-how-to-build-and-deploy"># Java Tree Builder (JTB) -How to build and deploy</h1>
+		<p>(for project admins) - Marc Mazas - Jan 13th, 2017</p>
+		<h2 id="build-a-new-jtb-version">Build a new JTB version</h2>
+		<ul>
+			<li>Check / update doc/a_faire_jtb.txt</li>
+			<li>Update doc/wiki/Releases.notes.md</li>
+			<li>Update other wiki pages doc/wiki if needed</li>
+			<li>Update versions: see comments in build.xml: set paths &amp; versions in the 4 different files</li>
+			<li>Build: see comments in build.xml: generate and rename to jtb-x.y.z.jar</li>
+			<li>Commit to the local repository </li>
+		</ul>
+		<h2 id="deploy-to-github-the-new-jtb-version">Deploy to GitHub the new JTB version</h2>
+		<ul>
+			<li>Check doc &amp; wiki updates</li>
+			<li>Push master</li>
+			<li>Update wiki pages (edit &amp; copy/paste the changed ones)</li>
+		</ul>
+		<h2 id="deploy-the-new-jtb-version-to-the-javacc-eclipse-plugin-at-sourceforge">Deploy the new JTB version to the JavaCC Eclipse plugin at SourceForge</h2>
+		<ul>
+			<li>Copy the last jar to the local plugin project lib folder (
+				<code>sf.eclipse.javacc.core/lib</code>)
+			</li>
+			<li>See the plugin README to set the version (
+				<code>sf.eclipse.javacc.site</code>)
+			</li>
+		</ul>
+		<h2 id="deploy-the-new-jtb-version-to-maven-central">Deploy the new JTB version to Maven Central</h2>
+		<p>TODO (FA)</p>
+	</body>
+</html>

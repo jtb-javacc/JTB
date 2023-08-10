@@ -1,0 +1,293 @@
+package EDU.purdue.jtb.visitor;
+
+import static EDU.purdue.jtb.syntaxtree.NodeConstants.*;
+import static EDU.purdue.jtb.visitor.GlobalDataBuilder.DONT_CREATE;
+
+import EDU.purdue.jtb.misc.Messages;
+import EDU.purdue.jtb.syntaxtree.*;
+import EDU.purdue.jtb.visitor.signature.NodeFieldsSignature;
+
+/**
+ * The {@link NodesToBeCreatedCounter} visitor walks down an {@link ExpansionChoices} or an
+ * {@link Expansion} or an {@link ExpansionUnit} and tells how many nodes must be created. This is
+ * used to create the appropriate base nodes which can disappear or change when nodes are indicated
+ * locally or globally not to be created.
+ *
+ * @author Marc Mazas
+ * @version 1.5.0 : 02/2017 : MMa : created
+ */
+class NodesToBeCreatedCounter extends DepthFirstIntVisitor {
+
+  /** The {@link GlobalDataBuilder} visitor */
+  final GlobalDataBuilder gdbv;
+
+  /**
+   * Constructor
+   *
+   * @param Agdbv - The {@link GlobalDataBuilder} visitor to use
+   */
+  public NodesToBeCreatedCounter(final GlobalDataBuilder Agdbv) {
+    gdbv = Agdbv;
+  }
+
+  /**
+   * Counts the nodes to be created below a an {@link ExpansionChoices}.
+   *
+   * @param n - an {@link ExpansionChoices}
+   * @return the number of nodes to be created
+   */
+  int count(final ExpansionChoices n) {
+    return visit(n);
+  }
+
+  /**
+   * Counts the nodes to be created below a an {@link Expansion}.
+   *
+   * @param n - an {@link Expansion}
+   * @return the number of nodes to be created
+   */
+  int count(final Expansion n) {
+    return visit(n);
+  }
+
+  /**
+   * Counts the nodes to be created below a an {@link ExpansionUnit}.
+   *
+   * @param n - an {@link ExpansionUnit}
+   * @return the number of nodes to be created
+   */
+  int count(final ExpansionUnit n) {
+    return visit(n);
+  }
+
+  /** Constant 0 */
+  final int ZERO = 0;
+
+  /** Constant 1 */
+  final int ONE  = 1;
+
+  /**
+   * Visits a {@link ExpansionChoices} node, whose children are the following :
+   * <p>
+   * f0 -> Expansion()<br>
+   * f1 -> ( #0 "|" #1 Expansion() )*<br>
+   * s: -1726831935<br>
+   *
+   * @param n - the node to visit
+   */
+  @Override
+  @NodeFieldsSignature({ -1726831935, JTB_SIG_EXPANSIONCHOICES, JTB_USER_EXPANSIONCHOICES })
+  public int visit(final ExpansionChoices n) {
+    int nRes = 0;
+    // f0 -> Expansion()
+    if (n.f0.accept(this) > 0) {
+      nRes++;
+    }
+    // f1 -> ( #0 "|" #1 Expansion() )*
+    final NodeListOptional n1 = n.f1;
+    if (n1.present()) {
+      for (int i = 0; i < n1.size(); i++) {
+        final NodeSequence seq = (NodeSequence) n1.elementAt(i);
+        // #1 Expansion()
+        if (seq.elementAt(1).accept(this) > 0) {
+          nRes++;
+        }
+      }
+    }
+    return nRes;
+  }
+
+  /**
+   * Visits a {@link Expansion} node, whose children are the following :
+   * <p>
+   * f0 -> ( #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" )?<br>
+   * f1 -> ( ExpansionUnit() )+<br>
+   * s: -2134365682<br>
+   *
+   * @param n - the node to visit
+   */
+  @Override
+  @NodeFieldsSignature({ -2134365682, JTB_SIG_EXPANSION, JTB_USER_EXPANSION })
+  public int visit(final Expansion n) {
+    int nRes = 0;
+    // f1 -> ( ExpansionUnit() )+
+    final NodeList n1 = n.f1;
+    for (int i = 0; i < n1.size(); i++) {
+      if (n1.elementAt(i).accept(this) > 0) {
+        nRes++;
+      }
+    }
+    return nRes;
+  }
+
+  /**
+   * Visits a {@link ExpansionUnit} node, whose child is the following :
+   * <p>
+   * f0 -> . %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"<br>
+   * .. .. | %1 Block()<br>
+   * .. .. | %2 #0 "[" #1 ExpansionChoices() #2 "]"<br>
+   * .. .. | %3 ExpansionUnitTCF()<br>
+   * .. .. | %4 #0 [ $0 PrimaryExpression() $1 "=" ]<br>
+   * .. .. . .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()<br>
+   * .. .. . .. .. . .. $2 [ "!" ]<br>
+   * .. .. . .. .. | &1 $0 RegularExpression()<br>
+   * .. .. . .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ]<br>
+   * .. .. . .. .. . .. $2 [ "!" ] )<br>
+   * .. .. | %5 #0 "(" #1 ExpansionChoices() #2 ")"<br>
+   * .. .. . .. #3 ( &0 "+"<br>
+   * .. .. . .. .. | &1 "*"<br>
+   * .. .. . .. .. | &2 "?" )?<br>
+   * s: 1116287061<br>
+   *
+   * @param n - the node to visit
+   */
+  @Override
+  @NodeFieldsSignature({ 1116287061, JTB_SIG_EXPANSIONUNIT, JTB_USER_EXPANSIONUNIT })
+  public int visit(final ExpansionUnit n) {
+    final NodeChoice nch = n.f0;
+    final INode ich = nch.choice;
+    switch (nch.which) {
+      case 0:
+        return ZERO;
+      case 1:
+        return ZERO;
+      case 2:
+        // %2 #0 "[" #1 ExpansionChoices() #2 "]"
+        // #1 ExpansionChoices()
+        return ((NodeSequence) ich).elementAt(1).accept(this) > 0 ? ONE : ZERO;
+      case 3:
+        // %3 ExpansionUnitTCF()
+        return ich.accept(this) > 0 ? ONE : ZERO;
+      case 4:
+        // %4 #0 [ $0 PrimaryExpression() $1 "=" ]
+        // .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()
+        // .. .. .. $2 [ "!" ]
+        // .. .. | &1 $0 RegularExpression()
+        // .. .. .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
+        // .. .. .. $2 [ "!" ] )
+        final NodeSequence seq = (NodeSequence) ich;
+        // #1 ( &0 $0 IdentifierAsString() $1 Arguments()
+        // .. .. $2 [ "!" ]
+        // .. | &1 $0 RegularExpression()
+        // .. .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
+        // .. .. $2 [ "!" ] )
+        final NodeChoice nch1 = (NodeChoice) seq.elementAt(1);
+        final INode ich1 = nch1.choice;
+        switch (nch1.which) {
+          case 0:
+            // &0 $0 IdentifierAsString() $1 Arguments()
+            // .. $2 [ "!" ]
+            if (((NodeOptional) ((NodeSequence) ich1).elementAt(2)).present()) {
+              return ZERO;
+            }
+            final IdentifierAsString ias = (IdentifierAsString) ((NodeSequence) ich1).elementAt(0);
+            if (gdbv.getNcnHT().containsKey(ias.f0.tokenImage)) {
+              return ZERO;
+            } else {
+              return ONE;
+            }
+          case 1:
+            // &1 $0 RegularExpression()
+            // .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
+            // .. $2 [ "!" ]
+            if (((NodeOptional) ((NodeSequence) ich1).elementAt(2)).present()) {
+              // do not create node so do not walk down
+              return ZERO;
+            }
+            // $0 RegularExpression()
+            return ((NodeSequence) ich1).elementAt(0).accept(this) > 0 ? ONE : ZERO;
+          default:
+            final String msg = "Invalid nch1.which = " + String.valueOf(nch1.which);
+            Messages.hardErr(msg);
+            throw new ProgrammaticError(msg);
+        }
+      case 5:
+        // %5 #0 "(" #1 ExpansionChoices() #2 ")"
+        // .. #3 ( &0 "+"
+        // .. .. | &1 "*"
+        // .. .. | &2 "?" )?
+        // #1 ExpansionChoices()
+        return ((NodeSequence) ich).elementAt(1).accept(this) > 0 ? ONE : ZERO;
+      default:
+        final String msg = "Invalid nch.which = " + String.valueOf(nch.which);
+        Messages.hardErr(msg);
+        throw new ProgrammaticError(msg);
+    }
+  }
+
+  /**
+   * Visits a {@link ExpansionUnitTCF} node, whose children are the following :
+   * <p>
+   * f0 -> "try"<br>
+   * f1 -> "{"<br>
+   * f2 -> ExpansionChoices()<br>
+   * f3 -> "}"<br>
+   * f4 -> ( #0 "catch" #1 "(" #2 Name() #3 < IDENTIFIER > #4 ")" #5 Block() )*<br>
+   * f5 -> [ #0 "finally" #1 Block() ]<br>
+   * s: 1155846389<br>
+   *
+   * @param n - the node to visit
+   */
+  @Override
+  @NodeFieldsSignature({ 1155846389, JTB_SIG_EXPANSIONUNITTCF, JTB_USER_EXPANSIONUNITTCF })
+  public int visit(final ExpansionUnitTCF n) {
+    return n.f2.accept(this) > 0 ? ONE : ZERO;
+  }
+
+  /**
+   * Visits a {@link RegularExpression} node, whose child is the following :
+   * <p>
+   * f0 -> . %0 StringLiteral()<br>
+   * .. .. | %1 #0 "<"<br>
+   * .. .. . .. #1 [ $0 [ "#" ]<br>
+   * .. .. . .. .. . $1 IdentifierAsString() $2 ":" ]<br>
+   * .. .. . .. #2 ComplexRegularExpressionChoices() #3 ">"<br>
+   * .. .. | %2 #0 "<" #1 IdentifierAsString() #2 ">"<br>
+   * .. .. | %3 #0 "<" #1 "EOF" #2 ">"<br>
+   * s: 1719627151<br>
+   *
+   * @param n - the node to visit
+   */
+  @Override
+  @NodeFieldsSignature({ 1719627151, JTB_SIG_REGULAREXPRESSION, JTB_USER_REGULAREXPRESSION })
+  public int visit(final RegularExpression n) {
+    // note : if we came down to here it means we have to create the node
+    // f0 -> . %0 StringLiteral()
+    // .. .. | %1 #0 "<"
+    // .. .. . .. #1 [ $0 [ "#" ]
+    // .. .. . .. .. . $1 IdentifierAsString() $2 ":" ]
+    // .. .. . .. #2 ComplexRegularExpressionChoices() #3 ">"
+    // .. .. | %2 #0 "<" #1 IdentifierAsString() #2 ">"
+    // .. .. | %3 #0 "<" #1 "EOF" #2 ">"
+    final NodeChoice nch = n.f0;
+    final INode ich = nch.choice;
+    switch (nch.which) {
+      case 0:
+        // %0 StringLiteral()
+        return ONE;
+      case 1:
+        // %1 #0 "<"
+        // .. #1 [ $0 [ "#" ]
+        // .. .. . $1 IdentifierAsString() $2 ":" ]
+        // .. #2 ComplexRegularExpressionChoices() #3 ">"
+        return ONE;
+      case 2:
+        // %2 #0 "<" #1 IdentifierAsString() #2 ">"
+        final NodeSequence seq9 = (NodeSequence) ich;
+        // #1 IdentifierAsString()
+        final INode seq11 = seq9.elementAt(1);
+        final String ias = ((IdentifierAsString) seq11).f0.tokenImage;
+        return DONT_CREATE.equals(gdbv.getTokenHT().get(ias)) ||
+               gdbv.getNcnHT().containsKey(ias) ? ZERO : ONE;
+      case 3:
+        // %3 #0 "<" #1 "EOF" #2 ">"
+        // Annotator creates a token node for < EOF > (but it can be suppressed)
+        return ONE;
+      default:
+        final String msg = "Invalid nch.which = " + String.valueOf(nch.which);
+        Messages.hardErr(msg);
+        throw new ProgrammaticError(msg);
+    }
+  }
+
+}

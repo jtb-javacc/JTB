@@ -1,0 +1,52 @@
+* {
+  font-family: arial,helvetica,sans-serif;
+  font-size:11pt;
+  color:#006666;
+}
+h1 {
+  font-size:14pt;
+  color: red;
+}
+h2 {
+  font-size:12pt;
+  color: blue;
+}
+h3 {
+  font-size:12pt;
+  color: green;
+}
+h4 {
+  font-size:11pt;
+  color: maroon;
+}
+table {
+  font-size:10pt;
+}
+code {
+  font-family: courier new;
+  font-size: 100%;
+  color: maroon;
+}
+.GreenYellow {
+  background-color: GreenYellow;
+}
+.NavajoWhite {
+  background-color: NavajoWhite;
+}
+.PaleTurquoise {
+  background-color: PaleTurquoise;
+}
+.Plum {
+  background-color: Plum;
+}
+.green {
+  color: green;
+}
+.red {
+  color: red;
+}
+.bold-red {
+  color: red;
+  font-weight: bold;
+}
+  

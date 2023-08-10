@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE fakeforremovingdtdvalidationinfo> 
+<!-- javacc_props.xml. Defines JavaCC properties, imported by build.xml.
+     Marc Mazas - Sopra Steria Group - 10/2020-04/2021 - Francis Andre - 03/2017 -->
+<project name="javacc_props" default="echo_javacc_props">
+
+  <!-- Set this JavaCC jar's directory according to your environment -->
+  <property name="javacc_imp_dir" value="lib" />
+  <!-- property name="javacc_imp_dir" value="C:\Devs\Parsers-workspace\javacc-svn_java.net\target" / -->
+  <!-- property name="javacc_imp_dir" value="Z:/git/javacc/target" / -->
+
+  <!-- JavaCC jar to use -->
+  <property name="javacc_ok_jar" value="${javacc_imp_dir}/javacc-7.0.12.jar" />
+  <!--property name="javacc_ok_jar" value="${javacc_imp_dir}/javacc-7.0.10.jar" /-->
+  <!--property name="javacc_ok_jar" value="${javacc_imp_dir}/javacc-5.0.jar" /-->
+  <property name="javacc_main" value="org.javacc.parser.Main" />
+  <property name="jjtree_main" value="org.javacc.jjtree.Main" />
+
+  <!-- echo some JavaCC / JJTree properties -->
+  <target name="echo_javacc_props">
+    <echo message="javacc_imp_dir=${javacc_imp_dir}" />
+    <echo message="javacc_ok_jar=${javacc_ok_jar}" />
+    <echo message="javacc_main=${javacc_main}" />
+  </target>
+</project>

@@ -1,0 +1,339 @@
+<?xml version='1.0' encoding='utf-8' ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<title>Release_notes</title>
+		<style type="text/css">* {
+			
+  font-family: arial,helvetica,sans-serif;			
+  font-size:11pt;			
+  color:#006666;			
+}			
+h1 {			
+  font-size:14pt;			
+  color: red;			
+}			
+h2 {			
+  font-size:12pt;			
+  color: blue;			
+}			
+h3 {			
+  font-size:12pt;			
+  color: green;			
+}			
+h4 {			
+  font-size:11pt;			
+  color: maroon;			
+}			
+table {			
+  font-size:10pt;			
+}			
+code {			
+  font-family: courier new;			
+  font-size: 100%;			
+  color: maroon;			
+}			
+.GreenYellow {			
+  background-color: GreenYellow;			
+}			
+.NavajoWhite {			
+  background-color: NavajoWhite;			
+}			
+.PaleTurquoise {			
+  background-color: PaleTurquoise;			
+}			
+.Plum {			
+  background-color: Plum;			
+}			
+.green {			
+  color: green;			
+}			
+.red {			
+  color: red;			
+}			
+.bold-red {			
+  color: red;			
+  font-weight: bold;			
+}			
+ </style>
+	</head>
+	<body>
+		<h1 id="java-tree-builder-jtb-release-notes-dd-mm-yy"># Java Tree Builder (JTB) - Release notes (dd/mm/yy)</h1>
+		<h3 id="version-1-5-1-jtb-1-5-1-jar-of-xx-08-2023-not-yet-committed-on-github-included-in-the-eclipse-javacc-plug-in-v1-6-1">Version 1.5.1 - jtb-1.5.1.jar of xx/08/2023, not yet committed on GitHub, included in the Eclipse JavaCC Plug-in v1.6.1</h3>
+		<ul>
+			<li>fixed node choice generation issue</li>
+			<li>changed package, grammar and out file names to be more aligned</li>
+			<li>improved imports generation with different combinations of options</li>
+			<li>improved build of no options grammars to align with Eclipse build</li>
+			<li>added optional annotations in catch of ExpansionUnitTCF</li>
+			<li>enriched test cases with no package grammars and more combinations of options</li>
+		</ul>
+		<h3 id="version-1-5-0-jtb-1-5-0-jar-of-03-05-2021-never-committed-on-github-included-in-the-eclipse-javacc-plug-in-v1-6-0">Version 1.5.0 - jtb-1.5.0.jar of 03/05/2021, never committed on GitHub, included in the Eclipse JavaCC Plug-in v1.6.0</h3>
+		<ul>
+			<li>updated docs (README.md, doc/Release_notes.md, doc/HowToBuild.md), added doc/wiki/*</li>
+			<li>needs JDK 1.8 now; project in UTF-8; tested with JavaCC 7.0.10</li>
+			<li>internal refactoring and code changes (removed some warnings and used try-with-resource, added Java nature,
+				   renamed unused classes, put back generated serialVersionUID to the JTB Version, reworked ClassInfo and
+				   added FieldInfo, replaced iterator loops by enhanced loops, renamed classes, restructured packages,
+				   used stderr and stdout, suppressed class FileExistsException, replaced deprecated calls)</li>
+			<li>suppressed the JTBToolkit class generated in the parser's file but after the parser's class, normalized file names</li>
+			<li>fixed grammar for optional TypeArguments in AllocationExpression</li>
+			<li>added generation of the NodeConstants class</li>
+			<li>added optional generation of node scope hook class, interface &amp; method calls in BNF Productions</li>
+			<li>added the do not generate visitors option (novis)</li>
+			<li>rewrote the visitors generation, allowing the user to specify their names, return and argument types</li>
+			<li>added generation of a control signature mechanism in classes and visit methods (for helping detecting at
+				   compile time changes impacting the visitors), and the do not generate signature annotations and classes option</li>
+			<li>added optional generation of nodes children methods</li>
+			<li>added optional custom classes generation through call to a method of an external class (e.g. class using FreeMarker
+				   templates)</li>
+			<li>parallelized user nodes classes generation</li>
+			<li>modified handling of special tokens (JTB_TK store special tokens in JTB nodes and JTB_TKJJ prints them)</li>
+			<li>made JTB non static</li>
+			<li>removed generation of NodeTCF (nodes for try ExpansionChoices / catch / finally) and TCF in visitors</li>
+			<li>added a significant test suite with tests and examples grammars (compilation and run)</li>
+			<li>enriched / changed build.xml targets (suppressWarnings, code coverage with JaCoCo)</li>
+			<li>reworked processing of nodes not to be created</li>
+			<li>created a data model for the FreeMarker template engine</li>
+			<li>fixed an issue in method names generation (with prefix / suffix and node not to be generated)</li>
+			<li>fixed an issue in array return types generation</li>
+			<li>passed Expression as optional in semantic lookahead</li>
+			<li>changed displayed paths in absolute, without ../..</li>
+			<li>added a test with ("xxx"|{}) (issue #86)</li>
+		</ul>
+		<h3 id="version-1-4-13-12-01-2017">Version 1.4.13 - 12/01/2017</h3>
+		<ul>
+			<li>fixed printing a local variable declaration with a modifier</li>
+			<li>moved properties from build.xml to jtb.xml (dev)</li>
+			<li>added options to generate correctly the grammar in Eclipse (dev)</li>
+		</ul>
+		<h3 id="version-1-4-12">Version 1.4.12</h3>
+		<ul>
+			<li>publish JTB as a Maven artifact to Maven Central</li>
+		</ul>
+		<h3 id="version-1-4-11-xx-04-2016">Version 1.4.11 - xx/04/2016</h3>
+		<ul>
+			<li>fixed (added) spaces between the '&lt;' and '&gt;' and the token labels in the generated javadoc comments</li>
+			<li>fixed the conditions on displaying the "warning:  Empty choice : a NodeChoice with a 'null' choice member ..."</li>
+			<li>fixed column numbers in messages</li>
+		</ul>
+		<h3 id="version-1-4-10-13-04-2015">Version 1.4.10 - 13/04/2015</h3>
+		<ul>
+			<li>JTB#main() returns error codes</li>
+		</ul>
+		<h3 id="version-1-4-9-2015">Version 1.4.9 - ??/??/2015</h3>
+		<ul>
+			<li>same as 1.4.8.fix_a</li>
+		</ul>
+		<h3 id="version-1-4-8-fix_a-01-2015">Version 1.4.8.fix_a - ??/01/2015</h3>
+		<ul>
+			<li>fixed regression (Annotator#bnfFinalActions())</li>
+		</ul>
+		<h3 id="version-1-4-8-30-12-2014">Version 1.4.8 - 30/12/2014</h3>
+		<ul>
+			<li>removed warnings everywhere except in some big classes in parser</li>
+			<li>removed the ordinal field in RegularExpression which was hiding the one in the superclass Expansion_</li>
+			<li>renamed TreeWalkerOp in ITreeWalkerOp</li>
+			<li>switched from implementing interfaces to import static for constants</li>
+			<li>changed ### Versions tags from 4.2.j.m to 5.0</li>
+			<li>improved printing specials</li>
+			<li>fixed the ExplicitConstructorInvocation production</li>
+			<li>fixed java blocs generation (Annotator visit LocalVariableDeclaration)</li>
+			<li>modified the warning message on ignored LOOKAHEAD (as it can actually be not ignored)</li>
+			<li>added short names generation for generated intermediate variables (default)</li>
+			<li>fixed printing specials in generating JTB options</li>
+			<li>added node_descriptor() and node_descriptor_expression() and modified JavaCodeProduction, BNFProduction,
+				   Expansion &amp; MethodDeclaration to allow a node descriptor</li>
+			<li>added @Override and @SuppressWarnings("unused") annotations in the generated visitors and base classes</li>
+			<li>added ReferenceType() in ExplicitConstructorInvocation() in the grammar</li>
+			<li>added AnnotationTypeDeclaration() in ClassOrInterfaceBodyDeclaration() in the grammar</li>
+			<li>changed in NodeToken.java  public ArrayList<NodeToken> specialTokens; into public List<NodeToken> specialTokens;</li>
+			<li>fixed prefix / suffix in lookahead</li>
+			<li>added "%" syntax on javacode</li>
+			<li>fixed bug 3164860</li>
+			<li>added control that a javacode production is not declared more than once</li>
+			<li>fixed problem "null choice for an empty choice"</li>
+		</ul>
+		<h3 id="version-1-4-7-25-09-2012">Version 1.4.7 - 25/09/2012</h3>
+		<ul>
+			<li>added sub comments in the generated visitors java code</li>
+			<li>did some optimizations</li>
+			<li>fixed bugs JTB-1 &amp; JTB-2</li>
+			<li>fixed some generation errors</li>
+			<li>added a check when 'n = prod()' and 'void prod()'</li>
+			<li>added the '!' syntax for not generating a node creation (in a BNFProduction, RegExprSpec and ExpansionUnit)</li>
+			<li>fixed some Java grammar issues and did some refactoring</li>
+			<li>added column numbers in messages</li>
+			<li>performed tests on more limit cases</li>
+			<li>fixed missing <EOF> in JavaCCInput() and parentheses in Annotation()</li>
+		</ul>
+		<h3 id="version-1-4-6-25-01-2011">Version 1.4.6 - 25/01/2011</h3>
+		<ul>
+			<li>added -va and -npfx and -nsfx options (Francis Andre)</li>
+			<li>added java code formatter &amp; clean up preference files</li>
+		</ul>
+		<h3 id="version-1-4-5-06-12-2010">Version 1.4.5 - 06/12/2010</h3>
+		<ul>
+			<li>Convert nodes and visitors output directories to absolute paths</li>
+		</ul>
+		<h3 id="version-1-4-4-12-07-2010">Version 1.4.4 - 12/07/2010</h3>
+		<ul>
+			<li>Fixed missing space after throws issue in visiting MethodDeclaration &amp; ConstructorDeclaration of JavaPrinter</li>
+			<li>Fixed index issue in visiting TypeArguments of JavaPrinter</li>
+		</ul>
+		<h3 id="version-1-4-3-2-26-04-2010">Version 1.4.3.2 - 26/04/2010</h3>
+		<ul>
+			<li>Fixed index issue in visiting Expansion of AcceptInliner (bug #2991455)</li>
+		</ul>
+		<h3 id="version-1-4-3-1-23-04-2010">Version 1.4.3.1 - 23/04/2010</h3>
+		<ul>
+			<li>Fixed output of AcceptInliner for -f option (bug #2989497)</li>
+			<li>Fixed case 4 of getExpUnitBaseNodeType of CommentsPrinter (bug #2990962) and tuned number of dots</li>
+		</ul>
+		<h3 id="version-1-4-3-31-03-2010">Version 1.4.3 - 31/03/2010</h3>
+		<ul>
+			<li>Added node declarations initialization in all cases</li>
+			<li>Fixed output of else bug in Annotator</li>
+			<li>Fixed output of constructor in TreeFormatter</li>
+		</ul>
+		<h3 id="version-1-4-2-25-02-2010">Version 1.4.2 - 25/02/2010</h3>
+		<ul>
+			<li>Fixed missing "java.util package" in generated JTBToolkit class</li>
+			<li>Fixed issue in visiting ExpansionChoices of AcceptInliner</li>
+		</ul>
+		<h3 id="version-1-4-1-17-02-2010">Version 1.4.1 - 17/02/2010</h3>
+		<ul>
+			<li>Fixed unprocessed n.f0.which == 0 case in visit(ExpansionUnit) in SemanticChecker</li>
+			<li>Fixed missing static modifier for JTB generated return variables in case static = true
+				   in Annotator &amp; JTB &amp; Globals</li>
+		</ul>
+		<h3 id="version-1-4-0-2-21-01-2010">Version 1.4.0.2 - 21/01/2010</h3>
+		<ul>
+			<li>Fixed output of else bug in JavaPrinter</li>
+		</ul>
+		<h3 id="version-1-4-0-1-20-01-2010">Version 1.4.0.1 - 20/01/2010</h3>
+		<ul>
+			<li>Fixed command line options overwrite bug</li>
+		</ul>
+		<h3 id="version-1-4-0-19-11-2009">Version 1.4.0 - 19/11/2009</h3>
+		<ul>
+			<li>Fixed NPE bug in visitors generation when no -jd is set</li>
+			<li>Added JTB options commenting in the output file</li>
+			<li>Added parent directories creation</li>
+		</ul>
+		<h3 id="version-1-4-j-m-15-16-11-2009">Version 1.4.j.m.15 - 16/11/2009</h3>
+		<ul>
+			<li>Back to JDK 1.5 (for use under the JavaCC Eclipse Plug-in)</li>
+			<li>Changed to JavaCC 5.0 the JavaCC jar used to compile the jtb.out.jj file</li>
+			<li>Added -d, -nd &amp; -vd options, modified -p, -pd &amp; -vp options (to separate directories from packages)</li>
+		</ul>
+		<h3 id="version-1-4-j-m-14-16-11-2009">Version 1.4.j.m.14 - 16/11/2009</h3>
+		<ul>
+			<li>Copied and optimized visit(ExpansionChoices) and visit(Expansion) from
+				   DepthFirstVoidVisitor to ExpansionUnitTypeCounter</li>
+			<li>Extracted ExpansionUnitInTCF production in grammar</li>
+			<li>Modified visitors and generators accordingly</li>
+			<li>Finished ExpansionUnitInTCF management in DepthFirstVisitorGenerator</li>
+		</ul>
+		<h3 id="version-1-4-j-m-13-25-08-2009-15-01">Version 1.4.j.m.13 - 25/08/2009 15:01</h3>
+		<ul>
+			<li>Added part of ExpansionUnit type 3 management in visitors</li>
+		</ul>
+		<h3 id="version-1-4-j-m-12-24-08-2009-18-07">Version 1.4.j.m.12 - 24/08/2009 18.07</h3>
+		<ul>
+			<li>Inlined accept methods in generated visitors with new class AcceptInliner</li>
+			<li>Added -dl option for depth level management generation</li>
+			<li>Fixed bug in CommentPrinter</li>
+			<li>Fixed bug in Annotator</li>
+		</ul>
+		<h3 id="version-1-4-j-m-11-29-07-2009-18-21">Version 1.4.j.m.11 - 29/07/2009 18:21</h3>
+		<ul>
+			<li>Fixed visit ReturnStatement in Annotator</li>
+		</ul>
+		<h3 id="version-1-4-j-m-10-29-07-2009-14-22">Version 1.4.j.m.10 - 29/07/2009 14:22</h3>
+		<ul>
+			<li>Added which value in javadoc comments for productions with choices</li>
+			<li>Removed arguments in javadoc comments for productions</li>
+			<li>Print on an indented new line regular expressions in javadoc comments for productions</li>
+			<li>Changed behavior of option -jd: now turns on printing classes, methods and fields javadoc comments</li>
+			<li>Added NodeList and NodeListOptional list of nodes allocation increment algorithm</li>
+			<li>Fixed parent pointer methods</li>
+			<li>Added -ia option for inlining visitor accept methods on base nodes</li>
+			<li>Added switch statement in inlining a NodeChoice</li>
+			<li>Renamed CommentPrinter into CommentsPrinter and moved it from misc.ClassInfo to visitor</li>
+			<li>Added fieldComments in ClassInfo and associated methods</li>
+			<li>Enhanced field comments with indentation</li>
+			<li>Added StringBuilders and javadoc in TreeFormatterGenerator and TreeDumperGenerator</li>
+			<li>Changed \n into line.separator in all generation classes</li>
+			<li>Updated all grammar comments in visitors</li>
+		</ul>
+		<h3 id="version-1-4-j-m-9-12-07-2009-20-48">Version 1.4.j.m.9 - 12/07/2009 20:48</h3>
+		<ul>
+			<li>Removed "only non void JavaCodeProduction" limitation</li>
+			<li>Fixed some errors</li>
+			<li>Added proper handling of PrimaryExpression() = Identifier() ... | RegularExpression() ...</li>
+			<li>Cleaned grammar with temporary modifications for generics, return types and pe() = id() | re()</li>
+		</ul>
+		<h3 id="version-1-4-j-m-8-10-07-2009-17-19">Version 1.4.j.m.8 - 10/07/2009 17:19</h3>
+		<ul>
+			<li>Removed "only void BNFProduction result type" limitation</li>
+			<li>Removed ModMMa comments, fixed some javadoc comments</li>
+		</ul>
+		<h3 id="version-1-4-j-m-7-05-07-2009-09-05">Version 1.4.j.m.7 - 05/07/2009 09:05</h3>
+		<ul>
+			<li>Fixed calls to AccessModifiers</li>
+			<li>Fixed some specials printing</li>
+			<li>Added missing methods in JavaPrinter</li>
+			<li>Renamed Printer in JavaCCPrinter</li>
+			<li>Enhanced generated comments</li>
+			<li>Added javadoc comments to visitors and generators</li>
+			<li>Added javadoc comments to JTB classes</li>
+		</ul>
+		<h3 id="version-1-4-j-m-6-25-06-2009-09-18">Version 1.4.j.m.6 - 25/06/2009 09:18</h3>
+		<ul>
+			<li>"instanceof" changed into "int variable" in ExpansionTreeWalker forgotten method</li>
+			<li>Removed jtbgram.jtb temporary changes for being processed by JTB 1.3.2 on generics</li>
+			<li>Generics types put back in jtbgram.jtb</li>
+		</ul>
+		<h3 id="version-1-4-j-m-5-22-06-2009-18-45">Version 1.4.j.m.5 - 22/06/2009 18:45</h3>
+		<ul>
+			<li>Refactoring ClassInfo, Printer, JavaPrinter, Annotator, JavaStringMaker (StringBuilders, BufferedWriters,
+				   methods signatures)</li>
+			<li>Renames JavaStringMaker into JavaBranchPrinter</li>
+			<li>Vectors changed into ArrayLists</li>
+			<li>"instanceof" changed into "int variable" in ExpansionTreeWalker and Expansion_ subclasses</li>
+			<li>Changed direct use of node.tokenImage in node.accept to be able to print specials</li>
+			<li>Moved addUnicodeEscapes to UnicodeConverter and use it for printing tokens in literals</li>
+			<li>Corrections in JavaPrinter</li>
+		</ul>
+		<h3 id="version-1-4-j-m-4-18-06-2009-12-41">Version 1.4.j.m.4 - 18/06/2009 12:41</h3>
+		<ul>
+			<li>Refactoring misc files : </li>
+			<li>Added base classes and visitors related constants in Globals</li>
+			<li>Auto classes refactored (StringBuilders, BufferedWriters, renamed, common code, ...)
+				   and all merged in BaseClasses</li>
+			<li>Depth First Visitor Generators refactored (StringBuilders, BufferedWriters, renamed, common code, ...)
+				   and all merged in DepthFirstVisitorsGenerator</li>
+			<li>toolkit files deleted or renamed and moved up to misc</li>
+		</ul>
+		<h3 id="version-1-4-j-m-3-12-06-2009-18-03">Version 1.4.j.m.3 - 12/06/2009 18:03</h3>
+		<ul>
+			<li>Work on syntaxtree classes : node interfaces and classes for visitors</li>
+			<li>Renamed the Node and NodeListInterface interfaces into INode and INodeList</li>
+			<li>jar generated and jtb parser looks functional</li>
+		</ul>
+		<h3 id="version-1-4-j-m-2-12-06-2009-12-06">Version 1.4.j.m.2 - 12/06/2009 12:06</h3>
+		<ul>
+			<li>Work on ClassInfo, and JavaPrinter, Printer &amp; Annotator visitors :
+				   adapted to JavaCC 4.2 grammar, performance improvements</li>
+			<li>jar generated and jtb parser looks functional</li>
+		</ul>
+		<h3 id="version-1-4-j-m-1-11-06-2009-15-26">Version 1.4.j.m.1 - 11/06/2009 15:26</h3>
+		<ul>
+			<li>parser classes taken from JavaCC 4.2 classes and adapted :
+				   no generics, no assignation of bnfproduction return info</li>
+			<li>build_jtb.xml and build_jtb_props.xml adapted</li>
+			<li>jar generated but jtb parser not functional</li>
+		</ul>
+	</body>
+</html>

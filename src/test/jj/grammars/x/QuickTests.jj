@@ -1,0 +1,63 @@
+/**
+ * To quickly check some JJ aspects.
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */options{  static = true;
+  IGNORE_CASE = false; // (default false)  UNICODE_INPUT = true; // (default false)
+  //  JAVA_UNICODE_ESCAPE = true; // (default false)
+  OUTPUT_DIRECTORY = "../../../../../target/generated-tests/jj/grammars/x";
+}PARSER_BEGIN(QuickTests)package grammars.x;
+
+public class QuickTests{  public static void main(String args []) throws ParseException  {    QuickTests parser = new QuickTests(System.in);
+    boolean done = false;    while (!done)    {      System.out.println("Reading from standard input...");
+      System.out.println("Ex1: babb!; / Ex2: babc; / Ex3: bacb!; / Ex4: bacc;");
+      try      {        switch (QuickTests.one_line())        {          case 0 :           System.out.println("OK.");          break;          case 1 :           System.out.println("Goodbye.");
+          done = true;          break;          default :           break;        }      }      catch (Exception e)      {        System.out.println("NOK.");        System.out.println(e.getMessage());        QuickTests.ReInit(System.in);      }      catch (Error e)      {        System.out.println("Oops.");        System.out.println(e.getMessage());        break;      }    }  }}PARSER_END(QuickTests)
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+TOKEN :{  < a : "a" >
+| < B : "B" >
+| < bB : "b" ("B")* >
+| < bkB : "b" (< B >)* >
+// here we have a JJ compile warning: ... Regular Expression choice : bB can never be matched as : kbBoc
+| < kbBoc : < bB > | "c" >
+// here we have a JJ compile warning: ... Regular Expression choice : bkB can never be matched as : kbkBoc
+| < kbkBoc : < bkB > | "c" >
+| < bBoc : "b" ("B")* | "c" >}int one_line() : {}{
+  p1() p2() p3() ";" { return 0; }
+| ";"  { return 1; }
+}
+
+/* in RegularExpression(): IdentifierAsString() ":" ComplexRegularExpressionChoices() */
+
+void p1() : {}
+{ < kbBka1 : < bB > < a > > { System.out.println("got kbBka p1"); } }
+
+// here we have a JJ compile warning: ... Regular Expression choice : bB can never be matched as : kbBoc2
+// Why? We don't have it in p5()/p3() with the direct formulation nor in p6() when not single in the choice
+void p2() : {}
+{ < kbBoc2 : < bB > | "c" > { System.out.println("got kbBoc p2"); } }
+
+void p3() : {}
+{ < kbBoc > { System.out.println("got kbBoc p3"); } }
+
+void p4() : {}
+{ < kbkBoc > { System.out.println("got kbkBoc p4"); } }
+
+void p5() : {}
+{ < bBoc2 : "b" ("B")* | "c" > { System.out.println("got bBoc2 p5"); } }
+
+void p6() : {}
+{ < kbBxoc : < bB > "x" | "c" > { System.out.println("got kbBxoc p6"); } }
+
+/* in ExpansionUnit(): RegularExpression() "."  < IDENTIFIER > */
+
+void q1() : { int k; String im; }
+{
+  k = < B >.kind
+  im = "r".image
+}

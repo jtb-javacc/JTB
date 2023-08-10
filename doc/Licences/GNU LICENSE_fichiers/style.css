@@ -1,0 +1,43 @@
+
+/*
+style.fr.css -- French CSS Stylesheet
+
+Copyright (C) 2006, 2007 Free Software Foundation
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+*/
+
+/* Attention gnu webmasters - please don't edit this file. Instead,
+get the French translation coordinator or the translation manager
+to do it. */
+
+
+/* Help the reader avoid wasted time linking to pages they can not read;
+   saves the translator time and effort */
+
+/*
+@media screen { 
+#content a[href^="http://"]:before, 
+ #content a[href^="https://"]:before { content: "\2197"; }
+#content a[href*="fsf.org"]:before,
+ #content a[href*="gnu.org"]:before,
+ #content #home a[href^="http://"]:before,
+ #content a[href*="upgradefrom"]:before,
+ #content table a[href^="http://"]:before,
+ #content table a[href^="https://"]:before { content: ""; }
+}
+*/
+
+ol#translator-notes-alpha li{list-style-type: lower-alpha;}
+.nounderline { text-decoration: none; }

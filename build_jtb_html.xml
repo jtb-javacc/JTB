@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE fakeforremovingdtdvalidationinfo>
+<!-- build_jtb_html.xml
+     Used to automatically (on save) generate .html files suited for the Wiki from the .textile file(s)
+      and for other .md file(s), and to manually delete them;
+     for the first the Ant builder must be added / enabled to the project, and for both see further comment.
+     Marc Mazas - Sopra Steria Group - 03/2021 -->
+
+<project name="jtb_html" default="generate_html">
+
+  <!-- Path to jars that must be on the classpath for Wikitext Ant tasks (note it has changed from Neon) -->
+  <path id="wikitext.ant.classpath">
+    <!--- this dir setting is ok for the project builder and for manual builds
+          only if the launch command specifies to be run in the project's JRE,
+          otherwise eclipse.home is not defined and dir does not exist! -->
+    <fileset dir="${eclipse.home}\plugins">
+      <include name="*wikitext*.jar" />
+      <include name="*guava*.jar" />
+    </fileset>
+  </path>
+
+  <!-- Corresponding task definition -->
+  <taskdef classpathref="wikitext.ant.classpath" resource="org/eclipse/mylyn/wikitext/ant/tasks.properties" />
+
+  <!-- Generate target -->
+  <target name="generate_html" description="Generate .html and -toc.xml files from .textile and .md file(s)">
+    <!-- textile files (future use) -->
+    <wikitext-to-html markupLanguage="Textile" overwrite="false" sourceEncoding="UTF-8" formatOutput="true">
+      <fileset dir="doc/wiki">
+        <include name="**/*.textile" />
+      </fileset>
+      <stylesheet file="${basedir}/doc/doc.css" />
+    </wikitext-to-html>
+    <!-- markdown files -->
+    <!-- output files are only overwritten if the output file timestamp is older than the markup source file -->
+    <wikitext-to-html markupLanguage="Markdown" overwrite="false" sourceEncoding="UTF-8" formatOutput="true">
+      <fileset dir="${basedir}">
+        <include name="*.md" />
+        <include name="doc/*.md" />
+        <include name="doc/wiki/*.md" />
+      </fileset>
+      <stylesheet file="${basedir}/doc/doc.css" />
+    </wikitext-to-html>
+  </target>
+
+  <!-- Clean target -->
+  <target name="clean_html" description="Delete all  .html and -toc.xml files">
+    <!-- note that on refresh the automatic builder will recreate the HTML files... -->
+    <delete>
+      <fileset dir="${basedir}">
+        <include name="**/*.html" />
+        <include name="**/*-toc.xml" />
+      </fileset>
+    </delete>
+
+  </target>
+
+</project>

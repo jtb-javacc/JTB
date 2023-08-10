@@ -1,0 +1,150 @@
+/**
+ * To check how JavaCC handle Unicode characters in constants. See one_line() production.
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */
+options
+{
+  static = true;
+  UNICODE_INPUT = true; // (default false)
+  //  JAVA_UNICODE_ESCAPE = true; // (default false)
+  OUTPUT_DIRECTORY = "../../../../../target/generated-tests/jj/grammars/j";
+}
+
+PARSER_BEGIN(TinyGrammar)
+package grammars.j;
+
+public class TinyGrammar
+{
+  public static void main(String args []) throws ParseException
+  {
+    new TinyGrammar(System.in);
+    while (true)
+    {
+      System.err.flush();
+      System.out.println("Reading from standard input...");
+      System.out.print("Enter an expression like \"1+(2+3)*4; or \".\" to quit\" :");
+      try
+      {
+        switch (TinyGrammar.one_line())
+        {
+          case 0 : 
+          System.out.println("Evaluation Ok.");
+          TinyGrammar.ReInit(System.in);
+          break;
+          case 1 : 
+          System.out.println("Goodbye.");
+          System.exit(0);
+          default : 
+          System.out.println("EOF.");
+          System.exit(1);
+        }
+      }
+      catch (Exception e)
+      {
+        System.out.flush();
+        System.err.println("Evaluation NOK.");
+        System.err.println(e.getMessage());
+        TinyGrammar.ReInit(System.in);
+      }
+      catch (Error e)
+      {
+        System.out.flush();
+        System.err.println("Oops.");
+        System.err.println(e.getMessage());
+        System.exit(-1);
+      }
+    }
+  }
+}
+
+PARSER_END(TinyGrammar)
+
+SKIP :
+{
+  " "
+| "\r"
+| "\t"
+| "\n"
+}
+
+TOKEN : /* OPERATORS */
+{
+  < PLUS : "+" >
+| < MINUS : "-" >
+| < MULTIPLY : "*" >
+| < DIVIDE : "/" >
+}
+
+TOKEN :
+{
+  < CONSTANT : (< DIGIT >)+ >
+| < #DIGIT : [ "0"-"9" ] >
+}
+
+int one_line() :
+{
+  char b, e;
+}
+{
+  sum() ";"
+  {
+    b = '\b';
+    // Current JavaCC versions do not handle correctly Unicode characters in constants.
+    // Try uncommenting e = 'é' for example. Current acccepted syntax is through the Unicode escape e = '\u00a9'
+    // Comment it back for the build to continue, otherwise it will fail.
+    // Once a new JavaCC version is OK, leave it uncommented.
+    // JavaCC 7.0 : org.javacc.parser.ParseException: Encountered " <ACT_TOK> "\' "" at line xx, column 9.
+    // JavaCC 5.0 : Exception in thread "main" org.javacc.parser.TokenMgrError: Lexical error at line xx, column 11.  Encountered: "©" (169), after : "\'Ã"
+//    e = 'é';
+    e = '\u00a9';
+    return 0;
+  }
+| "."
+  {
+    return 1;
+  }
+| < EOF >
+  {
+    return - 1;
+  }
+}
+
+void sum() :
+{}
+{
+  term()
+  (
+    (
+      < PLUS >
+    | < MINUS >
+    )
+    term()
+  )*
+}
+
+void term() :
+{}
+{
+  unary()
+  (
+    (
+      < MULTIPLY >
+    | < DIVIDE >
+    )
+    unary()
+  )*
+}
+
+void unary() :
+{}
+{
+  < MINUS > element()
+| element()
+}
+
+void element() :
+{}
+{
+  < CONSTANT >
+| "(" sum() ")"
+}

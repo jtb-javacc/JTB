@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE fakeforremovingdtdvalidationinfo>
+<!-- jtb_props.xml. Defines JTB properties, imported by build.xml.
+     Uses version.properties to import (and share) the to be built JTB version.
+     Marc Mazas - Sopra Steria Group - 05/2009-12/2022 - Francis Andre - 03/2017 -->
+<project name="jtb_props" default="echo_jtb_props">
+
+  <!-- JTB directories and packages -->
+  <dirname property="jtb_proj_dir" file="${ant.file.jtb_props}" />
+  <property name="jtb_tgt_cla_dir" value="${jtb_proj_dir}/target/classes" />
+  <property name="jtb_lib_dir" value="${jtb_proj_dir}/lib" />
+  <property name="jtb_pkg_name" value="EDU.purdue.jtb" />
+  <property name="jtb_pkg_dir" value="EDU/purdue/jtb" />
+  <property name="jtb_parser_pkg_name" value="${jtb_pkg_name}.parser" />
+  <property name="jtb_parser_pkg_dir" value="${jtb_pkg_dir}/parser" />
+
+  <property name="jtb_src_main_jtb_dir" value="${jtb_proj_dir}/src/main/jtb/${jtb_parser_pkg_dir}" />
+  <property name="jtb_src_main_java_dir" value="${jtb_proj_dir}/src/main/java/${jtb_pkg_dir}" />
+  <property name="jtb_ap_src_dir" value="${jtb_src_main_jtb_dir}/visitor" />
+  <property name="jtb_tgt_gensrc_jtb_dir"
+            value="${jtb_proj_dir}/target/generated-sources/jtb/${jtb_parser_pkg_dir}"
+  />
+  <property name="jtb_tgt_gensrc_jj_dir"
+            value="${jtb_proj_dir}/target/generated-sources/jj/${jtb_parser_pkg_dir}"
+  />
+  <property name="jtb_src_dir"
+            value="${jtb_tgt_gensrc_jtb_dir};${jtb_tgt_gensrc_jj_dir};${jtb_src_main_java_dir}"
+  />
+
+  <property name="jtb_tgt_gentst_jtb_dir" value="${jtb_proj_dir}/target/generated-tests/jtb" />
+  <property name="jtb_tgt_gentst_jjt_dir" value="${jtb_proj_dir}/target/generated-tests/jjt" />
+  <property name="jtb_tgt_gentst_jj_dir" value="${jtb_proj_dir}/target/generated-tests/jj" />
+  <property name="jtb_tgt_gentst_java_dir" value="${jtb_proj_dir}/target/generated-tests/java" />
+  <property name="jtb_src_tst_jtb_dir" value="${jtb_proj_dir}/src/test/jtb" />
+  <property name="jtb_src_tst_jjt_dir" value="${jtb_proj_dir}/src/test/jjt" />
+  <property name="jtb_src_tst_jj_dir" value="${jtb_proj_dir}/src/test/jj" />
+  <property name="jtb_src_tst_java_dir" value="${jtb_proj_dir}/src/test/java" />
+  <property name="jtb_gen_tst_dir"
+            value="${jtb_tgt_gentst_jtb_dir};${jtb_tgt_gentst_jj_dir};${jtb_tgt_gentst_java_dir}"
+  />
+  <property name="jtb_tst_dir" value="${jtb_gen_tst_dir};${jtb_src_tst_java_dir}" />
+
+  <property name="tgt/gensrc/java" value="target/generated-sources/java" />
+  <property name="target-folder" value="target" />
+
+  <!-- Specific for compile time annotation processing -->
+  <property name="jtb_ap_jar" value="${jtb_lib_dir}/ap.jar" />
+
+  <!-- JTB versions : 3 places : here, version.properties & common.Constants.java !!! -->
+
+  <!--property name="jtb_last_version" value="1.4.13" /-->
+  <!-- temp version saved during 1.5.0 dev as visitors have changed -->
+  <!--property name="jtb_last_version" value="1.5.0.temp.1" /-->
+  <property name="jtb_last_version" value="1.5.0" />
+  <property name="jtb_curr_version" value="1.5.1" />
+
+  <!-- file where are defined ${version.major}, ${version.minor} & ${version.patch} - for the maven part -->
+  <property file="version.properties" />
+  <!--property name="jtb_vp_version" value="${version.major}.${version.minor}.${version.patch}-SNAPSHOT" / -->
+  <property name="jtb_vp_version" value="${version.major}.${version.minor}.${version.patch}" />
+
+  <!-- JTB files and classes -->
+  <property name="jtb_parser" value="JTBParser" />
+  <property name="jtb_main" value="org.javacc.parser.Main" />
+  <property name="jtb_tool" value="EDU.purdue.jtb.JTB" />
+
+  <property name="jtb-path" value="lib/jtb-${jtb_curr_version}.jar" />
+
+  <property name="jtb-sources-path" value="target/jtb-${jtb_curr_version}-sources.jar" />
+  <property name="jtb-javadoc-path" value="target/jtb-${jtb_curr_version}-javadoc.jar" />
+
+  <!-- JDK version -->
+  <property name="jdk_version" value="1.8" />
+
+  <!-- which JTB jar to use -->
+  <!-- bootstrap JTB jar -->
+  <property name="jtb_bs_jar" value="${jtb_proj_dir}/lib/jtb132.jar" />
+  <!-- last version JTB jar if exists, otherwise bootstrap JTB jar -->
+  <property name="jtb_lv_jar" value="${jtb_lib_dir}/jtb-${jtb_last_version}.jar" />
+  <condition property="jtb_last_jar" value="${jtb_lv_jar}">
+    <available file="${jtb_lv_jar}" />
+  </condition>
+  <condition property="jtb_last_jar" value="${jtb_bs_jar}">
+    <not>
+      <available file="${jtb_last_jar}" />
+    </not>
+  </condition>
+  <!-- current version new JTB jar -->
+  <property name="jtb_new_jar" value="${jtb_lib_dir}/new_jtb-${jtb_curr_version}.jar" />
+  <property name="jtb_new_jar_src" value="${jtb_new_jar}_src" />
+  <!-- current version previous JTB jar if exists, otherwise last version JTB jar -->
+  <property name="jtb_prev_jar" value="${jtb_lib_dir}/jtb-${jtb_curr_version}.jar" />
+  <condition property="jtb_ok_jar" value="${jtb_prev_jar}">
+    <available file="${jtb_prev_jar}" />
+  </condition>
+  <condition property="jtb_ok_jar" value="${jtb_last_jar}">
+    <not>
+      <available file="${jtb_ok_jar}" />
+    </not>
+  </condition>
+
+  <!-- FreeMarker jar; tar.gz downloaded from Apache FreeMarker site and freemarker.jar extracted/renamed from tar.gz -->
+  <property name="freemarker_jar" value="${jtb_lib_dir}/freemarker-2.3.27.jar" />
+
+  <!-- JaCoCo ant task jar; zip downloaded from JaCoCo site and jars extracted/renamed from zip -->
+  <property name="jacocoant_jar" value="${jtb_lib_dir}/jacocoant-0.8.10.jar" />
+  <property name="jacocoagent_jar" value="${jtb_lib_dir}/jacocoagent-0.8.10.jar" />
+  <property name="jacoco_dir" value="target/jacoco" />
+  <property name="jacoco_dump_dir" value="${jacoco_dir}/dump" />
+  <property name="jacoco_report_dir" value="${jacoco_dir}/report" />
+
+  <!-- Maven ant tasks jar; maven-an-tasks-2.1.3.jar downloaded from Maven site -->
+  <property name="mavenanttasks_jar" value="${jtb_lib_dir}/maven-an-tasks-2.1.3.jar" />
+
+  <!-- JProfiler arguments -->
+  <property name="jprofiler_args"
+            value="-agentpath:C:\PROGRA~1\JPROFI~1\bin\WINDOW~1\jprofilerti.dll=wait,id=175,config=d:\Profiles\mmazas\.jprofiler9\config.xml"
+  />
+
+  <!-- echo some JTB version related properties -->
+  <target name="echo_jtb_props">
+    <echo message="jtb_last_version=${jtb_last_version}" />
+    <echo message="jtb_curr_version=${jtb_curr_version}" />
+    <echo message="jtb_vp_version=${jtb_vp_version}" />
+    <echo message="jtb_bs_jar=${jtb_bs_jar}" />
+    <echo message="jtb_lv_jar=${jtb_lv_jar}" />
+    <echo message="jtb_last_jar=${jtb_last_jar}" />
+    <echo message="jtb_new_jar=${jtb_new_jar}" />
+    <echo message="jtb_prev_jar=${jtb_prev_jar}" />
+    <echo message="jtb_ok_jar=${jtb_ok_jar}" />
+  </target>
+
+</project>
