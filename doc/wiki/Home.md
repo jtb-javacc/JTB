@@ -1,4 +1,4 @@
-# # Java Tree Builder (JTB) - Welcome to the JTB Wiki!
+# Java Tree Builder (JTB) - Welcome to the JTB Wiki!
 
 ## [Overview](Overview.html)
 

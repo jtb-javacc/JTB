@@ -1,4 +1,4 @@
-# # How JTB builds the nodes trees and the default visitors
+# How JTB builds the nodes trees and the default visitors
 
 This section aims at explaining the main things about the node generation performed by JTB.
 

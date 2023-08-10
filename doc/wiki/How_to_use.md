@@ -1,4 +1,4 @@
-# # Java Tree Builder (JTB) - How to use JTB
+# Java Tree Builder (JTB) - How to use JTB
 
 ## Environment
 JTB 1.5.0+ is meant to be used as a front end for JavaCC 5.0+, with a 1.8.0+ JDK, and so is command line by nature.  

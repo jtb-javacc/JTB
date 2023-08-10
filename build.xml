@@ -36,7 +36,7 @@
       on small inputs
    - if ok, run make_new_jtb_jar: it will recreate the new jar (jtb_new_jar)
    - finish docs, deactivate the ant builder for html files
-   - if ok and version finished, run new_to_prev_jtb_jar: it will rename the new jar in jar-yyy.jar
+   - if ok and version finished, run rename_new_to_prev_jtb_jar: it will rename the new jar in jar-yyy.jar
    - if after this need to revert back, run prev_to_prev_new_jar: it will rename the jar-yyy.jar in the new jar 
    - and you may prepare the new version numbers for the next version as above
    - the (default) target build_all will chain the first four previous targets with code coverage, the target 
@@ -1726,12 +1726,12 @@
   </target>
 
   <!-- Rename ${jtb_new_jar} in ${jtb_prev_jar} - when ${jtb_new_jar} is OK, before changing to a new version  -->
-  <target name="new_to_prev_jtb_jar">
+  <target name="rename_new_to_prev_jtb_jar">
     <move file="${jtb_new_jar}" tofile="${jtb_prev_jar}" overwrite="false" />
   </target>
 
   <!-- Rename ${jtb_prev_jar} in ${jtb_new_jar} - when ${jtb_prev_jar} was not OK, to revert back to the old version  -->
-  <target name="prev_to_new_jtb_jar">
+  <target name="revert_prev_to_new_jtb_jar">
     <move file="${jtb_prev_jar}" tofile="${jtb_new_jar}" overwrite="false" />
   </target>
 

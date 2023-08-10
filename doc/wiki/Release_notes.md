@@ -1,4 +1,4 @@
-# # Java Tree Builder (JTB) - Release notes (dd/mm/yy)
+# Java Tree Builder (JTB) - Release notes (dd/mm/yy)
 
 ### Version 1.5.1 - jtb-1.5.1.jar of xx/08/2023, not yet committed on GitHub, included in the Eclipse JavaCC Plug-in v1.6.1
 - fixed node choice generation issue

@@ -1,4 +1,4 @@
-# # Java Tree Builder (JTB) - Download
+# Java Tree Builder (JTB) - Download
 
 You can download:
 
