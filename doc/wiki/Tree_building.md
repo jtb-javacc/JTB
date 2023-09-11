@@ -186,10 +186,13 @@ and that will intertwin with nodes that derive from:
 </tr>
 <tr>
 <td>a *token node*</td><td>`"abc"` and `< ABC >`</td>
-<td><b><code>[NodeToken](../../target/generated-tests/jtb/grammars/b/syntaxtree/NodeToken.java)</code></b></td>
+<td><b><code>[Token](../../target/generated-tests/jtb/grammars/b/Token.java)</code></b></td>
 </tr>
-</table>
+</table>  
 
+Note that in version 1.4.x there was another base class, <code>NodeToken</code>, which is starting with
+ version 1.5.x the (enhanced) JavaCC class <code>Token</code>.  
+  
 Note that an *ExpansionUnit type 5 with no modifier* `( A )` gives a node of the inner node type
  (here `A`) which can be another base node or a user node. If `A` is not a *NodeSequence* nor a
  *NodeChoice*, then the parentheses are superfluous. 
@@ -243,7 +246,7 @@ By adding a <code class="PaleTurquoise">`%`</code> indicator to the *JavacodePro
  (IdentifierAsString()) refers to it.<br>
 Note that the generated user class will have no field, so in essence will be of poor use; you will likely
  have to overwrite this (derived) class with your custom class. (Note: we plan to add in the future the
- ability to specify the fields the generated class must have, like `% NodeToken f0; NodeToken msg; %`).<br>
+ ability to specify the fields the generated class must have, like `% Token f0; Token msg; %`).<br>
 This can be useful to build tools that are tolerant to the grammar errors (a code editor for example), or to
  build tools that chosse to enrich a parsed file directly in the tree.<br>
 
@@ -260,13 +263,13 @@ This can be useful to build tools that are tolerant to the grammar errors (a cod
 </code></pre>
 
 <span class="bold-red">Example</span> (assuming the generated class is overwritten with 2 fields
- <code>f0</code> & <code>msg</code> of type <code>NodeToken</code>)
+ <code>f0</code> & <code>msg</code> of type <code>Token</code>)
 
 <pre><code>
 JAVACODE void skipButBuild() <code class="PaleTurquoise">%</code> {<br>
   Token tk = getNextToken(); <code class="green">// eat a token</code><br>
-  f0 = new NodeToken(12, tk); <code class="green">// memorise it</code><br>
-  msg = new NodeToken(87, "extra token eated"); <code class="green">// with some message</code><br>
+  f0 = new Token(12, tk); <code class="green">// memorise it</code><br>
+  msg = new Token(87, "extra token eated"); <code class="green">// with some message</code><br>
 }<br>
 </code></pre>
 
@@ -462,9 +465,9 @@ void bp_v() :<br>
 <code class="green">// Node class</code><br>
 public class bp_v implements INode {<br>
   <code class="green">// First field, corresponding to < ID > */</code><br>
-  public NodeToken f0;<br>
+  public Token f0;<br>
   <code class="green">// constructor</code><br>
-  public bp_v(final NodeToken n0) {<br>
+  public bp_v(final Token n0) {<br>
     f0 = n0;<br>
   }<br>
   <code class="green">// Accepts a void visitor with no arguments</code><br>
@@ -606,8 +609,8 @@ For the node fields creation and the tree building, in the *BNFProduction* code,
 bp_v bp_v() :<br>
 {<br>
   <code class="green">// aded variable for the field<br></code>
-  NodeToken n0 = null;<br>
-  <code class="green">// added variable for the JavaCC token giving the JTB NodeToken<br></code>
+  Token n0 = null;<br>
+  <code class="green">// added variable for the JavaCC token giving the JTB Token<br></code>
   Token n1 = null;<br>
   <code class="green">// added variable returning the node<br></code>
   bp_v jtbNode = null;<br>
@@ -615,9 +618,9 @@ bp_v bp_v() :<br>
 {<br>
   <code class="green">// splitted JavaCC token variable assignment, first part<br></code>
   n1 = < ID ><br>
-  <code class="green">// added JTB NodeToken creation (here a single cast due to how is defined
+  <code class="green">// added JTB Token creation (here a single cast due to how is defined
  the JavaCC class Token in JTB)<br></code>
-  { n0 = (NodeToken) n1; }<br>
+  { n0 = (Token) n1; }<br>
   <code class="green">// splitted JavaCC token variable assignment, second part<br></code>
   { tk = n1; }<br>
   <code class="green">// changed return statement into an assignment to the global variable<br></code>
@@ -641,8 +644,8 @@ int jtbrt_bp_i;<br>
 bp_i bp_i() :<br>
 {<br>
   <code class="green">// added variable for the field<br></code>
-  NodeToken n0 = null;<br>
-  <code class="green">// variable for the JavaCC token giving the JTB NodeToken<br></code>
+  Token n0 = null;<br>
+  <code class="green">// variable for the JavaCC token giving the JTB Token<br></code>
   Token n1 = null;<br>
   <code class="green">// added variable returning the node<br></code>
   bp_i jtbNode = null;<br>
@@ -652,9 +655,9 @@ bp_i bp_i() :<br>
 {<br>
   <code class="green">// splitted JavaCC token variable assignment, first part<br></code>
   n1 = < ID ><br>
-  <code class="green">// added JTB NodeToken creation (here a single cast due to how is defined
+  <code class="green">// added JTB Token creation (here a single cast due to how is defined
  the JavaCC class Token in JTB)<br></code>
-  { n0 = (NodeToken) n1; }<br>
+  { n0 = (Token) n1; }<br>
   <code class="green">// splitted JavaCC token variable assignment, second part<br></code>
   { tk = n1; }<br>
   <code class="green">// changed return statement into initial return variable assignment<br></code>
@@ -722,7 +725,7 @@ For **inner** nodes, the user can ask JTB to **inline** or not the `accept()` ca
 **grammar.jtb**
 
 <pre><code>
-<code class="green">// BNFProduction with NodeToken, NodeOptional, NodeListOptional, NodeChoice and inner NodeSequence<br></code>
+<code class="green">// BNFProduction with Token, NodeOptional, NodeListOptional, NodeChoice and inner NodeSequence<br></code>
 void bp_acc() :<br>
 {}<br>
 {<br>
@@ -750,7 +753,7 @@ void bp_acc() :<br>
   @Override<br>
   public void visit(final bp_acc n) {<br>
     // f0 -> < ID ><br>
-    <code class="green">// here the NodeToken will accept this visitor<br></code>
+    <code class="green">// here the Token will accept this visitor<br></code>
     n.f0.accept(this);<br>
     // f1 -> [ "xyz" ]<br>
     <code class="green">// here the NodeOptional will accept this visitor<br></code>
@@ -782,12 +785,12 @@ void bp_acc() :<br>
   @Override<br>
   public void visit(final bp_acc n) {<br>
     // f0 -> < ID ><br>
-    <code class="green">// here the NodeToken will accept this visitor<br></code>
-    final NodeToken n0 = n.f0;<br>
+    <code class="green">// here the Token will accept this visitor<br></code>
+    final Token n0 = n.f0;<br>
     n0.accept(this);<br>
     // f1 -> [ "xyz" ]<br>
     <code class="green">// here the NodeOptional is inlined: if present, whatever is under</code><br>
-    <code class="green">// (here a NodeToken) will accept the visitor<br></code>
+    <code class="green">// (here a Token) will accept the visitor<br></code>
     final NodeOptional n1 = n.f1;<br>
     if (n1.present()) {<br>
       n1.accept(this);<br>

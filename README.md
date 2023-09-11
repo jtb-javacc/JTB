@@ -13,7 +13,7 @@ From 2011 to 2016 it was also provided as a stand-alone tool in the same hosting
 
 Since 2017 it is also provided as a stand-alone tool in the same new hosting environment as JavaCC [JTB at GitHub](https://github.com/jtb-javacc/JTB).
 
-Version 1.5.0 brings interesting new features. See [Overview page](doc/wiki/Overview.html) in Wiki.
+Version 1.5.0 brings interesting new features. See [Overview page](doc/wiki/Overview.md) in Wiki.
 
 ## Version
 

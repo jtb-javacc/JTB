@@ -1,13 +1,13 @@
 # Java Tree Builder (JTB) - Welcome to the JTB Wiki!
 
-## [Overview](Overview.html)
+## [Overview](Overview.md)
 
-## [Download](Download.html)
+## [Download](Download.md)
 
-## [How to use](How_to_use.html)
+## [How to use](How_to_use.md)
 
-## [Tree building](Tree_building.html)
+## [Tree building](Tree_building.md)
 
-## [Release notes](Release_notes.html)
+## [Release notes](Release_notes.md)
 
-## [Support](Support.html)
+## [Support](Support.md)
