@@ -33,15 +33,12 @@
 
 package EDU.purdue.jtb.generate;
 
-import static EDU.purdue.jtb.common.Constants.FILE_EXISTS_RC;
 import static EDU.purdue.jtb.common.Constants.LS;
-import static EDU.purdue.jtb.common.Constants.OK_RC;
 import static EDU.purdue.jtb.common.Constants.fileHeaderComment;
 import static EDU.purdue.jtb.common.Constants.genNodeVar;
 import static EDU.purdue.jtb.common.Constants.genVisVar;
 import static EDU.purdue.jtb.common.Constants.iNode;
 import static EDU.purdue.jtb.common.Constants.iNodeList;
-import static EDU.purdue.jtb.common.Constants.jjToken;
 import static EDU.purdue.jtb.common.Constants.jtbSigPfx;
 import static EDU.purdue.jtb.common.Constants.jtbUserPfx;
 import static EDU.purdue.jtb.common.Constants.nodeChoice;
@@ -69,7 +66,7 @@ import EDU.purdue.jtb.parser.syntaxtree.NodeList;
 import EDU.purdue.jtb.parser.syntaxtree.NodeListOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.parser.syntaxtree.NodeToken;
+import EDU.purdue.jtb.parser.Token;
 
 /**
  * Class {@link BaseNodesGenerator} contains methods to generate the base nodes interfaces and classes.
@@ -86,18 +83,22 @@ import EDU.purdue.jtb.parser.syntaxtree.NodeToken;
  *          1.4.7 : 09/2012 : MMa : extracted constants, added missing visit methods (NodeChoice and NodeTCF)
  * @version 1.4.8 : 10/2014 : MMa : minor fix<br>
  *          1.4.8 : 12/2014 : MMa : added printing override annotations ;<br>
- *          improved specials printing in {@link NodeToken}
+ *          improved specials printing in NodeToken
  * @version 1.4.9 : 12/2014 : MMa : fixed generated code NodeToken.withSpecials
  * @version 1.5.0 : 01-06/2017 : MMa : added NodeConstants generation ; removed unused methods, renamed some
  *          and passed some to private ; updated {@link #genNodeChoiceClass} ; added jopt.noVisitors
  *          conditions ; removed buffer allocations and withOverride flags in sub methods ; added children
  *          methods generation ; changed generation of some iterator based for loops to enhanced for loops ;
- *          fixed generated NodeToken withSpecials ; enhanced to VisitorInfo based visitor generation ;
+ *          fixed generated NodeToken.withSpecials ; enhanced to VisitorInfo based visitor generation ;
  *          renamed from BaseClasses ; subject to global packages and classes refactoring ; moved to non
  *          static ; fixed some issues with specials<br>
  *          1.5.0 : 10/2020-04/2021 : MMa : removed nodeTCF (managed as an {@link INodeList} (close to a
  *          {@link NodeSequence})) ; removed NodeTCF related code
- * @version 1.5.1 : 07/2023 : MMa : changed no overwrite management
+ * @version 1.5.1 : 07-08/2023 : MMa : changed no overwrite management; updated for token factory change
+ *          (NodeConstants -> NodeToken) ; editing changes for coverage analysis ; changes due to the
+ *          NodeToken replacement by Token
+ *          </p>
+ *          TESTCASE some to add
  */
 public class BaseNodesGenerator {
   
@@ -125,41 +126,60 @@ public class BaseNodesGenerator {
    * Generates the base nodes source files.
    *
    * @param aClasses - the list of {@link UserClassInfo} classes instances
-   * @return OK_RC or FILE_EXISTS_RC
+   * @return the number of generated files
    * @throws IOException if IO problem
    */
   public int genBaseNodesFiles(final List<UserClassInfo> aClasses) throws IOException {
-    boolean b = true;
-    b &= fillFile(iNode + ".java", genINodeInterface(null));
-    b &= fillFile(iNodeList + ".java", genINodeListInterface(null));
-    b &= fillFile(nodeChoice + ".java", genNodeChoiceClass(null));
-    b &= fillFile(nodeList + ".java", genNodeListClass(null));
-    b &= fillFile(nodeListOptional + ".java", genNodeListOptionalClass(null));
-    b &= fillFile(nodeOptional + ".java", genNodeOptionalClass(null));
-    b &= fillFile(nodeSequence + ".java", genNodeSequenceClass(null));
-    b &= fillFile(nodeToken + ".java", genNodeTokenClass(null));
-    b &= fillFile(nodeConstants + ".java", genNodeConstantsClass(null, aClasses));
-    if (jopt.noOverwrite && !b) {
-      return FILE_EXISTS_RC;
-    }
-    return OK_RC;
+    boolean r = true;
+    int n = 0;
+    r = fillFile(iNode + ".java", jopt.nodesDirName, genINodeInterface(null));
+    if (r)
+      n++;
+    r = fillFile(iNodeList + ".java", jopt.nodesDirName, genINodeListInterface(null));
+    if (r)
+      n++;
+    r = fillFile(nodeChoice + ".java", jopt.nodesDirName, genNodeChoiceClass(null));
+    if (r)
+      n++;
+    r = fillFile(nodeList + ".java", jopt.nodesDirName, genNodeListClass(null));
+    if (r)
+      n++;
+    r = fillFile(nodeListOptional + ".java", jopt.nodesDirName, genNodeListOptionalClass(null));
+    if (r)
+      n++;
+    r = fillFile(nodeOptional + ".java", jopt.nodesDirName, genNodeOptionalClass(null));
+    if (r)
+      n++;
+    r = fillFile(nodeSequence + ".java", jopt.nodesDirName, genNodeSequenceClass(null));
+    if (r)
+      n++;
+    r = fillFile(nodeToken + ".java", jopt.jjOutDirName, genTokenClass(null));
+    if (r)
+      n++;
+    r = fillFile(nodeConstants + ".java", jopt.nodesDirName, genNodeConstantsClass(null, aClasses));
+    if (r)
+      n++;
+    return n;
   }
   
   /**
    * Fills a class file given its class source. It adds the file header comment ("Generated by JTB version").
    *
    * @param aFileName - the class file name
+   * @param aDirName - the directory name
    * @param aClassSource - the buffer containing the class source
    * @throws IOException - if any IO Exception
    * @return false if the file exists and the no overwrite flag is set, true otherwise
    */
-  private boolean fillFile(final String aFileName, final StringBuilder aClassSource) throws IOException {
-    final File file = new File(jopt.nodesDirName, aFileName);
+  private boolean fillFile(final String aFileName, final String aDirName, final StringBuilder aClassSource)
+      throws IOException {
+    final File file = new File(aDirName, aFileName);
     if (jopt.noOverwrite && file.exists()) {
       mess.warning(
           "File " + file.getPath() + " exists and is not overwritten as the no overwrite flag has been set");
       return false;
     }
+    // TODO change to OutputStreamWriter on a FileOutputStream for handling UTF-8 names like bp_v£
     try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file), 2048))) {
       pw.println(fileHeaderComment);
       pw.print(aClassSource);
@@ -206,7 +226,7 @@ public class BaseNodesGenerator {
     sb.append("public interface ").append(iNode).append(" extends java.io.Serializable {").append(LS)
         .append(LS);
     
-    // needed for NodeToken
+    // needed for Token
     lineSeparatorDeclaration(sb);
     
     interfaceAcceptMethods(sb);
@@ -882,88 +902,231 @@ public class BaseNodesGenerator {
   }
   
   /**
-   * Generates the {@link NodeToken} class.
+   * Generates the {@link Token} class.
    *
    * @param aSb - a buffer to append to (will be allocated if null)
    * @return the generated class
    */
-  private StringBuilder genNodeTokenClass(final StringBuilder aSb) {
+  private StringBuilder genTokenClass(final StringBuilder aSb) {
     StringBuilder sb = aSb;
     if (sb == null) {
       sb = new StringBuilder(20 + 6310 + (jopt.noVisitors ? 0 : 1330) + (jopt.childrenMethods ? 1320 : 0)
           + (jopt.parentPointer ? 570 : 0)); // 9330 / 8960 / 7640 / 6310
     }
     
-    if (jopt.nodesPackageName != null)
-      sb.append("package ").append(jopt.nodesPackageName).append(';').append(LS).append(LS);
+    if (jopt.grammarPackageName != null)
+      sb.append("package ").append(jopt.grammarPackageName).append(';').append(LS).append(LS);
+    
     sb.append("import java.util.ArrayList;").append(LS);
     sb.append("import java.util.Iterator;").append(LS);
-    sb.append("import java.util.NoSuchElementException;").append(LS);
     sb.append("import java.util.List;").append(LS);
+    sb.append("import java.util.NoSuchElementException;").append(LS);
+    ccg.inodeImport(sb);
     ccg.interfaceVisitorsImports(sb);
-    ccg.javaCCTokenImport(sb);
     
-    /* NodeToken class declaration */
+    /* Class declaration */
     
     if (jopt.javaDocComments) {
       sb.append("/**").append(LS);
-      sb.append(" * Represents a single token in the grammar.<br>").append(LS);
-      sb.append(" * If the \"-tk\" option is used, also contains a ArrayList of preceding ")
+      sb.append(" * Represents a JavaCC single token in the grammar and a JTB corresponding node.<br>")
+          .append(LS);
+      sb.append(" * The class holds all the fields and methods generated normally by JavaCC, ")
+          .append("plus the ones required by JTB.<br>").append(LS);
+      sb.append(" * If the \"-tk\" JTB option is used, it also contains an ArrayList of preceding ")
           .append("special tokens.<br>").append(LS);
-      sb.append(" * The class stores the token image, kind and position information, ")
-          .append("and the special tokens list.<br>").append(LS);
       sb.append(" */").append(LS);
     } else {
       sb.append("@SuppressWarnings(\"javadoc\")").append(LS);
     }
-    sb.append("public class ").append(nodeToken).append(" extends ")
-        .append(jopt.nodesSuperclass != null ? jopt.nodesSuperclass : jjToken).append(" implements ")
-        .append(iNode).append(" {").append(LS).append(LS);
+    sb.append("public class Token ")
+        .append(jopt.nodesSuperclass != null ? " extends " + jopt.nodesSuperclass : "").append(" implements ")
+        .append(iNode).append(", java.io.Serializable {").append(LS).append(LS);
     
-    /* NodeToken members declarations */
+    /* JavaCC members declarations */
+    sb.append("  /* JavaCC members declarations */").append(LS).append(LS);
     
-    if (jopt.javaDocComments) {
-      sb.append("  /** The token image */").append(LS);
-    }
-    sb.append("  public String tokenImage;").append(LS).append(LS);
-    
-    if (jopt.javaDocComments) {
-      sb.append(" /** The list of special tokens */").append(LS);
-    }
-    sb.append(" public List<").append(nodeToken).append("> specialTokens;").append(LS).append(LS);
-    
-    ccg.parentPointerDeclaration(sb);
-    
-    ccg.genSerialUIDDeclaration(sb);
-    
-    /* NodeToken constructors */
-    
+    // ccg.genSerialUIDDeclaration(sb);
     if (jopt.javaDocComments) {
       sb.append("  /**").append(LS);
-      sb.append("   * Initializes a {@link NodeToken} with a given kind.").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @param aKind - the token kind").append(LS);
+      sb.append("   * The version identifier for this Serializable class.<br>").append(LS);
+      sb.append("   * Increment only if the <i>serialized</i> form of the class changes.").append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(nodeToken).append("(final int aKind) {").append(LS);
-    sb.append("    this(aKind, null);").append(LS);
-    sb.append("  }").append(LS).append(LS);
+    sb.append("  private static final long serialVersionUID = 1L;").append(LS).append(LS);
     
+    /* kind */
     if (jopt.javaDocComments) {
       sb.append("  /**").append(LS);
-      sb.append("   * Initializes a {@link NodeToken} with a given kind and image.").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @param aKind - the token kind").append(LS);
-      sb.append("   * @param aImage - the token image").append(LS);
+      sb.append("   * An integer that describes the kind of this token.<br>").append(LS);
+      sb.append("   * This numbering system is determined by JavaCCParser,<br>").append(LS);
+      sb.append("   * and a table of these numbers is stored in the class &l;ParserName&gt;Constants.java.")
+          .append(LS);
       sb.append("   */").append(LS);
     }
-    sb.append("  public ").append(nodeToken).append("(final int aKind, final String aImage) {").append(LS);
-    sb.append("    kind = aKind;").append(LS);
-    sb.append("    tokenImage = image = aImage;").append(LS);
+    sb.append("  public int kind;").append(LS).append(LS);
+    
+    /* beginLine */
+    if (jopt.javaDocComments) {
+      sb.append("  /** The line number of the first character of this token. */").append(LS);
+    }
+    sb.append("  public int beginLine;").append(LS).append(LS);
+    
+    /* beginColumn */
+    if (jopt.javaDocComments) {
+      sb.append("  /** The column number of the first character of this token. */").append(LS);
+    }
+    sb.append("  public int beginColumn;").append(LS).append(LS);
+    
+    /* endLine */
+    if (jopt.javaDocComments) {
+      sb.append("  /** The line number of the last character of this token. */").append(LS);
+    }
+    sb.append("  public int endLine;").append(LS).append(LS);
+    
+    /* endColumn */
+    if (jopt.javaDocComments) {
+      sb.append("  /** The column number of the last character of this token. */").append(LS);
+    }
+    sb.append("  public int endColumn;").append(LS).append(LS);
+    
+    /* image */
+    if (jopt.javaDocComments) {
+      sb.append("  /** The string image of the token. */").append(LS);
+    }
+    sb.append("  public String image;").append(LS).append(LS);
+    
+    /* next */
+    if (jopt.javaDocComments) {
+      sb.append("  /**").append(LS);
+      sb.append("   * For a regular token, a reference to the next regular token from the input stream,<br>")
+          .append(LS);
+      sb.append("   * or null if this is the last token from the input stream, or if the token manager<br>")
+          .append(LS);
+      sb.append("   * has not (yet) read a regular token beyond this one.<p>").append(LS);
+      sb.append("   * For a special token, a reference to the special token that just after it<br>")
+          .append(LS);
+      sb.append("   * (without an intervening regular token) if it exists, or null otherwise.").append(LS);
+      sb.append("   */").append(LS);
+    }
+    sb.append("  public Token next;").append(LS).append(LS);
+    
+    /* specialToken */
+    if (jopt.javaDocComments) {
+      sb.append("  /**").append(LS);
+      sb.append("   * For a regular token, a reference to the special token just before to this token,<br>")
+          .append(LS);
+      sb.append("   * (without an intervening regular token), or null if there is no such special token.<p>")
+          .append(LS);
+      sb.append("   * For a special token, a reference to the special token just after it<br>").append(LS);
+      sb.append("   * (without an intervening regular token) if it exists, or null otherwise.").append(LS);
+      sb.append("   */").append(LS);
+    }
+    sb.append("  public Token specialToken;").append(LS).append(LS);
+    
+    /* getValue() */
+    if (jopt.javaDocComments) {
+      sb.append("  /**").append(LS);
+      sb.append("   * An optional attribute value of the Token.<br>").append(LS);
+      sb.append("   * Tokens which are not used as syntactic sugar will often contain meaningful values<br>")
+          .append(LS);
+      sb.append("   * that will be used later on by the compiler or interpreter.<br>").append(LS);
+      sb.append("   * This attribute value is often different from the image.<br>").append(LS);
+      sb.append("   * Any subclass of Token that actually wants to return a non-null value<br>").append(LS);
+      sb.append("   * can override this method as appropriate.<br>").append(LS);
+      sb.append("   * Not used in JTB.").append(LS);
+      sb.append("   * ").append(LS);
+      sb.append("   * @return a value").append(LS);
+      sb.append("   */").append(LS);
+    }
+    sb.append("  public Object getValue() {").append(LS);
+    sb.append("    return null;").append(LS);
     sb.append("  }").append(LS).append(LS);
     
-    /* NodeToken toString() method */
+    /* constructors */
     
+    /* Token() */
+    if (jopt.javaDocComments) {
+      sb.append("  /**").append(LS);
+      sb.append("   * No-argument constructor.").append(LS);
+      sb.append("   */").append(LS);
+    }
+    sb.append("  public Token() {").append(LS);
+    sb.append("    /* empty */").append(LS);
+    sb.append("  }").append(LS).append(LS);
+    
+    /* Token(final int ki) */
+    if (jopt.javaDocComments) {
+      sb.append("  /**").append(LS);
+      sb.append("   * Constructs a new {@link Token} for the specified kind, with a null image.<br>")
+          .append(LS);
+      sb.append("   * Not used in JTB nor JavaCC.").append(LS);
+      sb.append("   *").append(LS);
+      sb.append("   * @param ki - the token kind").append(LS);
+      sb.append("   */").append(LS);
+    }
+    sb.append("  public Token(final int ki) {").append(LS);
+    sb.append("    this(ki, null);").append(LS);
+    sb.append("  }").append(LS).append(LS);
+    
+    /* Token(final int ki, final String im) */
+    if (jopt.javaDocComments) {
+      sb.append("  /**").append(LS);
+      sb.append("   * Constructs a {@link Token} with a given kind and image.").append(LS);
+      sb.append("   *").append(LS);
+      sb.append("   * @param ki - the token kind").append(LS);
+      sb.append("   * @param im - the token image").append(LS);
+      sb.append("   */").append(LS);
+    }
+    sb.append("  public Token(final int ki, final String im) {").append(LS);
+    sb.append("    kind = ki;").append(LS);
+    sb.append("    image = im;").append(LS);
+    sb.append("  }").append(LS).append(LS);
+    
+    /* newToken(final int ofKind, final String image) */
+    if (jopt.javaDocComments) {
+      sb.append("  /**").append(LS);
+      sb.append("   * Factory method used by JavaCC to create a new {@link Token}<br>").append(LS);
+      sb.append("   * (which is also a JTB node).").append(LS);
+      sb.append("   * By default returns a new {@link Token} object.").append(LS);
+      sb.append("   * You can override it to create and return subclass objects<br>").append(LS);
+      sb.append("   * based on the value of ofKind.<br>").append(LS);
+      sb.append("   * Simply add the cases to the switch for all those special cases.<br>").append(LS);
+      sb.append("   * For example, if you have a subclass of Token called IDToken<br>").append(LS);
+      sb.append("   * that you want to create if ofKind is ID, simply add something like:<br>").append(LS);
+      sb.append("   * case MyParserConstants.ID : return new IDToken(ofKind, image);<br>").append(LS);
+      sb.append("   * to the following switch statement.<br>").append(LS);
+      sb.append("   * Then you can cast matchedToken variable to the appropriate type<br>").append(LS);
+      sb.append("   * and use it in your lexical actions.").append(LS);
+      sb.append("   *").append(LS);
+      sb.append("   * @param ofKind - the token kind").append(LS);
+      sb.append("   * @param image - the token image").append(LS);
+      sb.append("   *").append(LS);
+      sb.append("   * @return a new Token").append(LS);
+      sb.append("   */").append(LS);
+    }
+    sb.append("  public static Token newToken(int ofKind, String image) {").append(LS);
+    sb.append("    switch(ofKind) {").append(LS);
+    sb.append("      default:").append(LS);
+    sb.append("        return new Token(ofKind, image);").append(LS);
+    sb.append("    }").append(LS);
+    sb.append("  }").append(LS).append(LS);
+    
+    /* newToken(final int ofKind) */
+    if (jopt.javaDocComments) {
+      sb.append("  /**").append(LS);
+      sb.append("   * Factory method calling {@link Token#newToken(int, String)} with a null image.")
+          .append(LS);
+      sb.append("   *").append(LS);
+      sb.append("   * @param ofKind - the token kind").append(LS);
+      sb.append("   *").append(LS);
+      sb.append("   * @return a new Token").append(LS);
+      sb.append("   */").append(LS);
+    }
+    sb.append("  public static Token newToken(int ofKind) {").append(LS);
+    sb.append("    return newToken(ofKind, null);").append(LS);
+    sb.append("  }").append(LS).append(LS);
+    
+    /* toString() */
     if (jopt.javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("   * @return the token image").append(LS);
@@ -971,11 +1134,21 @@ public class BaseNodesGenerator {
     }
     sb.append("  @Override").append(LS);
     sb.append("  public String toString() {").append(LS);
-    sb.append("    return tokenImage;").append(LS);
+    sb.append("    return image;").append(LS);
     sb.append("  }").append(LS).append(LS);
     
-    /* NodeToken special tokens method */
+    /* JTB members declarations */
+    sb.append("  /* JTB members declarations */").append(LS).append(LS);
     
+    /* specialTokens */
+    if (jopt.javaDocComments) {
+      sb.append("  /** The list of special tokens. TODO add explanation */").append(LS);
+    }
+    sb.append("  public List<Token> specialTokens;").append(LS).append(LS);
+    
+    ccg.parentPointerDeclaration(sb);
+    
+    /* getSpecialAt(final int i) */
     if (jopt.javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("  * Gets the special token in the special tokens list at a given position.").append(LS);
@@ -984,13 +1157,14 @@ public class BaseNodesGenerator {
       sb.append("  * @return the special token").append(LS);
       sb.append("  */").append(LS);
     }
-    sb.append("  public ").append(nodeToken).append(" getSpecialAt(final int i) {").append(LS);
+    sb.append("  public Token getSpecialAt(final int i) {").append(LS);
     sb.append("    if (specialTokens == null)").append(LS);
     sb.append("      throw new NoSuchElementException(\"No specialTokens in token\"); //$NON-NLS-1$")
         .append(LS);
     sb.append("    return specialTokens.get(i);").append(LS);
     sb.append("  }").append(LS).append(LS);
     
+    /* numSpecials() */
     if (jopt.javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("  * @return the number of special tokens").append(LS);
@@ -1002,6 +1176,7 @@ public class BaseNodesGenerator {
     sb.append("    return specialTokens.size();").append(LS);
     sb.append("  }").append(LS).append(LS);
     
+    /* addSpecial(final Token s) */
     if (jopt.javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("  * Adds a special token to the special tokens list.").append(LS);
@@ -1009,7 +1184,7 @@ public class BaseNodesGenerator {
       sb.append("  * @param s - the special token to add").append(LS);
       sb.append("  */").append(LS);
     }
-    sb.append("  public void addSpecial(final ").append(nodeToken).append(" s) {").append(LS);
+    sb.append("  public void addSpecial(final Token s) {").append(LS);
     sb.append("    if (specialTokens == null)").append(LS);
     sb.append("     specialTokens = new ArrayList<>();").append(LS);
     sb.append("    specialTokens.add(s);").append(LS);
@@ -1018,6 +1193,7 @@ public class BaseNodesGenerator {
     }
     sb.append("  }").append(LS).append(LS);
     
+    /* trimSpecials() */
     if (jopt.javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("  * Trims the special tokens list.").append(LS);
@@ -1026,12 +1202,13 @@ public class BaseNodesGenerator {
     sb.append("  public void trimSpecials() {").append(LS);
     sb.append("    if (specialTokens == null)").append(LS);
     sb.append("      return;").append(LS);
-    sb.append("    ((ArrayList<NodeToken>) specialTokens).trimToSize();").append(LS);
+    sb.append("    ((ArrayList<Token>) specialTokens).trimToSize();").append(LS);
     sb.append("  }").append(LS).append(LS);
     
+    /* getSpecials(final String spc) */
     if (jopt.javaDocComments) {
       sb.append("  /**").append(LS);
-      sb.append("  * Returns the string of the special tokens of the current {@link NodeToken},").append(LS);
+      sb.append("  * Returns the string of the special tokens of the current {@link Token},").append(LS);
       sb.append("  * taking in account a given indentation.").append(LS);
       sb.append("  * @param spc - the indentation").append(LS);
       sb.append("  * @return the string representing the special tokens list").append(LS);
@@ -1043,9 +1220,9 @@ public class BaseNodesGenerator {
     sb.append("    int stLastLine = -1;").append(LS);
     sb.append("    final StringBuilder buf = new StringBuilder(64);").append(LS);
     sb.append("    boolean hasEol = false;").append(LS);
-    sb.append("    for (final Iterator<NodeToken> e = specialTokens.iterator(); e.hasNext();) {").append(LS);
-    sb.append("      final NodeToken st = e.next();").append(LS);
-    sb.append("      final char c = st.tokenImage.charAt(st.tokenImage.length() - 1);").append(LS);
+    sb.append("    for (final Iterator<Token> e = specialTokens.iterator(); e.hasNext();) {").append(LS);
+    sb.append("      final Token st = e.next();").append(LS);
+    sb.append("      final char c = st.image.charAt(st.image.length() - 1);").append(LS);
     sb.append("      hasEol = c == '\\n' || c == '\\r';").append(LS);
     sb.append("      if (stLastLine != -1)").append(LS);
     sb.append("        // not first line ").append(LS);
@@ -1058,7 +1235,7 @@ public class BaseNodesGenerator {
     sb.append("        } else").append(LS);
     sb.append("          // on the same line as the previous").append(LS);
     sb.append("          buf.append(' ');").append(LS);
-    sb.append("      buf.append(st.tokenImage);").append(LS);
+    sb.append("      buf.append(st.image);").append(LS);
     sb.append("      if (!hasEol && e.hasNext())").append(LS);
     sb.append("        // not a single line comment and not the last one").append(LS);
     sb.append("        buf.append(LS);").append(LS);
@@ -1076,10 +1253,11 @@ public class BaseNodesGenerator {
     sb.append("    return buf.toString();").append(LS);
     sb.append("  }").append(LS).append(LS);
     
+    /* withSpecials(final String spc) */
     if (jopt.javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("  * Returns the string of the special tokens and the normal token of the current ")
-          .append("{@link NodeToken},").append(LS);
+          .append("{@link Token},").append(LS);
       sb.append("  * taking in account a given indentation.").append(LS);
       sb.append("  *").append(LS);
       sb.append("  * @param spc - the indentation").append(LS);
@@ -1090,10 +1268,11 @@ public class BaseNodesGenerator {
     sb.append("    return withSpecials(spc, null);").append(LS);
     sb.append("  }").append(LS).append(LS);
     
+    /* withSpecials(final String spc, final String var) */
     if (jopt.javaDocComments) {
       sb.append("  /**").append(LS);
       sb.append("  * Returns the string of the special tokens and the normal token of the current ")
-          .append("{@link NodeToken},").append(LS);
+          .append("{@link Token},").append(LS);
       sb.append("  * taking in account a given indentation and a given assignment.").append(LS);
       sb.append("  *").append(LS);
       sb.append("  * @param spc - the indentation").append(LS);
@@ -1105,22 +1284,22 @@ public class BaseNodesGenerator {
     sb.append("    final String specials = getSpecials(spc);").append(LS);
     sb.append("    int len = specials.length() + 1;").append(LS);
     sb.append("    if (len == 1)").append(LS);
-    sb.append("      return (var == null ? tokenImage : var + tokenImage);").append(LS);
+    sb.append("      return (var == null ? image : var + image);").append(LS);
     sb.append("    if (var != null)").append(LS);
     sb.append("      len += var.length();").append(LS);
-    sb.append("    StringBuilder buf = new StringBuilder(len + tokenImage.length());").append(LS);
+    sb.append("    StringBuilder buf = new StringBuilder(len + image.length());").append(LS);
     sb.append("    buf.append(specials);").append(LS);
     sb.append("    // see if needed to add a space").append(LS);
     sb.append("    int stLastLine = -1;").append(LS);
     sb.append("    if (specialTokens != null)").append(LS);
-    sb.append("    for (NodeToken e : specialTokens) {").append(LS);
+    sb.append("    for (Token e : specialTokens) {").append(LS);
     sb.append("      stLastLine = e.endLine;").append(LS);
     sb.append("    }").append(LS);
     sb.append("    if (stLastLine == beginLine)").append(LS);
     sb.append("      buf.append(' ');").append(LS);
     sb.append("    if (var != null)").append(LS);
     sb.append("      buf.append(var);").append(LS);
-    sb.append("    buf.append(tokenImage);").append(LS);
+    sb.append("    buf.append(image);").append(LS);
     sb.append("    return buf.toString();").append(LS);
     sb.append("  }").append(LS).append(LS);
     
@@ -1128,67 +1307,7 @@ public class BaseNodesGenerator {
     
     ccg.parentPointerGetterSetterImpl(sb);
     
-    nodeTokenChildrenMethods(sb);
-    
-    // TODO voir si cette classe devrait exister
-    /* NodeGTToken class declaration */
-    // et dans ce cas variabiliser NodeGTToken in Constants
-    //
-    // if (ccg.gdbv.parserName.equals("JTBParser")) {
-    //
-    // if (jopt.javaDocComments) {
-    // sb.append(" /**").append(LS);
-    // sb.append(" * NodeToken corresponding to the Greater than Token").append(LS);
-    // sb.append(" */").append(LS);
-    // }
-    // sb.append(" public static class NodeGTToken extends NodeToken {").append(LS);
-    // sb.append(LS);
-    // if (jopt.javaDocComments) {
-    // sb.append(" /**").append(LS);
-    // sb.append(
-    // " * The version identifier for this Serializable class. Increment only if the <i>serialized</i>")
-    // .append(LS);
-    // sb.append(" * form of the class changes.").append(LS);
-    // sb.append(" */").append(LS);
-    // }
-    // sb.append(" private static final long serialVersionUID = 1L;").append(LS);
-    // sb.append(LS);
-    //
-    // if (jopt.javaDocComments) {
-    // sb.append(" /**").append(LS);
-    // sb.append(" * Initializes a {@link NodeGTToken} with a given string and ")
-    // .append("no position information.").append(LS);
-    // sb.append(" *").append(LS);
-    // sb.append(" * @param s - the token string").append(LS);
-    // sb.append(" */").append(LS);
-    // }
-    // sb.append(" public ").append("NodeGTToken").append("(final String s) {").append(LS);
-    // sb.append(" this(s, -1, -1, -1, -1, -1);").append(LS);
-    // sb.append(" }").append(LS).append(LS);
-    //
-    // if (jopt.javaDocComments) {
-    // sb.append(" /**").append(LS);
-    // sb.append(" * Initializes a {@link NodeGTToken} with a given string and ")
-    // .append("position information.").append(LS);
-    // sb.append(" *").append(LS);
-    // sb.append(" * @param s - the token string").append(LS);
-    // sb.append(" * @param kn - the token kind").append(LS);
-    // sb.append(" * @param bl - the first line").append(LS);
-    // sb.append(" * @param bc - the first column").append(LS);
-    // sb.append(" * @param el - the last line").append(LS);
-    // sb.append(" * @param ec - the last column").append(LS);
-    // sb.append(" */").append(LS);
-    // }
-    // sb.append(" public ").append("NodeGTToken")
-    // .append("(final String s, final int kn, final int bl, final int bc, ")
-    // .append("final int el, final int ec) {").append(LS);
-    // sb.append(" super(s, kn, bl, bc, el, ec);").append(LS);
-    // sb.append(" }").append(LS).append(LS);
-    //
-    // sb.append(" int realKind = JTBParserConstants.GT;").append(LS);
-    // sb.append(" }").append(LS);
-    //
-    // }
+    tokenChildrenMethods(sb);
     
     sb.append('}').append(LS);
     
@@ -1212,36 +1331,14 @@ public class BaseNodesGenerator {
     if (jopt.nodesPackageName != null)
       sb.append("package ").append(jopt.nodesPackageName).append(';').append(LS).append(LS);
     
-    ccg.javaCCTokenImport(sb);
-    
     if (jopt.javaDocComments) {
       sb.append("/**").append(LS);
-      sb.append(
-          " * Provides constants reflecting the JTB user nodes and a factory method for creating Tokens.<br>")
-          .append(LS);
+      sb.append(" * Provides constants reflecting the JTB user nodes.<br>").append(LS);
       sb.append(" */").append(LS);
     } else {
       sb.append("@SuppressWarnings(\"javadoc\")").append(LS);
     }
     sb.append("public class ").append(nodeConstants).append(" {").append(LS).append(LS);
-    
-    if (jopt.javaDocComments) {
-      sb.append("  /**").append(LS);
-      sb.append("   * Factory method used by JavaCC to create a new Token object,"
-          + " which will be a (JTB) subclassed NodeToken object.").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @param ofKind - the token kind").append(LS);
-      sb.append("   * @param image - the token image").append(LS);
-      sb.append("   *").append(LS);
-      sb.append("   * @return a new Token (which is also a NodeToken)").append(LS);
-      sb.append("   */").append(LS);
-    }
-    sb.append("  public static Token newToken(int ofKind, String image) {").append(LS);
-    // sb.append(" switch(ofKind) }").append(LS);
-    // sb.append(" default : return new NodeToken(ofKind, image);").append(LS);
-    // sb.append(" }").append(LS);
-    sb.append("    return new NodeToken(ofKind, image);").append(LS);
-    sb.append("  }").append(LS).append(LS);
     
     if (jopt.javaDocComments) {
       sb.append("  /** The number of JTB user nodes */").append(LS);
@@ -1702,11 +1799,11 @@ public class BaseNodesGenerator {
   }
   
   /**
-   * Generates the children methods (implementations) for the {@link NodeToken} classes.
+   * Generates the children methods (implementations) for the {@link Token} classes.
    *
    * @param aSb - a buffer to append to (must be non null)
    */
-  private void nodeTokenChildrenMethods(final StringBuilder aSb) {
+  private void tokenChildrenMethods(final StringBuilder aSb) {
     if (jopt.childrenMethods) {
       CommonCodeGenerator.cmtHeaderChildrenMethods(aSb);
       

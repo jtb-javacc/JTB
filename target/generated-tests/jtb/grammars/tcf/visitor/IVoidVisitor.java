@@ -2,6 +2,7 @@
 package grammars.tcf.visitor;
 
 import grammars.tcf.syntaxtree.*;
+import grammars.tcf.Token;
 
 /**
  * All "IVoidVisitor" visitors must implement this interface.
@@ -49,11 +50,11 @@ public interface IVoidVisitor {
   public void visit(final NodeSequence n);
 
   /**
-   * Visits a {@link NodeToken} node.
+   * Visits a {@link Token} node.
    *
    * @param n - the node to visit
    */
-  public void visit(final NodeToken n);
+  public void visit(final Token n);
 
   /*
    * User grammar generated visit methods

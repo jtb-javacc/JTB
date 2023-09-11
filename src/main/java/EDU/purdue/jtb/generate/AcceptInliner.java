@@ -35,7 +35,7 @@ import EDU.purdue.jtb.parser.syntaxtree.NodeList;
 import EDU.purdue.jtb.parser.syntaxtree.NodeListOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.parser.syntaxtree.NodeToken;
+import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
 
 /**
@@ -49,7 +49,7 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  * Intermediate variables are generated within the visit methods to walk into the syntax tree of the
  * production each method visits.<br>
  * They are of the proper type (always for the {@link NodeList}, {@link NodeListOptional},
- * {@link NodeOptional}, {@link NodeSequence}, {@link NodeToken} types, or the production type if at the first
+ * {@link NodeOptional}, {@link NodeSequence}, {@link Token} types, or the production type if at the first
  * level), or of the {@link INode} type for a production type below the first level.<br>
  * They are generated (through the {@link AcceptInliner#LONGNAMES} build constant flag) in a long format
  * (reflecting all the types and levels of the parent variables) or in a short one (reflecting only their
@@ -80,7 +80,8 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  *          04/2021 : MMa : added null conditions on accept calls in TCF ; removed NodeTCF related code
  *          11/2022 : MMa : removed NodeTCF related code, fixed many issues while improving test grammars
  * @version 1.5.1 : 08/2023 : MMa : added optional annotations in catch of ExpansionUnitTCF ; fixed node
- *          choice generation issue
+ *          choice generation issue; editing changes for coverage analysis; changes due to the NodeToken
+ *          replacement by Token
  */
 public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
   

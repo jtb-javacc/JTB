@@ -103,7 +103,7 @@ import EDU.purdue.jtb.parser.syntaxtree.NodeChoice;
 import EDU.purdue.jtb.parser.syntaxtree.NodeListOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.parser.syntaxtree.NodeToken;
+import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.NullLiteral;
 import EDU.purdue.jtb.parser.syntaxtree.PackageDeclaration;
 import EDU.purdue.jtb.parser.syntaxtree.RelationalExpression;
@@ -165,7 +165,10 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  * @version 1.5.0 : 01-03/2017 : MMa : used try-with-resource ; changed some iterator based for loops to
  *          enhanced for loops ; applied UCDetector advices<br>
  *          1.5.0 02/2018 : MMa : removed methods identical to superclass<br>
- *          1.5.0 04/2021 : MMa : added missing visit(final TypeParameter n)
+ *          1.5.0 04/2021 : MMa : added missing visit(final TypeParameter n)<br>
+ * @version 1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
+ *          replacement by Token
+ * @version 1.5.1 : 09/2023 : MMa : removed noDebugComment flag
  */
 public class JavaPrinter extends DepthFirstVoidVisitor {
   
@@ -176,11 +179,9 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
   /** The indentation object */
   protected Spacing        spc;
   /** The OS line separator */
-  static final String      LS              = System.getProperty("line.separator");
-  /** True to suppress printing of debug comments, false otherwise */
-  boolean                  noDebugComments = false;
+  static final String      LS     = System.getProperty("line.separator");
   /** The node class comment prefix */
-  public String            JNCDCP          = " //jp ";
+  public String            JNCDCP = " //jp ";
   
   /**
    * Constructor with a given buffer and indentation.
@@ -216,16 +217,16 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    */
   
   /**
-   * Visits a NodeToken.
+   * Visits a Token.
    *
    * @param n - the node to visit
    */
   @Override
-  public void visit(final NodeToken n) {
+  public void visit(final Token n) {
     if (jopt.printSpecialTokensJJ) {
       sb.append(n.withSpecials(spc.spc));
     } else {
-      sb.append(n.tokenImage);
+      sb.append(n.image);
     }
   }
   
@@ -281,7 +282,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @return the comment
    */
   private String nodeClassComment(final INode n) {
-    if (!noDebugComments && DEBUG_CLASS) {
+    if (DEBUG_CLASS) {
       final String s = n.toString();
       final int b = s.lastIndexOf('.') + 1;
       final int e = s.indexOf('@');
@@ -305,7 +306,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @return the comment
    */
   private String nodeClassComment(final INode n, final String str) {
-    if (!noDebugComments && DEBUG_CLASS) {
+    if (DEBUG_CLASS) {
       return nodeClassComment(n) + " " + str;
     } else {
       return "";
@@ -331,7 +332,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
       1761039264, JTB_SIG_COMPILATIONUNIT, JTB_USER_COMPILATIONUNIT
   })
   public void visit(final CompilationUnit n) {
-    // probably never used as JJFileAnnotator$CompilationUnitPrinter should be used
+    // coverage: probably never used as JJFileAnnotator$CompilationUnitPrinter should be used
     // we do not use sb.append(spc.spc) as indent level should be 0 at this point
     // f0 -> [ PackageDeclaration() ]
     if (n.f0.present()) {
@@ -711,7 +712,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
   })
   public void visit(final TypeParameter n) {
     // f0 -> < IDENTIFIER >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> [ TypeBound() ]
     final NodeOptional n1 = n.f1;
@@ -1778,13 +1779,13 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
   public void visit(final Literal n) {
     if (n.f0.which <= 1) {
       // %0 < INTEGER_LITERAL > | %1 < FLOATING_POINT_LITERAL >
-      sb.append(jopt.printSpecialTokensJJ ? ((NodeToken) n.f0.choice).withSpecials(spc.spc)
-          : ((NodeToken) n.f0.choice).tokenImage);
+      sb.append(jopt.printSpecialTokensJJ ? ((Token) n.f0.choice).withSpecials(spc.spc)
+          : ((Token) n.f0.choice).image);
     } else if (n.f0.which <= 3) {
       // %2 < CHARACTER_LITERAL > | %3 < STRING_LITERAL >
       sb.append(UnicodeConverter
-          .addUnicodeEscapes(jopt.printSpecialTokensJJ ? ((NodeToken) n.f0.choice).withSpecials(spc.spc)
-              : ((NodeToken) n.f0.choice).tokenImage));
+          .addUnicodeEscapes(jopt.printSpecialTokensJJ ? ((Token) n.f0.choice).withSpecials(spc.spc)
+              : ((Token) n.f0.choice).image));
     } else {
       // %4 BooleanLiteral() | %5 NullLiteral()
       n.f0.choice.accept(this);
@@ -1801,7 +1802,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    */
   @Override
   public void visit(final IntegerLiteral n) {
-    final String str = jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : n.f0.tokenImage;
+    final String str = jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : n.f0.image;
     sb.append(str);
   }
   
@@ -1819,8 +1820,8 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
       -1365265107, JTB_SIG_BOOLEANLITERAL, JTB_USER_BOOLEANLITERAL
   })
   public void visit(final BooleanLiteral n) {
-    final String str = jopt.printSpecialTokensJJ ? ((NodeToken) n.f0.choice).withSpecials(spc.spc)
-        : ((NodeToken) n.f0.choice).tokenImage;
+    final String str = jopt.printSpecialTokensJJ ? ((Token) n.f0.choice).withSpecials(spc.spc)
+        : ((Token) n.f0.choice).image;
     sb.append(str);
   }
   
@@ -1837,7 +1838,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
       241433948, JTB_SIG_STRINGLITERAL, JTB_USER_STRINGLITERAL
   })
   public void visit(final StringLiteral n) {
-    final String str = jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : n.f0.tokenImage;
+    final String str = jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : n.f0.image;
     sb.append(UnicodeConverter.addUnicodeEscapes(str));
   }
   
@@ -1854,7 +1855,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
       -1703344686, JTB_SIG_NULLLITERAL, JTB_USER_NULLLITERAL
   })
   public void visit(final NullLiteral n) {
-    final String str = jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : n.f0.tokenImage;
+    final String str = jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : n.f0.image;
     sb.append(str);
   }
   

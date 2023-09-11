@@ -3,6 +3,7 @@ package grammars.a.sgtree;
 
 import java.util.ArrayList;
 import java.util.List;
+import grammars.a.Token;
 import grammars.a.sgvis.IVis2Visitor;
 import grammars.a.sgvis.IVoidVisitor;
 
@@ -10,16 +11,16 @@ import grammars.a.sgvis.IVoidVisitor;
 @SuppressWarnings("javadoc")
 public class ASTmethodName123 implements INode {
 
-  public NodeToken nodeToken;
+  public Token token;
 
   private INode parent;
 
   private static final long serialVersionUID = 151L;
 
-  public ASTmethodName123(final NodeToken n0) {
-    nodeToken = n0;
-    if (nodeToken != null)
-      nodeToken.setParent(this);
+  public ASTmethodName123(final Token n0) {
+    token = n0;
+    if (token != null)
+      token.setParent(this);
   }
   /*
    * Visitors accept methods (no -novis option, visitors specification : Void,void,None;Vis2,R,A,int[],short...)
@@ -72,19 +73,19 @@ public class ASTmethodName123 implements INode {
 
   @Override
   public int getNbBaseChildren() {
-    return 1;
+    return 0;
   }
 
   @Override
   public int getNbUserChildren() {
-    return 0;
+    return 1;
   }
 
   @Override
   public List<INode> getAllChildren() {
     if (lac == null) {
       lac = new ArrayList<>(1);
-      lac.add(nodeToken);
+      lac.add(token);
     }
     return lac;
   }
@@ -92,8 +93,7 @@ public class ASTmethodName123 implements INode {
   @Override
   public List<INode> getBaseChildren() {
     if (lbc == null) {
-      lbc = new ArrayList<>(1);
-      lbc.add(nodeToken);
+      lbc = new ArrayList<>(0);
     }
     return lbc;
   }
@@ -101,7 +101,8 @@ public class ASTmethodName123 implements INode {
   @Override
   public List<INode> getUserChildren() {
     if (luc == null) {
-      luc = new ArrayList<>(0);
+      luc = new ArrayList<>(1);
+      luc.add(token);
     }
     return luc;
   }

@@ -2,6 +2,7 @@
 package EDU.purdue.jtb.parser.visitor;
 
 import static EDU.purdue.jtb.parser.syntaxtree.JTBNodesConstantsTest.*;
+import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.*;
 
 import java.util.Hashtable;
@@ -80,12 +81,12 @@ public class SimpleStatsVisitorTest extends DepthFirstVoidVisitorTest {
   }
 
   /**
-   * Visits a {@link NodeToken} node.
+   * Visits a {@link Token} node.
    *
    * @param n - the node to visit
    */
   @Override
-  public void visit(final NodeToken n) {
+  public void visit(final Token n) {
     super.visit(n);
   }
 

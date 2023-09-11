@@ -3,6 +3,7 @@ package examples.java.ex1jtb.syntaxtree;
 
 import java.util.ArrayList;
 import java.util.List;
+import examples.java.ex1jtb.Token;
 import examples.java.ex1jtb.visitor.IGenVisitor;
 
 
@@ -15,7 +16,7 @@ import examples.java.ex1jtb.visitor.IGenVisitor;
 public class Identifier implements INode {
 
   /** Child node 0 */
-  public NodeToken f0;
+  public Token f0;
 
   /** The parent node */
   private INode parent;
@@ -28,7 +29,7 @@ public class Identifier implements INode {
    *
    * @param n0 - the child node
    */
-  public Identifier(final NodeToken n0) {
+  public Identifier(final Token n0) {
     f0 = n0;
     if (f0 != null)
       f0.setParent(this);
@@ -103,19 +104,19 @@ public class Identifier implements INode {
   }
 
   /**
-   * @return the number of direct base nodes children (always 1))
+   * @return the number of direct base nodes children (always 0))
    */
   @Override
   public int getNbBaseChildren() {
-    return 1;
+    return 0;
   }
 
   /**
-   * @return the number of direct user nodes children (always 0))
+   * @return the number of direct user nodes children (always 1))
    */
   @Override
   public int getNbUserChildren() {
-    return 0;
+    return 1;
   }
 
   /**
@@ -131,24 +132,24 @@ public class Identifier implements INode {
   }
 
   /**
-   * @return the list of all direct children (base + user nodes) (always 1 nodes))
+   * @return the list of all direct children (base + user nodes) (always 0 nodes))
    */
   @Override
   public List<INode> getBaseChildren() {
     if (lbc == null) {
-      lbc = new ArrayList<>(1);
-      lbc.add(f0);
+      lbc = new ArrayList<>(0);
     }
     return lbc;
   }
 
   /**
-   * @return the list of all direct children (base + user nodes) (always 0 nodes))
+   * @return the list of all direct children (base + user nodes) (always 1 nodes))
    */
   @Override
   public List<INode> getUserChildren() {
     if (luc == null) {
-      luc = new ArrayList<>(0);
+      luc = new ArrayList<>(1);
+      luc.add(f0);
     }
     return luc;
   }

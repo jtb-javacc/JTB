@@ -79,7 +79,7 @@ public class NoOptionGrammar
    * @return a new Token (which is also a NodeToken)
    */
   public static Token newToken(int ofKind, String image) {
-    return new NodeToken(ofKind, image);
+    return new Token(ofKind, image);
   }
 
 }

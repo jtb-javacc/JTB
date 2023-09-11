@@ -159,6 +159,8 @@ public interface FullGrammarConstants {
     "<recrec1>",
     "<recrec2>",
     "<recrec3>",
+    "\" >;\"",
+    "\"<;\"",
   };
 
 }

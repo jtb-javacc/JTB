@@ -3,6 +3,7 @@ package examples.java.ex1jtb.syntaxtree;
 
 import java.util.ArrayList;
 import java.util.List;
+import examples.java.ex1jtb.Token;
 import examples.java.ex1jtb.visitor.IGenVisitor;
 
 
@@ -16,7 +17,7 @@ import examples.java.ex1jtb.visitor.IGenVisitor;
 public class EgInteger implements INode {
 
   /** Child node 0 */
-  public NodeToken f0;
+  public Token f0;
 
   /** Child node 1 */
   public jc_1 f1;
@@ -33,7 +34,7 @@ public class EgInteger implements INode {
    * @param n0 - first child node
    * @param n1 - next child node
    */
-  public EgInteger(final NodeToken n0, final jc_1 n1) {
+  public EgInteger(final Token n0, final jc_1 n1) {
     f0 = n0;
     if (f0 != null)
       f0.setParent(this);
@@ -111,19 +112,19 @@ public class EgInteger implements INode {
   }
 
   /**
-   * @return the number of direct base nodes children (always 1))
+   * @return the number of direct base nodes children (always 0))
    */
   @Override
   public int getNbBaseChildren() {
-    return 1;
+    return 0;
   }
 
   /**
-   * @return the number of direct user nodes children (always 1))
+   * @return the number of direct user nodes children (always 2))
    */
   @Override
   public int getNbUserChildren() {
-    return 1;
+    return 2;
   }
 
   /**
@@ -140,24 +141,24 @@ public class EgInteger implements INode {
   }
 
   /**
-   * @return the list of all direct children (base + user nodes) (always 1 nodes))
+   * @return the list of all direct children (base + user nodes) (always 0 nodes))
    */
   @Override
   public List<INode> getBaseChildren() {
     if (lbc == null) {
-      lbc = new ArrayList<>(1);
-      lbc.add(f0);
+      lbc = new ArrayList<>(0);
     }
     return lbc;
   }
 
   /**
-   * @return the list of all direct children (base + user nodes) (always 1 nodes))
+   * @return the list of all direct children (base + user nodes) (always 2 nodes))
    */
   @Override
   public List<INode> getUserChildren() {
     if (luc == null) {
-      luc = new ArrayList<>(1);
+      luc = new ArrayList<>(2);
+      luc.add(f0);
       luc.add(f1);
     }
     return luc;

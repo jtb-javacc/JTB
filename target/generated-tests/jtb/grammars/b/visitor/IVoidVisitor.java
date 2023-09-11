@@ -2,6 +2,7 @@
 package grammars.b.visitor;
 
 import grammars.b.syntaxtree.*;
+import grammars.b.Token;
 
 /**
  * All "IVoidVisitor" visitors must implement this interface.
@@ -49,11 +50,11 @@ public interface IVoidVisitor {
   public void visit(final NodeSequence n);
 
   /**
-   * Visits a {@link NodeToken} node.
+   * Visits a {@link Token} node.
    *
    * @param n - the node to visit
    */
-  public void visit(final NodeToken n);
+  public void visit(final Token n);
 
   /*
    * User grammar generated visit methods
@@ -299,6 +300,16 @@ public interface IVoidVisitor {
    * @param n - the node to visit
    */
   public void visit(final bp_s n);
+
+  /**
+   * Visits a {@link bp_tcf_ie_w} node, whose child is the following :
+   * <p>
+   * f0 -> < ID ><br>
+   * s: -1032372970<br>
+   *
+   * @param n - the node to visit
+   */
+  public void visit(final bp_tcf_ie_w n);
 
   /**
    * Visits a {@link bp_sa} node, whose child is the following :
@@ -952,13 +963,14 @@ public interface IVoidVisitor {
    * .. .. . #1 ( $0 ";;; " $1 ";;;; " ) )<br>
    * f3 -> ( < NUM_3_9 > )*<br>
    * f4 -> ( ( %0 ":"<br>
-   * .. .. . | %1 #0 ":" #1 < ES > ) )?<br>
+   * .. .. . | %1 < NUM_3_9 ><br>
+   * .. .. . | %2 ":" ) )?<br>
    * f5 -> f0_eu1_peias2()<br>
    * f6 ->   %0 expch_a()<br>
    * .. .. | %1 expch_b()<br>
    * f7 -> ( %0 expch_2ch()<br>
    * .. .. | %1 expch_bl_a() )<br>
-   * s: -1657766831<br>
+   * s: -1377841071<br>
    *
    * @param n - the node to visit
    */
@@ -1136,5 +1148,25 @@ public interface IVoidVisitor {
    * @param n - the node to visit
    */
   public void visit(final f0_laeu2_jc n);
+
+  /**
+   * Visits a {@link gt_1} node, whose child is the following :
+   * <p>
+   * f0 -> " >;"<br>
+   * s: -195872082<br>
+   *
+   * @param n - the node to visit
+   */
+  public void visit(final gt_1 n);
+
+  /**
+   * Visits a {@link lt_1} node, whose child is the following :
+   * <p>
+   * f0 -> "<;"<br>
+   * s: -699028326<br>
+   *
+   * @param n - the node to visit
+   */
+  public void visit(final lt_1 n);
 
 }

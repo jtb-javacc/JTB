@@ -2,6 +2,7 @@
 package grammars.a.sgvis;
 
 import grammars.a.sgtree.*;
+import grammars.a.Token;
 
 @SuppressWarnings("javadoc")
 public interface IVis2Visitor<R, A> {
@@ -16,7 +17,7 @@ public interface IVis2Visitor<R, A> {
 
   public R visit(final NodeSequence n, final A argu, final int[] argu1, final short... argu2);
 
-  public R visit(final NodeToken n, final A argu, final int[] argu1, final short... argu2);
+  public R visit(final Token n, final A argu, final int[] argu1, final short... argu2);
 
   public R visit(final ASTclassDeclaration123 n, final A argu, final int[] argu1, final short... argu2);
 

@@ -259,17 +259,13 @@ public interface JTBParserConstants {
   /** RegularExpression Id. */
   int REMASSIGN = 136;
   /** RegularExpression Id. */
-  int RUNSIGNEDSHIFT = 137;
+  int GT = 137;
   /** RegularExpression Id. */
-  int RSIGNEDSHIFT = 138;
+  int IDENTIFIER = 146;
   /** RegularExpression Id. */
-  int GT = 139;
+  int LETTER = 147;
   /** RegularExpression Id. */
-  int IDENTIFIER = 148;
-  /** RegularExpression Id. */
-  int LETTER = 149;
-  /** RegularExpression Id. */
-  int PART_LETTER = 150;
+  int PART_LETTER = 148;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -421,8 +417,6 @@ public interface JTBParserConstants {
     "\"|=\"",
     "\"^=\"",
     "\"%=\"",
-    "\">>>\"",
-    "\">>\"",
     "\">\"",
     "\"options\"",
     "\"#\"",

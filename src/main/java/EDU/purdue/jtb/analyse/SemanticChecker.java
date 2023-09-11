@@ -52,6 +52,7 @@ import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_EXPANSIONUN
 import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_EXPANSIONUNITTCF;
 import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_JAVACCINPUT;
 import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_JAVACODEPRODUCTION;
+import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_LOCALLOOKAHEAD;
 import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_LOCALVARIABLEDECLARATION;
 import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_PRODUCTION;
 import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_REGEXPRSPEC;
@@ -68,6 +69,7 @@ import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_EXPANSIONU
 import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_EXPANSIONUNITTCF;
 import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_JAVACCINPUT;
 import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_JAVACODEPRODUCTION;
+import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_LOCALLOOKAHEAD;
 import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_LOCALVARIABLEDECLARATION;
 import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_PRODUCTION;
 import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_REGEXPRSPEC;
@@ -93,12 +95,14 @@ import EDU.purdue.jtb.parser.syntaxtree.IfStatement;
 import EDU.purdue.jtb.parser.syntaxtree.JavaCCInput;
 import EDU.purdue.jtb.parser.syntaxtree.JavaCodeProduction;
 import EDU.purdue.jtb.parser.syntaxtree.LabeledStatement;
+import EDU.purdue.jtb.parser.syntaxtree.LocalLookahead;
 import EDU.purdue.jtb.parser.syntaxtree.LocalVariableDeclaration;
 import EDU.purdue.jtb.parser.syntaxtree.NodeChoice;
+import EDU.purdue.jtb.parser.syntaxtree.NodeList;
 import EDU.purdue.jtb.parser.syntaxtree.NodeListOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.parser.syntaxtree.NodeToken;
+import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.OptionBinding;
 import EDU.purdue.jtb.parser.syntaxtree.PrimitiveType;
 import EDU.purdue.jtb.parser.syntaxtree.Production;
@@ -139,6 +143,7 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  * <li>when a user declared variable is not initialized (warning) (javac may complain while compiling the
  * generated parser),</li>
  * <li>when there are extraneous parentheses in a production (warning) (should be better to remove them),</li>
+ * <li>when a no node creation indicator appears in an ExpansionChoices in a syntactic lookahead</li>
  * <li>when a return statement is transformed (information).</li>
  * </ul>
  * <p>
@@ -170,6 +175,7 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  * This visitor is supposed to be run once and not supposed to be run in parallel threads (on the same
  * grammar).
  * </p>
+ * TODO check coverage
  *
  * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
@@ -182,7 +188,9 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  *          and messages
  * @version 1.5.0 : 01-06/2017 : MMa : changed some iterator based for loops to enhanced for loops ; fixed
  *          processing of nodes not to be created ; fixed missing accept call in ExpansionUnit ; added final
- *          in ExpansionUnitTCF's catch
+ *          in ExpansionUnitTCF's catch<br>
+ * @version 1.5.1 : 08/2023 : MMa : changes due to the NodeToken replacement by Token ; added warning in no
+ *          node creation in a syntactic lookahead
  */
 public class SemanticChecker extends DepthFirstVoidVisitor {
   
@@ -192,6 +200,8 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
   final Messages                  mess;
   /** The name of the current production */
   private String                  prod;
+  /** The flag telling we are in a LocalLookahead () */
+  private boolean                 inLA;
   
   /**
    * Constructor.
@@ -201,6 +211,7 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
   public SemanticChecker(final GlobalDataBuilder aGdbv) {
     gdbv = aGdbv;
     mess = aGdbv.jopt.mess;
+    inLA = false;
   }
   
   /**
@@ -297,9 +308,9 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
   })
   public void visit(final JavaCodeProduction n) {
     // f3 -> IdentifierAsString()
-    prod = n.f3.f0.tokenImage;
+    prod = n.f3.f0.image;
     // f2 -> ResultType()
-    NodeToken tk;
+    Token tk;
     final INode in = n.f2.f0.choice;
     if (n.f2.f0.which == 0) {
       // "void" type
@@ -318,16 +329,16 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
         final NodeChoice ch1 = ((ReferenceType) ch.choice).f0;
         if (ch1.which == 0) {
           // PrimitiveType() ( "[" "]" )+
-          tk = (NodeToken) ((PrimitiveType) ((NodeSequence) ch1.choice).elementAt(0)).f0.choice;
+          tk = (Token) ((PrimitiveType) ((NodeSequence) ch1.choice).elementAt(0)).f0.choice;
         } else {
           // ClassOrInterfaceType() ( "[" "]" )*
           tk = ((ClassOrInterfaceType) ((NodeSequence) ch1.choice).elementAt(0)).f0;
         }
       } else {
         // PrimitiveType()
-        tk = (NodeToken) ((PrimitiveType) ch.choice).f0.choice;
+        tk = (Token) ((PrimitiveType) ch.choice).f0.choice;
       }
-      final String resType = tk.tokenImage;
+      final String resType = tk.image;
       // messages in decreasing severity order for proper displaying in the plugin
       // f6 -> [ "%" ]
       if (n.f6.present()) {
@@ -379,18 +390,16 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
   })
   public void visit(final BNFProduction n) {
     // f2 -> IdentifierAsString()
-    prod = n.f2.f0.tokenImage;
+    prod = n.f2.f0.image;
     // f1 -> ResultType()
-    NodeToken tk;
+    Token tk;
     final INode in = n.f1.f0.choice;
     if (n.f1.f0.which == 0) {
       // "void" type
       // f5 -> [ "!" ]
       if (n.f5.present()) {
-        mess.info(
-            "The corresponding JTB node creation will NOT be generated "
-                + "in all places where this BNFProduction '" + prod + "' is used.",
-            n.f2.f0.beginLine, n.f2.f0.beginColumn);
+        mess.info("The corresponding JTB node creation will NOT be generated in all places where this " //
+            + "BNFProduction '" + prod + "' is used.", n.f2.f0.beginLine, n.f2.f0.beginColumn);
       }
     } else {
       // Type(
@@ -400,16 +409,16 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
         final NodeChoice ch1 = ((ReferenceType) ch.choice).f0;
         if (ch1.which == 0) {
           // PrimitiveType() ( "[" "]" )+
-          tk = (NodeToken) ((PrimitiveType) ((NodeSequence) ch1.choice).elementAt(0)).f0.choice;
+          tk = (Token) ((PrimitiveType) ((NodeSequence) ch1.choice).elementAt(0)).f0.choice;
         } else {
           // ClassOrInterfaceType() ( "[" "]" )*
           tk = ((ClassOrInterfaceType) ((NodeSequence) ch1.choice).elementAt(0)).f0;
         }
       } else {
         // PrimitiveType()
-        tk = (NodeToken) ((PrimitiveType) ch.choice).f0.choice;
+        tk = (Token) ((PrimitiveType) ch.choice).f0.choice;
       }
-      final String resType = tk.tokenImage;
+      final String resType = tk.image;
       // messages in decreasing severity order for proper displaying in the plugin
       // f5 -> [ "!" ]
       if (n.f5.present()) {
@@ -473,8 +482,49 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
       -2134365682, JTB_SIG_EXPANSION, JTB_USER_EXPANSION
   })
   public void visit(final Expansion n) {
-    // visit only f1 -> ( ExpansionUnit() )+
-    n.f1.accept(this);
+    // f0 -> ( #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" )?
+    final NodeOptional n0 = n.f0;
+    if (n0.present()) {
+      // #2 LocalLookahead()
+      // Token tk = (Token) ((NodeSequence) n0.node).elementAt(0);
+      // mess.info(" Exp: inLA = " + inLA + " <- true", tk.beginLine, tk.beginColumn);
+      ((NodeSequence) n0.node).elementAt(2).accept(this);
+    }
+    // f1 -> ( ExpansionUnit() )+
+    final NodeList n1 = n.f1;
+    for (int i = 0; i < n1.size(); i++) {
+      final INode lsteai = n1.elementAt(i);
+      lsteai.accept(this);
+    }
+  }
+  
+  /**
+   * Visits a {@link LocalLookahead} node, whose children are the following :
+   * <p>
+   * f0 -> [ IntegerLiteral() ]<br>
+   * f1 -> [ "," ]<br>
+   * f2 -> [ ExpansionChoices() ]<br>
+   * f3 -> [ "," ]<br>
+   * f4 -> [ #0 "{"<br>
+   * .. .. . #1 [ Expression() ]<br>
+   * .. .. . #2 "}" ]<br>
+   * s: -1879920786<br>
+   *
+   * @param n - the node to visit
+   */
+  @Override
+  @NodeFieldsSignature({
+      -1879920786, JTB_SIG_LOCALLOOKAHEAD, JTB_USER_LOCALLOOKAHEAD
+  })
+  public void visit(final LocalLookahead n) {
+    // f2 -> [ ExpansionChoices() ]
+    final NodeOptional n2 = n.f2;
+    if (n2.present()) {
+      boolean saveInLA = inLA;
+      inLA = true;
+      n2.accept(this);
+      inLA = saveInLA;
+    }
   }
   
   /**
@@ -507,6 +557,9 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
     switch (n.f0.which) {
     case 0:
       // %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"
+      // Token tk2 = (Token) ((NodeSequence) n.f0.choice).elementAt(0);
+      // mess.info(" EU: inLA = " + inLA + " <- true", tk2.beginLine, tk2.beginColumn);
+      ((NodeSequence) n.f0.choice).elementAt(2).accept(this);
       return;
     
     case 1:
@@ -539,8 +592,8 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
         if (ch.which == 0) {
           // IdentifierAsString() -> jtbrt_Identifier
           // $0 IdentifierAsString() $1 Arguments() $2 [ "!" ]
-          final NodeToken tk = ((IdentifierAsString) seq1.elementAt(0)).f0;
-          final String ident = tk.tokenImage;
+          final Token tk = ((IdentifierAsString) seq1.elementAt(0)).f0;
+          final String ident = tk.image;
           final String val = gdbv.getProdHM().get(ident);
           if ((JC_IND + "void").equals(val)) {
             mess.softErr("Use in an assignment of the JavaCodeProduction '" + ident + "()' of type void.",
@@ -556,8 +609,8 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
       if (ch.which == 0) {
         // $0 IdentifierAsString() $1 Arguments() $2 [ "!" ]
         // display messages
-        final NodeToken tk = ((IdentifierAsString) seq1.elementAt(0)).f0;
-        final String ident = tk.tokenImage;
+        final Token tk = ((IdentifierAsString) seq1.elementAt(0)).f0;
+        final String ident = tk.image;
         final String val = gdbv.getProdHM().get(ident);
         if (val == null) {
           mess.softErr("Use (in an ExpansionUnit) of an identifier '" + ident
@@ -565,22 +618,25 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
         } else {
           final String indProd = val.substring(0, 1);
           // messages in decreasing severity order for proper displaying in the plugin
-          if (((NodeOptional) seq1.elementAt(2)).present()) {
-            if (JC_IND.equals(indProd)) {
+          NodeOptional opt1 = (NodeOptional) seq1.elementAt(2);
+          if (opt1.present()) {
+            if (inLA) {
+              Token tk1 = (Token) opt1.node;
+              mess.warning("Invalid no node creation indication ('!' character) as no tree "
+                  + "is generated inside a syntactic lookahead.", tk1.beginLine, tk1.beginColumn);
+            } else if (JC_IND.equals(indProd)) {
               if (gdbv.getNotTbcNodesHM().containsKey(ident)) {
-                mess.warning(
-                    "Unnecessary no node creation indication ('!' character) as the " + "JavaCodeProduction '"
-                        + prod + "()' is not indicated to " + "be generated (no '%' character).",
-                    tk.beginLine, tk.beginColumn);
+                mess.warning("Unnecessary no node creation indication ('!' character) as the " //
+                    + "JavaCodeProduction '" + prod + "()' is not indicated to be generated "
+                    + "(no '%' character).", tk.beginLine, tk.beginColumn);
               } else {
                 mess.info("The corresponding JTB (JavaCode) node creation will NOT be generated here "
                     + "(as requested here).", tk.beginLine, tk.beginColumn);
               }
             } else if (BNF_IND.equals(indProd)) {
               if (gdbv.getNotTbcNodesHM().containsKey(ident)) {
-                mess.warning(
-                    "Unnecessary no node creation indication ('!' character) as the " + "BNFProduction '"
-                        + prod + "()' is indicated not to " + "be generated ('!' character).",
+                mess.warning("Unnecessary no node creation indication ('!' character) as the " //
+                    + "BNFProduction '" + prod + "()' is indicated not to " + "be generated ('!' character).",
                     tk.beginLine, tk.beginColumn);
               } else {
                 mess.info("The corresponding JTB (BNF) node creation will NOT be generated here "
@@ -592,7 +648,7 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
       } else {
         // $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ] $2 [ "!" ]
         // display messages
-        NodeToken tk = null;
+        Token tk = null;
         int lnre = 0;
         int cnre = 0;
         final RegularExpression re = (RegularExpression) seq1.elementAt(0);
@@ -611,17 +667,23 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
             // %2 #0 "<" #1 IdentifierAsString() #2 ">"
             tk = ((IdentifierAsString) seq2.elementAt(1)).f0;
           }
-          lnre = ((NodeToken) seq2.elementAt(0)).beginLine;
-          cnre = ((NodeToken) seq2.elementAt(0)).beginColumn;
+          lnre = ((Token) seq2.elementAt(0)).beginLine;
+          cnre = ((Token) seq2.elementAt(0)).beginColumn;
         }
         // messages in decreasing severity order for proper displaying in the plugin
-        if (((NodeOptional) seq1.elementAt(2)).present()) {
-          mess.info(
-              "The corresponding JTB NodeToken creation will NOT be generated here " + "(as requested here).",
-              lnre, cnre);
+        NodeOptional opt1 = (NodeOptional) seq1.elementAt(2);
+        if (opt1.present()) {
+          if (inLA) {
+            Token tk1 = (Token) opt1.node;
+            mess.warning("Invalid no node creation indication ('!' character) as no tree "
+                + "is generated inside a syntactic lookahead.", tk1.beginLine, tk1.beginColumn);
+          } else {
+            mess.info("The corresponding JTB Token creation will NOT be generated here (as requested here).",
+                lnre, cnre);
+          }
         }
-        if ((tk != null) && DONT_CREATE.equals(gdbv.getTokenHM().get(tk.tokenImage))) {
-          mess.info("The corresponding JTB NodeToken creation will NOT be generated here "
+        if ((tk != null) && DONT_CREATE.equals(gdbv.getTokenHM().get(tk.image))) {
+          mess.info("The corresponding JTB Token creation will NOT be generated here "
               + "(as requested in the RegExprSpec declaration).", lnre, cnre);
         }
       }
@@ -635,7 +697,7 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
       final ExpansionChoices choice = (ExpansionChoices) seq.elementAt(1);
       final NodeOptional mod = (NodeOptional) seq.elementAt(3);
       if (!mod.present() && !choice.f1.present()) {
-        final NodeToken tk = (NodeToken) ((NodeSequence) n.f0.choice).elementAt(0);
+        final Token tk = (Token) ((NodeSequence) n.f0.choice).elementAt(0);
         mess.info("Unnecessary parentheses in '" + prod + "()'.", tk.beginLine, tk.beginColumn);
       }
       choice.accept(this);
@@ -656,27 +718,29 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
    * f2 -> ExpansionChoices()<br>
    * f3 -> "}"<br>
    * f4 -> ( #0 "catch" #1 "("<br>
-   * .. .. . #2 [ "final" ]<br>
-   * .. .. . #3 Name() #4 < IDENTIFIER > #5 ")" #6 Block() )*<br>
+   * .. .. . #2 ( Annotation() )*<br>
+   * .. .. . #3 [ "final" ]<br>
+   * .. .. . #4 Name() #5 < IDENTIFIER > #6 ")" #7 Block() )*<br>
    * f5 -> [ #0 "finally" #1 Block() ]<br>
-   * s: -1347962218<br>
+   * s: 1601707097<br>
    *
    * @param n - the node to visit
    */
   @Override
   @NodeFieldsSignature({
-      -1347962218, JTB_SIG_EXPANSIONUNITTCF, JTB_USER_EXPANSIONUNITTCF
+      1601707097, JTB_SIG_EXPANSIONUNITTCF, JTB_USER_EXPANSIONUNITTCF
   })
   public void visit(final ExpansionUnitTCF n) {
     // f2 -> ExpansionChoices()
     n.f2.accept(this);
     // f4 -> ( #0 "catch" #1 "("
-    // .. .. . #2 [ "final" ]
-    // .. .. . #3 Name() #4 < IDENTIFIER > #5 ")" #6 Block() )*
+    // .. .. . #2 ( Annotation() )*
+    // .. .. . #3 [ "final" ]
+    // .. .. . #4 Name() #5 < IDENTIFIER > #6 ")" #7 Block() )*
     if (n.f4.present()) {
       for (int i = 0; i < n.f4.size(); i++) {
-        // #6 Block()
-        ((NodeSequence) n.f4.elementAt(i)).elementAt(6).accept(this);
+        // #7 Block()
+        ((NodeSequence) n.f4.elementAt(i)).elementAt(7).accept(this);
       }
     }
     // f5 -> [ #0 "finally" #1 Block() ]
@@ -757,13 +821,13 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
     // f1 -> [ "!" ]
     // display an info message
     if (n.f1.present()) {
-      NodeToken tk = null;
+      Token tk = null;
       // f0 -> RegularExpression()
       final NodeChoice ch = n.f0.f0;
       if (ch.which == 0) {
         tk = ((StringLiteral) ch.choice).f0;
       } else {
-        tk = (NodeToken) ((NodeSequence) ch.choice).elementAt(0);
+        tk = (Token) ((NodeSequence) ch.choice).elementAt(0);
       }
       mess.info("The corresponding JTB node creation will NOT be generated "
           + "in all places where this RegExprSpec is used.", tk.beginLine, tk.beginColumn);
@@ -786,7 +850,7 @@ public class SemanticChecker extends DepthFirstVoidVisitor {
   public void visit(final VariableDeclarator n) {
     // f1 -> [ #0 "=" #1 VariableInitializer() ]
     if (!n.f1.present()) {
-      final String var = n.f0.f0.tokenImage;
+      final String var = n.f0.f0.image;
       mess.warning("Non initialized user variable '" + var
           + "'. May lead to compiler error(s) (specially for 'Token' variables). "
           + "Check in generated parser.", n.f0.f0.beginLine, n.f0.f0.beginColumn);

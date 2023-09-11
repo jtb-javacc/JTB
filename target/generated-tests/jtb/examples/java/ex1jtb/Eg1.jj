@@ -8,8 +8,6 @@ options
   // JTB_VIS = "Gen,void,java.lang.String";
   // JTB_CHM = true;
   // JTB_PP = true;
-  TOKEN_FACTORY = "examples.java.ex1jtb.syntaxtree.NodeConstants"; // added by JTB 1.5.1
-
 }
 
 PARSER_BEGIN(Eg1)
@@ -88,14 +86,12 @@ TOKEN :
 Start Start() :
 {
   Expression n0 = null;
-  NodeToken n1 = null;
-  Token n2 = null;
+  Token n1 = null;
   Start jtbNode = null;
 }
 {
   n0 = Expression()
-  n2 = ";"
-  { n1 = (NodeToken) n2; }
+  n1 = ";"
   { jtbNode = new Start(n0, n1); }
   { return jtbNode; }
 }
@@ -117,13 +113,9 @@ AdditiveExpression AdditiveExpression() :
   NodeListOptional n1 = new NodeListOptional();
   NodeSequence n2 = null;
   NodeChoice n3 = null;
-  NodeSequence n4 = null;
-  NodeToken n5 = null;
-  Token n6 = null;
-  NodeSequence n7 = null;
-  NodeToken n8 = null;
-  Token n9 = null;
-  MultiplicativeExpression n10 = null;
+  Token n4 = null;
+  Token n5 = null;
+  MultiplicativeExpression n6 = null;
   AdditiveExpression jtbNode = null;
 }
 {
@@ -132,22 +124,16 @@ AdditiveExpression AdditiveExpression() :
     { n2 = new NodeSequence(2); }
     (
       (
-        { n4 = new NodeSequence(1); }
-        n6 = "+"
-        { n5 = (NodeToken) n6; }
-        { n4.addNode(n5); }
+        n4 = "+"
         { n3 = new NodeChoice(n4, 0, 2); }
       |
-        { n7 = new NodeSequence(1); }
-        n9 = "-"
-        { n8 = (NodeToken) n9; }
-        { n7.addNode(n8); }
-        { n3 = new NodeChoice(n7, 1, 2); }
+        n5 = "-"
+        { n3 = new NodeChoice(n5, 1, 2); }
       )
     )
     { n2.addNode(n3); }
-    n10 = MultiplicativeExpression()
-    { n2.addNode(n10); }
+    n6 = MultiplicativeExpression()
+    { n2.addNode(n6); }
     { n1.addNode(n2); }
   )*
   { n1.nodes.trimToSize(); }
@@ -161,16 +147,10 @@ MultiplicativeExpression MultiplicativeExpression() :
   NodeListOptional n1 = new NodeListOptional();
   NodeSequence n2 = null;
   NodeChoice n3 = null;
-  NodeSequence n4 = null;
-  NodeToken n5 = null;
+  Token n4 = null;
+  Token n5 = null;
   Token n6 = null;
-  NodeSequence n7 = null;
-  NodeToken n8 = null;
-  Token n9 = null;
-  NodeSequence n10 = null;
-  NodeToken n11 = null;
-  Token n12 = null;
-  UnaryExpression n13 = null;
+  UnaryExpression n7 = null;
   MultiplicativeExpression jtbNode = null;
 }
 {
@@ -179,28 +159,19 @@ MultiplicativeExpression MultiplicativeExpression() :
     { n2 = new NodeSequence(2); }
     (
       (
-        { n4 = new NodeSequence(1); }
-        n6 = "*"
-        { n5 = (NodeToken) n6; }
-        { n4.addNode(n5); }
+        n4 = "*"
         { n3 = new NodeChoice(n4, 0, 3); }
       |
-        { n7 = new NodeSequence(1); }
-        n9 = "/"
-        { n8 = (NodeToken) n9; }
-        { n7.addNode(n8); }
-        { n3 = new NodeChoice(n7, 1, 3); }
+        n5 = "/"
+        { n3 = new NodeChoice(n5, 1, 3); }
       |
-        { n10 = new NodeSequence(1); }
-        n12 = "%"
-        { n11 = (NodeToken) n12; }
-        { n10.addNode(n11); }
-        { n3 = new NodeChoice(n10, 2, 3); }
+        n6 = "%"
+        { n3 = new NodeChoice(n6, 2, 3); }
       )
     )
     { n2.addNode(n3); }
-    n13 = UnaryExpression()
-    { n2.addNode(n13); }
+    n7 = UnaryExpression()
+    { n2.addNode(n7); }
     { n1.addNode(n2); }
   )*
   { n1.nodes.trimToSize(); }
@@ -212,39 +183,29 @@ UnaryExpression UnaryExpression() :
 {
   NodeChoice n0 = null;
   NodeSequence n1 = null;
-  NodeToken n2 = null;
-  Token n3 = null;
-  Expression n4 = null;
-  NodeToken n5 = null;
-  Token n6 = null;
-  NodeSequence n7 = null;
-  Identifier n8 = null;
-  NodeSequence n9 = null;
-  EgInteger n10 = null;
+  Token n2 = null;
+  Expression n3 = null;
+  Token n4 = null;
+  Identifier n5 = null;
+  EgInteger n6 = null;
   UnaryExpression jtbNode = null;
 }
 {
   (
     { n1 = new NodeSequence(3); }
-    n3 = "("
-    { n2 = (NodeToken) n3; }
+    n2 = "("
     { n1.addNode(n2); }
-    n4 = Expression()
+    n3 = Expression()
+    { n1.addNode(n3); }
+    n4 = ")"
     { n1.addNode(n4); }
-    n6 = ")"
-    { n5 = (NodeToken) n6; }
-    { n1.addNode(n5); }
     { n0 = new NodeChoice(n1, 0, 3); }
   |
-    { n7 = new NodeSequence(1); }
-    n8 = Identifier()
-    { n7.addNode(n8); }
-    { n0 = new NodeChoice(n7, 1, 3); }
+    n5 = Identifier()
+    { n0 = new NodeChoice(n5, 1, 3); }
   |
-    { n9 = new NodeSequence(1); }
-    n10 = EgInteger()
-    { n9.addNode(n10); }
-    { n0 = new NodeChoice(n9, 2, 3); }
+    n6 = EgInteger()
+    { n0 = new NodeChoice(n6, 2, 3); }
   )
   { jtbNode = new UnaryExpression(n0); }
   { return jtbNode; }
@@ -252,13 +213,11 @@ UnaryExpression UnaryExpression() :
 
 Identifier Identifier() :
 {
-  NodeToken n0 = null;
-  Token n1 = null;
+  Token n0 = null;
   Identifier jtbNode = null;
 }
 {
-  n1 = < IDENTIFIER >
-  { n0 = (NodeToken) n1; }
+  n0 = < IDENTIFIER >
   jc_0()
   { jtbNode = new Identifier(n0); }
   { return jtbNode; }
@@ -266,16 +225,14 @@ Identifier Identifier() :
 
 EgInteger EgInteger() :
 {
-  NodeToken n0 = null;
-  Token n1 = null;
-  jc_1 n2 = null;
+  Token n0 = null;
+  jc_1 n1 = null;
   EgInteger jtbNode = null;
 }
 {
-  n1 = < INTEGER_LITERAL >
-  { n0 = (NodeToken) n1; }
-  n2 = jc_1()
-  { jtbNode = new EgInteger(n0, n2); }
+  n0 = < INTEGER_LITERAL >
+  n1 = jc_1()
+  { jtbNode = new EgInteger(n0, n1); }
   { return jtbNode; }
 }
 
@@ -284,6 +241,7 @@ JAVACODE int jc_0()
   int i = 0;
   return i;
 }
+
 JAVACODE jc_1 jc_1() /*%*/ 
 {
   int j = 0;jtbrt_jc_1 = j;

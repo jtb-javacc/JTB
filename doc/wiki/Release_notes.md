@@ -1,12 +1,13 @@
 # Java Tree Builder (JTB) - Release notes (dd/mm/yy)
 
-### Version 1.5.1 - jtb-1.5.1.jar of xx/08/2023, not yet committed on GitHub, included in the Eclipse JavaCC Plug-in v1.6.1
-- fixed node choice generation issue
+### Version 1.5.1 - jtb-1.5.1.jar of xx/08/2023, to be committed on GitHub, to be included in the Eclipse JavaCC Plug-in v1.6.1
+- fixed node generation issues
 - changed package, grammar and out file names to be more aligned
 - improved imports generation with different combinations of options
 - improved build of no options grammars to align with Eclipse build
 - added optional annotations in catch of ExpansionUnitTCF
 - enriched test cases with no package grammars and more combinations of options
+- suppressed the (internal JavaCC) Token.GTToken class and the NodeToken.tokenImage field
 
 ### Version 1.5.0 - jtb-1.5.0.jar of 03/05/2021, never committed on GitHub, included in the Eclipse JavaCC Plug-in v1.6.0
 - updated docs (README.md, doc/Release_notes.md, doc/HowToBuild.md), added doc/wiki/*

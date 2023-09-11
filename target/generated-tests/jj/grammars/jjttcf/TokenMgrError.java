@@ -3,7 +3,8 @@
 // package is different to avoid overwriting the JTB grammar's generated filespackage grammars.jjttcf;
 
 /** Token Manager Error. */
-@SuppressWarnings ("all") public class TokenMgrError extends Error
+@SuppressWarnings("all")
+public class TokenMgrError extends Error
 {
 
   /**

@@ -3,7 +3,8 @@
 package grammars.tcf;
 
 /** Token Manager Error. */
-@SuppressWarnings ("all") public class TokenMgrError extends Error
+@SuppressWarnings("all")
+public class TokenMgrError extends Error
 {
 
   /**

@@ -60,7 +60,7 @@ import EDU.purdue.jtb.common.UserClassInfo.FieldInfo;
  * Class {@link TreeFormatterGenerator} generates the TreeFormatter visitor which is a skeleton
  * pretty-printer.<br>
  * Using some pre-defined methods, users can quickly and easily create a formatter for their grammar.<br>
- * The formatter will then take a tree, insert token location information into the NodeTokens of the tree.<br>
+ * The formatter will then take a tree, insert token location information into the Tokens of the tree.<br>
  * TreeDumper can then be used to output the result.<br>
  * Note that unlike the other automatically generated file, since this one must be edited to be useful, JTB
  * will not overwrite this file automatically.<br>
@@ -75,7 +75,9 @@ import EDU.purdue.jtb.common.UserClassInfo.FieldInfo;
  * @version 1.4.3 : 03/2010 : MMa : fixed output of constructor
  * @version 1.4.8 : 10/2014 : MMa : fixed NPE on classes without fields
  * @version 1.5.0 : 01-06/2017 : MMa : used try-with-resource ; applied changes following new class FieldInfo
- *          ; passed some generated methods static ; always generate all javadoc comments
+ *          ; passed some generated methods static ; always generate all javadoc comments<br>
+ * @version 1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
+ *          replacement by Token
  */
 public class TreeFormatterGenerator {
   
@@ -147,6 +149,11 @@ public class TreeFormatterGenerator {
     
     sb.append(fileHeaderComment).append(LS);
     sb.append("package ").append(jopt.visitorsPackageName).append(";").append(LS).append(LS);
+    
+    sb.append("import ");
+    if (jopt.grammarPackageName != null)
+      sb.append(jopt.grammarPackageName).append('.');
+    sb.append(nodeToken).append(';').append(LS);
     sb.append("import java.util.ArrayList;").append(LS);
     sb.append("import java.util.Iterator;").append(LS).append(LS);
     sb.append("import ");
@@ -326,7 +333,7 @@ public class TreeFormatterGenerator {
     
     sb.append("  /**").append(LS);
     sb.append("   * Executes the commands waiting in the command queue,<br>").append(LS);
-    sb.append("   * then inserts the proper location information into the current NodeToken.").append(LS);
+    sb.append("   * then inserts the proper location information into the current Token.").append(LS);
     sb.append("   * <p>").append(LS);
     sb.append("   * If there are any special tokens preceding this token,<br>").append(LS);
     sb.append("   * they will be given the current location information.<br>").append(LS);
@@ -359,12 +366,12 @@ public class TreeFormatterGenerator {
     sb.append("    }").append(LS).append(LS);
     sb.append("    cmdQueue.removeAll(cmdQueue);").append(LS).append(LS);
     sb.append("    //").append(LS);
-    sb.append("    // Handle all special tokens preceding this NodeToken").append(LS);
+    sb.append("    // Handle all special tokens preceding this Token").append(LS);
     sb.append("    //").append(LS);
     sb.append("    if (").append(genNodeVar).append(".numSpecials() > 0)").append(LS);
     sb.append("      for (").append(nodeToken).append(" e : ").append(genNodeVar).append(".specialTokens) {")
         .append(LS);
-    sb.append("       NodeToken special = e;").append(LS).append(LS);
+    sb.append("       Token special = e;").append(LS).append(LS);
     sb.append("       //").append(LS);
     sb.append("       // Place the token").append(LS);
     sb.append("       // Move cursor to next line after the special token").append(LS);
@@ -380,23 +387,22 @@ public class TreeFormatterGenerator {
     
     sb.append("  /**").append(LS);
     sb.append("   * Inserts token location (beginLine, beginColumn, endLine, endColumn)<br>").append(LS);
-    sb.append("   * information into the NodeToken.<br>").append(LS);
+    sb.append("   * information into the Token.<br>").append(LS);
     sb.append("   * Takes into account line-wrap. Does not update curLine and curColumn.").append(LS);
     sb.append("   *").append(LS);
-    sb.append("   * @param ").append(genNodeVar).append(" - the NodeToken to insert").append(LS);
+    sb.append("   * @param ").append(genNodeVar).append(" - the Token to insert").append(LS);
     sb.append("   * @param aLine - the insertion line number").append(LS);
     sb.append("   * @param aColumn - the insertion column number").append(LS);
     sb.append("   */").append(LS);
     sb.append("  private void placeToken(final ").append(nodeToken).append(" ").append(genNodeVar)
         .append(", final int aLine, final int aColumn) {").append(LS);
-    sb.append("    final int length = ").append(genNodeVar).append(".tokenImage.length();").append(LS);
+    sb.append("    final int length = ").append(genNodeVar).append(".image.length();").append(LS);
     sb.append("    int line = aLine;").append(LS);
     sb.append("    int column = aColumn;").append(LS).append(LS);
     sb.append("    //").append(LS);
     sb.append("    // Find beginning of token.  Only line-wrap for single-line tokens").append(LS);
     sb.append("    //").append(LS);
-    sb.append("    if (!lineWrap || ").append(genNodeVar).append(".tokenImage.indexOf('\\n') != -1 ||")
-        .append(LS);
+    sb.append("    if (!lineWrap || ").append(genNodeVar).append(".image.indexOf('\\n') != -1 ||").append(LS);
     sb.append("       column + length <= wrapWidth)").append(LS);
     sb.append("       ").append(genNodeVar).append(".beginColumn = column;").append(LS);
     sb.append("    else {").append(LS);
@@ -409,7 +415,7 @@ public class TreeFormatterGenerator {
     sb.append("    // Find end of token; don't count '\\n' if it's the last character").append(LS);
     sb.append("    //").append(LS);
     sb.append("    for (int i = 0; i < length; ++i) {").append(LS);
-    sb.append("       if (").append(genNodeVar).append(".tokenImage.charAt(i) == '\\n' && i < length - 1) {")
+    sb.append("       if (").append(genNodeVar).append(".image.charAt(i) == '\\n' && i < length - 1) {")
         .append(LS);
     sb.append("        ++line;").append(LS);
     sb.append("        column = 1;").append(LS);

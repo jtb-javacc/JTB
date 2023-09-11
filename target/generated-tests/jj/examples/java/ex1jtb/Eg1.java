@@ -32,12 +32,10 @@ public class Eg1 implements Eg1Constants {
   }
 
   static final public Start Start() throws ParseException {Expression n0 = null;
-  NodeToken n1 = null;
-  Token n2 = null;
+  Token n1 = null;
   Start jtbNode = null;
     n0 = Expression();
-    n2 = jj_consume_token(14);
-n1 = (NodeToken) n2;
+    n1 = jj_consume_token(14);
 jtbNode = new Start(n0, n1);
 {if ("" != null) return jtbNode;}
     throw new Error("Missing return statement in function");
@@ -55,13 +53,9 @@ jtbNode = new Expression(n0);
   NodeListOptional n1 = new NodeListOptional();
   NodeSequence n2 = null;
   NodeChoice n3 = null;
-  NodeSequence n4 = null;
-  NodeToken n5 = null;
-  Token n6 = null;
-  NodeSequence n7 = null;
-  NodeToken n8 = null;
-  Token n9 = null;
-  MultiplicativeExpression n10 = null;
+  Token n4 = null;
+  Token n5 = null;
+  MultiplicativeExpression n6 = null;
   AdditiveExpression jtbNode = null;
     n0 = MultiplicativeExpression();
     label_1:
@@ -79,19 +73,13 @@ jtbNode = new Expression(n0);
 n2 = new NodeSequence(2);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case 15:{
-n4 = new NodeSequence(1);
-        n6 = jj_consume_token(15);
-n5 = (NodeToken) n6;
-n4.addNode(n5);
+        n4 = jj_consume_token(15);
 n3 = new NodeChoice(n4, 0, 2);
         break;
         }
       case 16:{
-n7 = new NodeSequence(1);
-        n9 = jj_consume_token(16);
-n8 = (NodeToken) n9;
-n7.addNode(n8);
-n3 = new NodeChoice(n7, 1, 2);
+        n5 = jj_consume_token(16);
+n3 = new NodeChoice(n5, 1, 2);
         break;
         }
       default:
@@ -100,8 +88,8 @@ n3 = new NodeChoice(n7, 1, 2);
         throw new ParseException();
       }
 n2.addNode(n3);
-      n10 = MultiplicativeExpression();
-n2.addNode(n10);
+      n6 = MultiplicativeExpression();
+n2.addNode(n6);
 n1.addNode(n2);
     }
 n1.nodes.trimToSize();
@@ -114,16 +102,10 @@ jtbNode = new AdditiveExpression(n0, n1);
   NodeListOptional n1 = new NodeListOptional();
   NodeSequence n2 = null;
   NodeChoice n3 = null;
-  NodeSequence n4 = null;
-  NodeToken n5 = null;
+  Token n4 = null;
+  Token n5 = null;
   Token n6 = null;
-  NodeSequence n7 = null;
-  NodeToken n8 = null;
-  Token n9 = null;
-  NodeSequence n10 = null;
-  NodeToken n11 = null;
-  Token n12 = null;
-  UnaryExpression n13 = null;
+  UnaryExpression n7 = null;
   MultiplicativeExpression jtbNode = null;
     n0 = UnaryExpression();
     label_2:
@@ -142,27 +124,18 @@ jtbNode = new AdditiveExpression(n0, n1);
 n2 = new NodeSequence(2);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case 17:{
-n4 = new NodeSequence(1);
-        n6 = jj_consume_token(17);
-n5 = (NodeToken) n6;
-n4.addNode(n5);
+        n4 = jj_consume_token(17);
 n3 = new NodeChoice(n4, 0, 3);
         break;
         }
       case 18:{
-n7 = new NodeSequence(1);
-        n9 = jj_consume_token(18);
-n8 = (NodeToken) n9;
-n7.addNode(n8);
-n3 = new NodeChoice(n7, 1, 3);
+        n5 = jj_consume_token(18);
+n3 = new NodeChoice(n5, 1, 3);
         break;
         }
       case 19:{
-n10 = new NodeSequence(1);
-        n12 = jj_consume_token(19);
-n11 = (NodeToken) n12;
-n10.addNode(n11);
-n3 = new NodeChoice(n10, 2, 3);
+        n6 = jj_consume_token(19);
+n3 = new NodeChoice(n6, 2, 3);
         break;
         }
       default:
@@ -171,8 +144,8 @@ n3 = new NodeChoice(n10, 2, 3);
         throw new ParseException();
       }
 n2.addNode(n3);
-      n13 = UnaryExpression();
-n2.addNode(n13);
+      n7 = UnaryExpression();
+n2.addNode(n7);
 n1.addNode(n2);
     }
 n1.nodes.trimToSize();
@@ -183,42 +156,32 @@ jtbNode = new MultiplicativeExpression(n0, n1);
 
   static final public UnaryExpression UnaryExpression() throws ParseException {NodeChoice n0 = null;
   NodeSequence n1 = null;
-  NodeToken n2 = null;
-  Token n3 = null;
-  Expression n4 = null;
-  NodeToken n5 = null;
-  Token n6 = null;
-  NodeSequence n7 = null;
-  Identifier n8 = null;
-  NodeSequence n9 = null;
-  EgInteger n10 = null;
+  Token n2 = null;
+  Expression n3 = null;
+  Token n4 = null;
+  Identifier n5 = null;
+  EgInteger n6 = null;
   UnaryExpression jtbNode = null;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case 20:{
 n1 = new NodeSequence(3);
-      n3 = jj_consume_token(20);
-n2 = (NodeToken) n3;
+      n2 = jj_consume_token(20);
 n1.addNode(n2);
-      n4 = Expression();
+      n3 = Expression();
+n1.addNode(n3);
+      n4 = jj_consume_token(21);
 n1.addNode(n4);
-      n6 = jj_consume_token(21);
-n5 = (NodeToken) n6;
-n1.addNode(n5);
 n0 = new NodeChoice(n1, 0, 3);
       break;
       }
     case IDENTIFIER:{
-n7 = new NodeSequence(1);
-      n8 = Identifier();
-n7.addNode(n8);
-n0 = new NodeChoice(n7, 1, 3);
+      n5 = Identifier();
+n0 = new NodeChoice(n5, 1, 3);
       break;
       }
     case INTEGER_LITERAL:{
-n9 = new NodeSequence(1);
-      n10 = EgInteger();
-n9.addNode(n10);
-n0 = new NodeChoice(n9, 2, 3);
+      n6 = EgInteger();
+n0 = new NodeChoice(n6, 2, 3);
       break;
       }
     default:
@@ -231,25 +194,21 @@ jtbNode = new UnaryExpression(n0);
     throw new Error("Missing return statement in function");
 }
 
-  static final public Identifier Identifier() throws ParseException {NodeToken n0 = null;
-  Token n1 = null;
+  static final public Identifier Identifier() throws ParseException {Token n0 = null;
   Identifier jtbNode = null;
-    n1 = jj_consume_token(IDENTIFIER);
-n0 = (NodeToken) n1;
+    n0 = jj_consume_token(IDENTIFIER);
     jc_0();
 jtbNode = new Identifier(n0);
 {if ("" != null) return jtbNode;}
     throw new Error("Missing return statement in function");
 }
 
-  static final public EgInteger EgInteger() throws ParseException {NodeToken n0 = null;
-  Token n1 = null;
-  jc_1 n2 = null;
+  static final public EgInteger EgInteger() throws ParseException {Token n0 = null;
+  jc_1 n1 = null;
   EgInteger jtbNode = null;
-    n1 = jj_consume_token(INTEGER_LITERAL);
-n0 = (NodeToken) n1;
-    n2 = jc_1();
-jtbNode = new EgInteger(n0, n2);
+    n0 = jj_consume_token(INTEGER_LITERAL);
+    n1 = jc_1();
+jtbNode = new EgInteger(n0, n1);
 {if ("" != null) return jtbNode;}
     throw new Error("Missing return statement in function");
 }

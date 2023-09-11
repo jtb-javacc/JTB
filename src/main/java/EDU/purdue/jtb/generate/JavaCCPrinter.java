@@ -90,7 +90,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import EDU.purdue.jtb.analyse.GlobalDataBuilder;
-import EDU.purdue.jtb.common.Constants;
 import EDU.purdue.jtb.common.JTBOptions;
 import EDU.purdue.jtb.common.JavaBranchPrinter;
 import EDU.purdue.jtb.common.Messages;
@@ -118,7 +117,7 @@ import EDU.purdue.jtb.parser.syntaxtree.NodeChoice;
 import EDU.purdue.jtb.parser.syntaxtree.NodeListOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.parser.syntaxtree.NodeToken;
+import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.OptionBinding;
 import EDU.purdue.jtb.parser.syntaxtree.Production;
 import EDU.purdue.jtb.parser.syntaxtree.RegExprKind;
@@ -161,7 +160,10 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  * @version 1.5.0 : 01-06/2017 : MMa : used try-with-resource ; fixed processing of nodes not to be created ;
  *          simplified special tokens processing ; fixed lines indentations and newlines ; fixed missing 'ni =
  *          "xxx"' when JTB_TK=false ; fixed specials printing ; added final in ExpansionUnitTCF's catch
- * @version 1.5.1 : 08/2023 : MMa : added optional annotations in catch of ExpansionUnitTCF
+ * @version 1.5.1 : 08/2023 : MMa : added optional annotations in catch of ExpansionUnitTCF<br>
+ *          1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
+ *          replacement by Token<br>
+ *          1.5.1 : 09/2023 : MMa : removed noDebugComment flag
  */
 class JavaCCPrinter extends DepthFirstVoidVisitor {
   
@@ -171,7 +173,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
   protected final CommonCodeGenerator ccg;
   /** The global JTB options (not thread safe but used only in read-access) */
   JTBOptions                          jopt;
-  /** The buffer to print into */
+  /** The (current) buffer to print into */
   protected StringBuilder             sb;
   /** The indentation object */
   protected Spacing                   spc;
@@ -187,13 +189,11 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * </ul>
    * Used to control spaces / new lines.
    */
-  protected int                       bnfLvl          = 0;
+  protected int                       bnfLvl  = 0;
   /** The OS line separator */
-  static final String                 LS              = System.getProperty("line.separator");
+  static final String                 LS      = System.getProperty("line.separator");
   /** The node class debug comment prefix */
-  String                              JJNCDCP         = " //jccp ";
-  /** The flag for adding the option TOKEN_FACTORY */
-  boolean                             addTokenFactory = true;
+  String                              JJNCDCP = " //jccp ";
   
   /*
    * Constructors
@@ -266,6 +266,20 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
   void oneDebugClassNewLine(final INode n, final Object... str) {
     if (DEBUG_CLASS) {
       sb.append(spc.spc).append("/*").append(nodeClassComment(n, str)).append(" */").append(LS);
+    }
+  }
+  
+  /**
+   * Prints into the current buffer a full debug class block comment line with an indentation, a node class
+   * comment, extra given comments, and a new line.
+   *
+   * @param aSb - the buffer to print into
+   * @param n - the node for the node class comment
+   * @param str - the extra comment
+   */
+  void oneDebugClassNewLine(final StringBuilder aSb, final INode n, final Object... str) {
+    if (DEBUG_CLASS) {
+      aSb.append(spc.spc).append("/*").append(nodeClassComment(n, str)).append(" */").append(LS);
     }
   }
   
@@ -355,7 +369,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       if ((b == -1) //
           || (e == -1)) {
         // coverage: this case is only if a JTBParser's node's toString() has been overriden, which happens
-        // only in NodeToken, where this method is not called; we keep this branch for potential future use
+        // only in Token, where this method is not called; we keep this branch for potential future use
         return JJNCDCP + s;
       } else {
         return JJNCDCP + s.substring(b, e);
@@ -403,19 +417,19 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    */
   
   /**
-   * Prints into the current buffer a NodeToken image and its specials before if global flag set.
+   * Prints into the current buffer a Token image and its specials before if global flag set.
    *
    * @param n - the node to visit
    */
   @Override
-  public void visit(final NodeToken n) {
+  public void visit(final Token n) {
     if (gdbv.jopt.printSpecialTokensJJ) {
       sb.append(n.withSpecials(spc.spc, gvaStr));
     } else {
       if (gvaStr != null) {
         sb.append(gvaStr);
       }
-      sb.append(n.tokenImage);
+      sb.append(n.image);
     }
     gvaStr = null;
   }
@@ -454,14 +468,6 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
             oneNewLine(n, "c");
           }
         }
-        if (addTokenFactory) {
-          oneNewLine(n, "d");
-          sb.append(spc.spc).append("TOKEN_FACTORY = \"");
-          if (jopt.nodesPackageName != null)
-            sb.append(jopt.nodesPackageName).append(".");
-          sb.append(Constants.nodeConstants).append("\"; // added by JTB ").append(Constants.JTB_VERSION);
-          oneNewLine(n, "e");
-        }
         spc.updateSpc(-1);
         oneNewLine(n, "f");
       }
@@ -494,21 +500,22 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
   })
   public void visit(final OptionBinding n) {
     // f0 -> ( %0 < IDENTIFIER > | %1 "LOOKAHEAD" | %2 "IGNORE_CASE" | %3 "static" )
-    final NodeToken nt0 = (NodeToken) n.f0.choice;
+    final Token nt0 = (Token) n.f0.choice;
     sb.append(spc.spc);
     if (n.f0.which == 0) {
-      if (nt0.tokenImage.startsWith("JTB_")) {
+      if (nt0.image.startsWith("JTB_")) {
         // f0 -> %0 < IDENTIFIER >
         // comment JTB options ; to easily handle possible previous special tokens,
         // just temporarily change (comment) the token image, print everything and restore the image
-        final String tkim = nt0.tokenImage;
-        nt0.tokenImage = "// " + tkim;
+        final String tkim = nt0.image;
+        nt0.image = "// " + tkim;
         nt0.accept(this);
-        nt0.tokenImage = tkim;
-      } else if (nt0.tokenImage.equals("TOKEN_FACTORY")) {
-        addTokenFactory = false;
-        jopt.mess.warning("Existing TOKEN_FACTORY option, so no TOKEN_FACTORY option added; "
-            + "ensure that this class implements proper newToken(...)", nt0.beginLine, nt0.beginColumn);
+        nt0.image = tkim;
+      } else if (nt0.image.equals("TOKEN_FACTORY")) {
+        jopt.mess.warning(
+            "Existing TOKEN_FACTORY option; "
+                + "ensure that this class implements proper Token newToken(...)",
+            nt0.beginLine, nt0.beginColumn);
         nt0.accept(this);
       } else {
         nt0.accept(this);
@@ -612,6 +619,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
     }
     // f7 -> Block()
     sb.append(genJavaBranch(n.f7));
+    oneNewLine(n);
   }
   
   /**
@@ -645,7 +653,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
     sb.append(genJavaBranch(n.f1));
     sb.append(' ');
     // f2 -> IdentifierAsString()
-    final String ident = n.f2.f0.tokenImage;
+    final String ident = n.f2.f0.image;
     // must be prefixed / suffixed
     final String idfn = gdbv.getFixedName(ident);
     sb.append(idfn);
@@ -911,17 +919,18 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       for (final INode e : n.f1.nodes) {
         final NodeSequence seq = (NodeSequence) e;
         oneNewLine(n, "exp");
-        spc.updateSpc(-1);
+        // found only inside a LOOKAHEAD
+        spc.updateSpc(+4);
         sb.append(spc.spc);
         // #0 "|"
+        sb.append(' ');
         seq.elementAt(0).accept(this);
-        oneNewLine(n, "exp");
-        spc.updateSpc(+1);
-        sb.append(spc.spc);
+        sb.append(' ');
         // #1 Expansion()
         ++bnfLvl;
         seq.elementAt(1).accept(this);
         --bnfLvl;
+        spc.updateSpc(-4);
       }
     }
   }
@@ -962,8 +971,9 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       // ExpansionUnit()
       e.next().accept(this);
       if (e.hasNext()) {
-        oneNewLine(n, "eu");
-        sb.append(spc.spc);
+        sb.append(' ');
+        // oneNewLine(n, "eu");
+        // sb.append(spc.spc);
       }
     }
   }
@@ -1125,12 +1135,12 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       final NodeSequence seq1 = (NodeSequence) ch.choice;
       if (ch.which == 0) {
         // $0 IdentifierAsString()
-        final String ias = ((IdentifierAsString) seq1.elementAt(0)).f0.tokenImage;
+        final String ias = ((IdentifierAsString) seq1.elementAt(0)).f0.image;
         sb.append(gdbv.getFixedName(ias));
         // $1 Arguments()
         sb.append(genJavaBranch(seq1.elementAt(1)));
         // $2 [ "!" ]
-        // print it in a block comment TESTCASE to be found
+        // print it in a block comment
         if (((NodeOptional) seq1.elementAt(2)).present()) {
           sb.append(" /*!*/ ");
         }
@@ -1140,8 +1150,8 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
         // $1 [ ?0 "." ?1 < IDENTIFIER > ]
         final NodeOptional opt1 = (NodeOptional) seq1.elementAt(1);
         if (opt1.present()) {
-          ((NodeToken) ((NodeSequence) opt1.node).elementAt(0)).accept(this);
-          ((NodeToken) ((NodeSequence) opt1.node).elementAt(1)).accept(this);
+          ((Token) ((NodeSequence) opt1.node).elementAt(0)).accept(this);
+          ((Token) ((NodeSequence) opt1.node).elementAt(1)).accept(this);
         }
         // $2 [ "!" ]
         // print it in a block comment
@@ -1258,7 +1268,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
         sb.append(genJavaBranch(seq.elementAt(4)));
         sb.append(' ');
         // #5 < IDENTIFIER >
-        sb.append(((NodeToken) seq.elementAt(5)).tokenImage);
+        sb.append(((Token) seq.elementAt(5)).image);
         // #6 ")"
         seq.elementAt(6).accept(this);
         sb.append(' ');
@@ -1591,7 +1601,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       -1580059612, JTB_SIG_IDENTIFIERASSTRING, JTB_USER_IDENTIFIERASSTRING
   })
   public void visit(final IdentifierAsString n) {
-    final String str = gdbv.jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : n.f0.tokenImage;
+    final String str = gdbv.jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : n.f0.image;
     sb.append(str);
   }
   
@@ -1608,7 +1618,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       -1048223857, JTB_SIG_INTEGERLITERAL, JTB_USER_INTEGERLITERAL
   })
   public void visit(final IntegerLiteral n) {
-    final String str = gdbv.jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : n.f0.tokenImage;
+    final String str = gdbv.jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : n.f0.image;
     sb.append(str);
   }
   
@@ -1631,7 +1641,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       if (gvaStr != null) {
         sb.append(gvaStr);
       }
-      sb.append(UnicodeConverter.addUnicodeEscapes(n.f0.tokenImage));
+      sb.append(UnicodeConverter.addUnicodeEscapes(n.f0.image));
     }
     gvaStr = null;
   }

@@ -7,7 +7,7 @@ package examples.java.ex2jjt;
  * Describes the input token stream.
  */
 
-@SuppressWarnings ("all") public class Token implements java.io.Serializable {
+public class Token implements java.io.Serializable {
 
   /**
    * The version identifier for this Serializable class.
@@ -121,4 +121,4 @@ package examples.java.ex2jjt;
   }
 
 }
-/* JavaCC - OriginalChecksum=b60618ab2e9ec669d8abcd47e4bb30a6 (do not edit this line) */
+/* JavaCC - OriginalChecksum=3bf342757f9035884ac995b2a1f3aa33 (do not edit this line) */

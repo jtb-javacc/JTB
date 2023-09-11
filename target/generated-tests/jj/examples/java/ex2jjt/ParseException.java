@@ -12,7 +12,8 @@ package examples.java.ex2jjt;
  * You can modify this class to customize your error reporting
  * mechanisms so long as you retain the public fields.
  */
-@SuppressWarnings ("all") public class ParseException extends Exception {
+@SuppressWarnings("all")
+public class ParseException extends Exception {
 
   /**
    * The version identifier for this Serializable class.
@@ -190,4 +191,4 @@ package examples.java.ex2jjt;
    }
 
 }
-/* JavaCC - OriginalChecksum=4ea7bd3b6b45c37ec38ad7c549c667da (do not edit this line) */
+/* JavaCC - OriginalChecksum=e40bf50d0f32d318e1f6f512907e8043 (do not edit this line) */

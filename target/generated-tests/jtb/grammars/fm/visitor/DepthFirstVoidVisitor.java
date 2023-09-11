@@ -2,10 +2,10 @@
 package grammars.fm.visitor;
 
 import static grammars.fm.syntaxtree.NodeConstants.*;
-
+import grammars.fm.Token;
 import grammars.fm.syntaxtree.*;
-
 import grammars.fm.visitor.signature.NodeFieldsSignature;
+
 @SuppressWarnings("javadoc")
 public class DepthFirstVoidVisitor implements IVoidVisitor {
 
@@ -53,50 +53,73 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   }
 
   @Override
-  public void visit(final NodeToken n) {
+  public void visit(final Token n) {
     @SuppressWarnings("unused")
-    final String tkIm = n.tokenImage;
+    final String tkIm = n.image;
     return;
   }
 
   @Override
   @NodeFieldsSignature({ 0, JTB_SIG_CLASSDECLARATION, JTB_USER_CLASSDECLARATION })
   public void visit(final classDeclaration n) {
-    n.f0.accept(this);
-    n.f1.accept(this);
-    n.f2.accept(this);
-    n.f3.accept(this);
-    n.f4.accept(this);
-    n.f5.accept(this);
-    n.f6.accept(this);
+    final skip n0 = n.f0;
+    n0.accept(this);
+    final Token n1 = n.f1;
+    n1.accept(this);
+    final Token n2 = n.f2;
+    n2.accept(this);
+    final NodeListOptional n3 = n.f3;
+    if (n3.present()) {
+      for (int i = 0; i < n3.size(); i++) {
+        final INode nloeai = n3.elementAt(i);
+        nloeai.accept(this);
+      }
+    }
+    final Token n4 = n.f4;
+    n4.accept(this);
+    final Token n5 = n.f5;
+    n5.accept(this);
+    final Token n6 = n.f6;
+    n6.accept(this);
   }
 
   @Override
   @NodeFieldsSignature({ 0, JTB_SIG_CLASSNAME, JTB_USER_CLASSNAME })
   public void visit(final className n) {
-    n.f0.accept(this);
+    final Token n0 = n.f0;
+    n0.accept(this);
   }
 
   @Override
   @NodeFieldsSignature({ 0, JTB_SIG_METHOD, JTB_USER_METHOD })
   public void visit(final method n) {
-    n.f0.accept(this);
-    n.f1.accept(this);
-    n.f2.accept(this);
-    n.f3.accept(this);
+    final methodName n0 = n.f0;
+    n0.accept(this);
+    final Token n1 = n.f1;
+    n1.accept(this);
+    final NodeList n2 = n.f2;
+    for (int i = 0; i < n2.size(); i++) {
+      final INode lsteai = n2.elementAt(i);
+      lsteai.accept(this);
+    }
+    final Token n3 = n.f3;
+    n3.accept(this);
   }
 
   @Override
   @NodeFieldsSignature({ 0, JTB_SIG_METHODNAME, JTB_USER_METHODNAME })
   public void visit(final methodName n) {
-    n.f0.accept(this);
+    final Token n0 = n.f0;
+    n0.accept(this);
   }
 
   @Override
   @NodeFieldsSignature({ 0, JTB_SIG_INSTRUCTION, JTB_USER_INSTRUCTION })
   public void visit(final instruction n) {
-    n.f0.accept(this);
-    n.f1.accept(this);
+    final Token n0 = n.f0;
+    n0.accept(this);
+    final Token n1 = n.f1;
+    n1.accept(this);
   }
 
   @SuppressWarnings("unused")
@@ -104,6 +127,21 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 0, JTB_SIG_SKIP, JTB_USER_SKIP })
   public void visit(final skip n) {
     /* empty node, nothing that can be generated so far */
+  }
+
+@SuppressWarnings("javadoc")
+  public static class ShouldNotOccurException extends RuntimeException {
+
+    private static final long serialVersionUID = 1L;
+
+    public ShouldNotOccurException() {
+      super();
+    }
+
+    public ShouldNotOccurException(final NodeChoice ch) {
+      super("Invalid switch value (" + ch.which + ") or fall-through");
+    }
+
   }
 
 }

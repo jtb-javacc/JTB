@@ -2,6 +2,7 @@
 package grammars.fm.visitor;
 
 import grammars.fm.syntaxtree.*;
+import grammars.fm.Token;
 
 @SuppressWarnings("javadoc")
 public interface IVoidVisitor {
@@ -16,7 +17,7 @@ public interface IVoidVisitor {
 
   public void visit(final NodeSequence n);
 
-  public void visit(final NodeToken n);
+  public void visit(final Token n);
 
   public void visit(final classDeclaration n);
 

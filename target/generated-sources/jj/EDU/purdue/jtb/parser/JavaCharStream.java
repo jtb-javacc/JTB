@@ -7,8 +7,8 @@ package EDU.purdue.jtb.parser;
  * contain only ASCII characters (with java-like unicode escape processing).
  */
 
-public
-class JavaCharStream
+@SuppressWarnings("all")
+public class JavaCharStream
 {
   /** Whether parser is static. */
   public static final boolean staticFlag = false;

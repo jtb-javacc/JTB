@@ -7,7 +7,7 @@ package grammars.q;
  * contain only ASCII characters (without unicode processing).
  */
 
-@SuppressWarnings("all") public class SimpleCharStream
+public class SimpleCharStream
 {
 /** Whether parser is static. */
   public static final boolean staticFlag = false;

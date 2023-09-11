@@ -3,6 +3,7 @@ package grammars.a.sgtree;
 
 import java.util.ArrayList;
 import java.util.List;
+import grammars.a.Token;
 import grammars.a.sgvis.IVis2Visitor;
 import grammars.a.sgvis.IVoidVisitor;
 
@@ -12,29 +13,29 @@ public class ASTmethod123 implements INode {
 
   public ASTmethodName123 methodName;
 
-  public NodeToken nodeToken;
+  public Token token;
 
   public NodeList nodeList;
 
-  public NodeToken nodeToken1;
+  public Token token1;
 
   private INode parent;
 
   private static final long serialVersionUID = 151L;
 
-  public ASTmethod123(final ASTmethodName123 n0, final NodeToken n1, final NodeList n2, final NodeToken n3) {
+  public ASTmethod123(final ASTmethodName123 n0, final Token n1, final NodeList n2, final Token n3) {
     methodName = n0;
     if (methodName != null)
       methodName.setParent(this);
-    nodeToken = n1;
-    if (nodeToken != null)
-      nodeToken.setParent(this);
+    token = n1;
+    if (token != null)
+      token.setParent(this);
     nodeList = n2;
     if (nodeList != null)
       nodeList.setParent(this);
-    nodeToken1 = n3;
-    if (nodeToken1 != null)
-      nodeToken1.setParent(this);
+    token1 = n3;
+    if (token1 != null)
+      token1.setParent(this);
   }
   /*
    * Visitors accept methods (no -novis option, visitors specification : Void,void,None;Vis2,R,A,int[],short...)
@@ -87,12 +88,12 @@ public class ASTmethod123 implements INode {
 
   @Override
   public int getNbBaseChildren() {
-    return 3;
+    return 1;
   }
 
   @Override
   public int getNbUserChildren() {
-    return 1;
+    return 3;
   }
 
   @Override
@@ -100,9 +101,9 @@ public class ASTmethod123 implements INode {
     if (lac == null) {
       lac = new ArrayList<>(4);
       lac.add(methodName);
-      lac.add(nodeToken);
+      lac.add(token);
       lac.add(nodeList);
-      lac.add(nodeToken1);
+      lac.add(token1);
     }
     return lac;
   }
@@ -110,10 +111,8 @@ public class ASTmethod123 implements INode {
   @Override
   public List<INode> getBaseChildren() {
     if (lbc == null) {
-      lbc = new ArrayList<>(3);
-      lbc.add(nodeToken);
+      lbc = new ArrayList<>(1);
       lbc.add(nodeList);
-      lbc.add(nodeToken1);
     }
     return lbc;
   }
@@ -121,8 +120,10 @@ public class ASTmethod123 implements INode {
   @Override
   public List<INode> getUserChildren() {
     if (luc == null) {
-      luc = new ArrayList<>(1);
+      luc = new ArrayList<>(3);
       luc.add(methodName);
+      luc.add(token);
+      luc.add(token1);
     }
     return luc;
   }

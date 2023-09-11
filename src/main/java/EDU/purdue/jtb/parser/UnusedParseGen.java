@@ -646,7 +646,7 @@ public class UnusedParseGen extends JavaCCGlobals {
   //        else
   //          out.println("      exptokseq[i] = jj_expentries.get(i);");
   //        out.println("    }");
-  //        out.println("    return new ParseException(token, exptokseq, tokenImage);");
+  //        out.println("    return new ParseException(token, exptokseq, image);");
   //        out.println("  }");
   //      } else {
   //        out.println("  /** Generate ParseException. */");
@@ -654,7 +654,7 @@ public class UnusedParseGen extends JavaCCGlobals {
   //        out.println("    Token errortok = token.next;");
   //        if (Options.getKeepLineColumn())
   //          out.println("    int line = errortok.beginLine, column = errortok.beginColumn;");
-  //        out.println("    String mess = (errortok.kind == 0) ? tokenImage[0] : errortok.image;");
+  //        out.println("    String mess = (errortok.kind == 0) ? image[0] : errortok.image;");
   //        if (Options.getKeepLineColumn())
   //          out.println("    return new ParseException(" +
   //                      "\"Parse error at line \" + line + \", column \" + column + \".  " +
@@ -698,8 +698,8 @@ public class UnusedParseGen extends JavaCCGlobals {
   //        out.println("  " + staticOpt() + "private void trace_token(Token t, String where) {");
   //        out.println("    if (trace_enabled) {");
   //        out.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
-  //        out.println("      System.out.print(\"Consumed token: <\" + tokenImage[t.kind]);");
-  //        out.println("      if (t.kind != 0 && !tokenImage[t.kind].equals(\"\\\"\" + t.image + \"\\\"\")) {");
+  //        out.println("      System.out.print(\"Consumed token: <\" + image[t.kind]);");
+  //        out.println("      if (t.kind != 0 && !image[t.kind].equals(\"\\\"\" + t.image + \"\\\"\")) {");
   //        out.println("        System.out.print(\": \\\"\" + t.image + \"\\\"\");");
   //        out.println("      }");
   //        out.println("      System.out.println(\" at line \" + t.beginLine + " +
@@ -710,12 +710,12 @@ public class UnusedParseGen extends JavaCCGlobals {
   //        out.println("  " + staticOpt() + "private void trace_scan(Token t1, int t2) {");
   //        out.println("    if (trace_enabled) {");
   //        out.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
-  //        out.println("      System.out.print(\"Visited token: <\" + tokenImage[t1.kind]);");
-  //        out.println("      if (t1.kind != 0 && !tokenImage[t1.kind].equals(\"\\\"\" + t1.image + \"\\\"\")) {");
+  //        out.println("      System.out.print(\"Visited token: <\" + image[t1.kind]);");
+  //        out.println("      if (t1.kind != 0 && !image[t1.kind].equals(\"\\\"\" + t1.image + \"\\\"\")) {");
   //        out.println("        System.out.print(\": \\\"\" + t1.image + \"\\\"\");");
   //        out.println("      }");
   //        out.println("      System.out.println(\" at line \" + t1.beginLine + \"" +
-  //                    " column \" + t1.beginColumn + \">; Expected token: <\" + tokenImage[t2] + \">\");");
+  //                    " column \" + t1.beginColumn + \">; Expected token: <\" + image[t2] + \">\");");
   //        out.println("    }");
   //        out.println("  }");
   //        out.println("");

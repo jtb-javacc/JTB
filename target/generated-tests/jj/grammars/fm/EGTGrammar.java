@@ -34,27 +34,19 @@ public class EGTGrammar implements EGTGrammarConstants {
 
   final public classDeclaration classDeclaration() throws ParseException {// --- JTB generated node declarations ---
   skip n0 = null;
-  NodeToken n1 = null;
+  Token n1 = null;
   Token n2 = null;
-  NodeToken n3 = null;
-  Token n4 = null;
-  NodeListOptional n5 = new NodeListOptional();
-  NodeSequence n6 = null;
-  method n7 = null;
-  NodeToken n8 = null;
-  Token n9 = null;
-  NodeToken n10 = null;
-  Token n11 = null;
-  NodeToken n12 = null;
-  Token n13 = null;
+  NodeListOptional n3 = new NodeListOptional();
+  method n4 = null;
+  Token n5 = null;
+  Token n6 = null;
+  Token n7 = null;
   classDeclaration jtbNode = null;
     // --- user BNFProduction ExpansionChoices ---
       n0 = skip();
-    n2 = jj_consume_token(1);
-n1 = (NodeToken) n2;
+    n1 = jj_consume_token(1);
     className();
-    n4 = jj_consume_token(2);
-n3 = (NodeToken) n4;
+    n2 = jj_consume_token(2);
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -66,38 +58,28 @@ n3 = (NodeToken) n4;
         jj_la1[0] = jj_gen;
         break label_1;
       }
-n6 = new NodeSequence(1);
-      n7 = method();
-n6.addNode(n7);
-n5.addNode(n6);
+      n4 = method();
+n3.addNode(n4);
     }
-n5.nodes.trimToSize();
-    n9 = jj_consume_token(3);
-n8 = (NodeToken) n9;
-    n11 = jj_consume_token(4);
-n10 = (NodeToken) n11;
-    n13 = jj_consume_token(0);
-n13.beginColumn++;
-n13.endColumn++;
-n12 = (NodeToken) n13;
-jtbNode = new classDeclaration(n0, n1, n3, n5, n8, n10, n12);
+n3.nodes.trimToSize();
+    n5 = jj_consume_token(3);
+    n6 = jj_consume_token(4);
+    n7 = jj_consume_token(0);
+n7.beginColumn++;
+n7.endColumn++;
+jtbNode = new classDeclaration(n0, n1, n2, n3, n5, n6, n7);
 {if ("" != null) return jtbNode;}
     throw new Error("Missing return statement in function");
 }
 
   final public className className() throws ParseException {// --- JTB generated node declarations ---
-  NodeToken n0 = null;
-  Token n1 = null;
+  Token n0 = null;
   className jtbNode = null;
   // --- user BNFProduction java block ---
-  // leave b uninitialized (for code coverage)
   char b, e = '\u0000';
     // --- user BNFProduction ExpansionChoices ---
-      n1 = jj_consume_token(ID);
-n0 = (NodeToken) n1;
+      n0 = jj_consume_token(ID);
 b = '\b';
-  //    e = 'é';
-
 jtbNode = new className(n0);
 {if ("" != null) return jtbNode;}
     throw new Error("Missing return statement in function");
@@ -105,24 +87,18 @@ jtbNode = new className(n0);
 
   final public method method() throws ParseException {// --- JTB generated node declarations ---
   methodName n0 = null;
-  NodeToken n1 = null;
-  Token n2 = null;
-  NodeList n3 = new NodeList();
-  NodeSequence n4 = null;
-  instruction n5 = null;
-  NodeToken n6 = null;
-  Token n7 = null;
+  Token n1 = null;
+  NodeList n2 = new NodeList();
+  instruction n3 = null;
+  Token n4 = null;
   method jtbNode = null;
     // --- user BNFProduction ExpansionChoices ---
       n0 = methodName();
-    n2 = jj_consume_token(5);
-n1 = (NodeToken) n2;
+    n1 = jj_consume_token(5);
     label_2:
     while (true) {
-n4 = new NodeSequence(1);
-      n5 = instruction();
-n4.addNode(n5);
-n3.addNode(n4);
+      n3 = instruction();
+n2.addNode(n3);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case ID:{
         ;
@@ -133,38 +109,31 @@ n3.addNode(n4);
         break label_2;
       }
     }
-n3.nodes.trimToSize();
-    n7 = jj_consume_token(6);
-n6 = (NodeToken) n7;
-jtbNode = new method(n0, n1, n3, n6);
+n2.nodes.trimToSize();
+    n4 = jj_consume_token(6);
+jtbNode = new method(n0, n1, n2, n4);
 {if ("" != null) return jtbNode;}
     throw new Error("Missing return statement in function");
 }
 
   final public methodName methodName() throws ParseException {// --- JTB generated node declarations ---
-  NodeToken n0 = null;
-  Token n1 = null;
+  Token n0 = null;
   methodName jtbNode = null;
     // --- user BNFProduction ExpansionChoices ---
-      n1 = jj_consume_token(ID);
-n0 = (NodeToken) n1;
+      n0 = jj_consume_token(ID);
 jtbNode = new methodName(n0);
 {if ("" != null) return jtbNode;}
     throw new Error("Missing return statement in function");
 }
 
   final public instruction instruction() throws ParseException {// --- JTB generated node declarations ---
-  NodeToken n0 = null;
+  Token n0 = null;
   Token n1 = null;
-  NodeToken n2 = null;
-  Token n3 = null;
   instruction jtbNode = null;
     // --- user BNFProduction ExpansionChoices ---
-      n1 = jj_consume_token(ID);
-n0 = (NodeToken) n1;
-    n3 = jj_consume_token(7);
-n2 = (NodeToken) n3;
-jtbNode = new instruction(n0, n2);
+      n0 = jj_consume_token(ID);
+    n1 = jj_consume_token(7);
+jtbNode = new instruction(n0, n1);
 {if ("" != null) return jtbNode;}
     throw new Error("Missing return statement in function");
 }

@@ -2,6 +2,7 @@
 package grammars.b.visitor;
 
 import grammars.b.syntaxtree.*;
+import grammars.b.Token;
 
 /**
  * All "IRetArguVisitor" visitors must implement this interface.
@@ -61,13 +62,13 @@ public interface IRetArguVisitor<R, A> {
   public R visit(final NodeSequence n, final A argu);
 
   /**
-   * Visits a {@link NodeToken} node), passing it argument(s).
+   * Visits a {@link Token} node), passing it argument(s).
    *
    * @param n - the node to visit
    * @param argu - the user argument 0
    * @return the user return information
    */
-  public R visit(final NodeToken n, final A argu);
+  public R visit(final Token n, final A argu);
 
   /*
    * User grammar generated visit methods
@@ -357,6 +358,18 @@ public interface IRetArguVisitor<R, A> {
    * @return the user return information
    */
   public R visit(final bp_s n, final A argu);
+
+  /**
+   * Visits a {@link bp_tcf_ie_w} node, whose child is the following :
+   * <p>
+   * f0 -> < ID ><br>
+   * s: -1032372970<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   * @return the user return information
+   */
+  public R visit(final bp_tcf_ie_w n, final A argu);
 
   /**
    * Visits a {@link bp_sa} node, whose child is the following :
@@ -1124,13 +1137,14 @@ public interface IRetArguVisitor<R, A> {
    * .. .. . #1 ( $0 ";;; " $1 ";;;; " ) )<br>
    * f3 -> ( < NUM_3_9 > )*<br>
    * f4 -> ( ( %0 ":"<br>
-   * .. .. . | %1 #0 ":" #1 < ES > ) )?<br>
+   * .. .. . | %1 < NUM_3_9 ><br>
+   * .. .. . | %2 ":" ) )?<br>
    * f5 -> f0_eu1_peias2()<br>
    * f6 ->   %0 expch_a()<br>
    * .. .. | %1 expch_b()<br>
    * f7 -> ( %0 expch_2ch()<br>
    * .. .. | %1 expch_bl_a() )<br>
-   * s: -1657766831<br>
+   * s: -1377841071<br>
    *
    * @param n - the node to visit
    * @param argu - the user argument 0
@@ -1346,5 +1360,29 @@ public interface IRetArguVisitor<R, A> {
    * @return the user return information
    */
   public R visit(final f0_laeu2_jc n, final A argu);
+
+  /**
+   * Visits a {@link gt_1} node, whose child is the following :
+   * <p>
+   * f0 -> " >;"<br>
+   * s: -195872082<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   * @return the user return information
+   */
+  public R visit(final gt_1 n, final A argu);
+
+  /**
+   * Visits a {@link lt_1} node, whose child is the following :
+   * <p>
+   * f0 -> "<;"<br>
+   * s: -699028326<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   * @return the user return information
+   */
+  public R visit(final lt_1 n, final A argu);
 
 }

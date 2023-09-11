@@ -2,6 +2,7 @@
 package grammars.fm.visitor;
 
 import grammars.fm.syntaxtree.*;
+import grammars.fm.Token;
 import java.lang.String;
 
 @SuppressWarnings("javadoc")
@@ -17,7 +18,7 @@ public interface IVis2Visitor {
 
   public int visit(final NodeSequence n, final String argu);
 
-  public int visit(final NodeToken n, final String argu);
+  public int visit(final Token n, final String argu);
 
   public int visit(final classDeclaration n, final String argu);
 

@@ -2,10 +2,10 @@
 package examples.java.ex3jtb.visitor;
 
 import static examples.java.ex3jtb.syntaxtree.NodeConstants.*;
-
+import examples.java.ex3jtb.Token;
 import examples.java.ex3jtb.syntaxtree.*;
-
 import examples.java.ex3jtb.visitor.signature.NodeFieldsSignature;
+
 /**
  * Provides default methods which visit each node in the tree in depth-first order.<br>
  * In your "Gen" visitors extend this class and override part or all of these methods.
@@ -103,15 +103,15 @@ public class DepthFirstGenVisitor implements IGenVisitor {
   }
 
   /**
-   * Visits a {@link NodeToken} node.
+   * Visits a {@link Token} node.
    *
    * @param n - the node to visit
    * @param argu - the user argument 0
    */
   @Override
-  public void visit(final NodeToken n, @SuppressWarnings("unused") final String argu) {
+  public void visit(final Token n, @SuppressWarnings("unused") final String argu) {
     @SuppressWarnings("unused")
-    final String tkIm = n.tokenImage;
+    final String tkIm = n.image;
     return;
   }
 
@@ -138,7 +138,7 @@ public class DepthFirstGenVisitor implements IGenVisitor {
     n0.accept(this, argu);
     --depthLevel;
     // f1 -> ";"
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     ++depthLevel;
     n1.accept(this, argu);
     --depthLevel;
@@ -360,7 +360,7 @@ public class DepthFirstGenVisitor implements IGenVisitor {
   @NodeFieldsSignature({ -1580059612, JTB_SIG_ASTMYID, JTB_USER_ASTMYID })
   public void visit(final ASTMyID n, final String argu) {
     // f0 -> < IDENTIFIER >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     ++depthLevel;
     n0.accept(this, argu);
     --depthLevel;
@@ -380,7 +380,7 @@ public class DepthFirstGenVisitor implements IGenVisitor {
   @NodeFieldsSignature({ 640957941, JTB_SIG_ASTINTEGER, JTB_USER_ASTINTEGER })
   public void visit(final ASTInteger n, final String argu) {
     // f0 -> < INTEGER_LITERAL >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     ++depthLevel;
     n0.accept(this, argu);
     --depthLevel;

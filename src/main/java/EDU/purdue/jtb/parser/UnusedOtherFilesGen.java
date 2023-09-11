@@ -138,7 +138,7 @@ public class UnusedOtherFilesGen extends JavaCCGlobals {
   //      out.println("");
   //    }
   //    out.println("  /** Literal token values. */");
-  //    out.println("  String[] tokenImage = {");
+  //    out.println("  String[] image = {");
   //    out.println("    \"<EOF>\",");
   //    for (final Iterator<TokenProduction> it = rexprlist.iterator(); it.hasNext();) {
   //      final TokenProduction tp = (it.next());

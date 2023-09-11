@@ -3,6 +3,7 @@ package grammars.a.sgtree;
 
 import java.util.ArrayList;
 import java.util.List;
+import grammars.a.Token;
 import grammars.a.sgvis.IVis2Visitor;
 import grammars.a.sgvis.IVoidVisitor;
 

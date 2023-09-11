@@ -37,13 +37,11 @@ static   public IEnterExitHook jtb_eeh;
   }
 
   static final public ASTStart ASTStart() throws ParseException {ASTExpression n0 = null;
-  NodeToken n1 = null;
-  Token n2 = null;
+  Token n1 = null;
   ASTStart jtbNode = null;
 if (jtb_eeh != null) jtb_eeh.ASTStartEnter();
     n0 = ASTExpression();
-    n2 = jj_consume_token(14);
-n1 = (NodeToken) n2;
+    n1 = jj_consume_token(14);
 jtbNode = new ASTStart(n0, n1);
 if (jtb_eeh != null) jtb_eeh.ASTStartExit(jtbNode);
 {if ("" != null) return jtbNode;}
@@ -64,13 +62,9 @@ if (jtb_eeh != null) jtb_eeh.ASTExpressionExit(jtbNode);
   NodeListOptional n1 = new NodeListOptional();
   NodeSequence n2 = null;
   NodeChoice n3 = null;
-  NodeSequence n4 = null;
-  NodeToken n5 = null;
-  Token n6 = null;
-  NodeSequence n7 = null;
-  NodeToken n8 = null;
-  Token n9 = null;
-  ASTMultiplicativeExpression n10 = null;
+  Token n4 = null;
+  Token n5 = null;
+  ASTMultiplicativeExpression n6 = null;
   ASTAdditiveExpression jtbNode = null;
 if (jtb_eeh != null) jtb_eeh.ASTAdditiveExpressionEnter();
     n0 = ASTMultiplicativeExpression();
@@ -89,19 +83,13 @@ if (jtb_eeh != null) jtb_eeh.ASTAdditiveExpressionEnter();
 n2 = new NodeSequence(2);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case 15:{
-n4 = new NodeSequence(1);
-        n6 = jj_consume_token(15);
-n5 = (NodeToken) n6;
-n4.addNode(n5);
+        n4 = jj_consume_token(15);
 n3 = new NodeChoice(n4, 0, 2);
         break;
         }
       case 16:{
-n7 = new NodeSequence(1);
-        n9 = jj_consume_token(16);
-n8 = (NodeToken) n9;
-n7.addNode(n8);
-n3 = new NodeChoice(n7, 1, 2);
+        n5 = jj_consume_token(16);
+n3 = new NodeChoice(n5, 1, 2);
         break;
         }
       default:
@@ -110,8 +98,8 @@ n3 = new NodeChoice(n7, 1, 2);
         throw new ParseException();
       }
 n2.addNode(n3);
-      n10 = ASTMultiplicativeExpression();
-n2.addNode(n10);
+      n6 = ASTMultiplicativeExpression();
+n2.addNode(n6);
 n1.addNode(n2);
     }
 n1.nodes.trimToSize();
@@ -125,16 +113,10 @@ if (jtb_eeh != null) jtb_eeh.ASTAdditiveExpressionExit(jtbNode);
   NodeListOptional n1 = new NodeListOptional();
   NodeSequence n2 = null;
   NodeChoice n3 = null;
-  NodeSequence n4 = null;
-  NodeToken n5 = null;
+  Token n4 = null;
+  Token n5 = null;
   Token n6 = null;
-  NodeSequence n7 = null;
-  NodeToken n8 = null;
-  Token n9 = null;
-  NodeSequence n10 = null;
-  NodeToken n11 = null;
-  Token n12 = null;
-  ASTUnaryExpression n13 = null;
+  ASTUnaryExpression n7 = null;
   ASTMultiplicativeExpression jtbNode = null;
 if (jtb_eeh != null) jtb_eeh.ASTMultiplicativeExpressionEnter();
     n0 = ASTUnaryExpression();
@@ -154,27 +136,18 @@ if (jtb_eeh != null) jtb_eeh.ASTMultiplicativeExpressionEnter();
 n2 = new NodeSequence(2);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case 17:{
-n4 = new NodeSequence(1);
-        n6 = jj_consume_token(17);
-n5 = (NodeToken) n6;
-n4.addNode(n5);
+        n4 = jj_consume_token(17);
 n3 = new NodeChoice(n4, 0, 3);
         break;
         }
       case 18:{
-n7 = new NodeSequence(1);
-        n9 = jj_consume_token(18);
-n8 = (NodeToken) n9;
-n7.addNode(n8);
-n3 = new NodeChoice(n7, 1, 3);
+        n5 = jj_consume_token(18);
+n3 = new NodeChoice(n5, 1, 3);
         break;
         }
       case 19:{
-n10 = new NodeSequence(1);
-        n12 = jj_consume_token(19);
-n11 = (NodeToken) n12;
-n10.addNode(n11);
-n3 = new NodeChoice(n10, 2, 3);
+        n6 = jj_consume_token(19);
+n3 = new NodeChoice(n6, 2, 3);
         break;
         }
       default:
@@ -183,8 +156,8 @@ n3 = new NodeChoice(n10, 2, 3);
         throw new ParseException();
       }
 n2.addNode(n3);
-      n13 = ASTUnaryExpression();
-n2.addNode(n13);
+      n7 = ASTUnaryExpression();
+n2.addNode(n7);
 n1.addNode(n2);
     }
 n1.nodes.trimToSize();
@@ -196,44 +169,34 @@ if (jtb_eeh != null) jtb_eeh.ASTMultiplicativeExpressionExit(jtbNode);
 
   static final public ASTUnaryExpression ASTUnaryExpression() throws ParseException {NodeChoice n0 = null;
   NodeSequence n1 = null;
-  NodeToken n2 = null;
-  Token n3 = null;
-  ASTExpression n4 = null;
-  NodeToken n5 = null;
-  Token n6 = null;
-  NodeSequence n7 = null;
-  ASTMyID n8 = null;
-  NodeSequence n9 = null;
-  ASTInteger n10 = null;
+  Token n2 = null;
+  ASTExpression n3 = null;
+  Token n4 = null;
+  ASTMyID n5 = null;
+  ASTInteger n6 = null;
   ASTUnaryExpression jtbNode = null;
 if (jtb_eeh != null) jtb_eeh.ASTUnaryExpressionEnter();
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case 20:{
 n1 = new NodeSequence(3);
-      n3 = jj_consume_token(20);
-n2 = (NodeToken) n3;
+      n2 = jj_consume_token(20);
 n1.addNode(n2);
-      n4 = ASTExpression();
+      n3 = ASTExpression();
+n1.addNode(n3);
+      n4 = jj_consume_token(21);
 n1.addNode(n4);
-      n6 = jj_consume_token(21);
-n5 = (NodeToken) n6;
-n1.addNode(n5);
 n0 = new NodeChoice(n1, 0, 3);
       break;
       }
     case IDENTIFIER:{
-n7 = new NodeSequence(1);
-      n8 = ASTMyID();
-n7.addNode(n8);
-n0 = new NodeChoice(n7, 1, 3);
-((ASTMyID)n7.elementAt(0)).f0.tokenImage = "reset";
+      n5 = ASTMyID();
+n0 = new NodeChoice(n5, 1, 3);
+n5.f0.image = "reset";
       break;
       }
     case INTEGER_LITERAL:{
-n9 = new NodeSequence(1);
-      n10 = ASTInteger();
-n9.addNode(n10);
-n0 = new NodeChoice(n9, 2, 3);
+      n6 = ASTInteger();
+n0 = new NodeChoice(n6, 2, 3);
       break;
       }
     default:
@@ -247,15 +210,13 @@ if (jtb_eeh != null) jtb_eeh.ASTUnaryExpressionExit(jtbNode);
     throw new Error("Missing return statement in function");
 }
 
-  static final public ASTMyID ASTMyID() throws ParseException {NodeToken n0 = null;
-  Token n1 = null;
+  static final public ASTMyID ASTMyID() throws ParseException {Token n0 = null;
   ASTMyID jtbNode = null;
   Token t = null;
 if (jtb_eeh != null) jtb_eeh.ASTMyIDEnter();
-    n1 = jj_consume_token(IDENTIFIER);
-n0 = (NodeToken) n1;
-t = n1;
-n0.tokenImage = t.image + " modified";
+    n0 = jj_consume_token(IDENTIFIER);
+t = n0;
+n0.image = t.image + " modified";
     jc_0();
 jtbNode = new ASTMyID(n0);
 if (jtb_eeh != null) jtb_eeh.ASTMyIDExit(jtbNode);
@@ -263,15 +224,13 @@ if (jtb_eeh != null) jtb_eeh.ASTMyIDExit(jtbNode);
     throw new Error("Missing return statement in function");
 }
 
-  static final public ASTInteger ASTInteger() throws ParseException {NodeToken n0 = null;
-  Token n1 = null;
-  ASTjc_1 n2 = null;
+  static final public ASTInteger ASTInteger() throws ParseException {Token n0 = null;
+  ASTjc_1 n1 = null;
   ASTInteger jtbNode = null;
 if (jtb_eeh != null) jtb_eeh.ASTIntegerEnter();
-    n1 = jj_consume_token(INTEGER_LITERAL);
-n0 = (NodeToken) n1;
-    n2 = ASTjc_1();
-jtbNode = new ASTInteger(n0, n2);
+    n0 = jj_consume_token(INTEGER_LITERAL);
+    n1 = ASTjc_1();
+jtbNode = new ASTInteger(n0, n1);
 if (jtb_eeh != null) jtb_eeh.ASTIntegerExit(jtbNode);
 {if ("" != null) return jtbNode;}
     throw new Error("Missing return statement in function");

@@ -4,9 +4,7 @@ package grammars.a;
 
 import grammars.a.sgvis.*;
 import grammars.a.sghook.*;
-// not needed, just for code coverage
 import grammars.a.sgtree.*;
-// not needed, just for code coverage
 import java.util.ArrayList;
 
 
@@ -63,45 +61,27 @@ public class SmallGrammar implements SmallGrammarConstants {
     }
   }
 
-  /* For test case with user changed factory method */
-  /**
-   * Factory method used by JavaCC to create a new Token object, which will be a (JTB) subclassed NodeToken object.
-   *
-   * @param ofKind - the token kind
-   * @param image - the token image
-   *
-   * @return a new Token (which is also a NodeToken)
-   */
   public static Token newToken(int ofKind, String image) {
-    return new NodeToken(ofKind, image);
+    return new Token(ofKind, image);
   }
 
   final public ASTclassDeclaration123 ASTclassDeclaration123() throws ParseException {// --- JTB generated node declarations ---
-  NodeToken n0 = null;
-  Token n1 = null;
-  ASTclassName123 n2 = null;
-  NodeToken n3 = null;
-  Token n4 = null;
-  NodeListOptional n5 = new NodeListOptional();
-  NodeChoice n6 = null;
-  NodeSequence n7 = null;
-  ASTmethod123 n8 = null;
-  NodeSequence n9 = null;
-  ASTinstruction123 n10 = null;
-  NodeToken n11 = null;
-  Token n12 = null;
-  NodeToken n13 = null;
-  Token n14 = null;
-  ASTjc_0123 n15 = null;
-  NodeToken n16 = null;
-  Token n17 = null;
+  Token n0 = null;
+  ASTclassName123 n1 = null;
+  Token n2 = null;
+  NodeListOptional n3 = new NodeListOptional();
+  NodeChoice n4 = null;
+  ASTmethod123 n5 = null;
+  ASTinstruction123 n6 = null;
+  Token n7 = null;
+  Token n8 = null;
+  ASTjc_0123 n9 = null;
+  Token n10 = null;
   ASTclassDeclaration123 jtbNode = null;
 if (jtb_eeh != null) jtb_eeh.ASTclassDeclaration123Enter();
-    n1 = jj_consume_token(1);
-n0 = (NodeToken) n1;
-    n2 = ASTclassName123();
-    n4 = jj_consume_token(2);
-n3 = (NodeToken) n4;
+    n0 = jj_consume_token(1);
+    n1 = ASTclassName123();
+    n2 = jj_consume_token(2);
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -114,17 +94,13 @@ n3 = (NodeToken) n4;
         break label_1;
       }
       if (jj_2_1(2)) {
-n7 = new NodeSequence(1);
-        n8 = ASTmethod123();
-n7.addNode(n8);
-n6 = new NodeChoice(n7, 0, 2);
+        n5 = ASTmethod123();
+n4 = new NodeChoice(n5, 0, 2);
       } else {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case ID:{
-n9 = new NodeSequence(1);
-          n10 = ASTinstruction123();
-n9.addNode(n10);
-n6 = new NodeChoice(n9, 1, 2);
+          n6 = ASTinstruction123();
+n4 = new NodeChoice(n6, 1, 2);
           break;
           }
         default:
@@ -133,38 +109,31 @@ n6 = new NodeChoice(n9, 1, 2);
           throw new ParseException();
         }
       }
-n5.addNode(n6);
+n3.addNode(n4);
     }
-n5.nodes.trimToSize();
-    n12 = jj_consume_token(3);
-n11 = (NodeToken) n12;
-    n14 = jj_consume_token(4);
-n13 = (NodeToken) n14;
-    n15 = ASTjc_0123();
-    n17 = jj_consume_token(0);
-n17.beginColumn++;
-n17.endColumn++;
-n16 = (NodeToken) n17;
-jtbNode = new ASTclassDeclaration123(n0, n2, n3, n5, n11, n13, n15, n16);
+n3.nodes.trimToSize();
+    n7 = jj_consume_token(3);
+    n8 = jj_consume_token(4);
+    n9 = ASTjc_0123();
+    n10 = jj_consume_token(0);
+n10.beginColumn++;
+n10.endColumn++;
+jtbNode = new ASTclassDeclaration123(n0, n1, n2, n3, n7, n8, n9, n10);
 if (jtb_eeh != null) jtb_eeh.ASTclassDeclaration123Exit(jtbNode);
 {if ("" != null) return jtbNode;}
     throw new Error("Missing return statement in function");
 }
 
   final public ASTclassName123 ASTclassName123() throws ParseException {// --- JTB generated node declarations ---
-  NodeToken n0 = null;
-  Token n1 = null;
+  Token n0 = null;
   ASTclassName123 jtbNode = null;
   // --- user BNFProduction java block ---
-  // leave b & e uninitialized
   char b, e;
   Token t = null;
 if (jtb_eeh != null) jtb_eeh.ASTclassName123Enter();
-    n1 = jj_consume_token(ID);
-n0 = (NodeToken) n1;
-t = n1;
-//    e = 'é';
-    b = '\b';
+    n0 = jj_consume_token(ID);
+t = n0;
+b = '\b';
 jtbNode = new ASTclassName123(n0);
 if (jtb_eeh != null) jtb_eeh.ASTclassName123Exit(jtbNode);
 {if ("" != null) return jtbNode;}
@@ -173,24 +142,18 @@ if (jtb_eeh != null) jtb_eeh.ASTclassName123Exit(jtbNode);
 
   final public ASTmethod123 ASTmethod123() throws ParseException {// --- JTB generated node declarations ---
   ASTmethodName123 n0 = null;
-  NodeToken n1 = null;
-  Token n2 = null;
-  NodeList n3 = new NodeList();
-  NodeSequence n4 = null;
-  ASTinstruction123 n5 = null;
-  NodeToken n6 = null;
-  Token n7 = null;
+  Token n1 = null;
+  NodeList n2 = new NodeList();
+  ASTinstruction123 n3 = null;
+  Token n4 = null;
   ASTmethod123 jtbNode = null;
 if (jtb_eeh != null) jtb_eeh.ASTmethod123Enter();
     n0 = ASTmethodName123();
-    n2 = jj_consume_token(5);
-n1 = (NodeToken) n2;
+    n1 = jj_consume_token(5);
     label_2:
     while (true) {
-n4 = new NodeSequence(1);
-      n5 = ASTinstruction123();
-n4.addNode(n5);
-n3.addNode(n4);
+      n3 = ASTinstruction123();
+n2.addNode(n3);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case ID:{
         ;
@@ -201,22 +164,19 @@ n3.addNode(n4);
         break label_2;
       }
     }
-n3.nodes.trimToSize();
-    n7 = jj_consume_token(6);
-n6 = (NodeToken) n7;
-jtbNode = new ASTmethod123(n0, n1, n3, n6);
+n2.nodes.trimToSize();
+    n4 = jj_consume_token(6);
+jtbNode = new ASTmethod123(n0, n1, n2, n4);
 if (jtb_eeh != null) jtb_eeh.ASTmethod123Exit(jtbNode);
 {if ("" != null) return jtbNode;}
     throw new Error("Missing return statement in function");
 }
 
   final public ASTmethodName123 ASTmethodName123() throws ParseException {// --- JTB generated node declarations ---
-  NodeToken n0 = null;
-  Token n1 = null;
+  Token n0 = null;
   ASTmethodName123 jtbNode = null;
 if (jtb_eeh != null) jtb_eeh.ASTmethodName123Enter();
-    /*com*/ n1 = jj_consume_token(ID);
-n0 = (NodeToken) n1;
+    n0 = jj_consume_token(ID);
 jtbNode = new ASTmethodName123(n0);
 if (jtb_eeh != null) jtb_eeh.ASTmethodName123Exit(jtbNode);
 {if ("" != null) return jtbNode;}
@@ -226,33 +186,24 @@ if (jtb_eeh != null) jtb_eeh.ASTmethodName123Exit(jtbNode);
   final public ASTinstruction123 ASTinstruction123() throws ParseException {// --- JTB generated node declarations ---
   NodeChoice n0 = null;
   NodeSequence n1 = null;
-  NodeToken n2 = null;
+  Token n2 = null;
   Token n3 = null;
-  NodeToken n4 = null;
-  Token n5 = null;
-  NodeSequence n6 = null;
-  NodeToken n7 = null;
-  Token n8 = null;
+  Token n4 = null;
   ASTinstruction123 jtbNode = null;
 if (jtb_eeh != null) jtb_eeh.ASTinstruction123Enter();
     if (jj_2_2(2)) {
 n1 = new NodeSequence(2);
-      n3 = jj_consume_token(ID);
-n2 = (NodeToken) n3;
+      n2 = jj_consume_token(ID);
 n1.addNode(n2);
-      n5 = jj_consume_token(7);
-n4 = (NodeToken) n5;
-n1.addNode(n4);
+      n3 = jj_consume_token(7);
+n1.addNode(n3);
 n0 = new NodeChoice(n1, 0, 2);
     } else {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case ID:{
-n6 = new NodeSequence(1);
         bp_al();
-        n8 = jj_consume_token(8);
-n7 = (NodeToken) n8;
-n6.addNode(n7);
-n0 = new NodeChoice(n6, 1, 2);
+        n4 = jj_consume_token(8);
+n0 = new NodeChoice(n4, 1, 2);
         break;
         }
       default:
@@ -278,15 +229,13 @@ al.add(-23.E-40F);
 }
 
   final public ASTbp_jual123 ASTbp_jual123() throws ParseException {// --- JTB generated node declarations ---
-  NodeToken n0 = null;
-  Token n1 = null;
+  Token n0 = null;
   ASTbp_jual123 jtbNode = null;
   // --- user BNFProduction java block ---
   ArrayList<Float> al = new ArrayList<>();
   java.util.ArrayList<Float> jual = null;
 if (jtb_eeh != null) jtb_eeh.ASTbp_jual123Enter();
-    n1 = jj_consume_token(ID);
-n0 = (NodeToken) n1;
+    n0 = jj_consume_token(ID);
 jtbNode = new ASTbp_jual123(n0);
 al.add(-23.E-40F);
     jual = new java.util.ArrayList<>(al);
@@ -298,14 +247,12 @@ if (jtb_eeh != null) jtb_eeh.ASTbp_jual123Exit(jtbNode);
 }
 
   final public ASTbp_hm123 ASTbp_hm123(final java.util.ArrayList<Float> jual) throws ParseException {// --- JTB generated node declarations ---
-  NodeToken n0 = null;
-  Token n1 = null;
+  Token n0 = null;
   ASTbp_hm123 jtbNode = null;
   // --- user BNFProduction java block ---
   java.util.HashMap<String , Float> hm = new java.util.HashMap<>();
 if (jtb_eeh != null) jtb_eeh.ASTbp_hm123Enter();
-    n1 = jj_consume_token(ID);
-n0 = (NodeToken) n1;
+    n0 = jj_consume_token(ID);
 jtbNode = new ASTbp_hm123(n0);
 hm.put("nine", jual == null ? 9.9F : jual.get(9));
     jtbrt_bp_hm = hm;
@@ -337,12 +284,6 @@ if (jtb_eeh != null) jtb_eeh.ASTbp_hm123Exit(jtbNode);
     finally { jj_save(1, xla); }
   }
 
-  private boolean jj_3R_ASTmethodName123_267_3_4()
- {
-    if (jj_scan_token(ID)) return true;
-    return false;
-  }
-
   private boolean jj_3_2()
  {
     if (jj_scan_token(ID)) return true;
@@ -350,16 +291,22 @@ if (jtb_eeh != null) jtb_eeh.ASTbp_hm123Exit(jtbNode);
     return false;
   }
 
-  private boolean jj_3_1()
+  private boolean jj_3R_ASTmethodName123_202_3_4()
  {
-    if (jj_3R_ASTmethod123_240_3_3()) return true;
+    if (jj_scan_token(ID)) return true;
     return false;
   }
 
-  private boolean jj_3R_ASTmethod123_240_3_3()
+  private boolean jj_3R_ASTmethod123_180_3_3()
  {
-    if (jj_3R_ASTmethodName123_267_3_4()) return true;
+    if (jj_3R_ASTmethodName123_202_3_4()) return true;
     if (jj_scan_token(5)) return true;
+    return false;
+  }
+
+  private boolean jj_3_1()
+ {
+    if (jj_3R_ASTmethod123_180_3_3()) return true;
     return false;
   }
 

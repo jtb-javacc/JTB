@@ -237,7 +237,7 @@ void UnaryExpression() :
     //    ASTMyID m = (ASTMyID) ( (ASTUnaryExpression) jjtree.peekNode() ).jjtGetChild(0);
     //    m.setName("reset");
     // one finds in the jj file which variable refers to the MyID node
-    ((ASTMyID) n7.elementAt(0)).f0.tokenImage = "reset";
+    n5.f0.image = "reset";
   }
 | Integer()
 }
@@ -253,7 +253,7 @@ void MyID() /* #MyID */ :
     // modified from the JJTree example to adapt to JTB
     // slightly modified from the original example
     //    jjtThis.setName(t.image + " modified");
-    n0.tokenImage = t.image + " modified";
+    n0.image = t.image + " modified";
   }
   jc_0()
 }

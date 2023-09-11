@@ -85,7 +85,9 @@ import EDU.purdue.jtb.parser.syntaxtree.NodeConstants;
  *          children methods generation ; applied changes following new class FieldInfo ; added signature
  *          files generation ; enhanced to VisitorInfo based visitor generation ; renamed from FilesGenerator
  *          ; subject to global packages and classes refactoring ; removed NodeTCF related code
- * @version 1.5.1 : 07/2023 : MMa : changed no overwrite management
+ * @version 1.5.1 : 07-08/2023 : MMa : changed no overwrite management<br>
+ * @version 1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
+ *          replacement by Token
  */
 public class UserFilesGenerator {
   
@@ -162,20 +164,19 @@ public class UserFilesGenerator {
    * Generates user nodes (classes source) files.
    *
    * @param aNodesDir - the nodes directory File
-   * @return OK_RC or FILE_EXISTS_RC
+   * @return the number of generated files
    * @throws Exception - on any exception
    */
   public int genUserNodesFiles(final File aNodesDir) throws Exception {
     if (jopt.noParallel) {
       // generate classes in sequence
-      boolean exists = false;
+      int n = 0;
       for (final UserClassInfo uci : classes) {
         final File file = new File(aNodesDir, uci.fixedClassName + ".java");
         if (jopt.noOverwrite //
             && file.exists()) {
           mess.warning("File " + uci.fixedClassName
               + " exists and is not overwritten as the no overwrite flag has been set");
-          exists = true;
           continue;
         }
         // in case of exception something is printed :-(
@@ -185,9 +186,8 @@ public class UserFilesGenerator {
           pw = new PrintWriter(new BufferedWriter(new FileWriter(file), BR_BUF_SZ));
           gsb.setLength(0);
           genUserNodeClass(gsb, uci);
-          if (jopt.noOverwrite) {
-            mess.info("File " + uci.fixedClassName + " generated");
-          }
+          mess.info("File " + uci.fixedClassName + " generated");
+          n++;
         } finally {
           if (pw != null) {
             pw.print(gsb);
@@ -195,12 +195,7 @@ public class UserFilesGenerator {
           }
         }
       }
-      if (jopt.noOverwrite //
-          && exists) {
-        // mess.info("Some of the generated nodes classes files exist and were not overwritten");
-        return FILE_EXISTS_RC;
-      }
-      return OK_RC;
+      return n;
     } else {
       // generate classes in parallel ; the IntStream mapToInt(ToIntFunction<? super UserClassInfo> mapper)
       // function applies the function between the {} which works on each class (uci) and returns an int,
@@ -212,7 +207,7 @@ public class UserFilesGenerator {
             && file.exists()) {
           mess.warning("File " + uci.fixedClassName
               + " exists and is not overwritten as the no overwrite flag has been set");
-          return 1;
+          return 0;
         }
         // in case of exception something is printed :-(
         @SuppressWarnings("resource") PrintWriter pw = null;
@@ -222,7 +217,7 @@ public class UserFilesGenerator {
           // TODO change to OutputStreamWriter on a FileOutputStream for handling UTF-8 names like bp_v£
           pw = new PrintWriter(new BufferedWriter(new FileWriter(file), BR_BUF_SZ));
           genUserNodeClass(sb, uci);
-          return 0;
+          return 1;
         } catch (final IOException ex) {
           Messages.hardErr("IOException on " + uci.fixedClassName, ex);
           return 1 + NodeConstants.NB_JTB_USER_NODES;
@@ -243,11 +238,7 @@ public class UserFilesGenerator {
       if (res > NodeConstants.NB_JTB_USER_NODES) {
         throw new IOException("IOException(s) on some user nodes class files");
       }
-      if (res > 0) {
-        // mess.info("Some of the generated user nodes classes files exist and were not overwritten");
-        return FILE_EXISTS_RC;
-      }
-      return OK_RC;
+      return res;
     }
   }
   
@@ -271,6 +262,7 @@ public class UserFilesGenerator {
       sb.append("import ").append("java.util.ArrayList").append(';').append(LS);
       sb.append("import ").append("java.util.List").append(';').append(LS);
     }
+    ccg.tokenImport(aSb);
     ccg.interfaceVisitorsImports(sb);
     sb.append(LS);
     if (jopt.javaDocComments) {

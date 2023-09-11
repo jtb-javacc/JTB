@@ -78,7 +78,7 @@ import EDU.purdue.jtb.parser.syntaxtree.LocalLookahead;
 import EDU.purdue.jtb.parser.syntaxtree.NodeChoice;
 import EDU.purdue.jtb.parser.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.parser.syntaxtree.NodeToken;
+import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.RegularExprProduction;
 import EDU.purdue.jtb.parser.syntaxtree.RegularExpression;
 import EDU.purdue.jtb.parser.syntaxtree.TokenManagerDecls;
@@ -112,7 +112,9 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  *          generation to unless not requested
  * @version 1.5.0 : 01-06/2017 : MMa : changed some iterator based for loops to enhanced for loops ; fixed
  *          processing of nodes not to be created ; added final in ExpansionUnitTCF's catch ; removed NodeTCF
- *          related code
+ *          related code<br>
+ * @version 1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
+ *          replacement by Token
  */
 public class ClassesFinder extends DepthFirstVoidVisitor {
   
@@ -211,7 +213,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
     if (n.f6.present()) {
       fng.reset();
       // f6 -> [ "%" ]
-      final String cn = n.f3.f0.tokenImage;
+      final String cn = n.f3.f0.image;
       final String fcn = gdbv.getFixedName(cn);
       uci = new UserClassInfo(null, 0, cn, fcn);
       uciList.add(uci);
@@ -247,7 +249,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
     if (!n.f5.present()) {
       fng.reset();
       final int nbFields = gdbv.getNbSubNodesTbc(n.f9);
-      final String cn = n.f2.f0.tokenImage;
+      final String cn = n.f2.f0.image;
       final String fcn = gdbv.getFixedName(cn);
       uci = new UserClassInfo(n.f9, nbFields, cn, fcn);
       uciList.add(uci);
@@ -484,19 +486,20 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    * f2 -> ExpansionChoices()<br>
    * f3 -> "}"<br>
    * f4 -> ( #0 "catch" #1 "("<br>
-   * .. .. . #2 [ "final" ]<br>
-   * .. .. . #3 Name() #4 < IDENTIFIER > #5 ")" #6 Block() )*<br>
+   * .. .. . #2 ( Annotation() )*<br>
+   * .. .. . #3 [ "final" ]<br>
+   * .. .. . #4 Name() #5 < IDENTIFIER > #6 ")" #7 Block() )*<br>
    * f5 -> [ #0 "finally" #1 Block() ]<br>
-   * s: -1347962218<br>
+   * s: 1601707097<br>
    *
    * @param n - the node to visit
    */
   @Override
   @NodeFieldsSignature({
-      -1347962218, JTB_SIG_EXPANSIONUNITTCF, JTB_USER_EXPANSIONUNITTCF
+      1601707097, JTB_SIG_EXPANSIONUNITTCF, JTB_USER_EXPANSIONUNITTCF
   })
   public void visit(final ExpansionUnitTCF n) {
-    // if > 0 all the NodeTCF, if = 0 nothing
+    // if > 0 all the ExpansionChoices, if = 0 nothing
     if (gdbv.getNbSubNodesTbc(n.f2) > 0) {
       // f2 -> ExpansionChoices()
       n.f2.accept(this);
@@ -557,7 +560,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
       seq.elementAt(1).accept(this);
       final String regExpr = gdbv.getTokenHM().get(ident);
       if (regExpr == null) {
-        final NodeToken ident_nt = ((IdentifierAsString) seq.elementAt(1)).f0;
+        final Token ident_nt = ((IdentifierAsString) seq.elementAt(1)).f0;
         mess.softErr("Undefined token \"" + ident_nt + "\".", ident_nt.beginLine, ident_nt.beginColumn);
         ident = "";
       } else if (DONT_CREATE.equals(regExpr)) {
@@ -566,9 +569,6 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
       } else if (gdbv.getNotTbcNodesHM().containsKey(ident)) {
         // requested not to create the node
         addNodeToken = false;
-        // } else if (DONT_CREATE.equals(regExpr) || gdbv.getNotTbcNodesHM().containsKey(ident)) {
-        // // requested not to create the node
-        // addNodeToken = false;
       }
       break;
     
@@ -599,7 +599,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
       -1580059612, JTB_SIG_IDENTIFIERASSTRING, JTB_USER_IDENTIFIERASSTRING
   })
   public void visit(final IdentifierAsString n) {
-    ident = n.f0.tokenImage;
+    ident = n.f0.image;
   }
   
 }

@@ -198,7 +198,7 @@ public class DumpVisitor extends DepthFirstGenVisitor {
       -1580059612, JTB_SIG_ASTMYID, JTB_USER_ASTMYID
   })
   public void visit(final ASTMyID n, final String argu) {
-    dump("Identifier: " + n.f0.tokenImage, argu);
+    dump("Identifier: " + n.f0.image, argu);
     ++indent;
     // f0 -> < IDENTIFIER >
     n.f0.accept(this, argu);

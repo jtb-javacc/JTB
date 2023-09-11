@@ -47,6 +47,7 @@ Idées futuristes sur JTB/JavaCC
 - voir à faire un LSP
 
 A faire prochainement sur JTB
+- voir pourquoi signature/* ne sont pas marqués dérivés
 - tcf avec autres options
 - tests exhaustifs sur suppression / ajout de noeuds
 - changer le NodeToken pour qu'il référence le Token au lieu de copier ses propriétés (vérifier que les Tokens sont GCed bien avant les NodeTokens), ou mieux (?) faire hériter Token d'un NodeToken 
@@ -78,12 +79,14 @@ A faire prochainement sur JTB
 - voir les aspects sécurité
 
 Fait sur JTB en 1.5.1
-- corrigé le pb de génération des node choice
+- corrigé des problèmes de génération de node (node choice, EUNS)
 - changé le package de jtbgram.jtb pour l'aligner avec la déclaration interne
 - corrigé la génération des imports pour différentes combinaisons d'options
 - amélioré la génération build.xml des grammaires sans options pour les aligner avec la génération Eclipse
 - ajouté la grammaire sans package
 - ajouté les annotations optionnelles dans ExpansionUnitTCF
+- supprimé le GTToken et le NodeToken.tokenImage
+- revu les .gitignore
 
 Fait sur JTB en 1.5.0
 - créé les pages wiki, mis à jour les différents fichiers de docs et autres

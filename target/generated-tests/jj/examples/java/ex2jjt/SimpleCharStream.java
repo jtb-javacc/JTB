@@ -8,7 +8,7 @@ package examples.java.ex2jjt;
  * contain only ASCII characters (without unicode processing).
  */
 
-@SuppressWarnings("all") public class SimpleCharStream
+public class SimpleCharStream
 {
 /** Whether parser is static. */
   public static final boolean staticFlag = true;
@@ -349,4 +349,4 @@ package examples.java.ex2jjt;
     buffer = null;
   }
 }
-/* JavaCC - OriginalChecksum=a60758e53e8ee1b36a1eb395c216d192 (do not edit this line) */
+/* JavaCC - OriginalChecksum=23152dd81ecf584b05b8dbedf7241eaf (do not edit this line) */

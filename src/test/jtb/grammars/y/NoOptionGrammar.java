@@ -41,33 +41,24 @@ public class NoOptionGrammar implements NoOptionGrammarConstants {
   }
 
   public static Token newToken(int ofKind, String image) {
-    return new NodeToken(ofKind, image);
+    return new Token(ofKind, image);
   }
 
-  static final public classDeclaration classDeclaration() throws ParseException {NodeToken n0 = null;
-  Token n1 = null;
-  className n2 = null;
-  NodeToken n3 = null;
-  Token n4 = null;
-  NodeListOptional n5 = new NodeListOptional();
-  NodeChoice n6 = null;
-  NodeSequence n7 = null;
-  method n8 = null;
-  NodeSequence n9 = null;
-  instruction n10 = null;
-  NodeToken n11 = null;
-  Token n12 = null;
-  NodeToken n13 = null;
-  Token n14 = null;
-  jc_0 n15 = null;
-  NodeToken n16 = null;
-  Token n17 = null;
+  static final public classDeclaration classDeclaration() throws ParseException {Token n0 = null;
+  className n1 = null;
+  Token n2 = null;
+  NodeListOptional n3 = new NodeListOptional();
+  NodeChoice n4 = null;
+  method n5 = null;
+  instruction n6 = null;
+  Token n7 = null;
+  Token n8 = null;
+  jc_0 n9 = null;
+  Token n10 = null;
   classDeclaration jtbNode = null;
-    n1 = jj_consume_token(1);
-n0 = (NodeToken) n1;
-    n2 = className();
-    n4 = jj_consume_token(2);
-n3 = (NodeToken) n4;
+    n0 = jj_consume_token(1);
+    n1 = className();
+    n2 = jj_consume_token(2);
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -80,17 +71,13 @@ n3 = (NodeToken) n4;
         break label_1;
       }
       if (jj_2_1(2)) {
-n7 = new NodeSequence(1);
-        n8 = method();
-n7.addNode(n8);
-n6 = new NodeChoice(n7, 0, 2);
+        n5 = method();
+n4 = new NodeChoice(n5, 0, 2);
       } else {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case ID:{
-n9 = new NodeSequence(1);
-          n10 = instruction();
-n9.addNode(n10);
-n6 = new NodeChoice(n9, 1, 2);
+          n6 = instruction();
+n4 = new NodeChoice(n6, 1, 2);
           break;
           }
         default:
@@ -99,31 +86,26 @@ n6 = new NodeChoice(n9, 1, 2);
           throw new ParseException();
         }
       }
-n5.addNode(n6);
+n3.addNode(n4);
     }
-n5.nodes.trimToSize();
-    n12 = jj_consume_token(3);
-n11 = (NodeToken) n12;
-    n14 = jj_consume_token(4);
-n13 = (NodeToken) n14;
-    n15 = jc_0();
-    n17 = jj_consume_token(0);
-n17.beginColumn++;
-n17.endColumn++;
-n16 = (NodeToken) n17;
-jtbNode = new classDeclaration(n0, n2, n3, n5, n11, n13, n15, n16);
+n3.nodes.trimToSize();
+    n7 = jj_consume_token(3);
+    n8 = jj_consume_token(4);
+    n9 = jc_0();
+    n10 = jj_consume_token(0);
+n10.beginColumn++;
+n10.endColumn++;
+jtbNode = new classDeclaration(n0, n1, n2, n3, n7, n8, n9, n10);
 {if ("" != null) return jtbNode;}
     throw new Error("Missing return statement in function");
 }
 
-  static final public className className() throws ParseException {NodeToken n0 = null;
-  Token n1 = null;
+  static final public className className() throws ParseException {Token n0 = null;
   className jtbNode = null;
   char b, e;
   Token t = null;
-    n1 = jj_consume_token(ID);
-n0 = (NodeToken) n1;
-t = n1;
+    n0 = jj_consume_token(ID);
+t = n0;
 b = '\b';
 jtbNode = new className(n0);
 {if ("" != null) return jtbNode;}
@@ -131,23 +113,17 @@ jtbNode = new className(n0);
 }
 
   static final public method method() throws ParseException {methodName n0 = null;
-  NodeToken n1 = null;
-  Token n2 = null;
-  NodeList n3 = new NodeList();
-  NodeSequence n4 = null;
-  instruction n5 = null;
-  NodeToken n6 = null;
-  Token n7 = null;
+  Token n1 = null;
+  NodeList n2 = new NodeList();
+  instruction n3 = null;
+  Token n4 = null;
   method jtbNode = null;
     n0 = methodName();
-    n2 = jj_consume_token(5);
-n1 = (NodeToken) n2;
+    n1 = jj_consume_token(5);
     label_2:
     while (true) {
-n4 = new NodeSequence(1);
-      n5 = instruction();
-n4.addNode(n5);
-n3.addNode(n4);
+      n3 = instruction();
+n2.addNode(n3);
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case ID:{
         ;
@@ -158,19 +134,16 @@ n3.addNode(n4);
         break label_2;
       }
     }
-n3.nodes.trimToSize();
-    n7 = jj_consume_token(6);
-n6 = (NodeToken) n7;
-jtbNode = new method(n0, n1, n3, n6);
+n2.nodes.trimToSize();
+    n4 = jj_consume_token(6);
+jtbNode = new method(n0, n1, n2, n4);
 {if ("" != null) return jtbNode;}
     throw new Error("Missing return statement in function");
 }
 
-  static final public methodName methodName() throws ParseException {NodeToken n0 = null;
-  Token n1 = null;
+  static final public methodName methodName() throws ParseException {Token n0 = null;
   methodName jtbNode = null;
-    n1 = jj_consume_token(ID);
-n0 = (NodeToken) n1;
+    n0 = jj_consume_token(ID);
 jtbNode = new methodName(n0);
 {if ("" != null) return jtbNode;}
     throw new Error("Missing return statement in function");
@@ -178,32 +151,23 @@ jtbNode = new methodName(n0);
 
   static final public instruction instruction() throws ParseException {NodeChoice n0 = null;
   NodeSequence n1 = null;
-  NodeToken n2 = null;
+  Token n2 = null;
   Token n3 = null;
-  NodeToken n4 = null;
-  Token n5 = null;
-  NodeSequence n6 = null;
-  NodeToken n7 = null;
-  Token n8 = null;
+  Token n4 = null;
   instruction jtbNode = null;
     if (jj_2_2(2)) {
 n1 = new NodeSequence(2);
-      n3 = jj_consume_token(ID);
-n2 = (NodeToken) n3;
+      n2 = jj_consume_token(ID);
 n1.addNode(n2);
-      n5 = jj_consume_token(7);
-n4 = (NodeToken) n5;
-n1.addNode(n4);
+      n3 = jj_consume_token(7);
+n1.addNode(n3);
 n0 = new NodeChoice(n1, 0, 2);
     } else {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case ID:{
-n6 = new NodeSequence(1);
         bp_al();
-        n8 = jj_consume_token(8);
-n7 = (NodeToken) n8;
-n6.addNode(n7);
-n0 = new NodeChoice(n6, 1, 2);
+        n4 = jj_consume_token(8);
+n0 = new NodeChoice(n4, 1, 2);
         break;
         }
       default:
@@ -227,13 +191,11 @@ al.add(-23.E-40F);
     throw new Error("Missing return statement in function");
 }
 
-  static final public bp_jual bp_jual() throws ParseException {NodeToken n0 = null;
-  Token n1 = null;
+  static final public bp_jual bp_jual() throws ParseException {Token n0 = null;
   bp_jual jtbNode = null;
   ArrayList<Float> al = new ArrayList<Float>();
   java.util.ArrayList<Float> jual = null;
-    n1 = jj_consume_token(ID);
-n0 = (NodeToken) n1;
+    n0 = jj_consume_token(ID);
 jtbNode = new bp_jual(n0);
 al.add(MIN_NORMAL);
     jual = new java.util.ArrayList(al);
@@ -243,12 +205,10 @@ al.add(MIN_NORMAL);
     throw new Error("Missing return statement in function");
 }
 
-  static final public bp_hm bp_hm(final java.util.ArrayList<Float> jual) throws ParseException {NodeToken n0 = null;
-  Token n1 = null;
+  static final public bp_hm bp_hm(final java.util.ArrayList<Float> jual) throws ParseException {Token n0 = null;
   bp_hm jtbNode = null;
   java.util.HashMap<String , Float> hm = new java.util.HashMap<String , Float>();
-    n1 = jj_consume_token(ID);
-n0 = (NodeToken) n1;
+    n0 = jj_consume_token(ID);
 jtbNode = new bp_hm(n0);
 hm.put("nine", jual == null ? 9.9F : jual.get(9));
     jtbrt_bp_hm = hm;
@@ -276,6 +236,12 @@ hm.put("nine", jual == null ? 9.9F : jual.get(9));
     finally { jj_save(1, xla); }
   }
 
+  static private boolean jj_3R_methodName_139_3_4()
+ {
+    if (jj_scan_token(ID)) return true;
+    return false;
+  }
+
   static private boolean jj_3_2()
  {
     if (jj_scan_token(ID)) return true;
@@ -283,22 +249,16 @@ hm.put("nine", jual == null ? 9.9F : jual.get(9));
     return false;
   }
 
-  static private boolean jj_3R_methodName_165_3_4()
- {
-    if (jj_scan_token(ID)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_method_142_3_3()
- {
-    if (jj_3R_methodName_165_3_4()) return true;
-    if (jj_scan_token(5)) return true;
-    return false;
-  }
-
   static private boolean jj_3_1()
  {
-    if (jj_3R_method_142_3_3()) return true;
+    if (jj_3R_method_121_3_3()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_method_121_3_3()
+ {
+    if (jj_3R_methodName_139_3_4()) return true;
+    if (jj_scan_token(5)) return true;
     return false;
   }
 

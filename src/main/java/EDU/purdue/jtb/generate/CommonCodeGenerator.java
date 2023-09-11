@@ -11,6 +11,7 @@ import static EDU.purdue.jtb.common.Constants.genDepthLevelVar;
 import static EDU.purdue.jtb.common.Constants.genNodeVar;
 import static EDU.purdue.jtb.common.Constants.genVisVar;
 import static EDU.purdue.jtb.common.Constants.iNode;
+import static EDU.purdue.jtb.common.Constants.nodeToken;
 import EDU.purdue.jtb.analyse.GlobalDataBuilder;
 import EDU.purdue.jtb.common.JTBOptions;
 import EDU.purdue.jtb.common.Spacing;
@@ -31,7 +32,9 @@ import EDU.purdue.jtb.common.VisitorInfo.ArgumentInfo;
  *
  * @author Marc Mazas
  * @version 1.5.0 : 01-03/2017 : MMa : created from refactoring of UserFilesGenerator and BaseNodesGenerator
- * @version 1.5.1 : 07/2023 : MMa : fixed issue on Token import
+ * @version 1.5.1 : 07/2023 : MMa : fixed issue on Token import<br>
+ *          1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
+ *          replacement by Token
  */
 public class CommonCodeGenerator {
   
@@ -385,6 +388,29 @@ public class CommonCodeGenerator {
       }
     }
     aSb.append(LS);
+  }
+  
+  /**
+   * Generates the Token import.
+   *
+   * @param aSb - a buffer to append to (must be non null)
+   */
+  void tokenImport(final StringBuilder aSb) {
+    if (jopt.grammarPackageName != null) {
+      aSb.append("import ").append(jopt.grammarPackageName).append(".").append(nodeToken).append(";")
+          .append(LS);
+    }
+  }
+  
+  /**
+   * Generates the Token import.
+   *
+   * @param aSb - a buffer to append to (must be non null)
+   */
+  void inodeImport(final StringBuilder aSb) {
+    if (jopt.grammarPackageName != null) {
+      aSb.append("import ").append(jopt.nodesPackageName).append(".").append(iNode).append(";").append(LS);
+    }
   }
   
   /**

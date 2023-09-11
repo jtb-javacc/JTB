@@ -11,6 +11,7 @@
 <#include "/commons/GeneratedBy.ftl">
 package ${parser_package}.${visitor_subpackage};
 
+import ${parser_package}.Token;
 import ${parser_package}.${syntaxtree_subpackage}.*;
 
 /**

@@ -109,7 +109,8 @@ import EDU.purdue.jtb.parser.syntaxtree.INode;
  *          packages and classes refactoring ; separated info and error messages ; suppressed class
  *          FileExistsException ; moved to non static ; changed default true values to false<br>
  *          1.5.0 : 10-2020 : MMa : create directories only if needed ; normalized file names
- * @version 1.5.1 : 07/2023 : MMa : changed no overwrite management ; fixed issue on JTB_VP/JTB_VD
+ * @version 1.5.1 : 07/2023 : MMa : changed no overwrite management ; fixed issue on JTB_VP/JTB_VD<br>
+ *          1.5.1 : 08/2023 : MMa : changes due to the NodeToken replacement by Token
  */
 public class JTB {
   
@@ -223,39 +224,42 @@ public class JTB {
       final INode root = jtbParser.JavaCCInput(jopt);
       printlnInfo("jtb input file parsed successfully.");
       
-      // Get the input file options and overwrite command line options
+      // Get the output directory JavaCC option (for generating Token.java)
+      File jjOutDir = jtbParser.opt.getOutputDirectory();
+      if (!jjOutDir.isAbsolute()) {
+        jjOutDir = new File(inDir + File.separator + jjOutDir);
+        jopt.jjOutDirName = jjOutDir.toPath().normalize().toString();
+      }
+      
+      // Get the input file JTB options and overwrite command line options
       jopt.loadJTBGlobalOptions(jtbParser.grammarPackage);
       if (mess.errorCount() > 0) {
         mess.printSummary();
         return FO_ERR;
       }
       
-      // convert nodes and visitors output directories and jj output file to absolute paths
+      // convert directories and jj output file to absolute paths
       convertPathsToAbsolute();
       
       // create all directories if they do not exist
+      createDirectory(jopt.jjOutDirName);
       createParentDirectory(jopt.jtbOutputFileName);
-      
       File visitorDir = null;
       if (jopt.visitorsDirName != null && !jopt.noVisitors) {
         visitorDir = createDirectory(jopt.visitorsDirName);
       }
-      
       File signatureDir = null;
       if (jopt.visitorsDirName != null && !jopt.noSignature) {
         signatureDir = createDirectory(jopt.signatureDirName);
       }
-      
       File nodesDir = null;
       if (jopt.nodesDirName != null) {
         nodesDir = createDirectory(jopt.nodesDirName);
       }
-      
       File hookDir = null;
       if (jopt.hookDirName != null && jopt.hook) {
         hookDir = createDirectory(jopt.hookDirName);
       }
-      
       if (mess.errorCount() > 0) {
         mess.printSummary();
         return DI_ERR;
@@ -1009,6 +1013,13 @@ public class JTB {
    */
   private void convertPathsToAbsolute() {
     final String dir = inDir + File.separator;
+    if (jopt.grammarDirectoryName != null) {
+      File ndn = new File(jopt.grammarDirectoryName);
+      if (!ndn.isAbsolute()) {
+        ndn = new File(dir + jopt.grammarDirectoryName);
+        jopt.grammarDirectoryName = ndn.toPath().normalize().toString();
+      }
+    }
     if (jopt.nodesDirName != null) {
       File ndn = new File(jopt.nodesDirName);
       if (!ndn.isAbsolute()) {
@@ -1097,23 +1108,13 @@ public class JTB {
       final File aNodesDir) throws Exception {
     // user nodes must be created before NodeConstants.java for signatures to be created
     int rc = aFg.genUserNodesFiles(aNodesDir);
-    if (rc == 0) {
-      printlnInfo("" + aClasses.size() + " syntax tree node class files " + "generated into directory \""
-          + jopt.nodesDirName + "\".");
-      // } else {
-      // printlnInfo(
-      // "One or more of the generated syntax tree " + "node class files already exists. Won't overwrite.");
-    }
+    printlnInfo(
+        rc + " syntax tree node class files " + "generated into directory \"" + jopt.nodesDirName + "\".");
     
     final BaseNodesGenerator bg = new BaseNodesGenerator(jopt, ccg, mess);
     rc = bg.genBaseNodesFiles(aClasses);
-    if (rc == 0) {
-      printlnInfo(
-          "7+2 base node class+interface files " + "generated into directory \"" + jopt.nodesDirName + "\".");
-      // } else {
-      // printlnInfo(
-      // "One or more of the generated base " + "node class files already exists. Won't overwrite.");
-    }
+    printlnInfo(
+        rc + " base node class+interface files " + "generated into directory \"" + jopt.nodesDirName + "\".");
   }
   
   /**

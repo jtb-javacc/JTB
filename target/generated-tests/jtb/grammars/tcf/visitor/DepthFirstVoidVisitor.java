@@ -2,10 +2,10 @@
 package grammars.tcf.visitor;
 
 import static grammars.tcf.syntaxtree.NodeConstants.*;
-
+import grammars.tcf.Token;
 import grammars.tcf.syntaxtree.*;
-
 import grammars.tcf.visitor.signature.NodeFieldsSignature;
+
 /**
  * Provides default methods which visit each node in the tree in depth-first order.<br>
  * In your "Void" visitors extend this class and override part or all of these methods.
@@ -86,14 +86,14 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   }
 
   /**
-   * Visits a {@link NodeToken} node.
+   * Visits a {@link Token} node.
    *
    * @param n - the node to visit
    */
   @Override
-  public void visit(final NodeToken n) {
+  public void visit(final Token n) {
     @SuppressWarnings("unused")
-    final String tkIm = n.tokenImage;
+    final String tkIm = n.image;
     return;
   }
 
@@ -308,7 +308,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
     if (n.f2 != null) {
       n.f2.accept(this);
     }
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     n3.accept(this);
   }
 
@@ -388,7 +388,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       }
     }
     // f2 -> ":"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     n2.accept(this);
   }
 
@@ -404,7 +404,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -699039424, JTB_SIG_BP_IV1, JTB_USER_BP_IV1 })
   public void visit(final bp_iv1 n) {
     // f0 -> "1*"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
   }
 
@@ -420,7 +420,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -699038463, JTB_SIG_BP_IV2, JTB_USER_BP_IV2 })
   public void visit(final bp_iv2 n) {
     // f0 -> "2*"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
   }
 
@@ -436,7 +436,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -699037502, JTB_SIG_BP_IV3, JTB_USER_BP_IV3 })
   public void visit(final bp_iv3 n) {
     // f0 -> "3*"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
   }
 
@@ -453,10 +453,10 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -1427135545, JTB_SIG_BP_IV3_, JTB_USER_BP_IV3_ })
   public void visit(final bp_iv3_ n) {
     // f0 -> "3_"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> < NUM_3_9 >
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     n1.accept(this);
   }
 
@@ -472,7 +472,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -699036541, JTB_SIG_BP_IV4, JTB_USER_BP_IV4 })
   public void visit(final bp_iv4 n) {
     // f0 -> "4*"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
   }
 
@@ -488,7 +488,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -699035580, JTB_SIG_BP_IV5, JTB_USER_BP_IV5 })
   public void visit(final bp_iv5 n) {
     // f0 -> "5*"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
   }
 
@@ -504,7 +504,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -699034619, JTB_SIG_BP_IV6, JTB_USER_BP_IV6 })
   public void visit(final bp_iv6 n) {
     // f0 -> "6*"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
   }
 
@@ -520,7 +520,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -699033658, JTB_SIG_BP_IV7, JTB_USER_BP_IV7 })
   public void visit(final bp_iv7 n) {
     // f0 -> "7*"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
   }
 
@@ -536,7 +536,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -1580059612, JTB_SIG_IDENTIFIER, JTB_USER_IDENTIFIER })
   public void visit(final Identifier n) {
     // f0 -> < IDENTIFIER >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
   }
 
@@ -552,7 +552,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -1048223857, JTB_SIG_INTEGER_LITERAL_BOUM, JTB_USER_INTEGER_LITERAL_BOUM })
   public void visit(final Integer_literal_boum n) {
     // f0 -> < INTEGER_LITERAL >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
   }
 

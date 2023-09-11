@@ -33,7 +33,7 @@ import EDU.purdue.jtb.parser.syntaxtree.IdentifierAsString;
 import EDU.purdue.jtb.parser.syntaxtree.NodeChoice;
 import EDU.purdue.jtb.parser.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.parser.syntaxtree.NodeToken;
+import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.StringLiteral;
 import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
 
@@ -179,7 +179,10 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  *          iterator based for loops to enhanced for loops ; applied changes following new class FieldInfo ;
  *          fixed processing of not to be created nodes ; added final in ExpansionUnitTCF's catch ; removed
  *          NodeTCF related code<br>
- *          10-11/2022 : MMa : removed NodeTCF related code ; fixed many issues while improving test grammars
+ *          10-11/2022 : MMa : removed NodeTCF related code ; fixed many issues while improving test
+ *          grammars<br>
+ * @version 1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
+ *          replacement by Token
  */
 class CommentsPrinter extends JavaCCPrinter {
   
@@ -321,21 +324,21 @@ class CommentsPrinter extends JavaCCPrinter {
   }
   
   /**
-   * Prints a NodeToken image taking care of '<' and '>' characters (change &lt;ABC&gt; into < ABC > for
-   * proper display of comments in Eclipse javadoc views).
+   * Prints a Token image taking care of '<' and '>' characters (change &lt;ABC&gt; into < ABC > for proper
+   * display of comments in Eclipse javadoc views).
    *
-   * @param n - the NodeToken
+   * @param n - the Token
    */
   @Override
-  public void visit(final NodeToken n) {
-    final int len = n.tokenImage.length();
+  public void visit(final Token n) {
+    final int len = n.image.length();
     for (int i = 0; i < len; ++i) {
-      final char c = n.tokenImage.charAt(i);
+      final char c = n.image.charAt(i);
       if (c == '<') {
-        // tokenImage is single character, add space !
+        // image is single character, add space !
         curCtn.addId("< ");
       } else if (c == '>') {
-        // tokenImage is single character, add space !
+        // image is single character, add space !
         curCtn.addId(" >");
       } else {
         // there should be no '<' nor '>'
@@ -760,7 +763,7 @@ class CommentsPrinter extends JavaCCPrinter {
         curCtn.addEnd(" )");
         // #3 ( &0 "+" | &1 "*" | &2 "?" )?
         // don't visit #3, take it directly to add it to the end member, not to the id member
-        final String image = ((NodeToken) ((NodeChoice) opt.node).choice).tokenImage;
+        final String image = ((Token) ((NodeChoice) opt.node).choice).image;
         if (image == null) {
           curCtn.addEnd("{im})");
         } else {
@@ -788,16 +791,17 @@ class CommentsPrinter extends JavaCCPrinter {
    * f2 -> ExpansionChoices()<br>
    * f3 -> "}"<br>
    * f4 -> ( #0 "catch" #1 "("<br>
-   * .. .. . #2 [ "final" ]<br>
-   * .. .. . #3 Name() #4 < IDENTIFIER > #5 ")" #6 Block() )*<br>
+   * .. .. . #2 ( Annotation() )*<br>
+   * .. .. . #3 [ "final" ]<br>
+   * .. .. . #4 Name() #5 < IDENTIFIER > #6 ")" #7 Block() )*<br>
    * f5 -> [ #0 "finally" #1 Block() ]<br>
-   * s: -1347962218<br>
+   * s: 1601707097<br>
    *
    * @param n - the node to visit
    */
   @Override
   @NodeFieldsSignature({
-      -1347962218, JTB_SIG_EXPANSIONUNITTCF, JTB_USER_EXPANSIONUNITTCF
+      1601707097, JTB_SIG_EXPANSIONUNITTCF, JTB_USER_EXPANSIONUNITTCF
   })
   public void visit(final ExpansionUnitTCF n) {
     // if > 0 all the NodeTCF, if == 0 nothing
@@ -836,7 +840,7 @@ class CommentsPrinter extends JavaCCPrinter {
       -1580059612, JTB_SIG_IDENTIFIERASSTRING, JTB_USER_IDENTIFIERASSTRING
   })
   public void visit(final IdentifierAsString n) {
-    curCtn.addId(UnicodeConverter.addUnicodeEscapes(n.f0.tokenImage));
+    curCtn.addId(UnicodeConverter.addUnicodeEscapes(n.f0.image));
   }
   
   /**
@@ -852,7 +856,7 @@ class CommentsPrinter extends JavaCCPrinter {
       241433948, JTB_SIG_STRINGLITERAL, JTB_USER_STRINGLITERAL
   })
   public void visit(final StringLiteral n) {
-    curCtn.addId(UnicodeConverter.addUnicodeEscapes(n.f0.tokenImage));
+    curCtn.addId(UnicodeConverter.addUnicodeEscapes(n.f0.image));
   }
   
   /*

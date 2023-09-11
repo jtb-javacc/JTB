@@ -7,8 +7,6 @@ options
   // JTB_D = "../../../../../target/generated-tests/jtb/grammars/q";
   // JTB_IA = true;
   // JTB_P = "grammars.q";
-  TOKEN_FACTORY = "grammars.q.syntaxtree.NodeConstants"; // added by JTB 1.5.1
-
 }
 
 PARSER_BEGIN(NoDecOptPackageGrammar)
@@ -55,73 +53,55 @@ PARSER_END(NoDecOptPackageGrammar)
 
 classDeclaration classDeclaration() :
 {
-  NodeToken n0 = null;
-  Token n1 = null;
-  className n2 = null;
-  NodeToken n3 = null;
-  Token n4 = null;
-  NodeListOptional n5 = new NodeListOptional();
-  NodeChoice n6 = null;
-  NodeSequence n7 = null;
-  method n8 = null;
-  NodeSequence n9 = null;
-  instruction n10 = null;
-  NodeToken n11 = null;
-  Token n12 = null;
-  NodeToken n13 = null;
-  Token n14 = null;
-  jc_0 n15 = null;
-  NodeToken n16 = null;
-  Token n17 = null;
+  Token n0 = null;
+  className n1 = null;
+  Token n2 = null;
+  NodeListOptional n3 = new NodeListOptional();
+  NodeChoice n4 = null;
+  method n5 = null;
+  instruction n6 = null;
+  Token n7 = null;
+  Token n8 = null;
+  jc_0 n9 = null;
+  Token n10 = null;
   classDeclaration jtbNode = null;
 }
 {
-  n1 = "class"
-  { n0 = (NodeToken) n1; }
-  n2 = className()
-  n4 = "{"
-  { n3 = (NodeToken) n4; }
+  n0 = "class"
+  n1 = className()
+  n2 = "{"
   (
     (
       LOOKAHEAD( 2 )
-      { n7 = new NodeSequence(1); }
-      n8 = method()
-      { n7.addNode(n8); }
-      { n6 = new NodeChoice(n7, 0, 2); }
+      n5 = method()
+      { n4 = new NodeChoice(n5, 0, 2); }
     |
-      { n9 = new NodeSequence(1); }
-      n10 = instruction()
-      { n9.addNode(n10); }
-      { n6 = new NodeChoice(n9, 1, 2); }
+      n6 = instruction()
+      { n4 = new NodeChoice(n6, 1, 2); }
     )
-    { n5.addNode(n6); }
+    { n3.addNode(n4); }
   )*
-  { n5.nodes.trimToSize(); }
-  n12 = "}"
-  { n11 = (NodeToken) n12; }
-  n14 = "."
-  { n13 = (NodeToken) n14; }
-  n15 = jc_0()
-    n17 = < EOF >
-  { n17.beginColumn++; }
-  { n17.endColumn++; }
-  { n16 = (NodeToken) n17; }
-  { jtbNode = new classDeclaration(n0, n2, n3, n5, n11, n13, n15, n16); }
+  { n3.nodes.trimToSize(); }
+  n7 = "}"
+  n8 = "."
+  n9 = jc_0()
+    n10 = < EOF >
+  { n10.beginColumn++; }
+  { n10.endColumn++; }
+  { jtbNode = new classDeclaration(n0, n1, n2, n3, n7, n8, n9, n10); }
   { return jtbNode; }
 }
 
 className className() :
 {
-  NodeToken n0 = null;
-  Token n1 = null;
+  Token n0 = null;
   className jtbNode = null;
   char b, e;
   Token t = null;
 }
 {
-  n1 = < ID >
-  { n0 = (NodeToken) n1; }
-  { t = n1; }
+  n0 = < ID >
+  { t = n0; }
   {
     b = '\b';
   }
@@ -132,41 +112,32 @@ className className() :
 method method() :
 {
   methodName n0 = null;
-  NodeToken n1 = null;
-  Token n2 = null;
-  NodeList n3 = new NodeList();
-  NodeSequence n4 = null;
-  instruction n5 = null;
-  NodeToken n6 = null;
-  Token n7 = null;
+  Token n1 = null;
+  NodeList n2 = new NodeList();
+  instruction n3 = null;
+  Token n4 = null;
   method jtbNode = null;
 }
 {
   n0 = methodName()
-  n2 = "("
-  { n1 = (NodeToken) n2; }
+  n1 = "("
   (
-    { n4 = new NodeSequence(1); }
-    n5 = instruction()
-    { n4.addNode(n5); }
-    { n3.addNode(n4); }
+    n3 = instruction()
+    { n2.addNode(n3); }
   )+
-  { n3.nodes.trimToSize(); }
-  n7 = ")"
-  { n6 = (NodeToken) n7; }
-  { jtbNode = new method(n0, n1, n3, n6); }
+  { n2.nodes.trimToSize(); }
+  n4 = ")"
+  { jtbNode = new method(n0, n1, n2, n4); }
   { return jtbNode; }
 }
 
 methodName methodName() :
 {
-  NodeToken n0 = null;
-  Token n1 = null;
+  Token n0 = null;
   methodName jtbNode = null;
 }
 {
-  n1 = < ID >
-  { n0 = (NodeToken) n1; }
+  n0 = < ID >
   { jtbNode = new methodName(n0); }
   { return jtbNode; }
 }
@@ -175,33 +146,24 @@ instruction instruction() :
 {
   NodeChoice n0 = null;
   NodeSequence n1 = null;
-  NodeToken n2 = null;
+  Token n2 = null;
   Token n3 = null;
-  NodeToken n4 = null;
-  Token n5 = null;
-  NodeSequence n6 = null;
-  NodeToken n7 = null;
-  Token n8 = null;
+  Token n4 = null;
   instruction jtbNode = null;
 }
 {
   (
     LOOKAHEAD( 2 )
     { n1 = new NodeSequence(2); }
-    n3 = < ID >
-    { n2 = (NodeToken) n3; }
+    n2 = < ID >
     { n1.addNode(n2); }
-    n5 = ";"
-    { n4 = (NodeToken) n5; }
-    { n1.addNode(n4); }
+    n3 = ";"
+    { n1.addNode(n3); }
     { n0 = new NodeChoice(n1, 0, 2); }
   |
-    { n6 = new NodeSequence(1); }
     bp_al()
-    n8 = ","
-    { n7 = (NodeToken) n8; }
-    { n6.addNode(n7); }
-    { n0 = new NodeChoice(n6, 1, 2); }
+    n4 = ","
+    { n0 = new NodeChoice(n4, 1, 2); }
   )
   { jtbNode = new instruction(n0); }
   { return jtbNode; }
@@ -232,8 +194,7 @@ ArrayList<Float> bp_al () /*!*/ :
   java.util.ArrayList<Float> jual = null;
 }
 {
-  < ID >
-  {
+  < ID > {
     al.add(-23.E-40F);
     jual = new java.util.ArrayList<>(al);
     jual.add(.12e+30F);
@@ -243,15 +204,13 @@ ArrayList<Float> bp_al () /*!*/ :
 
 bp_jual bp_jual() :
 {
-  NodeToken n0 = null;
-  Token n1 = null;
+  Token n0 = null;
   bp_jual jtbNode = null;
   ArrayList<Float> al = new ArrayList<>();
   java.util.ArrayList<Float> jual = null;
 }
 {
-  n1 = < ID >
-  { n0 = (NodeToken) n1; }
+  n0 = < ID >
   { jtbNode = new bp_jual(n0); }
   {
     al.add(-23.E-40F);
@@ -264,14 +223,12 @@ bp_jual bp_jual() :
 
 bp_hm bp_hm(final java.util.ArrayList<Float> jual) :
 {
-  NodeToken n0 = null;
-  Token n1 = null;
+  Token n0 = null;
   bp_hm jtbNode = null;
   java.util.HashMap<String , Float> hm = new java.util.HashMap<>();
 }
 {
-  n1 = < ID >
-  { n0 = (NodeToken) n1; }
+  n0 = < ID >
   { jtbNode = new bp_hm(n0); }
   {
     hm.put("nine", jual == null ? 9.9F : jual.get(9));

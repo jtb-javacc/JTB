@@ -96,29 +96,31 @@
  *   to use the try-ExpansionChoices-catch-finally syntax through the ExpansionUnitInTCF production
  */
 // ModMMa 2012/06 : 1.4.7 : modified AccessModifier(), BlockStatement(), LocalVariableDeclaration()
-//                added VariableModifiers()
-// ModMMa 2012/07 : 1.4.7 : added assert, enum & strictfp java keywords
-//               fixed ForStatement() ; ForInit()
-//               renamed RSIGNEDSHIFT in RSignedShift and fixed it
-//               renamed RUNSIGNEDSHIFT in RUnsignedShift and fixed it
-//               modified RegularExpression (remove LANGLE & RANGLE definitions)
-//               renamed ExpansionUnitInTCF into ExpansionUnitTCF
+//                          added VariableModifiers()
+// ModMMa 2012/07 : 1.4.7 : added assert, enum & strictfp java keywords; fixed ForStatement() & ForInit();
+//                          renamed RSIGNEDSHIFT in RSignedShift and fixed it;
+//                          renamed RUNSIGNEDSHIFT in RUnsignedShift and fixed it;
+//                          modified RegularExpression (remove LANGLE & RANGLE definitions);
+//                          renamed ExpansionUnitInTCF into ExpansionUnitTCF
 // ModMMa 2012/09 : 1.4.7 : added "!" syntax in BNFProduction and RegExprSpec and ExpansionUnit
-//                for not generating the node creation in the callers ;
-//                fixed forbidding punctuation between productions
+//                           for not generating the node creation in the callers;
+//                          fixed forbidden punctuation between productions
 // ModMMa 2012/10 : 1.4.8 : added "%" syntax in JavaCodeProduction
-// ModMMa 2014/11 : 1.4.8 : added AnnotationTypeDeclaration() in ClassOrInterfaceBodyDeclaration() ;
-//                added ReferenceType() in ExplicitConstructorInvocation() ;
-//               removed old invalid comments on missing node descriptors (they are in JJTree but not JTB)
-// ModMMa 2014/12 : 1.4.8 : added variables initialization code ;
-//                fixed the LOOKAHEAD in and modified ExplicitConstructorInvocation()
-// ModMMa 2017/01 : 1.4.13 : added default options for proper generation by the Eclipse plugin
-// ModMMa 2017/01 : 1.5.0 : changed AllocationExpression() and added EmptyTypeArguments() ; adapted to new
-//                source folders structure
+// ModMMa 2014/11 : 1.4.8 : added AnnotationTypeDeclaration() in ClassOrInterfaceBodyDeclaration();
+//                          added ReferenceType() in ExplicitConstructorInvocation() ;
+//                          removed old invalid comments on missing node descriptors
+//                           (they are in JJTree but not JTB)
+// ModMMa 2014/12 : 1.4.8 : added variables initialization code;
+//                          fixed the LOOKAHEAD in and modified ExplicitConstructorInvocation()
+// ModMMa 2017/01 : 1.4.13: added default options for proper generation by the Eclipse plugin
+// ModMMa 2017/01 : 1.5.0 : changed AllocationExpression() and added EmptyTypeArguments();
+//                          adapted to new source folders structure
 // ModMMa 2017/05 : 1.5.0 : added optional final in ExpansionUnitTCF's catch
 // ModMMa 2020/10 : 1.5.0 : changed Expression in semantic lookahead to optional
 // ModMMa 2023/07 : 1.5.1 : changed package name
-// ModMMa 2023/08 : 1.5.1 : added optional annotations in catch of ExpansionUnitTCF; renamed .jtb and .jj
+// ModMMa 2023/08 : 1.5.1 : added optional annotations in catch of ExpansionUnitTCF;
+//                          renamed .jtb and .jj files; added grammarPackage;
+//                          suppressed Token.GTToken, RUNSIGNEDSHIFT & RSIGNEDSHIFT
 
 options
 {
@@ -140,10 +142,10 @@ options
 
 // ModMMa : for proper generation by the Eclipse plugin besides the ant task
   JTB_P = "EDU.purdue.jtb.parser"; // nodes and visitors package
-  JTB_IA = true; // inline accepts (default false, but for build.xml)
-  JTB_JD = true; // javadoc comments (default false, but for build.xmle)
-  JTB_TK = true; // store special tokens in NodeTokens (default false, but for build.xml)
-  JTB_TKJJ = true; // print special tokens in JJ file (default false, but for build.xml)
+  JTB_IA = true; // inline accepts (default false)
+  JTB_JD = true; // javadoc comments (default false)
+  JTB_TK = true; // store special tokens in Tokens (default false)
+  JTB_TKJJ = true; // print special tokens in JJ file (default false)
 
 // ModMMa 2017/03 : added 1.5.0
   JTB_VIS = "Void,void,None;Int,int,None";
@@ -174,7 +176,7 @@ public class JTBParser extends JavaCCParserInternals
   /**
    * The options, shared with JTB.
    */
-  Options opt;
+  public Options opt; // ModMMa 2023/08 added public
   
   /**
    * This flag is set to true when the part between PARSER_BEGIN and
@@ -570,9 +572,9 @@ TOKEN :
 | < BIT_OR : "|" >
 | < XOR : "^" >
 | < REM : "%" >
-  //    | < LSHIFT: "<<" >
-  //    | < RSIGNEDSHIFT: ">>" >
-  //    | < RUNSIGNEDSHIFT: ">>>" >
+  //    | < LSHIFT: "<<" > // in AdditiveExpression()
+  //    | < RSIGNEDSHIFT: ">>" > // in RSignedShift()
+  //    | < RUNSIGNEDSHIFT: ">>>" > // in RUnignedShift()
 | < PLUSASSIGN : "+=" >
 | < MINUSASSIGN : "-=" >
 | < STARASSIGN : "*=" >
@@ -581,30 +583,52 @@ TOKEN :
 | < ORASSIGN : "|=" >
 | < XORASSIGN : "^=" >
 | < REMASSIGN : "%=" >
-  //    | < LSHIFTASSIGN: "<<=" >
-  //    | < RSIGNEDSHIFTASSIGN: ">>=" >
-  //    | < RUNSIGNEDSHIFTASSIGN: ">>>=" >
+  //    | < LSHIFTASSIGN: "<<=" > // in AssignmentOperator()
+  //    | < RSIGNEDSHIFTASSIGN: ">>=" > // in AssignmentOperator()
+  //    | < RUNSIGNEDSHIFTASSIGN: ">>>=" > // in AssignmentOperator()
 }
 
-/* >'s need special attention due to generics syntax */
-// (see also RUnsignedShift() and RSignedShift())
+/*
+ * >'s need special attention due to generics syntax:
+ * ">>>" & ">>" can be found as bit operators or sequences of closing TypeArguments() &
+ *  ExplicitConstructorInvocation() characters.
+ * We do not anymore let the token manager recognize them (and transform them into sequences of ">" (GT)
+ *  tokens when we  *  create the token (in Token.newToken(kind, image)).
+ * In RUnsignedShift() / RSignedShift() we lookahead for 3 / 2 GT tokens, and check they are contiguous.
+ */
 TOKEN :
 {
-  < RUNSIGNEDSHIFT : ">>>" >
-  {
-    matchedToken.kind = GT;
-    ((Token.GTToken) matchedToken).realKind = RUNSIGNEDSHIFT;
-    input_stream.backup(2);
-    matchedToken.image = ">";
-  }
-| < RSIGNEDSHIFT : ">>" >
-  {
-    matchedToken.kind = GT;
-    ((Token.GTToken) matchedToken).realKind = RSIGNEDSHIFT;
-    input_stream.backup(1);
-    matchedToken.image = ">";
-  }
-| < GT : ">" >
+    // ModMMa 2023/08 : changed when suppressed GTToken
+//  < RUNSIGNEDSHIFT : ">>>" >
+//  {
+//    { System.err.println("RUNSIGNEDSHIFT: matchedToken: kind = " + matchedToken.kind +
+//                         ", realKind = " + matchedToken.realKind +
+//                         ", image = " + matchedToken.image +
+//                         ", beginLine = " + matchedToken.beginLine +
+//                         ", beginColumn = " + matchedToken.beginColumn);
+//      System.err.flush(); }
+//    matchedToken.kind = GT;
+//    ((Token.GTToken) matchedToken).realKind = RUNSIGNEDSHIFT;
+//    matchedToken.realKind = RUNSIGNEDSHIFT;
+//    input_stream.backup(2);
+//    matchedToken.image = ">";
+//  }
+//| < RSIGNEDSHIFT : ">>" >
+//  {
+//    { System.err.println("RSIGNEDSHIFT: matchedToken: kind = " + matchedToken.kind +
+//                         ", realKind = " + matchedToken.realKind +
+//                         ", image = " + matchedToken.image +
+//                         ", beginLine = " + matchedToken.beginLine +
+//                         ", beginColumn = " + matchedToken.beginColumn);
+//      System.err.flush(); }
+//    matchedToken.kind = GT;
+//    ((Token.GTToken) matchedToken).realKind = RSIGNEDSHIFT;
+//    matchedToken.realKind = RSIGNEDSHIFT;
+//    input_stream.backup(1);
+//    matchedToken.image = ">";
+//  }
+//|
+  < GT : ">" >
 }
 
 /************************************************
@@ -869,31 +893,31 @@ void RegularExprProduction() :
       // for (int i = 0; i < states.size(); i++) {
       for (int i = 0; i != states.size(); i++)
         p.lexStates [ i ] = states.get(i);
-      }
-    ]
-    RegExprKind(p)
-    {
-      if (p.kind != TokenProduction.TOKEN && opt.getUserTokenManager())
-        JavaCCErrors.warning(getToken(0), "Regular expression is being treated as if it were a TOKEN since option USER_TOKEN_MANAGER has been set to true.");
     }
-    [
-      "[" t = "IGNORE_CASE" "]"
-      {
-        p.ignoreCase = true;
-        if (opt.getUserTokenManager())
-          JavaCCErrors.warning(t, "Ignoring \"IGNORE_CASE\" specification since option USER_TOKEN_MANAGER has been set to true.");
-      }
-    ]
-    ":" "{" RegExprSpec(p)
-    (
-      "|" RegExprSpec(p)
-    )*
-    t = "}"
-    {
-      p.lastToken = t;
-      addregexpr(p, opt.getUserTokenManager());
-    }
+  ]
+  RegExprKind(p)
+  {
+    if (p.kind != TokenProduction.TOKEN && opt.getUserTokenManager())
+      JavaCCErrors.warning(getToken(0), "Regular expression is being treated as if it were a TOKEN since option USER_TOKEN_MANAGER has been set to true.");
   }
+  [
+    "[" t = "IGNORE_CASE" "]"
+    {
+      p.ignoreCase = true;
+      if (opt.getUserTokenManager())
+        JavaCCErrors.warning(t, "Ignoring \"IGNORE_CASE\" specification since option USER_TOKEN_MANAGER has been set to true.");
+    }
+  ]
+  ":" "{" RegExprSpec(p)
+  (
+    "|" RegExprSpec(p)
+  )*
+  t = "}"
+  {
+    p.lastToken = t;
+    addregexpr(p, opt.getUserTokenManager());
+  }
+}
 
 // ModMMa : changed all token_manager_decls into TokenManagerDecls to conform to class name convention
 void TokenManagerDecls() :
@@ -2339,18 +2363,35 @@ void ShiftExpression() :
 void RSignedShift() :
 {}
 {
-  LOOKAHEAD({ getToken(1).kind == GT && ((Token.GTToken) getToken(1)).realKind == RSIGNEDSHIFT })
+  // ModMMa 2023/08 : changed when suppressed GTToken
+  //  LOOKAHEAD({ getToken(1).kind == GT && ((Token.GTToken) getToken(1)).realKind == RSIGNEDSHIFT })
+//  LOOKAHEAD({ getToken(1).kind == GT && getToken(1).realKind == RSIGNEDSHIFT })
+  LOOKAHEAD({ getToken(1).kind == GT &&  getToken(2).kind == GT
+              && (getToken(2).beginColumn == 1 + getToken(1).beginColumn) })
   // ModMMa 2012/07 : '">" ">"' changed to '">>"'
-  ">>"
+  // ModMMa 2023/08 : back to '">" ">"'
+  //  ">>"
+  ">" ">"
+//  { System.err.println("RSignedShift() at line " + getToken(1).beginLine + ", col " + getToken(1).beginColumn);
+//    System.err.flush(); }
 }
 
 // ModMMa 2012/07 : moved from after TryStatement() and renamed from RUNSIGNEDSHIFT()
 void RUnsignedShift() :
 {}
 {
-  LOOKAHEAD({ getToken(1).kind == GT && ((Token.GTToken) getToken(1)).realKind == RUNSIGNEDSHIFT })
+  // ModMMa 2023/08 : changed when suppressed GTToken
+  //  LOOKAHEAD({ getToken(1).kind == GT && ((Token.GTToken) getToken(1)).realKind == RUNSIGNEDSHIFT })
+//  LOOKAHEAD({ getToken(1).kind == GT &&  getToken(1).realKind == RUNSIGNEDSHIFT })
+  LOOKAHEAD({ getToken(1).kind == GT &&  getToken(2).kind == GT &&  getToken(3).kind == GT
+              && (getToken(2).beginColumn == 1 + getToken(1).beginColumn)
+              && (getToken(3).beginColumn == 1 + getToken(2).beginColumn) })
   // ModMMa 2012/07 : '">" ">" ">"' changed to '">>>"'
-  ">>>"
+  // ModMMa 2023/08 : back to '">" ">" ">"'
+  //  ">>>"
+  ">" ">" ">"
+//  { System.err.println("RUnsignedShift() at line " + getToken(1).beginLine + ", col " + getToken(1).beginColumn);
+//    System.err.flush(); }
 }
 
 void AdditiveExpression() :
@@ -2856,16 +2897,18 @@ void ReturnStatement() :
 {
   t = "return"
   {
-    // Add if statement to prevent subsequent code generated from being dead code
-    if (inAction) {
-      t.image = "{if (true) return";
-      jumpPatched = true;
-    }
+    // ModMMa 2023/08: removed for unwanted side effects in jj annotation
+//    // Add if statement to prevent subsequent code generated from being dead code
+//    if (inAction) {
+//      t.image = "{if (true) return";
+//      jumpPatched = true;
+//    }
   }
   [ Expression(null) ] t = ";"
   {
-    // Add closing brace for above if statement
-    if (inAction) t.image = ";}";
+    // ModMMa 2023/08: removed for unwanted side effects in jj annotation
+//    // Add closing brace for above if statement
+//    if (inAction) t.image = ";}";
   }
 }
 
@@ -2876,16 +2919,18 @@ void ThrowStatement() :
 {
   t = "throw"
   {
-    // Add if statement to prevent subsequent code generated from being dead code
-    if (inAction) {
-      t.image = "{if (true) throw";
-      jumpPatched = true;
-    }
+    // ModMMa 2023/08: removed for unwanted side effects in jj annotation
+//    // Add if statement to prevent subsequent code generated from being dead code
+//    if (inAction) {
+//      t.image = "{if (true) throw";
+//      jumpPatched = true;
+//    }
   }
   Expression(null) t = ";"
   {
-    // Add closing brace for above if statement
-    if (inAction) t.image = ";}";
+    // ModMMa 2023/08: removed for unwanted side effects in jj annotation
+//    // Add closing brace for above if statement
+//    if (inAction) t.image = ";}";
   }
 }
 

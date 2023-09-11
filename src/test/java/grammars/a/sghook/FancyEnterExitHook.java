@@ -5,7 +5,9 @@ import grammars.a.sgtree.ASTclassDeclaration123;
 
 /** A fancy hook. */
 // @SuppressWarnings({ "javadoc", "unused" })
-@SuppressWarnings({ "javadoc" })
+@SuppressWarnings({
+    "javadoc"
+})
 public class FancyEnterExitHook /* implements IEnterExitHook */ extends EmptyEnterExitHook {
   
   SmallGrammar sg  = null;
@@ -56,9 +58,9 @@ public class FancyEnterExitHook /* implements IEnterExitHook */ extends EmptyEnt
   
   @Override
   public void ASTclassDeclaration123Exit(final ASTclassDeclaration123 n) {
-    System.out.println("/// Exiting hook : class name : " + n.className.nodeToken.tokenImage + ", str : "
-        + str + ", sg : " + sg);
-    n.className.nodeToken.tokenImage = str.substring(0, n.className.nodeToken.tokenImage.length());
+    System.out.println(
+        "/// Exiting hook : class name : " + n.className.token.image + ", str : " + str + ", sg : " + sg);
+    n.className.token.image = str.substring(0, n.className.token.image.length());
   }
   
   // @Override

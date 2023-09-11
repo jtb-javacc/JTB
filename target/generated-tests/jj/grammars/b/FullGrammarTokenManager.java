@@ -3,6 +3,7 @@
 package grammars.b;
 import grammars.b.visitor.*;
 import java.util.ArrayList;
+import java.util.List;
 import grammars.b.syntaxtree.*;
 
 /** Token Manager. */
@@ -23,6 +24,8 @@ private int jjStopAtPos(int pos, int kind)
 private int jjMoveStringLiteralDfa0_0(){
    switch(curChar)
    {
+      case 32:
+         return jjMoveStringLiteralDfa1_0(0x0L, 0x800000L);
       case 33:
          jjmatchedKind = 24;
          return jjMoveStringLiteralDfa1_0(0x120000000L, 0x5c000L);
@@ -50,6 +53,8 @@ private int jjMoveStringLiteralDfa0_0(){
       case 59:
          jjmatchedKind = 19;
          return jjMoveStringLiteralDfa1_0(0x3fffc0000000000L, 0x3800L);
+      case 60:
+         return jjMoveStringLiteralDfa1_0(0x0L, 0x1000000L);
       case 63:
          jjmatchedKind = 30;
          return jjMoveStringLiteralDfa1_0(0x80000000L, 0x0L);
@@ -159,9 +164,16 @@ private int jjMoveStringLiteralDfa1_0(long active0, long active1){
          }
          break;
       case 59:
+         if ((active1 & 0x1000000L) != 0L)
+         {
+            jjmatchedKind = 88;
+            jjmatchedPos = 1;
+         }
          return jjMoveStringLiteralDfa2_0(active0, 0L, active1, 0x3800L);
       case 61:
          return jjMoveStringLiteralDfa2_0(active0, 0x1e00000000L, active1, 0L);
+      case 62:
+         return jjMoveStringLiteralDfa2_0(active0, 0L, active1, 0x800000L);
       case 67:
          return jjMoveStringLiteralDfa2_0(active0, 0x800L, active1, 0L);
       case 78:
@@ -262,6 +274,11 @@ private int jjMoveStringLiteralDfa2_0(long old0, long active0, long old1, long a
       case 57:
          return jjMoveStringLiteralDfa3_0(active0, 0x2000000000L, active1, 0L);
       case 59:
+         if ((active1 & 0x800000L) != 0L)
+         {
+            jjmatchedKind = 87;
+            jjmatchedPos = 2;
+         }
          return jjMoveStringLiteralDfa3_0(active0, 0L, active1, 0x3000L);
       case 61:
          return jjMoveStringLiteralDfa3_0(active0, 0x1e00000000L, active1, 0L);
@@ -1598,7 +1615,7 @@ public static final String[] jjstrLiteralImages = {
 "\54\163\164\165", "\44\136\44\136", null, null, "\52\61", "\52\62", "\52\63", null, "\52\64", 
 "\52\65", "\52\66", null, null, null, "\73\73\40", "\73\73\73\40", "\73\73\73\73\40", 
 "\41\41\40", "\41\41\41\40", "\41\41\41\41\40", "\45\143\164\142\165\77\156\157\52\52\52", 
-"\41\170", null, null, null, null, };
+"\41\170", null, null, null, null, "\40\76\73", "\74\73", };
 protected Token jjFillToken()
 {
    final Token t;
@@ -1613,7 +1630,9 @@ protected Token jjFillToken()
    beginColumn = input_stream.getBeginColumn();
    endLine = input_stream.getEndLine();
    endColumn = input_stream.getEndColumn();
-   t = grammars.b.syntaxtree.NodeConstants.newToken(jjmatchedKind, curTokenImage);
+   t = Token.newToken(jjmatchedKind);
+   t.kind = jjmatchedKind;
+   t.image = curTokenImage;
 
    t.beginLine = beginLine;
    t.endLine = endLine;
@@ -1874,10 +1893,10 @@ public static final int[] jjnewLexState = {
    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 0, -1, -1, -1, -1, -1, -1, -1, 
    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
+   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
 };
 static final long[] jjtoToken = {
-   0xfffffffffffa3fe7L, 0x7fffffL, 
+   0xfffffffffffa3fe7L, 0x1ffffffL, 
 };
 static final long[] jjtoSkip = {
    0xc000L, 0x0L, 

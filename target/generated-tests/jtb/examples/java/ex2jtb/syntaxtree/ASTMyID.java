@@ -22,6 +22,7 @@
 // added to the original JJTree example
 package examples.java.ex2jtb.syntaxtree;
 
+import examples.java.ex2jtb.Token;
 import examples.java.ex2jtb.visitor.IGenVisitor;
 
 /**
@@ -36,14 +37,14 @@ public class ASTMyID implements INode {
   private String name = "my name";
 
   /** Child node 0 */
-  public NodeToken f0;
+  public Token f0;
 
   /**
    * Constructs the node with its child node.
    *
    * @param n0 - the child node
    */
-  public ASTMyID(final NodeToken n0) {
+  public ASTMyID(final Token n0) {
     f0 = n0;
   }
 

@@ -20,6 +20,7 @@ PARSER_BEGIN(FullGrammar)
 package grammars.b;
 import grammars.b.visitor.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class FullGrammar
 {
@@ -339,6 +340,41 @@ JAVACODE public protected boolean jcp_uob()
   return false;
 }
 */
+
+JAVACODE void jcp_sts() throws Exception
+{
+  int k = 0;
+  try
+  {
+    if (k == 1) throw new Exception();
+  }
+  catch (Exception ex)
+  {
+    k = 1;
+  }
+  try
+  {
+    if (k != 1) throw new Exception();
+  }
+  finally
+  {
+    k = 2;
+  }
+  try
+  {
+    k = 3;
+    if (k == 0) return;
+  }
+  catch (Exception ex)
+  {
+    k = 4;
+  }
+  finally
+  {
+    k = 5;
+  }
+  return;
+}
 
 /*
  * --------------------------------
@@ -797,6 +833,64 @@ protected String bp_s() :
 {
   tk = < ID >
   {
+    return tk.image;
+  }
+}
+
+protected String bp_tcf_ie_w() :
+{
+  Token tk;
+}
+{
+  tk = < ID >
+  {
+    int k = 0;
+    try
+    {
+      if (k == 1) throw new Exception();
+      if (k == 1)
+      {
+        throw new Exception();
+      }
+      while (k > 9)
+      {
+        k--;
+      }
+    }
+    catch (Exception ex)
+    {
+      k = 1;
+    }
+    try
+    {
+      if (k != 1) k = 1;
+    }
+    finally
+    {
+      k = 2;
+    }
+    try
+    {
+      k = 3;
+      if (k == 0) return tk.image;
+      else 
+      if (k == 1)
+      {
+        return tk.image;
+      }
+      else
+      {
+        return null;
+      }
+    }
+    catch (Exception ex)
+    {
+      k = 4;
+    }
+    finally
+    {
+      k = 5;
+    }
     return tk.image;
   }
 }
@@ -1418,7 +1512,7 @@ void expch_eu_a() : // eu case 2 bracket & case 5 parentheses & eu case 1 ias cr
 // JJ compile warning: Encountered LOOKAHEAD(...) at a non-choice location.  This will be ignored.
 //    LOOKAHEAD(2) // ExpansionUnit
     (
-      LOOKAHEAD(2) // ExpansionUnit, used by JavaCC ("< abID >")
+      LOOKAHEAD(2) // Expansion, used by JavaCC ("< abID >")
       // only if next ExpansionChoices is surrounded by ()
       // note: the choice conflict in (...)? construct at ...
       // Expansion nested within construct and expansion following construct
@@ -1433,7 +1527,7 @@ void expch_eu_a() : // eu case 2 bracket & case 5 parentheses & eu case 1 ias cr
 // JJ compile warning: Encountered LOOKAHEAD(...) at a non-choice location.  This will be ignored.
 //    LOOKAHEAD(2) // ExpansionUnit
     (
-      LOOKAHEAD(2) // ExpansionUnit, used by JavaCC ("< abID >")
+      LOOKAHEAD(2) // Expansion, used by JavaCC ("< abID >")
       // only if next ExpansionChoices is surrounded by ()
       // note: the choice conflict in (...)? construct at ...
       // Expansion nested within construct and expansion following construct
@@ -1446,7 +1540,7 @@ void expch_eu_a() : // eu case 2 bracket & case 5 parentheses & eu case 1 ias cr
   )?
   ( "*4"
     (
-      LOOKAHEAD(2) // ExpansionUnit, used by JavaCC ("< abID >")
+      LOOKAHEAD(2) // Expansion, used by JavaCC ("< abID >")
       // only if next ExpansionChoices is surrounded by ()
       // note: the choice conflict in (...)? construct at ...
       // Expansion nested within construct and expansion following construct
@@ -1459,7 +1553,7 @@ void expch_eu_a() : // eu case 2 bracket & case 5 parentheses & eu case 1 ias cr
   )*
   ( ( < "*5" > )?
     (
-      LOOKAHEAD(2) // ExpansionUnit, used by JavaCC ("< abID >")
+      LOOKAHEAD(2) // Expansion, used by JavaCC ("< abID >")
       // only if next ExpansionChoices is surrounded by ()
       // note: the choice conflict in (...)+ construct at ...
       // Expansion nested within construct and expansion following construct
@@ -1743,13 +1837,13 @@ void f0_eu2_all1() : // all types of LA in ExpansionUnit for JJFileAnnotator
 {
   LOOKAHEAD(0) // Expansion, no warning but seems then ignored by JavaCC
 // JJ compile warning: Encountered LOOKAHEAD(...) at a non-choice location.  This will be ignored.
-  LOOKAHEAD(1) // Expansion
+  LOOKAHEAD(1) // ExpansionUnit
   [
-    LOOKAHEAD(2) // ExpansionUnit, used by JavaCC (".")
+    LOOKAHEAD(2) // Expansion, used by JavaCC (".")
     k = ".".kind !
   ]
   [
-    LOOKAHEAD(2) // ExpansionUnit, used by JavaCC (";")
+    LOOKAHEAD(2) // Expansion, used by JavaCC (";")
     im = ";".image
   ]
 //  LOOKAHEAD(0) // ExpansionUnit, no warning but seems then ignored by JavaCC
@@ -1760,23 +1854,26 @@ void f0_eu2_all1() : // all types of LA in ExpansionUnit for JJFileAnnotator
   ( "!! " ! ( "!!! " ! "!!!! " ! ) )
   // "%ctbu?no" cannot be used as a more general regexpr is already defined
   (
-     LOOKAHEAD("%ctbu?no***") // ExpansionUnit, used by JavaCC ("%ctbu?no***")
+     LOOKAHEAD("%ctbu?no***") // Expansion, used by JavaCC ("%ctbu?no***")
      "%ctbu?no***" !
      im = < A_BS_B >.image !
   )+
   // "%ctbu?yes" can be used as the same general regexpr is already defined
   (
-     LOOKAHEAD(1, "%ctbu?yes") // ExpansionUnit, used by JavaCC ("%ctbu?yes")
+     LOOKAHEAD(1, "%ctbu?yes" !) // Expansion, used by JavaCC ("%ctbu?yes")
      "%ctbu?yes" !
      < NUM_3_9 >
   )*
   (
-     LOOKAHEAD(":") // ExpansionUnit, used by JavaCC (":")
+     LOOKAHEAD(":") // Expansion, used by JavaCC (":")
      (
-        LOOKAHEAD(2) // Expansion, used by JavaCC (":")
-        ":" < NOT_BUILT >
+        LOOKAHEAD(":" < ES > !) // Expansion, used by JavaCC (":")
+        ":" < ES > !
      |
-       ":" < ES >
+        LOOKAHEAD(":" ! < NUM_3_9 >) // Expansion, used by JavaCC (":")
+        ":" ! < NUM_3_9 >
+     |
+       ":" < NOT_BUILT >
      )
   )?
   try
@@ -1796,13 +1893,13 @@ void f0_eu2_all1$() ! : // all types of LA in ExpansionUnit for JavaCCPrinter (s
 {
   LOOKAHEAD(0) // Expansion, no warning but seems then ignored by JavaCC
 // JJ compile warning: Encountered LOOKAHEAD(...) at a non-choice location.  This will be ignored.
-  LOOKAHEAD(1) // Expansion
+  LOOKAHEAD(1) // ExpansionUnit
   [
-    LOOKAHEAD(2) // ExpansionUnit, used by JavaCC (".")
+    LOOKAHEAD(2) // Expansion, used by JavaCC (".")
     k = ".".kind !
   ]
   [
-    LOOKAHEAD(2) // ExpansionUnit, used by JavaCC (";")
+    LOOKAHEAD(2) // Expansion, used by JavaCC (";")
     im = ";".image
   ]
 //  LOOKAHEAD(0) // ExpansionUnit, no warning but seems then ignored by JavaCC
@@ -1813,23 +1910,26 @@ void f0_eu2_all1$() ! : // all types of LA in ExpansionUnit for JavaCCPrinter (s
   ( "!! " ! ( "!!! " ! "!!!! " ! ) )
   // "%ctbu?no" cannot be used as a more general regexpr is already defined
   (
-     LOOKAHEAD("%ctbu?no***") // ExpansionUnit, used by JavaCC ("%ctbu?no***")
+     LOOKAHEAD("%ctbu?no***") // Expansion, used by JavaCC ("%ctbu?no***")
      "%ctbu?no***" !
      im = < A_BS_B >.image !
   )+
   // "%ctbu?yes" can be used as the same general regexpr is already defined
   (
-     LOOKAHEAD(1, "%ctbu?yes") // ExpansionUnit, used by JavaCC ("%ctbu?yes")
+     LOOKAHEAD(1, "%ctbu?yes" !) // Expansion, used by JavaCC ("%ctbu?yes")
      "%ctbu?yes" !
      < NUM_3_9 >
   )*
   (
-     LOOKAHEAD(":") // ExpansionUnit, used by JavaCC (":")
+     LOOKAHEAD(":") // Expansion, used by JavaCC (":")
      (
-        LOOKAHEAD(2) // Expansion, used by JavaCC (":")
-        ":" < NOT_BUILT >
+        LOOKAHEAD(":" < ES > !) // Expansion, used by JavaCC (":")
+        ":" < ES > !
      |
-       ":" < ES >
+        LOOKAHEAD(":" ! < NUM_3_9 >) // Expansion, used by JavaCC (":")
+        ":" ! < NUM_3_9 >
+     |
+       ":" < NOT_BUILT >
      )
   )?
   try
@@ -2070,4 +2170,45 @@ void f0_laeu2_jc() : // Javacode
   // JJ compile warning: LA in non choice location, ignored; TESTCASE for annotator case 0 ExpansionUnit
   LOOKAHEAD(1) 
   eatNextToken()
+}
+
+/*
+ * ---------------------------------------------------
+ * ' >' & '<' handling
+ * ---------------------------------------------------
+ */
+
+void gt_1() :
+{}
+{
+  {
+    List<Token> l1 = new ArrayList<>();
+    List<List<Token>> l2 = new ArrayList<List<Token>>();
+    List<List<List<Token>>> l3 = new ArrayList<List<List<Token>>>();
+    List<List<List<List<Token>>>> l4 = new ArrayList<List<List<List<Token>>>>();
+    boolean b = 1 > 2;
+    b = 3 >= 4;
+    int i = 5 >> 6;
+    i = 7 >>> 8;
+//    i = 9 > > 10; // error
+//    i = 11 > > > 12; // error
+//    i = 13 >> > 14; // error
+//    i = 15 > >> 16; // error
+    i >>= 9;
+    i >>>= 10;
+  }
+  " >;"
+}
+
+void lt_1() :
+{}
+{
+  {
+    boolean b = 1 < 2;
+    b = 3 <=  4;
+    int i = 5 << 6;
+    i = 7 << 8;
+    i <<= 9;
+  }
+  "<;"
 }

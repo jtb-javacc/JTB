@@ -57,7 +57,9 @@ import EDU.purdue.jtb.common.Messages;
  *
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
- * @version 1.5.0 : 01/2017 : MMa : used try-with-resource
+ * @version 1.5.0 : 01/2017 : MMa : used try-with-resource<br>
+ * @version 1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
+ *          replacement by Token
  */
 public class TreeDumperGenerator {
   
@@ -117,6 +119,11 @@ public class TreeDumperGenerator {
   public void generateTreeDumper() {
     sb.append(fileHeaderComment).append(LS);
     sb.append("package ").append(jopt.visitorsPackageName).append(";").append(LS).append(LS);
+    
+    sb.append("import ");
+    if (jopt.grammarPackageName != null)
+      sb.append(jopt.grammarPackageName).append('.');
+    sb.append(nodeToken).append(';').append(LS);
     sb.append("import ");
     if (jopt.nodesPackageName != null)
       sb.append(jopt.nodesPackageName).append(".");
@@ -126,7 +133,7 @@ public class TreeDumperGenerator {
     sb.append("import java.io.Writer;").append(LS).append(LS);
     
     sb.append("/**").append(LS);
-    sb.append(" * Dumps the syntax tree using the location information in each NodeToken.").append(LS);
+    sb.append(" * Dumps the syntax tree using the location information in each Token.").append(LS);
     sb.append(" */").append(LS);
     sb.append("public class TreeDumper extends DepthFirstVoidVisitor {").append(LS).append(LS);
     
@@ -192,7 +199,7 @@ public class TreeDumperGenerator {
     sb.append("  public void resetPosition()  { curLine = curColumn = 1; }").append(LS).append(LS);
     
     sb.append("  /**").append(LS);
-    sb.append("   * Dumps the current NodeToken to the output stream being used.").append(LS);
+    sb.append("   * Dumps the current Token to the output stream being used.").append(LS);
     sb.append("   *").append(LS);
     sb.append("   * @throws  IllegalStateException   if the token position is invalid").append(LS);
     sb.append("   *   relative to the current position, i.e. its location places it").append(LS);
@@ -203,7 +210,7 @@ public class TreeDumperGenerator {
         .append(LS);
     sb.append("    if (").append(genNodeVar).append(".beginLine == -1 || ").append(genNodeVar)
         .append(".beginColumn == -1) {").append(LS);
-    sb.append("      printToken(").append(genNodeVar).append(".tokenImage);").append(LS);
+    sb.append("      printToken(").append(genNodeVar).append(".image);").append(LS);
     sb.append("      return;").append(LS);
     sb.append("    }").append(LS).append(LS);
     sb.append("    //").append(LS);
@@ -228,14 +235,14 @@ public class TreeDumperGenerator {
     sb.append("    //").append(LS);
     sb.append("    if (").append(genNodeVar).append(".beginLine < curLine)").append(LS);
     sb.append("      throw new IllegalStateException(\"at token \\\"\" + ").append(genNodeVar)
-        .append(".tokenImage +").append(LS);
+        .append(".image +").append(LS);
     sb.append("        \"\\\", ").append(genNodeVar).append(".beginLine = \" + Integer.toString(")
         .append(genNodeVar).append(".beginLine) +").append(LS);
     sb.append("        \", curLine = \" + Integer.toString(curLine));").append(LS);
     sb.append("    else if (").append(genNodeVar).append(".beginLine == curLine && ").append(genNodeVar)
         .append(".beginColumn < curColumn)").append(LS);
     sb.append("      throw new IllegalStateException(\"at token \\\"\" + ").append(genNodeVar)
-        .append(".tokenImage +").append(LS);
+        .append(".image +").append(LS);
     sb.append("        \"\\\", ").append(genNodeVar).append(".beginColumn = \" +").append(LS);
     sb.append("        Integer.toString(").append(genNodeVar).append(".beginColumn) + \", curColumn = \" +")
         .append(LS);
@@ -250,7 +257,7 @@ public class TreeDumperGenerator {
     sb.append("    }").append(LS).append(LS);
     sb.append("    for (; curColumn < ").append(genNodeVar).append(".beginColumn; ++curColumn)").append(LS);
     sb.append("      out.print(\" \");").append(LS).append(LS);
-    sb.append("    printToken(").append(genNodeVar).append(".tokenImage);").append(LS);
+    sb.append("    printToken(").append(genNodeVar).append(".image);").append(LS);
     sb.append("  }").append(LS).append(LS);
     
     sb.append("  /**").append(LS);

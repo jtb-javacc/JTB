@@ -137,7 +137,7 @@ public class TemplateProcessorTester {
         "int c = 2;", "return;"
     });
     jtb_base_node_bag.put("visit_code", visit_code);
-    jtb_base_nodes.put("NodeToken", jtb_base_node_bag);
+    jtb_base_nodes.put("Token", jtb_base_node_bag);
     
     root.put("jtb_base_nodes", jtb_base_nodes);
     

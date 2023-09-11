@@ -71,7 +71,7 @@ import EDU.purdue.jtb.parser.syntaxtree.NodeList;
 import EDU.purdue.jtb.parser.syntaxtree.NodeListOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.parser.syntaxtree.NodeToken;
+import EDU.purdue.jtb.parser.Token;
 
 /**
  * Class {@link VisitorsGenerator} contains methods to generate: CODEJAVA
@@ -104,7 +104,9 @@ import EDU.purdue.jtb.parser.syntaxtree.NodeToken;
  *          {@link NodeSequence})<br>
  *          1.5.0 : 04/2021 : MMa : added null conditions on accept calls in TCF ; removed NodeTCF related
  *          code<br>
- *          1.5.1 : 07/2023 : MMa : fixed issues with imports / packages on grammars with no package
+ * @version 1.5.1 : 07/2023 : MMa : fixed issues with imports / packages on grammars with no package<br>
+ *          1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
+ *          replacement by Token
  */
 public class VisitorsGenerator {
   
@@ -197,21 +199,24 @@ public class VisitorsGenerator {
     
     if (jopt.visitorsPackageName != null)
       sb.append("package ").append(jopt.visitorsPackageName).append(';').append(LS).append(LS);
+    
     if (!jopt.noSignature) {
       if (jopt.nodesPackageName != null)
         sb.append("import static ").append(jopt.nodesPackageName).append(".").append(nodeConstants)
-            .append(".*;").append(LS).append(LS);
+            .append(".*;").append(LS);
     }
+    ccg.tokenImport(sb);
     if (jopt.visitorsPackageName != null //
         && jopt.nodesPackageName != null //
         && !jopt.visitorsPackageName.equals(jopt.nodesPackageName)) {
-      sb.append("import ").append(jopt.nodesPackageName).append(".").append("*;").append(LS).append(LS);
+      sb.append("import ").append(jopt.nodesPackageName).append(".").append("*;").append(LS);
     }
     if (jopt.visitorsPackageName != null //
         && !jopt.noSignature) {
       sb.append("import ").append(jopt.visitorsPackageName).append(".").append(DEF_SIG_PKG_NAME).append(".")
           .append(sigAnnName).append(";").append(LS);
     }
+    sb.append(LS);
     
     if (jopt.javaDocComments) {
       sb.append("/**").append(LS);
@@ -382,7 +387,7 @@ public class VisitorsGenerator {
     sb.append(LS);
     genNodeSequenceVisit(sb, aSpc, aVi);
     sb.append(LS);
-    genNodeTokenVisit(sb, aSpc, aVi);
+    genTokenVisit(sb, aSpc, aVi);
     sb.append(LS);
     
     return sb;
@@ -614,60 +619,15 @@ public class VisitorsGenerator {
     return sb;
   }
   
-  // /**
-  // * Generates the base node {@link NodeSequence} visit method.
-  // *
-  // * @param aSb - the buffer to append to (will be allocated if null)
-  // * @param aSpc - the indentation
-  // * @param aVi - a VisitorInfo defining the visitor to generate
-  // * @return the buffer with the DepthFirst visitor class source
-  // */
-  // StringBuilder genNodeSequence2Visit(final StringBuilder aSb, final Spacing aSpc, final VisitorInfo aVi) {
-  // StringBuilder sb = aSb;
-  // if (sb == null) {
-  // sb = new StringBuilder(920);
-  // }
-  //
-  // baseNodeVisitMethodBegin(sb, aSpc, aVi, nodeSequence + "2", false);
-  // if (!aVi.retInfo.isVoid) {
-  // sb.append(aSpc.spc).append(aVi.retInfo.fullType).append(' ').append(genRetVar).append(" = ")
-  // .append(aVi.retInfo.initializer).append(";").append(LS);
-  // }
-  // sb.append(aSpc.spc).append("for (").append(iNode).append(" e : ").append(genNodeVar).append(".nodes) {")
-  // .append(LS);
-  // aSpc.updateSpc(+1);
-  // if (jopt.depthLevel) {
-  // CommonCodeGenerator.increaseDepthLevel(sb, aSpc);
-  // }
-  // sb.append(aSpc.spc);
-  // if (!aVi.retInfo.isVoid) {
-  // sb.append("@SuppressWarnings(\"unused\")").append(LS);
-  // sb.append(aSpc.spc).append(aVi.retInfo.fullType).append(" subRet = ");
-  // }
-  // sb.append("e.accept(this").append(aVi.userArguments).append(");").append(LS);
-  // if (jopt.depthLevel) {
-  // CommonCodeGenerator.decreaseDepthLevel(sb, aSpc);
-  // }
-  // baseNodeVisitMethodCloseBrace(sb, aSpc);
-  // sb.append(aSpc.spc).append("return");
-  // if (!aVi.retInfo.isVoid) {
-  // sb.append(' ').append(genRetVar);
-  // }
-  // sb.append(';').append(LS);
-  // baseNodeVisitMethodCloseBrace(sb, aSpc);
-  //
-  // return sb;
-  // }
-  
   /**
-   * Generates the base node {@link NodeToken} visit method.
+   * Generates the base node {@link Token} visit method.
    *
    * @param aSb - the buffer to append to (will be allocated if null)
    * @param aSpc - the indentation
    * @param aVi - a VisitorInfo defining the visitor to generate
    * @return the buffer with the DepthFirst visitor class source
    */
-  StringBuilder genNodeTokenVisit(final StringBuilder aSb, final Spacing aSpc, final VisitorInfo aVi) {
+  StringBuilder genTokenVisit(final StringBuilder aSb, final Spacing aSpc, final VisitorInfo aVi) {
     StringBuilder sb = aSb;
     if (sb == null) {
       sb = new StringBuilder(680);
@@ -679,7 +639,7 @@ public class VisitorsGenerator {
           .append(aVi.retInfo.initializer).append(";").append(LS);
     }
     sb.append(aSpc.spc).append("@SuppressWarnings(\"unused\")").append(LS);
-    sb.append(aSpc.spc).append("final String tkIm = ").append(genNodeVar).append(".tokenImage;").append(LS);
+    sb.append(aSpc.spc).append("final String tkIm = ").append(genNodeVar).append(".image;").append(LS);
     sb.append(aSpc.spc).append("return");
     if (!aVi.retInfo.isVoid) {
       sb.append(' ').append(genRetVar);
@@ -852,6 +812,7 @@ public class VisitorsGenerator {
       if (!jopt.visitorsPackageName.equals(jopt.nodesPackageName)) {
         aSb.append("import ").append(jopt.nodesPackageName).append(".*;").append(LS);
       }
+    ccg.tokenImport(aSb);
     aSb.append(aVi.imports);
     aSb.append(LS);
     if (jopt.javaDocComments) {

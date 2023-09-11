@@ -54,6 +54,7 @@ import EDU.purdue.jtb.parser.syntaxtree.INode;
  *
  * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
+ * @version 1.5.1 : 09/2023 : MMa : removed noDebugComment flag
  */
 public class JavaBranchPrinter {
   
@@ -92,25 +93,6 @@ public class JavaBranchPrinter {
     sb.setLength(0);
     jpv.reset(sb, spc);
     aJavaNode.accept(jpv);
-    return sb;
-  }
-  
-  /**
-   * Visits a given (java code) node branch of the tree and returns a pretty printed string representation of
-   * the subtree.<br>
-   * Implementation note : it reuses a class allocated StringBuilder buffer, which is therefore overwritten on
-   * a next call.
-   *
-   * @param aJavaNode - the node to walk down and pretty print
-   * @param noDebugComments - true to suppress debug comments, false otherwise
-   * @return the pretty print in a reused StringBuilder buffer
-   */
-  public StringBuilder genJavaBranch(final INode aJavaNode, final boolean noDebugComments) {
-    sb.setLength(0);
-    jpv.reset(sb, spc);
-    jpv.noDebugComments = noDebugComments;
-    aJavaNode.accept(jpv);
-    jpv.noDebugComments = false;
     return sb;
   }
   

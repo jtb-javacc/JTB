@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import EDU.purdue.jtb.parser.Options;
+import EDU.purdue.jtb.parser.Token;
 
 /**
  * A subclass of the JavaCC options class to extend it to the JTB options.<br>
@@ -31,7 +32,9 @@ import EDU.purdue.jtb.parser.Options;
  * @author Marc Mazas
  * @version 1.5.0 : 03-06/2017 : MMa : created when refactoring JTB, Globals and Options together ; added
  *          language
- * @version 1.5.1 : 07/2023 : MMa : fixed issue with imports / packages on grammars with no package
+ * @version 1.5.1 : 07/2023 : MMa : fixed issue with imports / packages on grammars with no package<br>
+ *          1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
+ *          replacement by Token
  */
 public class JTBOptions extends Options {
   
@@ -206,6 +209,13 @@ public class JTBOptions extends Options {
    * Signature package name (default is {@link #visitorsPackageName}.{@link #DEF_SIG_DIR_NAME})
    */
   public String            signaturePackageName   = null;
+  
+  /*
+   * JavaCC option
+   */
+  
+  /** The JavaCC output directory option (OUTPUT_DIRECTORY) name (the directory, for {@link Token}) */
+  public String jjOutDirName;
   
   /*
    * Miscellaneous

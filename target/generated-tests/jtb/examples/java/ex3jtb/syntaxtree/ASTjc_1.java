@@ -3,6 +3,7 @@ package examples.java.ex3jtb.syntaxtree;
 
 import java.util.ArrayList;
 import java.util.List;
+import examples.java.ex3jtb.Token;
 import examples.java.ex3jtb.visitor.IGenVisitor;
 
 

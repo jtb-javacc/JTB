@@ -2,10 +2,10 @@
 package examples.java.ex2jtb.visitor;
 
 import static examples.java.ex2jtb.syntaxtree.NodeConstants.*;
-
+import examples.java.ex2jtb.Token;
 import examples.java.ex2jtb.syntaxtree.*;
-
 import examples.java.ex2jtb.visitor.signature.NodeFieldsSignature;
+
 /**
  * Provides default methods which visit each node in the tree in depth-first order.<br>
  * In your "Gen" visitors extend this class and override part or all of these methods.
@@ -91,15 +91,15 @@ public class DepthFirstGenVisitor implements IGenVisitor {
   }
 
   /**
-   * Visits a {@link NodeToken} node.
+   * Visits a {@link Token} node.
    *
    * @param n - the node to visit
    * @param argu - the user argument 0
    */
   @Override
-  public void visit(final NodeToken n, @SuppressWarnings("unused") final String argu) {
+  public void visit(final Token n, @SuppressWarnings("unused") final String argu) {
     @SuppressWarnings("unused")
-    final String tkIm = n.tokenImage;
+    final String tkIm = n.image;
     return;
   }
 

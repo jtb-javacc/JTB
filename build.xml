@@ -28,7 +28,7 @@
    - in src/main/java/.../common.Constants.java, set VERSION to the same as jtb_curr_version
    - make code modifications
    - run build_new_jtb_jar: it will create the new JTB parser jar (jtb_new_jar) using the stable one (jtb_ok_jar)
-   - if ok, run try_rebuild_jtbparser: it will regenerate the JTB parser files using the new jar (jtb_new_jar)
+   - if ok, run rebuild_jtbparser: it will regenerate the JTB parser files using the new jar (jtb_new_jar)
       and compile them
    - if ok, run compile_test_jtb_java, then build_testparsers, then build_examplesparsers : it will test
       regenerating test and examples parsers and compile them
@@ -37,7 +37,7 @@
    - if ok, run make_new_jtb_jar: it will recreate the new jar (jtb_new_jar)
    - finish docs, deactivate the ant builder for html files
    - if ok and version finished, run rename_new_to_prev_jtb_jar: it will rename the new jar in jar-yyy.jar
-   - if after this need to revert back, run prev_to_prev_new_jar: it will rename the jar-yyy.jar in the new jar 
+   - if after this need to revert back, run revert_prev_to_new_jar: it will rename the jar-yyy.jar in the new jar 
    - and you may prepare the new version numbers for the next version as above
    - the (default) target build_all will chain the first four previous targets with code coverage, the target 
       build_all_core will do the same without code coverage
@@ -54,7 +54,9 @@
         
    MMa : 04/2021 : adapted to javacc 7.0.10 output; factored gen_xx compilation & add_suppresswarnings
    MMa : 07/2023 : improved gen_y / gen_z, and some minor stuff
-   MMa : 08/2023 : renamed jtb grammar and out files
+   MMa : 08/2023 : renamed jtb grammar and out files; moved call to copy_specific_token_for_jtb before generation
+   MMa : 09/2023 : fixed visitors list to be compiled with annotation processor
+   
    
    FAn: COMMENT TO BE ADDED HERE TO DESCRIBE THE USE OF THE POM.XML TARGETS AND ASSOCIATED PROPERTIES IN JTB.XML
   -->
@@ -90,7 +92,7 @@
         comments are produced)
    - in CommentsPrinter.java:
      * DEBUG_CHARS: to change prefix and field names strings (useful to see where they are produced)
-        (see target try_rebuild_jtbparser)
+        (see target rebuild_jtbparser)
   -->
 
 <project name="jtb"
@@ -103,7 +105,8 @@
   <taskdef resource="org/jacoco/ant/antlib.xml" uri="antlib:org.jacoco.ant">
     <classpath path="${jacocoant_jar}" />
   </taskdef>
-  <!-- Note: to enable/disable the code coverage, we found shorter to use the agent, versus the coverage tasks -->
+  <!-- Note: to enable/disable the code coverage, we found shorter to use the agent, versus the coverage tasks
+       Note: looks we cannot use properties here in the values -->
   <jacoco:agent property="jacocoagentvmparam"
                 enabled="true"
                 destfile="target/jacoco/jacoco.exec"
@@ -155,9 +158,13 @@
   <!-- The full build core (jtb parser + tests parsers + examples parsers) (no code coverage)-->
   <target name="build_all_core">
     <antcall target="check_versions" />
+    <antcall target="clean_classes" />
     <antcall target="build_new_jtb_jar" />
-    <antcall target="try_rebuild_jtbparser" />
     <antcall target="compile_test_jtb_java" />
+    <antcall target="run_jtb_tvs" />
+    <antcall target="rebuild_jtbparser" />
+    <!-- TODO see if this influences eclemma reporting -->
+    <!--antcall target="re-rebuild_jtbparser"/-->
     <antcall target="build_testparsers" />
     <antcall target="build_examplesparsers" />
     <antcall target="run_testparsers" />
@@ -185,29 +192,34 @@
     />
   </target>
 
-  <!-- Generate with ${jtb_ok_jar}, compile, create ${jtb_new_jar}, unit test -->
+  <!-- Build: generate with ${jtb_ok_jar}, compile, create ${jtb_new_jar} -->
   <target name="build_new_jtb_jar">
     <antcall target="echo_all_props" />
-    <!-- antcall target="copy_saved_old_ntbcc" / -->
-    <!-- antcall target="delete_unused_visitors" / -->
-    <antcall target="generate_jtbgram" />
-    <antcall target="compile_main_java" />
+    <antcall target="generate_jtbparser" />
+    <!-- kept although clean_jtb_gen_files does not delete it, but Eclipse do sometimes -->
+    <!-- FIX ME remove this temporary fix needed for 1.5.0 -> 1.5.1 
+    <antcall target="temp_copy_specific_nodetoken-150_for_jtbparser" />
+    -->
+    <antcall target="compile_main_jtb_java" />
     <antcall target="make_new_jtb_jar" />
-    <antcall target="compile_test_jtb_java" />
-    <antcall target="run_jtb_tvs" />
   </target>
 
-  <!-- Regenerate jtb parser files with new jtb jar and compile -->
-  <!-- Note: if JTB nodes signatures change: switch to compile_visitors_without_ap, build_all, -->
-  <!-- under Eclipse build project, look at the Error Log info messages, modify all signatures -->
-  <!-- switch back to compile_visitors_with_ap -->
-  <!-- note that when debuging with DEBUG_CHARS = true in CommentsPrinter, signatures change -->
-  <target name="try_rebuild_jtbparser">
-    <antcall target="regenerate_jtbgram" />
-    <!-- FIX ME (revet back) needed to manually use the without_ap target when CommentsPrinter changes -->
+  <!-- Rebuild : regenerate jtb parser files with ${jtb_new_jar} and compile -->
+  <!-- Note: if JTB nodes signatures change: you can skip the signature contol by setting skip_ap to true, -->
+  <!-- then work, then set back skip_ap to false -->
+  <!-- (when debuging with DEBUG_CHARS = true in CommentsPrinter, signatures do change) -->
+  <property name="skip_ap" value="false" />
+  <target name="rebuild_jtbparser">
+    <antcall target="regenerate_jtbparser" />
     <antcall target="compile_visitors_with_ap" />
-    <!--antcall target="compile_visitors_without_ap" /-->
-    <antcall target="compile_main_java" />
+    <antcall target="compile_main_jtb_java" />
+  </target>
+
+  <!-- Re-rebuild : re-regenerate jtb parser files with new jtb classes (${jtb_tgt_cla_dir}) and compile -->
+  <target name="re-rebuild_jtbparser">
+    <antcall target="re-regenerate_jtbparser" />
+    <antcall target="compile_visitors_with_ap" />
+    <antcall target="compile_main_jtb_java" />
   </target>
 
   <!-- Regenerate and compile test parsers -->
@@ -235,11 +247,19 @@
   </target>
 
   <!-- Generate: process JTB with ${jtb_ok_jar}, then JavaCC & java files -->
-  <target name="generate_jtbgram">
+  <target name="generate_jtbparser">
     <antcall target="clean_all_gen_files" />
-    <antcall target="process_jtbgram_with_jtb_ok_jar" />
-    <!-- FIXME remove this temporary fix needed when using 1.5.0 -->
-    <antcall target="fix_jtbparser.jj_1.5.0" />
+    <antcall target="process_jtbparser_with_jtb_ok_jar" />
+    <!-- FIX ME remove this temporary fix needed for 1.5.0 -> 1.5.1
+    <antcall target="temp_copy_specific_visitors-150_for_jtbparser" />
+     -->
+    <!-- JavaCC should not overwrite this (JTB specific version) file -->
+    <!-- FIX ME remove this temporary fix needed for 1.5.0 -> 1.5.1
+    <antcall target="temp_copy_specific_token-150_for_jtbparser" />
+     -->
+    <!-- FIX ME remove this temporary fix needed for 1.5.0 -> 1.5.1 
+    <antcall target="temp_fix_jtbparser.jj_150" />
+    -->
     <antcall target="process_jtbparser.jj" />
     <antcall target="add_suppresswarnings_jcs">
       <param name="fdir" value="${jtb_tgt_gensrc_jj_dir}" />
@@ -248,9 +268,20 @@
   </target>
 
   <!-- Regenerate: process JTB with ${jtb_new_jar}, then JavaCC & java files -->
-  <target name="regenerate_jtbgram">
+  <target name="regenerate_jtbparser">
     <antcall target="clean_all_gen_files" />
-    <antcall target="process_jtbgram_with_jtb_new_jar" />
+    <antcall target="process_jtbparser_with_jtb_new_jar" />
+    <antcall target="process_jtbparser.jj" />
+    <antcall target="add_suppresswarnings_jcs">
+      <param name="fdir" value="${jtb_tgt_gensrc_jj_dir}" />
+      <param name="gname" value="JTBParser" />
+    </antcall>
+  </target>
+
+  <!-- Re-regenerate: process JTB with ${jtb_tgt_cla_dir}, then JavaCC & java files -->
+  <target name="re-regenerate_jtbparser">
+    <antcall target="clean_all_gen_files" />
+    <antcall target="process_jtbparser_with_curr_cp" />
     <antcall target="process_jtbparser.jj" />
     <antcall target="add_suppresswarnings_jcs">
       <param name="fdir" value="${jtb_tgt_gensrc_jj_dir}" />
@@ -259,18 +290,25 @@
   </target>
 
   <!-- Process ${jtb_parser}.jtb with ${jtb_ok_jar} -->
-  <target name="process_jtbgram_with_jtb_ok_jar">
+  <target name="process_jtbparser_with_jtb_ok_jar">
     <java classname="${jtb_tool}" classpath="${jtb_ok_jar}" fork="true" failonerror="true">
       <!-- suppresses semantic checking -->
       <arg value="-e" />
       <!-- input file -->
+      <!-- FIX ME remove this temporary fix needed for 1.5.0 -> 1.5.1 
+      <arg value="${jtb_src_main_java_dir}/saves/${jtb_parser}.jtb-150.save" />
+      -->
       <arg value="${jtb_src_main_jtb_dir}/${jtb_parser}.jtb" />
+      <!-- enable assertions -->
+      <assertions>
+        <enable />
+      </assertions>
       <!-- no code coverage on current JTB version -->
     </java>
   </target>
 
   <!-- Process ${jtb_parser}.jtb with ${jtb_new_jar} -->
-  <target name="process_jtbgram_with_jtb_new_jar">
+  <target name="process_jtbparser_with_jtb_new_jar">
     <java classname="${jtb_tool}" classpath="${jtb_new_jar}" fork="true" failonerror="true">
       <!-- suppresses semantic checking -->
       <arg value="-e" />
@@ -280,13 +318,50 @@
       <assertions>
         <enable />
       </assertions>
-      <!-- jacocoagent vm arguments -->
+      <!-- jacocoagent vm arguments
       <jvmarg value="${jacocoagentvmparam}" />
+       -->
+    </java>
+  </target>
+
+  <!-- Process ${jtb_parser}.jtb with ${jtb_tgt_cla_dir} -->
+  <target name="process_jtbparser_with_curr_cp">
+    <java classname="${jtb_tool}" classpath="${jtb_tgt_cla_dir}" fork="true" failonerror="true">
+      <!-- suppresses semantic checking -->
+      <arg value="-e" />
+      <!-- input file -->
+      <arg value="${jtb_src_main_jtb_dir}/${jtb_parser}.jtb" />
+      <!-- enable assertions -->
+      <assertions>
+        <enable />
+      </assertions>
+      <!-- no code coverage really needed.
+           Also, if we use the same ${jacocoagentvmparam} property with the same classdumpdir, we get an error
+            as some of the classes appear twice (see https://www.jacoco.org/jacoco/trunk/doc/faq.html)
+            (java.lang.IllegalStateException: Can't add different class with same name: EDU/purdue/jtb/...)
+      -->
+    </java>
+  </target>
+
+  <!-- Process ${jtb_parser}.jtb with ${jtb_tgt_cla_dir} with DEBUG arguments -->
+  <target name="process_jtbparser_with_curr_cp_debug">
+    <java classname="${jtb_tool}" classpath="${jtb_tgt_cla_dir}" fork="true" failonerror="true">
+      <!-- suppresses semantic checking -->
+      <arg value="-e" />
+      <!-- input file -->
+      <arg value="${jtb_src_main_jtb_dir}/${jtb_parser}.jtb" />
+      <!-- enable assertions -->
+      <assertions>
+        <enable />
+      </assertions>
+      <!-- debug vm arguments -->
+      <jvmarg value="-Xdebug" />
+      <jvmarg value="-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y" />
     </java>
   </target>
 
   <!-- Process ${jtb_parser}.jtb with ${jtb_new_jar} for profiling with JProfiler -->
-  <target name="profile_jtbgram_with_jtb_new_jar">
+  <target name="profile_jtbparser_with_jtb_new_jar">
     <java classname="${jtb_tool}" classpath="${jtb_new_jar}" fork="true" failonerror="true">
       <!-- profiling info -->
       <jvmarg value="${jprofiler_args}" />
@@ -302,8 +377,8 @@
     </java>
   </target>
 
-  <!-- Fix ${jtb_parser}.jj when using 1.5.0 -->
-  <target name="fix_jtbparser.jj_1.5.0">
+  <!-- Fix ${jtb_parser}.jj for 1.5.0 -> 1.5.1 -->
+  <target name="temp_fix_jtbparser.jj_150" if="${isLastVersion150}">
     <replace file="${jtb_tgt_gensrc_jtb_dir}/${jtb_parser}.jj" summary="yes">
       <replacefilter token='{ n16 = new NodeChoice(n9, 4, 4); }'
                      value='{  n0 = new NodeChoice(n9, 3, 4);  }'
@@ -353,59 +428,46 @@
       <arg value="${jtb_tgt_gensrc_jtb_dir}/${jtb_parser}.jj" />
       <!-- no code coverage on JavaCC -->
     </java>
-    <antcall target="copy_specific_token_for_jtb" />
   </target>
 
-  <!-- Copy specific Token.java file for JTBParser -->
-  <target name="copy_specific_token_for_jtb">
-    <copy file="${jtb_src_main_java_dir}/saves/Token.java.save"
+  <!-- Copy specific 1.5.0 NodeToken.java file for JTBParser for 1.5.0 -> 1.5.1 -->
+  <target name="temp_copy_specific_nodetoken-150_for_jtbparser" if="${isLastVersion150}">
+    <copy file="${jtb_src_main_java_dir}/saves/NodeToken.java-150.save"
+          tofile="${jtb_tgt_gensrc_jtb_dir}/syntaxtree/NodeToken.java"
+          overwrite="true"
+    />
+  </target>
+
+  <!-- Copy specific Token.java file for JTBParser for 1.5.0 -> 1.5.1 -->
+  <target name="temp_copy_specific_token-150_for_jtbparser" if="${isLastVersion150}">
+    <copy file="${jtb_src_main_java_dir}/saves/Token.java-150.save"
           tofile="${jtb_tgt_gensrc_jj_dir}/Token.java"
           overwrite="true"
     />
   </target>
 
-  <!-- Copy saved NodeConstants.java file for 1.4.13 -> 1.5.0 ; removed
-	<target name="copy_saved_nodeconstants">
-		<copy file="${jtb_src_main_java_dir}/saves/NodeConstants.java.save"
-		      tofile="${jtb_tgt_gensrc_jtb_dir}/syntaxtree/NodeConstants.java"
-		      overwrite="true" />
-	</target>
-	 -->
+  <!-- Copy specific visitors for JTBParser for 1.5.0 -> 1.5.1 -->
+  <target name="temp_copy_specific_visitors-150_for_jtbparser" if="${isLastVersion150}">
+    <copy file="${jtb_src_main_java_dir}/saves/DepthFirstVoidVisitor.java-150.save"
+          tofile="${jtb_tgt_gensrc_jtb_dir}/visitor/DepthFirstVoidVisitor.java"
+          overwrite="true"
+    />
+    <copy file="${jtb_src_main_java_dir}/saves/DepthFirstIntVisitor.java-150.save"
+          tofile="${jtb_tgt_gensrc_jtb_dir}/visitor/DepthFirstIntVisitor.java"
+          overwrite="true"
+    />
+    <copy file="${jtb_src_main_java_dir}/saves/IVoidVisitor.java-150.save"
+          tofile="${jtb_tgt_gensrc_jtb_dir}/visitor/IVoidVisitor.java"
+          overwrite="true"
+    />
+    <copy file="${jtb_src_main_java_dir}/saves/IIntVisitor.java-150.save"
+          tofile="${jtb_tgt_gensrc_jtb_dir}/visitor/IIntVisitor.java"
+          overwrite="true"
+    />
+  </target>
 
-  <!-- Copy saved New_NodesToBeCreatedCounter.java file for 1.4.13 -> 1.5.0 ; removed
-	<target name="copy_saved_new_ntbcc">
-		<copy file="${jtb_src_main_java_dir}/saves/New_NodesToBeCreatedCounter.java.save"
-		      tofile="${jtb_tgt_gensrc_jtb_dir}/visitor/NodesToBeCreatedCounter.java"
-		      overwrite="true" />
-	</target>
-	 -->
-
-  <!-- Copy saved Old_NodesToBeCreatedCounter.java file for 1.4.13 -> 1.5.0 ; removed
-	<target name="copy_saved_old_ntbcc">
-		<copy file="${jtb_src_main_java_dir}/saves/Old_NodesToBeCreatedCounter.java.save"
-		      tofile="${jtb_tgt_gensrc_jtb_dir}/visitor/NodesToBeCreatedCounter.java"
-		      overwrite="true" />
-	</target>
-	 -->
-
-  <!-- Delete unused visitors NodeConstants.java file for 1.4.13 -> 1.5.0 ; removed
-	<target name="delete_unused_visitors">
-		<delete>
-			<fileset dir="${jtb_tgt_gensrc_jtb_dir}/visitor">
-				<include name="DepthFirstVoidArguVisitor.java" />
-				<include name="DepthFirstRetArguVisitor.java" />
-				<include name="DepthFirstRetVisitor.java" />
-				<include name="IVoidArguVisitor.java" />
-				<include name="IRetArguVisitor.java" />
-				<include name="IRetVisitor.java" />
-			</fileset>
-		</delete>
-	</target>
-	 -->
-
-  <!-- Compile Java main classes -->
-  <target name="compile_main_java">
-    <!-- antcall target="copy_saved_nodeconstants" / -->
+  <!-- Compile Java main JTB classes -->
+  <target name="compile_main_jtb_java">
     <javac srcdir="${jtb_src_dir}"
            destdir="${jtb_tgt_cla_dir}"
            excludes="**/templates/*"
@@ -414,16 +476,19 @@
            source="${jdk_version}"
            target="${jdk_version}"
            classpath="${jtb_tgt_cla_dir}"
+           listfiles="true"
     >
       <compilerarg value="-proc:none" />
       <compilerarg value="-Xlint:deprecation" />
       <!-- compilerarg value="-Xlint:unchecked" / -->
     </javac>
+    <antcall target="msg_date_time">
+      <param name="message" value="compile_main_jtb_java at " />
+    </antcall>
   </target>
 
   <!-- Compile Java classes for testing with JTB parser - user coded classes -->
   <target name="compile_test_jtb_java">
-    <!-- antcall target="copy_saved_nodeconstants" / -->
     <javac srcdir="${jtb_src_tst_java_dir}/${jtb_pkg_dir}"
            destdir="${jtb_tgt_cla_dir}"
            includeantruntime="false"
@@ -431,35 +496,41 @@
            source="${jdk_version}"
            target="${jdk_version}"
            classpath="${jtb_tgt_cla_dir};${freemarker_jar}"
+           listfiles="true"
     >
       <compilerarg value="-proc:none" />
       <compilerarg value="-Xlint:deprecation" />
       <!-- excludes="**/templates/*" -->
       <!-- compilerarg value="-Xlint:unchecked" / -->
     </javac>
+    <antcall target="msg_date_time">
+      <param name="message" value="compile_test_jtb_java at " />
+    </antcall>
   </target>
 
   <!-- Compile Java classes for test grammars - generated (by JTB/JavaCC/JJTree) and user coded classes -->
   <target name="compile_test_grammars_java">
-    <!-- antcall target="copy_saved_nodeconstants" / -->
-    <javac srcdir="${jtb_gen_tst_dir};${jtb_src_tst_java_dir}"
-           includes="grammars/**"
+    <javac srcdir="${jtb_gen_tst_dir};${jtb_src_tst_jtb_dir};${jtb_src_tst_java_dir}"
+           includes="grammars/**, EDU/**"
            destdir="${jtb_tgt_cla_dir}"
            includeantruntime="false"
            debug="true"
            source="${jdk_version}"
            target="${jdk_version}"
            classpath="${jtb_tgt_cla_dir};${freemarker_jar}"
+           listfiles="true"
     >
       <compilerarg value="-proc:none" />
       <!-- excludes="**/templates/*" -->
       <!-- compilerarg value="-Xlint:unchecked" / -->
     </javac>
+    <antcall target="msg_date_time">
+      <param name="message" value="compile_test_grammars_java at " />
+    </antcall>
   </target>
 
   <!-- Compile Java classes for examples grammars - generated (by JTB/JavaCC/JJTree) and user coded classes -->
   <target name="compile_test_examples_java">
-    <!-- antcall target="copy_saved_nodeconstants" / -->
     <javac srcdir="${jtb_gen_tst_dir};${jtb_src_tst_java_dir}"
            includes="examples/**"
            destdir="${jtb_tgt_cla_dir}"
@@ -468,25 +539,33 @@
            source="${jdk_version}"
            target="${jdk_version}"
            classpath="${jtb_tgt_cla_dir}"
+           listfiles="true"
     >
       <compilerarg value="-proc:none" />
       <!-- excludes="**/templates/*" -->
       <!-- compilerarg value="-Xlint:unchecked" / -->
     </javac>
+    <antcall target="msg_date_time">
+      <param name="message" value="compile_test_examples_java at " />
+    </antcall>
   </target>
 
   <!-- Compile the annotation processor package -->
   <target name="compile_ap_pkg">
     <javac srcdir="${jtb_src_dir}"
            destdir="${jtb_tgt_cla_dir}"
-           includes="${jtb_ap_src_dir}"
+           includes="**/signature/*"
            includeantruntime="false"
            debug="true"
            source="${jdk_version}"
            target="${jdk_version}"
            classpath="${jtb_tgt_cla_dir}"
+           listfiles="true"
     >
     </javac>
+    <antcall target="msg_date_time">
+      <param name="message" value="compile_ap_pkg at " />
+    </antcall>
   </target>
 
   <!-- Create the annotation processor jar ${jtb_ap_jar} -->
@@ -496,26 +575,33 @@
         <include name="/META-INF/services/*" />
       </fileset>
       <fileset dir="${jtb_tgt_cla_dir}">
-        <include name="${jtb_parser_pkg_name}/visitor/signature/ControlSignatureProcessor*" />
+        <include name="**/signature/*" />
       </fileset>
     </jar>
   </target>
 
-  <!-- Compile the visitors directory with the annotation processor -->
-  <target name="compile_visitors_with_ap" depends="make_ap_jar">
+  <!-- Compile the visitors with (only) the annotation processor (= check signatures) -->
+  <target name="compile_visitors_with_ap" depends="make_ap_jar" unless="skip_ap">
     <javac srcdir="${jtb_src_dir}"
            destdir="${jtb_tgt_cla_dir}"
-           includes="**/visitor/*"
+           includes="**/visitor/*,
+                     **/ClassesFinder*, **/GlobalDataBuilder*, **/SemanticChecker*,
+                     **/JavaPrinter*,
+                     **/AcceptInliner*, **/CommentsPrinter*, JavaCCPrinter*, **/JJFileAnnotator*"
            includeantruntime="false"
            source="${jdk_version}"
            target="${jdk_version}"
+           listfiles="true"
     >
       <compilerarg value="-proc:only" />
       <compilerarg line="-processorpath ${jtb_ap_jar};${jtb_tgt_cla_dir}" />
     </javac>
+    <antcall target="msg_date_time">
+      <param name="message" value="compile_visitors_with_ap at " />
+    </antcall>
   </target>
 
-  <!-- Compile the visitors directory without the annotation processor -->
+  <!-- Compile the visitors directory without the annotation processor
   <target name="compile_visitors_without_ap">
     <javac srcdir="${jtb_src_dir}"
            destdir="${jtb_tgt_cla_dir}"
@@ -523,10 +609,15 @@
            includeantruntime="false"
            source="${jdk_version}"
            target="${jdk_version}"
+           listfiles="true"
     >
       <compilerarg value="-proc:none" />
     </javac>
+    <antcall target="msg_date_time">
+      <param name="message" value="compile_visitors_without_ap at " />
+    </antcall>
   </target>
+   -->
 
   <!-- Regenerate JTB, JavaCC & java files from the test grammars with ${jtb_new_jar} -->
   <target name="regenerate_testparsers">
@@ -612,27 +703,29 @@
     <delete dir="${jacoco_dir}" />
   </target>
 
-  <!-- Produce the JaCoCo report, unless no code coverage has been specified -->
+  <!-- Produce the JaCoCo report, unless no code coverage has been specified
+       Run the build with the -v argument to get the full stack trace
+  -->
   <target name="report_jacoco" unless="no_code_coverage">
     <jacoco:report>
       <executiondata>
-        <file file="target/jacoco/jacoco.exec" />
+        <file file="${jacoco_dir}/jacoco.exec" />
       </executiondata>
       <structure name="Exec on new JTB on JTB and test grammars, and exec of test grammars">
         <group name="JTB">
           <classfiles>
             <fileset dir="${jacoco_dump_dir}/EDU">
-              <exclude name="**/*Control SignatureProcessor*"/>
+              <exclude name="**/*ControlSignatureProcessor*" />
             </fileset>
           </classfiles>
           <sourcefiles encoding="UTF-8">
             <fileset dir="${jtb_proj_dir}/src/main/java" />
             <fileset dir="${jtb_proj_dir}/target/generated-sources/jtb">
-              <exclude name="**/*ControlSignatureProcessor*"/>
+              <exclude name="**/*ControlSignatureProcessor*" />
             </fileset>
             <fileset dir="${jtb_proj_dir}/target/generated-sources/jj" />
             <fileset dir="${jtb_proj_dir}/target/generated-tests/jtb">
-              <exclude name="**/*ControlSignatureProcessor*"/>
+              <exclude name="**/*ControlSignatureProcessor*" />
             </fileset>
             <fileset dir="${jtb_proj_dir}/target/generated-tests/jj" />
             <fileset dir="${jtb_proj_dir}/target/generated-tests/java" />
@@ -642,24 +735,24 @@
         <group name="Test and examples grammars">
           <classfiles>
             <fileset dir="${jacoco_dump_dir}/grammars">
-              <exclude name="**/*ControlSignatureProcessor*"/>
+              <exclude name="**/*ControlSignatureProcessor*" />
               <exclude name="${jacoco_dump_dir}/grammars.x*" />
               <exclude name="${jacoco_dump_dir}/grammars.y*" />
               <exclude name="${jacoco_dump_dir}/grammars.z*" />
             </fileset>
             <fileset dir="${jacoco_dump_dir}/examples">
-              <exclude name="**/*ControlSignatureProcessor*"/>
+              <exclude name="**/*ControlSignatureProcessor*" />
             </fileset>
             <!--fileset dir="${jacoco_dump_dir}/freemarker" /-->
           </classfiles>
           <sourcefiles encoding="UTF-8">
             <fileset dir="${jtb_proj_dir}/src/main/java" />
             <fileset dir="${jtb_proj_dir}/target/generated-sources/jtb">
-              <exclude name="**/*ControlSignatureProcessor*"/>
+              <exclude name="**/*ControlSignatureProcessor*" />
             </fileset>
             <fileset dir="${jtb_proj_dir}/target/generated-sources/jj" />
             <fileset dir="${jtb_proj_dir}/target/generated-tests/jtb">
-              <exclude name="**/*ControlSignatureProcessor*"/>
+              <exclude name="**/*ControlSignatureProcessor*" />
               <exclude name="${jacoco_dump_dir}/grammars.y*" />
               <exclude name="${jacoco_dump_dir}/grammars.z*" />
             </fileset>
@@ -673,8 +766,7 @@
       </structure>
       <html destdir="${jacoco_report_dir}" />
     </jacoco:report>
-    <echo message="JaCoCo formated report is in ${jacoco_report_dir}\index.html"
-    />
+    <echo message="JaCoCo formated report is in ${jacoco_report_dir}\index.html" />
     <echo message="In Eclipse, use File/Import/Run+Debug/Coverage Session on target\jacoco\jacoco.exec to see the results in each class"
     />
   </target>
@@ -686,8 +778,9 @@
           classname="${jtb_pkg_name}.misc.TestVisitorsString"
           classpath="${jtb_tgt_cla_dir}"
     >
-      <!-- jacocoagent vm arguments -->
+      <!-- jacocoagent vm arguments
       <jvmarg value="${jacocoagentvmparam}" />
+       -->
     </java>
   </target>
 
@@ -703,7 +796,7 @@
     </java>
   </target>
 
-  <!-- Compile grammars/a/SmallGrammar.jtb, a grammar with most options not used in jtbgram.jtb -->
+  <!-- Compile grammars/a/SmallGrammar.jtb, a grammar with most options not used in ${jtb_parser}.jtb -->
   <target name="gen_ga" depends="clean_ga_gen_files">
 
     <!-- grammars/a/SmallGrammar.jtb -->
@@ -1199,7 +1292,7 @@
       <param name="add_msg" value='with a "EOF."' />
     </antcall>
   </target>
-  
+
   <!-- Compile grammars/p/NoPackageGrammar.jtb, a grammar with no package declaration and no package option -->
   <target name="gen_gp" depends="clean_gp_gen_files">
 
@@ -1266,73 +1359,73 @@
       <param name="add_msg" value='with a "NoPackageGrammar ended."' />
     </antcall>
 
-    </target>
+  </target>
 
-    <!-- Compile grammars/q/NoDecOptPackageGrammar.jtb, a grammar with no package declaration and a package option -->
-    <target name="gen_gq" depends="clean_gq_gen_files">
+  <!-- Compile grammars/q/NoDecOptPackageGrammar.jtb, a grammar with no package declaration and a package option -->
+  <target name="gen_gq" depends="clean_gq_gen_files">
 
-      <!-- grammars/q/NoDecOptPackageGrammar.jtb -->
-      <antcall target="gen_jtb_gram">
-        <param name="fdir" value="${jtb_src_tst_jtb_dir}/grammars/q" />
-        <param name="gname" value="NoDecOptPackageGrammar" />
-      </antcall>
+    <!-- grammars/q/NoDecOptPackageGrammar.jtb -->
+    <antcall target="gen_jtb_gram">
+      <param name="fdir" value="${jtb_src_tst_jtb_dir}/grammars/q" />
+      <param name="gname" value="NoDecOptPackageGrammar" />
+    </antcall>
 
-      <!-- grammars/q/NoDecOptPackageGrammar.jj -->
-      <antcall target="gen_jj_gram">
-        <param name="fdir" value="${jtb_tgt_gentst_jtb_dir}/grammars/q" />
-        <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/q" />
-        <param name="gname" value="NoDecOptPackageGrammar" />
-      </antcall>
+    <!-- grammars/q/NoDecOptPackageGrammar.jj -->
+    <antcall target="gen_jj_gram">
+      <param name="fdir" value="${jtb_tgt_gentst_jtb_dir}/grammars/q" />
+      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/q" />
+      <param name="gname" value="NoDecOptPackageGrammar" />
+    </antcall>
 
-      <!-- add @SuppressWarnings -->
-      <antcall target="add_suppresswarnings_scs">
-        <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/grammars/q" />
-        <param name="gname" value="NoDecOptPackageGrammar" />
-      </antcall>
+    <!-- add @SuppressWarnings -->
+    <antcall target="add_suppresswarnings_scs">
+      <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/grammars/q" />
+      <param name="gname" value="NoDecOptPackageGrammar" />
+    </antcall>
 
-    </target>
+  </target>
 
-    <!-- Run grammars/q/NoDecOptPackageGrammar.jtb -->
-    <target name="run_gq">
+  <!-- Run grammars/q/NoDecOptPackageGrammar.jtb -->
+  <target name="run_gq">
 
-      <!-- run Oops (!no package!) -->
-      <java classname="grammars.q.NoDecOptPackageGrammar"
-            classpath="${jtb_tgt_cla_dir}"
-            fork="true"
-            failonerror="false"
-            resultproperty="rc1"
-            inputstring="tut tut class c {a(i;j;) n; b (k;) end;}."
-      >
-        <!-- jacocoagent vm arguments -->
-        <jvmarg value="${jacocoagentvmparam}" />
-      </java>
-      <!-- Run should have produced a Oops! -->
-      <antcall target="check_rc">
-        <param name="act_rc" value="${rc1}" />
-        <param name="exp_rc" value="-1" />
-        <param name="add_msg" value='with a "Oops!"' />
-      </antcall>
+    <!-- run Oops (!no package!) -->
+    <java classname="grammars.q.NoDecOptPackageGrammar"
+          classpath="${jtb_tgt_cla_dir}"
+          fork="true"
+          failonerror="false"
+          resultproperty="rc1"
+          inputstring="tut tut class c {a(i;j;) n; b (k;) end;}."
+    >
+      <!-- jacocoagent vm arguments -->
+      <jvmarg value="${jacocoagentvmparam}" />
+    </java>
+    <!-- Run should have produced a Oops! -->
+    <antcall target="check_rc">
+      <param name="act_rc" value="${rc1}" />
+      <param name="exp_rc" value="-1" />
+      <param name="add_msg" value='with a "Oops!"' />
+    </antcall>
 
-      <echo>
-      </echo>
+    <echo>
+    </echo>
 
-      <!-- run Ok (!no package!) -->
-      <java classname="grammars.q.NoDecOptPackageGrammar"
-            classpath="${jtb_tgt_cla_dir}"
-            fork="true"
-            failonerror="false"
-            resultproperty="rc2"
-            inputstring="class c {a(i;j;) b (k;) bp, end;}."
-      >
-        <!-- jacocoagent vm arguments -->
-        <jvmarg value="${jacocoagentvmparam}" />
-      </java>
-      <!-- Run should end normally -->
-      <antcall target="check_rc">
-        <param name="act_rc" value="${rc2}" />
-        <param name="exp_rc" value="0" />
-        <param name="add_msg" value='with a "NoDecOptPackageGrammar ended."' />
-      </antcall>
+    <!-- run Ok (!no package!) -->
+    <java classname="grammars.q.NoDecOptPackageGrammar"
+          classpath="${jtb_tgt_cla_dir}"
+          fork="true"
+          failonerror="false"
+          resultproperty="rc2"
+          inputstring="class c {a(i;j;) b (k;) bp, end;}."
+    >
+      <!-- jacocoagent vm arguments -->
+      <jvmarg value="${jacocoagentvmparam}" />
+    </java>
+    <!-- Run should end normally -->
+    <antcall target="check_rc">
+      <param name="act_rc" value="${rc2}" />
+      <param name="exp_rc" value="0" />
+      <param name="add_msg" value='with a "NoDecOptPackageGrammar ended."' />
+    </antcall>
 
   </target>
   <!-- Compile examples/java/ex1jtb/Eg1.jtb, a grammar similar to a JJTree example -->
@@ -1685,28 +1778,28 @@
     <jar destfile="${jtb_new_jar}" compress="true" manifest="${jtb_proj_dir}/META-INF/MANIFEST.MF">
       <fileset dir="${jtb_tgt_cla_dir}">
         <include name="EDU/**" />
-        <exclude name="${jtb_parser}.jj" />
-        <exclude name="${jtb_parser}.jtb" />
+        <exclude name="**/${jtb_parser}.jj" />
+        <exclude name="**/${jtb_parser}.jtb" />
       </fileset>
     </jar>
   </target>
 
   <!-- Create ${jtb_new_jar_src} ; contains sources and classes -->
-  <target name="make_new_jtb_jar_src" depends="check_jtb_jar_src" unless="jtb_jar.uptodate">
-    <jar destfile="${jtb_new_jar}" compress="true" manifest="${jtb_proj_dir}/META-INF/MANIFEST.MF">
+  <target name="make_new_jtb_jar_src">
+    <jar destfile="${jtb_new_jar_src}" compress="true" manifest="${jtb_proj_dir}/META-INF/MANIFEST.MF">
       <fileset dir="${jtb_tgt_cla_dir}">
         <include name="EDU/**" />
         <include name="grammars/**" />
         <include name="examples/**" />
-        <exclude name="${jtb_parser}.jj" />
-        <exclude name="${jtb_parser}.jtb" />
+        <exclude name="**/${jtb_parser}.jj" />
+        <exclude name="**/${jtb_parser}.jtb" />
       </fileset>
-      <fileset dir="${jtb_proj_dir}/src" />
-      <fileset dir="${jtb_proj_dir}/target" />
-      <fileset dir="${jtb_proj_dir}/doc" />
       <fileset dir="${jtb_proj_dir}">
-        <include name="*.xml" />
-        <include name="*.md" />
+        <include name="doc/**" />
+        <include name="src/**" />
+        <include name="target/gen*/**" />
+        <include name="*.*" />
+        <exclude name=".*" />
       </fileset>
     </jar>
   </target>
@@ -1714,13 +1807,6 @@
   <!-- Check ${jtb_new_jar} is up to date -->
   <target name="check_jtb_jar">
     <uptodate property="jtb_jar.uptodate" targetfile="${jtb_new_jar}">
-      <srcfiles dir="${jtb_tgt_cla_dir}/" />
-    </uptodate>
-  </target>
-
-  <!-- Check ${jtb_new_jar_src} is up to date -->
-  <target name="check_jtb_jar_src">
-    <uptodate property="jtb_jar_src.uptodate" targetfile="${jtb_new_jar_src}">
       <srcfiles dir="${jtb_tgt_cla_dir}/" />
     </uptodate>
   </target>
@@ -1733,6 +1819,16 @@
   <!-- Rename ${jtb_prev_jar} in ${jtb_new_jar} - when ${jtb_prev_jar} was not OK, to revert back to the old version  -->
   <target name="revert_prev_to_new_jtb_jar">
     <move file="${jtb_prev_jar}" tofile="${jtb_new_jar}" overwrite="false" />
+  </target>
+
+  <!-- Rename ${jtb_new_jar_src} in ${jtb_prev_jar_src} - when ${jtb_new_jar_src} is OK, before changing to a new version  -->
+  <target name="rename_new_to_prev_jtb_src_jar">
+    <move file="${jtb_new_jar_src}" tofile="${jtb_prev_jar_src}" overwrite="false" />
+  </target>
+
+  <!-- Rename ${jtb_prev_jar_src} in ${jtb_new_jar_src} - when ${jtb_prev_jar} was not OK, to revert back to the old version  -->
+  <target name="revert_prev_to_new_jtb_src_jar">
+    <move file="${jtb_prev_jar_src}" tofile="${jtb_new_jar_src}" overwrite="false" />
   </target>
 
   <target name="clean" depends="clean_classes, clean_all_gen_files, clean_html" />
@@ -1749,52 +1845,28 @@
     <antcall target="clean_jtb_gen_files" />
   </target>
 
-  <!-- Clean JTB generated files for jtbgram.jtb -->
+  <!-- Clean JTB generated files for ${jtb_parser}.jtb -->
   <target name="clean_jtb_gen_files">
     <delete dir="${jtb_tgt_gensrc_jtb_dir}" />
-    <!-- delete>
-			<fileset dir="${jtb_tgt_gensrc_jtb_dir}/syntaxtree">
-				<include name="*.java" />
-				<include name="*Visitor.java" />
-				<exclude name="IN*.java" />
-			</fileset>
-		</delete>
-		<delete>
-			<fileset dir="${jtb_tgt_gensrc_jtb_dir}/visitor">
-				<include name="Tree*.java" />
-				<include name="*Visitor.java" />
-			</fileset>
-		</delete>
-		<delete>
-			<fileset dir="${jtb_tgt_gensrc_jtb_dir}">
-				<include name="${jtb_parser}.jj" />
-			</fileset>
-		</delete -->
+    <!--delete verbose="false">
+      <fileset dir="${jtb_tgt_gensrc_jtb_dir}">
+        <exclude name="syntaxtree/NodeToken.java" />
+      </fileset>
+    </delete-->
   </target>
 
   <!-- Clean JavaCC generated files for ${jtb_parser}.jj -->
   <target name="clean_javacc_gen_files">
     <!-- sometimes files are generated a level too low ... -->
     <delete dir="${jtb_tgt_gensrc_jj_dir}/parser/parser" />
-    <!-- delete>
-      <fileset dir="${jtb_tgt_gensrc_jj_dir}/parser">
-        <include name="${jtb_parser}.jj" />
-      </fileset>
-    </delete -->
     <!-- normally generated files here -->
     <delete dir="${jtb_tgt_gensrc_jj_dir}" />
-    <!-- delete>
-      <fileset dir="${jtb_tgt_gensrc_jj_dir}/parser">
-        <include name="${jtb_parser}.java" />
-        <include name="${jtb_parser}TokenManager.java" />
-        <include name="${jtb_parser}Constants.java" />
-        <include name="*CharStream*.java" />
-        <!- - Token.java has been modified for serialUID and finals, so keep it - ->
-        <exclude name="Token.java" />
-        <include name="TokenMgrError.java" />
-        <include name="ParseException.java" />
+    <!--delete>
+      <fileset dir="${jtb_tgt_gensrc_jj_dir}">
+        <!- - Token.java has been modified, so keep it - ->
+        <exclude name="parser/Token.java" />
       </fileset>
-    </delete -->
+    </delete-->
   </target>
 
   <!-- Clean generated files for test grammar a -->
@@ -1837,10 +1909,14 @@
     <delete dir="${jtb_tgt_gentst_jj_dir}/grammars/j" />
   </target>
 
-  <!-- Clean generated files for test grammar p -->
+  <!-- Clean generated files for test grammar p (keep directories for Eclipse build path -->
   <target name="clean_gp_gen_files">
-    <delete dir="${jtb_tgt_gentst_jtb_dir}/grammars/p" />
-    <delete dir="${jtb_tgt_gentst_jj_dir}/grammars/p" />
+    <delete includeemptydirs="true">
+      <fileset dir="${jtb_tgt_gentst_jtb_dir}/grammars/p" includes="**/*" />
+    </delete>
+    <delete includeemptydirs="true">
+      <fileset dir="${jtb_tgt_gentst_jj_dir}/grammars/p" includes="**/*" />
+    </delete>
   </target>
 
   <!-- Clean generated files for test grammar a -->
@@ -1909,11 +1985,10 @@
   <target name="add_suppresswarnings_jcs">
 
     <replace file="${fdir}/JavaCharStream.java" summary="yes">
-      <replacefilter token='public
-class JavaCharStream'
-                     value='@SuppressWarnings("all")
-public class JavaCharStream'
-      />
+      <replacetoken>public
+class JavaCharStream</replacetoken>
+      <replacevalue>@SuppressWarnings("all")
+public class JavaCharStream</replacevalue>
     </replace>
 
     <antcall target="add_suppresswarnings_others">
@@ -1929,10 +2004,10 @@ public class JavaCharStream'
   <target name="add_suppresswarnings_scs">
 
     <replace file="${fdir}/SimpleCharStream.java" summary="yes">
-      <replacefilter token='public class SimpleCharStream'
-                     value='@SuppressWarnings("all")
-public class SimpleCharStream'
-      />
+      <replacetoken>public
+class SimpleCharStream</replacetoken>
+      <replacevalue>@SuppressWarnings("all")
+public class SimpleCharStream</replacevalue>
     </replace>
 
     <antcall target="add_suppresswarnings_others">
@@ -1948,35 +2023,44 @@ public class SimpleCharStream'
   <target name="add_suppresswarnings_others">
 
     <replace file="${fdir}/${gname}.java" summary="yes">
-      <replacefilter token='public class' value='@SuppressWarnings ("all")
-public class' />
+      <replacetoken>public class</replacetoken>
+      <replacevalue>@SuppressWarnings("all")
+public class</replacevalue>
     </replace>
 
     <!-- well, JavaCC 7.x introduced a weird annotation (and with a space) -->
     <replace file="${fdir}/${gname}TokenManager.java" summary="yes">
-      <replacefilter token='@SuppressWarnings ("unused")' value="" />
-      <replacefilter token='public class' value='@SuppressWarnings ("all")
-public class' />
+      <replacefilter token='@SuppressWarnings ("unused")' value='' />
+      <replacefilter>
+        <replacetoken>public class</replacetoken>
+        <replacevalue>@SuppressWarnings("all")
+public class</replacevalue>
+      </replacefilter>
     </replace>
 
     <replace file="${fdir}/ParseException.java" summary="yes">
-      <replacefilter token='public class ParseException'
-                     value='@SuppressWarnings ("all")
-public class ParseException'
-      />
+      <replacetoken> */
+public class ParseException</replacetoken>
+      <replacevalue> */
+@SuppressWarnings("all")
+public class ParseException</replacevalue>
     </replace>
 
+    <!-- no more needed
     <replace file="${fdir}/Token.java" summary="yes">
       <replacefilter token='@SuppressWarnings("javadoc")' value='' />
-      <replacefilter token='public class Token' value='@SuppressWarnings ("all")
-public class Token' />
+      <replacetoken>public class Token</replacetoken>
+      <replacevalue>@SuppressWarnings("all")
+public class Token</replacevalue>
     </replace>
+    -->
 
     <replace file="${fdir}/TokenMgrError.java" summary="yes">
-      <replacefilter token='public class TokenMgrError'
-                     value='@SuppressWarnings ("all")
-public class TokenMgrError'
-      />
+      <replacetoken> */
+public class TokenMgrError</replacetoken>
+      <replacevalue> */
+@SuppressWarnings("all")
+public class TokenMgrError</replacevalue>
     </replace>
 
   </target>
@@ -2299,7 +2383,6 @@ public class TokenMgrError'
     <delete dir="${target-folder}/javadoc" />
     <mkdir dir="${target-folder}/javadoc" />
     <javadoc destdir="${target-folder}/javadoc">
-      <!-- fileset dir="${tgt/gensrc/java}" / -->
       <fileset dir="${jtb_src_dir}" />
     </javadoc>
 

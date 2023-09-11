@@ -3,6 +3,7 @@ package grammars.a.sgtree;
 
 import java.util.ArrayList;
 import java.util.List;
+import grammars.a.Token;
 import grammars.a.sgvis.IVis2Visitor;
 import grammars.a.sgvis.IVoidVisitor;
 
@@ -10,51 +11,51 @@ import grammars.a.sgvis.IVoidVisitor;
 @SuppressWarnings("javadoc")
 public class ASTclassDeclaration123 implements INode {
 
-  public NodeToken nodeToken;
+  public Token token;
 
   public ASTclassName123 className;
 
-  public NodeToken nodeToken1;
+  public Token token1;
 
   public NodeListOptional nodeListOptional;
 
-  public NodeToken nodeToken2;
+  public Token token2;
 
-  public NodeToken nodeToken3;
+  public Token token3;
 
   public ASTjc_0123 jc_0;
 
-  public NodeToken nodeToken4;
+  public Token token4;
 
   private INode parent;
 
   private static final long serialVersionUID = 151L;
 
-  public ASTclassDeclaration123(final NodeToken n0, final ASTclassName123 n1, final NodeToken n2, final NodeListOptional n3, final NodeToken n4, final NodeToken n5, final ASTjc_0123 n6, final NodeToken n7) {
-    nodeToken = n0;
-    if (nodeToken != null)
-      nodeToken.setParent(this);
+  public ASTclassDeclaration123(final Token n0, final ASTclassName123 n1, final Token n2, final NodeListOptional n3, final Token n4, final Token n5, final ASTjc_0123 n6, final Token n7) {
+    token = n0;
+    if (token != null)
+      token.setParent(this);
     className = n1;
     if (className != null)
       className.setParent(this);
-    nodeToken1 = n2;
-    if (nodeToken1 != null)
-      nodeToken1.setParent(this);
+    token1 = n2;
+    if (token1 != null)
+      token1.setParent(this);
     nodeListOptional = n3;
     if (nodeListOptional != null)
       nodeListOptional.setParent(this);
-    nodeToken2 = n4;
-    if (nodeToken2 != null)
-      nodeToken2.setParent(this);
-    nodeToken3 = n5;
-    if (nodeToken3 != null)
-      nodeToken3.setParent(this);
+    token2 = n4;
+    if (token2 != null)
+      token2.setParent(this);
+    token3 = n5;
+    if (token3 != null)
+      token3.setParent(this);
     jc_0 = n6;
     if (jc_0 != null)
       jc_0.setParent(this);
-    nodeToken4 = n7;
-    if (nodeToken4 != null)
-      nodeToken4.setParent(this);
+    token4 = n7;
+    if (token4 != null)
+      token4.setParent(this);
   }
   /*
    * Visitors accept methods (no -novis option, visitors specification : Void,void,None;Vis2,R,A,int[],short...)
@@ -107,26 +108,26 @@ public class ASTclassDeclaration123 implements INode {
 
   @Override
   public int getNbBaseChildren() {
-    return 6;
+    return 1;
   }
 
   @Override
   public int getNbUserChildren() {
-    return 2;
+    return 7;
   }
 
   @Override
   public List<INode> getAllChildren() {
     if (lac == null) {
       lac = new ArrayList<>(8);
-      lac.add(nodeToken);
+      lac.add(token);
       lac.add(className);
-      lac.add(nodeToken1);
+      lac.add(token1);
       lac.add(nodeListOptional);
-      lac.add(nodeToken2);
-      lac.add(nodeToken3);
+      lac.add(token2);
+      lac.add(token3);
       lac.add(jc_0);
-      lac.add(nodeToken4);
+      lac.add(token4);
     }
     return lac;
   }
@@ -134,13 +135,8 @@ public class ASTclassDeclaration123 implements INode {
   @Override
   public List<INode> getBaseChildren() {
     if (lbc == null) {
-      lbc = new ArrayList<>(6);
-      lbc.add(nodeToken);
-      lbc.add(nodeToken1);
+      lbc = new ArrayList<>(1);
       lbc.add(nodeListOptional);
-      lbc.add(nodeToken2);
-      lbc.add(nodeToken3);
-      lbc.add(nodeToken4);
     }
     return lbc;
   }
@@ -148,9 +144,14 @@ public class ASTclassDeclaration123 implements INode {
   @Override
   public List<INode> getUserChildren() {
     if (luc == null) {
-      luc = new ArrayList<>(2);
+      luc = new ArrayList<>(7);
+      luc.add(token);
       luc.add(className);
+      luc.add(token1);
+      luc.add(token2);
+      luc.add(token3);
       luc.add(jc_0);
+      luc.add(token4);
     }
     return luc;
   }

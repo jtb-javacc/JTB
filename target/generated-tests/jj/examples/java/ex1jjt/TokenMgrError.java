@@ -4,7 +4,8 @@
 package examples.java.ex1jjt;
 
 /** Token Manager Error. */
-@SuppressWarnings ("all") public class TokenMgrError extends Error
+@SuppressWarnings("all")
+public class TokenMgrError extends Error
 {
 
   /**
@@ -145,4 +146,4 @@ package examples.java.ex1jjt;
     this(LexicalErr(EOFSeen, lexState, errorLine, errorColumn, errorAfter, curChar), reason);
   }
 }
-/* JavaCC - OriginalChecksum=41d7154d3d51b903f14f222cf42d0307 (do not edit this line) */
+/* JavaCC - OriginalChecksum=220605fee9b25b3444e232082744463f (do not edit this line) */

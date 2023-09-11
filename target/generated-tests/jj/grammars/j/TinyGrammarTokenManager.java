@@ -3,7 +3,7 @@
 package grammars.j;
 
 /** Token Manager. */
-@SuppressWarnings ("all") public class TinyGrammarTokenManager implements TinyGrammarConstants {
+public class TinyGrammarTokenManager implements TinyGrammarConstants {
 
   /** Debug output. */
   public static  java.io.PrintStream debugStream = System.out;

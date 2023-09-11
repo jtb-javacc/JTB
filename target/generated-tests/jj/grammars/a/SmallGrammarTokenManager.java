@@ -3,9 +3,7 @@
 package grammars.a;
 import grammars.a.sgvis.*;
 import grammars.a.sghook.*;
-// not needed, just for code coverage
 import grammars.a.sgtree.*;
-// not needed, just for code coverage
 import java.util.ArrayList;
 
 /** Token Manager. */

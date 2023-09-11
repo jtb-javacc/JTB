@@ -2,6 +2,7 @@
 package examples.java.ex2jtb.visitor;
 
 import examples.java.ex2jtb.syntaxtree.*;
+import examples.java.ex2jtb.Token;
 import java.lang.String;
 
 /**
@@ -55,12 +56,12 @@ public interface IGenVisitor {
   public void visit(final NodeSequence n, final String argu);
 
   /**
-   * Visits a {@link NodeToken} node), passing it argument(s).
+   * Visits a {@link Token} node), passing it argument(s).
    *
    * @param n - the node to visit
    * @param argu - the user argument 0
    */
-  public void visit(final NodeToken n, final String argu);
+  public void visit(final Token n, final String argu);
 
   /*
    * User grammar generated visit methods

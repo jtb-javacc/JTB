@@ -84,15 +84,15 @@ public class SmallGrammar
 
   /* For test case with user changed factory method */
   /**
-   * Factory method used by JavaCC to create a new Token object, which will be a (JTB) subclassed NodeToken object.
+   * Factory method used by JavaCC to create a new Token object, which will be a JTB node.
    *
    * @param ofKind - the token kind
    * @param image - the token image
    *
-   * @return a new Token (which is also a NodeToken)
+   * @return a new Token (which is also a )
    */
   public static Token newToken(int ofKind, String image) {
-    return new NodeToken(ofKind, image);
+    return new Token(ofKind, image);
   }
 
 }

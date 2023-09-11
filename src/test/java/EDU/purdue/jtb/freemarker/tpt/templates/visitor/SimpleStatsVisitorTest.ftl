@@ -12,6 +12,7 @@
 package ${parser_package}.${visitor_subpackage};
 
 import static ${parser_package}.${syntaxtree_subpackage}.JTBNodesConstantsTest.*;
+import ${parser_package}.Token;
 import ${parser_package}.${syntaxtree_subpackage}.*;
 
 import java.util.Hashtable;

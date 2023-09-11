@@ -8,7 +8,7 @@ package examples.java.ex1jjt;
  * contain only ASCII characters (without unicode processing).
  */
 
-@SuppressWarnings("all") public class SimpleCharStream
+public class SimpleCharStream
 {
 /** Whether parser is static. */
   public static final boolean staticFlag = true;
@@ -474,4 +474,4 @@ package examples.java.ex1jjt;
   static boolean getTrackLineColumn() { return trackLineColumn; }
   static void setTrackLineColumn(boolean tlc) { trackLineColumn = tlc; }
 }
-/* JavaCC - OriginalChecksum=a663abc5de870fde1b0cccb5678987cd (do not edit this line) */
+/* JavaCC - OriginalChecksum=3ab4ecb03eb3bedfc0c524e60c7665b2 (do not edit this line) */

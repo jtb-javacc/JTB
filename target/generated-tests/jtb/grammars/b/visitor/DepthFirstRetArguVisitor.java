@@ -2,10 +2,10 @@
 package grammars.b.visitor;
 
 import static grammars.b.syntaxtree.NodeConstants.*;
-
+import grammars.b.Token;
 import grammars.b.syntaxtree.*;
-
 import grammars.b.visitor.signature.NodeFieldsSignature;
+
 /**
  * Provides default methods which visit each node in the tree in depth-first order.<br>
  * In your "RetArgu" visitors extend this class and override part or all of these methods.
@@ -109,18 +109,18 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   }
 
   /**
-   * Visits a {@link NodeToken} node.
+   * Visits a {@link Token} node.
    *
    * @param n - the node to visit
    * @param argu - the user argument 0
    * @return the user return information
    */
   @Override
-  public R visit(final NodeToken n, @SuppressWarnings("unused") final A argu) {
+  public R visit(final Token n, @SuppressWarnings("unused") final A argu) {
     /* You have to adapt which data is returned (result variables below are just examples) */
     R nRes = null;
     @SuppressWarnings("unused")
-    final String tkIm = n.tokenImage;
+    final String tkIm = n.image;
     return nRes;
   }
 
@@ -527,7 +527,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final bp_v n, final A argu) {
     R nRes = null;
     // f0 -> < ID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
   }
@@ -648,10 +648,10 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final bp_y n, final A argu) {
     R nRes = null;
     // f0 -> < Y:":y" >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     // f1 -> ":"
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this, argu);
     return nRes;
   }
@@ -671,7 +671,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final bp_y_ n, final A argu) {
     R nRes = null;
     // f0 -> "!"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
   }
@@ -853,7 +853,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final bp_i n, final A argu) {
     R nRes = null;
     // f0 -> < ID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
   }
@@ -893,7 +893,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final bp_ui n, final A argu) {
     R nRes = null;
     // f0 -> < ID >.kind
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
 // Please report to support with a real example of your grammar if you want the suffix to be generated : $1 [ ?0 "." ?1 < IDENTIFIER > ]
     return nRes;
@@ -914,7 +914,27 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final bp_s n, final A argu) {
     R nRes = null;
     // f0 -> < ID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
+    nRes = n0.accept(this, argu);
+    return nRes;
+  }
+
+  /**
+   * Visits a {@link bp_tcf_ie_w} node, whose child is the following :
+   * <p>
+   * f0 -> < ID ><br>
+   * s: -1032372970<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   * @return the user return information
+   */
+  @Override
+  @NodeFieldsSignature({ -1032372970, JTB_SIG_BP_TCF_IE_W, JTB_USER_BP_TCF_IE_W })
+  public R visit(final bp_tcf_ie_w n, final A argu) {
+    R nRes = null;
+    // f0 -> < ID >
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
   }
@@ -934,7 +954,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final bp_sa n, final A argu) {
     R nRes = null;
     // f0 -> < ID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
   }
@@ -1120,7 +1140,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final bp_haa n, final A argu) {
     R nRes = null;
     // f0 -> < ID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
   }
@@ -1140,7 +1160,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final bp_l n, final A argu) {
     R nRes = null;
     // f0 -> < ID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
   }
@@ -1192,7 +1212,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final bp_f n, final A argu) {
     R nRes = null;
     // f0 -> < efID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
   }
@@ -1212,7 +1232,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final bp_jual n, final A argu) {
     R nRes = null;
     // f0 -> < ID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
   }
@@ -1232,7 +1252,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final bp_hm n, final A argu) {
     R nRes = null;
     // f0 -> < ID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
   }
@@ -1255,7 +1275,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final bp_tu_a n, final A argu) {
     R nRes = null;
     // f0 -> < ID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     // f1 -> ( #0 skipButBuild()
     // .. .. . #1 jcp_ubar$() )
@@ -1291,7 +1311,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final bp_acc n, final A argu) {
     R nRes = null;
     // f0 -> < ID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     // f1 -> [ "xyz" ]
     final NodeOptional n1 = n.f1;
@@ -1364,7 +1384,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final bp_class1 n, final A argu) {
     R nRes = null;
     // f0 -> < ID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
   }
@@ -1679,7 +1699,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
         throw new ShouldNotOccurException(nch);
     }
     // f1 -> "/"
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this, argu);
     return nRes;
   }
@@ -2266,7 +2286,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final expun_a1 n, final A argu) {
     R nRes = null;
     // f0 -> < ID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     // f1 -> Identifier()
     final Identifier n1 = n.f1;
@@ -2329,7 +2349,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final expun_b1 n, final A argu) {
     R nRes = null;
     // f0 -> < ID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     // f1 -> Identifier()
     final Identifier n1 = n.f1;
@@ -2376,7 +2396,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final expun_c1 n, final A argu) {
     R nRes = null;
     // f0 -> < ID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     // f1 -> Identifier()
     final Identifier n1 = n.f1;
@@ -2420,7 +2440,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final expun_d1 n, final A argu) {
     R nRes = null;
     // f0 -> < ID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     // f1 -> Identifier()
     final Identifier n1 = n.f1;
@@ -2466,7 +2486,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final expun_a2 n, final A argu) {
     R nRes = null;
     // f0 -> < ID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     // f1 -> Identifier()
     final Identifier n1 = n.f1;
@@ -2535,7 +2555,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final expun_b2 n, final A argu) {
     R nRes = null;
     // f0 -> < ID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     // f1 -> Identifier()
     final Identifier n1 = n.f1;
@@ -2585,7 +2605,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final expun_c2 n, final A argu) {
     R nRes = null;
     // f0 -> < ID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     // f1 -> Identifier()
     final Identifier n1 = n.f1;
@@ -2629,7 +2649,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final expun_d2 n, final A argu) {
     R nRes = null;
     // f0 -> < ID >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     // f1 -> Identifier()
     final Identifier n1 = n.f1;
@@ -2992,20 +3012,21 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
    * .. .. . #1 ( $0 ";;; " $1 ";;;; " ) )<br>
    * f3 -> ( < NUM_3_9 > )*<br>
    * f4 -> ( ( %0 ":"<br>
-   * .. .. . | %1 #0 ":" #1 < ES > ) )?<br>
+   * .. .. . | %1 < NUM_3_9 ><br>
+   * .. .. . | %2 ":" ) )?<br>
    * f5 -> f0_eu1_peias2()<br>
    * f6 ->   %0 expch_a()<br>
    * .. .. | %1 expch_b()<br>
    * f7 -> ( %0 expch_2ch()<br>
    * .. .. | %1 expch_bl_a() )<br>
-   * s: -1657766831<br>
+   * s: -1377841071<br>
    *
    * @param n - the node to visit
    * @param argu - the user argument 0
    * @return the user return information
    */
   @Override
-  @NodeFieldsSignature({ -1657766831, JTB_SIG_F0_EU2_ALL1, JTB_USER_F0_EU2_ALL1 })
+  @NodeFieldsSignature({ -1377841071, JTB_SIG_F0_EU2_ALL1, JTB_USER_F0_EU2_ALL1 })
   public R visit(final f0_eu2_all1 n, final A argu) {
     R nRes = null;
     // f0 -> [ ";".image ]
@@ -3041,7 +3062,8 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
       }
     }
     // f4 -> ( ( %0 ":"
-    // .. .. . | %1 #0 ":" #1 < ES > ) )?
+    // .. .. . | %1 < NUM_3_9 >
+    // .. .. . | %2 ":" ) )?
     final NodeOptional n4 = n.f4;
     if (n4.present()) {
       final NodeChoice nch = (NodeChoice) n4.node;
@@ -3052,14 +3074,12 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
           nRes = ich.accept(this, argu);
           break;
         case 1:
-          //%1 #0 ":" #1 < ES >
-          final NodeSequence seq1 = (NodeSequence) ich;
-          //#0 ":"
-          final INode nd4 = seq1.elementAt(0);
-          nRes = nd4.accept(this, argu);
-          //#1 < ES >
-          final INode nd5 = seq1.elementAt(1);
-          nRes = nd5.accept(this, argu);
+          //%1 < NUM_3_9 >
+          nRes = ich.accept(this, argu);
+          break;
+        case 2:
+          //%2 ":"
+          nRes = ich.accept(this, argu);
           break;
         default:
           // should not occur !!!
@@ -3096,13 +3116,13 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
       final INode ich2 = n.f7.choice;
       switch (n.f7.which) {
         case 0:
-          // invalid sub comment index (12), size = 12 ; ExpansionChoices, h
+          // invalid sub comment index (11), size = 11 ; ExpansionChoices, h
           if (ich2 != null) {
             nRes = ich2.accept(this, argu);
           }
           break;
         case 1:
-          // invalid sub comment index (13), size = 12 ; ExpansionChoices, j
+          // invalid sub comment index (12), size = 11 ; ExpansionChoices, j
           if (ich2 != null) {
             nRes = ich2.accept(this, argu);
           }
@@ -3218,7 +3238,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final f0_eu1_resl1 n, final A argu) {
     R nRes = null;
     // f0 -> "!"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
   }
@@ -3238,7 +3258,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final f0_eu1_resl2 n, final A argu) {
     R nRes = null;
     // f0 -> < resl2:"!x" >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
   }
@@ -3258,7 +3278,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final f0_eu1_resl3 n, final A argu) {
     R nRes = null;
     // f0 -> < resl3:< resl2 > >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
   }
@@ -3278,7 +3298,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final f0_eu1_recrec1 n, final A argu) {
     R nRes = null;
     // f0 -> < recrec1:< abID >< ID >|< efID > >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
   }
@@ -3298,7 +3318,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final f0_eu1_recrec2 n, final A argu) {
     R nRes = null;
     // f0 -> < recrec2:"!"|< resl2 >|< resl3 >|< efID >|("#1")|(("#2")?"#3"|(("#4")*"#5"|("#6")+))|("#7"< A_BS_B >)("#8"|< SYN_ESC >) >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
   }
@@ -3318,7 +3338,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final f0_eu1_recrec3 n, final A argu) {
     R nRes = null;
     // f0 -> < recrec3:"'"|< recrec1 >|< recrec2 > >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
   }
@@ -3354,7 +3374,7 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   public R visit(final f0_eu1_reeof n, final A argu) {
     R nRes = null;
     // f0 -> < EOF >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this, argu);
     return nRes;
   }
@@ -3444,6 +3464,46 @@ public class DepthFirstRetArguVisitor<R, A> implements IRetArguVisitor<R, A> {
   @NodeFieldsSignature({ 0, JTB_SIG_F0_LAEU2_JC, JTB_USER_F0_LAEU2_JC })
   public R visit(final f0_laeu2_jc n, final A argu) {
     R nRes = null;
+    return nRes;
+  }
+
+  /**
+   * Visits a {@link gt_1} node, whose child is the following :
+   * <p>
+   * f0 -> " >;"<br>
+   * s: -195872082<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   * @return the user return information
+   */
+  @Override
+  @NodeFieldsSignature({ -195872082, JTB_SIG_GT_1, JTB_USER_GT_1 })
+  public R visit(final gt_1 n, final A argu) {
+    R nRes = null;
+    // f0 -> " >;"
+    final Token n0 = n.f0;
+    nRes = n0.accept(this, argu);
+    return nRes;
+  }
+
+  /**
+   * Visits a {@link lt_1} node, whose child is the following :
+   * <p>
+   * f0 -> "<;"<br>
+   * s: -699028326<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   * @return the user return information
+   */
+  @Override
+  @NodeFieldsSignature({ -699028326, JTB_SIG_LT_1, JTB_USER_LT_1 })
+  public R visit(final lt_1 n, final A argu) {
+    R nRes = null;
+    // f0 -> "<;"
+    final Token n0 = n.f0;
+    nRes = n0.accept(this, argu);
     return nRes;
   }
 

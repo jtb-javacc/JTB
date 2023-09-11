@@ -2,10 +2,10 @@
 package grammars.fm.visitor;
 
 import static grammars.fm.syntaxtree.NodeConstants.*;
-
+import grammars.fm.Token;
 import grammars.fm.syntaxtree.*;
-
 import grammars.fm.visitor.signature.NodeFieldsSignature;
+
 @SuppressWarnings("javadoc")
 public class DepthFirstVis2Visitor implements IVis2Visitor {
 
@@ -64,11 +64,11 @@ public class DepthFirstVis2Visitor implements IVis2Visitor {
   }
 
   @Override
-  public int visit(final NodeToken n, @SuppressWarnings("unused") final String argu) {
+  public int visit(final Token n, @SuppressWarnings("unused") final String argu) {
     /* You have to adapt which data is returned (result variables below are just examples) */
     int nRes = 0;
     @SuppressWarnings("unused")
-    final String tkIm = n.tokenImage;
+    final String tkIm = n.image;
     return nRes;
   }
 
@@ -76,13 +76,25 @@ public class DepthFirstVis2Visitor implements IVis2Visitor {
   @NodeFieldsSignature({ 0, JTB_SIG_CLASSDECLARATION, JTB_USER_CLASSDECLARATION })
   public int visit(final classDeclaration n, final String argu) {
     int nRes = 0;
-    n.f0.accept(this, argu);
-    n.f1.accept(this, argu);
-    n.f2.accept(this, argu);
-    n.f3.accept(this, argu);
-    n.f4.accept(this, argu);
-    n.f5.accept(this, argu);
-    n.f6.accept(this, argu);
+    final skip n0 = n.f0;
+    nRes = n0.accept(this, argu);
+    final Token n1 = n.f1;
+    nRes = n1.accept(this, argu);
+    final Token n2 = n.f2;
+    nRes = n2.accept(this, argu);
+    final NodeListOptional n3 = n.f3;
+    if (n3.present()) {
+      for (int i = 0; i < n3.size(); i++) {
+        final INode nloeai = n3.elementAt(i);
+        nRes = nloeai.accept(this, argu);
+      }
+    }
+    final Token n4 = n.f4;
+    nRes = n4.accept(this, argu);
+    final Token n5 = n.f5;
+    nRes = n5.accept(this, argu);
+    final Token n6 = n.f6;
+    nRes = n6.accept(this, argu);
     return nRes;
   }
 
@@ -90,7 +102,8 @@ public class DepthFirstVis2Visitor implements IVis2Visitor {
   @NodeFieldsSignature({ 0, JTB_SIG_CLASSNAME, JTB_USER_CLASSNAME })
   public int visit(final className n, final String argu) {
     int nRes = 0;
-    n.f0.accept(this, argu);
+    final Token n0 = n.f0;
+    nRes = n0.accept(this, argu);
     return nRes;
   }
 
@@ -98,10 +111,17 @@ public class DepthFirstVis2Visitor implements IVis2Visitor {
   @NodeFieldsSignature({ 0, JTB_SIG_METHOD, JTB_USER_METHOD })
   public int visit(final method n, final String argu) {
     int nRes = 0;
-    n.f0.accept(this, argu);
-    n.f1.accept(this, argu);
-    n.f2.accept(this, argu);
-    n.f3.accept(this, argu);
+    final methodName n0 = n.f0;
+    nRes = n0.accept(this, argu);
+    final Token n1 = n.f1;
+    nRes = n1.accept(this, argu);
+    final NodeList n2 = n.f2;
+    for (int i = 0; i < n2.size(); i++) {
+      final INode lsteai = n2.elementAt(i);
+      nRes = lsteai.accept(this, argu);
+    }
+    final Token n3 = n.f3;
+    nRes = n3.accept(this, argu);
     return nRes;
   }
 
@@ -109,7 +129,8 @@ public class DepthFirstVis2Visitor implements IVis2Visitor {
   @NodeFieldsSignature({ 0, JTB_SIG_METHODNAME, JTB_USER_METHODNAME })
   public int visit(final methodName n, final String argu) {
     int nRes = 0;
-    n.f0.accept(this, argu);
+    final Token n0 = n.f0;
+    nRes = n0.accept(this, argu);
     return nRes;
   }
 
@@ -117,8 +138,10 @@ public class DepthFirstVis2Visitor implements IVis2Visitor {
   @NodeFieldsSignature({ 0, JTB_SIG_INSTRUCTION, JTB_USER_INSTRUCTION })
   public int visit(final instruction n, final String argu) {
     int nRes = 0;
-    n.f0.accept(this, argu);
-    n.f1.accept(this, argu);
+    final Token n0 = n.f0;
+    nRes = n0.accept(this, argu);
+    final Token n1 = n.f1;
+    nRes = n1.accept(this, argu);
     return nRes;
   }
 
@@ -129,6 +152,21 @@ public class DepthFirstVis2Visitor implements IVis2Visitor {
     int nRes = 0;
     /* empty node, nothing that can be generated so far */
     return nRes;
+  }
+
+@SuppressWarnings("javadoc")
+  public static class ShouldNotOccurException extends RuntimeException {
+
+    private static final long serialVersionUID = 1L;
+
+    public ShouldNotOccurException() {
+      super();
+    }
+
+    public ShouldNotOccurException(final NodeChoice ch) {
+      super("Invalid switch value (" + ch.which + ") or fall-through");
+    }
+
   }
 
 }

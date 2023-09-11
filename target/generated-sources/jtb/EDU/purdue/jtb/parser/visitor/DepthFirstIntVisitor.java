@@ -2,10 +2,10 @@
 package EDU.purdue.jtb.parser.visitor;
 
 import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.*;
-
+import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.*;
-
 import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
+
 /**
  * Provides default methods which visit each node in the tree in depth-first order.<br>
  * In your "Int" visitors extend this class and override part or all of these methods.
@@ -102,17 +102,17 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   }
 
   /**
-   * Visits a {@link NodeToken} node.
+   * Visits a {@link Token} node.
    *
    * @param n - the node to visit
    * @return the user return information
    */
   @Override
-  public int visit(final NodeToken n) {
+  public int visit(final Token n) {
     /* You have to adapt which data is returned (result variables below are just examples) */
     int nRes = 0;
     @SuppressWarnings("unused")
-    final String tkIm = n.tokenImage;
+    final String tkIm = n.image;
     return nRes;
   }
 
@@ -148,31 +148,31 @@ public class DepthFirstIntVisitor implements IIntVisitor {
     final JavaCCOptions n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> "PARSER_BEGIN"
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> "("
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     nRes = n2.accept(this);
     // f3 -> IdentifierAsString()
     final IdentifierAsString n3 = n.f3;
     nRes = n3.accept(this);
     // f4 -> ")"
-    final NodeToken n4 = n.f4;
+    final Token n4 = n.f4;
     nRes = n4.accept(this);
     // f5 -> CompilationUnit()
     final CompilationUnit n5 = n.f5;
     nRes = n5.accept(this);
     // f6 -> "PARSER_END"
-    final NodeToken n6 = n.f6;
+    final Token n6 = n.f6;
     nRes = n6.accept(this);
     // f7 -> "("
-    final NodeToken n7 = n.f7;
+    final Token n7 = n.f7;
     nRes = n7.accept(this);
     // f8 -> IdentifierAsString()
     final IdentifierAsString n8 = n.f8;
     nRes = n8.accept(this);
     // f9 -> ")"
-    final NodeToken n9 = n.f9;
+    final Token n9 = n.f9;
     nRes = n9.accept(this);
     // f10 -> ( Production() )+
     final NodeList n10 = n.f10;
@@ -181,7 +181,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       nRes = lsteai.accept(this);
     }
     // f11 -> < EOF >
-    final NodeToken n11 = n.f11;
+    final Token n11 = n.f11;
     nRes = n11.accept(this);
     return nRes;
   }
@@ -279,7 +279,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
         throw new ShouldNotOccurException(nch);
     }
     // f1 -> "="
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> ( %0 IntegerLiteral()
     // .. .. | %1 BooleanLiteral()
@@ -305,7 +305,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
         throw new ShouldNotOccurException(nch1);
     }
     // f3 -> ";"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     nRes = n3.accept(this);
     return nRes;
   }
@@ -378,7 +378,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final JavaCodeProduction n) {
     int nRes = 0;
     // f0 -> "JAVACODE"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> AccessModifier()
     final AccessModifier n1 = n.f1;
@@ -499,19 +499,19 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       nRes = n5.accept(this);
     }
     // f6 -> ":"
-    final NodeToken n6 = n.f6;
+    final Token n6 = n.f6;
     nRes = n6.accept(this);
     // f7 -> Block()
     final Block n7 = n.f7;
     nRes = n7.accept(this);
     // f8 -> "{"
-    final NodeToken n8 = n.f8;
+    final Token n8 = n.f8;
     nRes = n8.accept(this);
     // f9 -> ExpansionChoices()
     final ExpansionChoices n9 = n.f9;
     nRes = n9.accept(this);
     // f10 -> "}"
-    final NodeToken n10 = n.f10;
+    final Token n10 = n.f10;
     nRes = n10.accept(this);
     return nRes;
   }
@@ -666,10 +666,10 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       nRes = nd11.accept(this);
     }
     // f3 -> ":"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     nRes = n3.accept(this);
     // f4 -> "{"
-    final NodeToken n4 = n.f4;
+    final Token n4 = n.f4;
     nRes = n4.accept(this);
     // f5 -> RegExprSpec()
     final RegExprSpec n5 = n.f5;
@@ -689,7 +689,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       }
     }
     // f7 -> "}"
-    final NodeToken n7 = n.f7;
+    final Token n7 = n.f7;
     nRes = n7.accept(this);
     return nRes;
   }
@@ -710,10 +710,10 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final TokenManagerDecls n) {
     int nRes = 0;
     // f0 -> "TOKEN_MGR_DECLS"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> ":"
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> ClassOrInterfaceBody()
     final ClassOrInterfaceBody n2 = n.f2;
@@ -1174,16 +1174,16 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final ExpansionUnitTCF n) {
     int nRes = 0;
     // f0 -> "try"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> "{"
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> ExpansionChoices()
     final ExpansionChoices n2 = n.f2;
     nRes = n2.accept(this);
     // f3 -> "}"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     nRes = n3.accept(this);
     // f4 -> ( #0 "catch" #1 "("
     // .. .. . #2 ( Annotation() )*
@@ -1570,7 +1570,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       nRes = n0.accept(this);
     }
     // f1 -> "["
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> [ #0 CharacterDescriptor()
     // .. .. . #1 ( $0 "," $1 CharacterDescriptor() )* ]
@@ -1597,7 +1597,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       }
     }
     // f3 -> "]"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     nRes = n3.accept(this);
     return nRes;
   }
@@ -1647,7 +1647,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final IdentifierAsString n) {
     int nRes = 0;
     // f0 -> < IDENTIFIER >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     return nRes;
   }
@@ -1802,13 +1802,13 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final PackageDeclaration n) {
     int nRes = 0;
     // f0 -> "package"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> Name()
     final Name n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> ";"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     nRes = n2.accept(this);
     return nRes;
   }
@@ -1831,7 +1831,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final ImportDeclaration n) {
     int nRes = 0;
     // f0 -> "import"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> [ "static" ]
     final NodeOptional n1 = n.f1;
@@ -1853,7 +1853,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       nRes = nd1.accept(this);
     }
     // f4 -> ";"
-    final NodeToken n4 = n.f4;
+    final Token n4 = n.f4;
     nRes = n4.accept(this);
     return nRes;
   }
@@ -2065,7 +2065,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
         throw new ShouldNotOccurException(nch);
     }
     // f1 -> < IDENTIFIER >
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> [ TypeParameters() ]
     final NodeOptional n2 = n.f2;
@@ -2104,7 +2104,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final ExtendsList n) {
     int nRes = 0;
     // f0 -> "extends"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> ClassOrInterfaceType()
     final ClassOrInterfaceType n1 = n.f1;
@@ -2142,7 +2142,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final ImplementsList n) {
     int nRes = 0;
     // f0 -> "implements"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> ClassOrInterfaceType()
     final ClassOrInterfaceType n1 = n.f1;
@@ -2181,10 +2181,10 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final EnumDeclaration n) {
     int nRes = 0;
     // f0 -> "enum"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> < IDENTIFIER >
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> [ ImplementsList() ]
     final NodeOptional n2 = n.f2;
@@ -2217,7 +2217,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final EnumBody n) {
     int nRes = 0;
     // f0 -> "{"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> [ #0 EnumConstant()
     // .. .. . #1 ( $0 "," $1 EnumConstant() )* ]
@@ -2267,7 +2267,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       }
     }
     // f4 -> "}"
-    final NodeToken n4 = n.f4;
+    final Token n4 = n.f4;
     nRes = n4.accept(this);
     return nRes;
   }
@@ -2292,7 +2292,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
     final Modifiers n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> < IDENTIFIER >
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> [ Arguments() ]
     final NodeOptional n2 = n.f2;
@@ -2324,7 +2324,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final TypeParameters n) {
     int nRes = 0;
     // f0 -> "<"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> TypeParameter()
     final TypeParameter n1 = n.f1;
@@ -2344,7 +2344,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       }
     }
     // f3 -> ">"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     nRes = n3.accept(this);
     return nRes;
   }
@@ -2364,7 +2364,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final TypeParameter n) {
     int nRes = 0;
     // f0 -> < IDENTIFIER >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> [ TypeBound() ]
     final NodeOptional n1 = n.f1;
@@ -2390,7 +2390,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final TypeBound n) {
     int nRes = 0;
     // f0 -> "extends"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> ClassOrInterfaceType()
     final ClassOrInterfaceType n1 = n.f1;
@@ -2428,7 +2428,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final ClassOrInterfaceBody n) {
     int nRes = 0;
     // f0 -> "{"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> ( ClassOrInterfaceBodyDeclaration() )*
     final NodeListOptional n1 = n.f1;
@@ -2439,7 +2439,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       }
     }
     // f2 -> "}"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     nRes = n2.accept(this);
     return nRes;
   }
@@ -2580,7 +2580,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       }
     }
     // f3 -> ";"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     nRes = n3.accept(this);
     return nRes;
   }
@@ -2631,7 +2631,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final VariableDeclaratorId n) {
     int nRes = 0;
     // f0 -> < IDENTIFIER >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> ( #0 "[" #1 "]" )*
     final NodeListOptional n1 = n.f1;
@@ -2702,7 +2702,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final ArrayInitializer n) {
     int nRes = 0;
     // f0 -> "{"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> [ #0 VariableInitializer()
     // .. .. . #1 ( $0 "," $1 VariableInitializer() )* ]
@@ -2734,7 +2734,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       nRes = n2.accept(this);
     }
     // f3 -> "}"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     nRes = n3.accept(this);
     return nRes;
   }
@@ -2816,7 +2816,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final MethodDeclarator n) {
     int nRes = 0;
     // f0 -> < IDENTIFIER >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> FormalParameters()
     final FormalParameters n1 = n.f1;
@@ -2855,7 +2855,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final FormalParameters n) {
     int nRes = 0;
     // f0 -> "("
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> [ #0 FormalParameter()
     // .. .. . #1 ( $0 "," $1 FormalParameter() )* ]
@@ -2882,7 +2882,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       }
     }
     // f2 -> ")"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     nRes = n2.accept(this);
     return nRes;
   }
@@ -2946,7 +2946,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       nRes = n0.accept(this);
     }
     // f1 -> < IDENTIFIER >
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> FormalParameters()
     final FormalParameters n2 = n.f2;
@@ -2963,7 +2963,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       nRes = nd1.accept(this);
     }
     // f4 -> "{"
-    final NodeToken n4 = n.f4;
+    final Token n4 = n.f4;
     nRes = n4.accept(this);
     // f5 -> [ ExplicitConstructorInvocation() ]
     final NodeOptional n5 = n.f5;
@@ -2979,7 +2979,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       }
     }
     // f7 -> "}"
-    final NodeToken n7 = n.f7;
+    final Token n7 = n.f7;
     nRes = n7.accept(this);
     return nRes;
   }
@@ -3264,7 +3264,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final ClassOrInterfaceType n) {
     int nRes = 0;
     // f0 -> < IDENTIFIER >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> [ TypeArguments() ]
     final NodeOptional n1 = n.f1;
@@ -3312,7 +3312,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final TypeArguments n) {
     int nRes = 0;
     // f0 -> "<"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> TypeArgument()
     final TypeArgument n1 = n.f1;
@@ -3332,7 +3332,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       }
     }
     // f3 -> ">"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     nRes = n3.accept(this);
     return nRes;
   }
@@ -3352,10 +3352,10 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final EmptyTypeArguments n) {
     int nRes = 0;
     // f0 -> "<"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> ">"
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this);
     return nRes;
   }
@@ -4169,40 +4169,52 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   }
 
   /**
-   * Visits a {@link RSignedShift} node, whose child is the following :
+   * Visits a {@link RSignedShift} node, whose children are the following :
    * <p>
-   * f0 -> ">>"<br>
-   * s: -699026311<br>
+   * f0 -> ">"<br>
+   * f1 -> ">"<br>
+   * s: 1560485759<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
   @Override
-  @NodeFieldsSignature({ -699026311, JTB_SIG_RSIGNEDSHIFT, JTB_USER_RSIGNEDSHIFT })
+  @NodeFieldsSignature({ 1560485759, JTB_SIG_RSIGNEDSHIFT, JTB_USER_RSIGNEDSHIFT })
   public int visit(final RSignedShift n) {
     int nRes = 0;
-    // f0 -> ">>"
-    final NodeToken n0 = n.f0;
+    // f0 -> ">"
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
+    // f1 -> ">"
+    final Token n1 = n.f1;
+    nRes = n1.accept(this);
     return nRes;
   }
 
   /**
-   * Visits a {@link RUnsignedShift} node, whose child is the following :
+   * Visits a {@link RUnsignedShift} node, whose children are the following :
    * <p>
-   * f0 -> ">>>"<br>
-   * s: -194978259<br>
+   * f0 -> ">"<br>
+   * f1 -> ">"<br>
+   * f2 -> ">"<br>
+   * s: -171434548<br>
    *
    * @param n - the node to visit
    * @return the user return information
    */
   @Override
-  @NodeFieldsSignature({ -194978259, JTB_SIG_RUNSIGNEDSHIFT, JTB_USER_RUNSIGNEDSHIFT })
+  @NodeFieldsSignature({ -171434548, JTB_SIG_RUNSIGNEDSHIFT, JTB_USER_RUNSIGNEDSHIFT })
   public int visit(final RUnsignedShift n) {
     int nRes = 0;
-    // f0 -> ">>>"
-    final NodeToken n0 = n.f0;
+    // f0 -> ">"
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
+    // f1 -> ">"
+    final Token n1 = n.f1;
+    nRes = n1.accept(this);
+    // f2 -> ">"
+    final Token n2 = n.f2;
+    nRes = n2.accept(this);
     return nRes;
   }
 
@@ -4407,7 +4419,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final PreIncrementExpression n) {
     int nRes = 0;
     // f0 -> "++"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> PrimaryExpression()
     final PrimaryExpression n1 = n.f1;
@@ -4430,7 +4442,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final PreDecrementExpression n) {
     int nRes = 0;
     // f0 -> "--"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> PrimaryExpression()
     final PrimaryExpression n1 = n.f1;
@@ -4787,13 +4799,13 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final MemberSelector n) {
     int nRes = 0;
     // f0 -> "."
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> TypeArguments()
     final TypeArguments n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> < IDENTIFIER >
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     nRes = n2.accept(this);
     return nRes;
   }
@@ -5046,7 +5058,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final IntegerLiteral n) {
     int nRes = 0;
     // f0 -> < INTEGER_LITERAL >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     return nRes;
   }
@@ -5099,7 +5111,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final StringLiteral n) {
     int nRes = 0;
     // f0 -> < STRING_LITERAL >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     return nRes;
   }
@@ -5118,7 +5130,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final NullLiteral n) {
     int nRes = 0;
     // f0 -> "null"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     return nRes;
   }
@@ -5139,7 +5151,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final Arguments n) {
     int nRes = 0;
     // f0 -> "("
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> [ ArgumentList() ]
     final NodeOptional n1 = n.f1;
@@ -5147,7 +5159,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       nRes = n1.accept(this);
     }
     // f2 -> ")"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     nRes = n2.accept(this);
     return nRes;
   }
@@ -5528,7 +5540,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final AssertStatement n) {
     int nRes = 0;
     // f0 -> "assert"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> Expression()
     final Expression n1 = n.f1;
@@ -5545,7 +5557,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       nRes = nd1.accept(this);
     }
     // f3 -> ";"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     nRes = n3.accept(this);
     return nRes;
   }
@@ -5566,10 +5578,10 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final LabeledStatement n) {
     int nRes = 0;
     // f0 -> < IDENTIFIER >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> ":"
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> Statement()
     final Statement n2 = n.f2;
@@ -5593,7 +5605,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final Block n) {
     int nRes = 0;
     // f0 -> "{"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> ( BlockStatement() )*
     final NodeListOptional n1 = n.f1;
@@ -5604,7 +5616,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       }
     }
     // f2 -> "}"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     nRes = n2.accept(this);
     return nRes;
   }
@@ -5751,7 +5763,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final EmptyStatement n) {
     int nRes = 0;
     // f0 -> ";"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     return nRes;
   }
@@ -5861,19 +5873,19 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final SwitchStatement n) {
     int nRes = 0;
     // f0 -> "switch"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> "("
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> Expression()
     final Expression n2 = n.f2;
     nRes = n2.accept(this);
     // f3 -> ")"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     nRes = n3.accept(this);
     // f4 -> "{"
-    final NodeToken n4 = n.f4;
+    final Token n4 = n.f4;
     nRes = n4.accept(this);
     // f5 -> ( #0 SwitchLabel()
     // .. .. . #1 ( BlockStatement() )* )*
@@ -5897,7 +5909,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       }
     }
     // f6 -> "}"
-    final NodeToken n6 = n.f6;
+    final Token n6 = n.f6;
     nRes = n6.accept(this);
     return nRes;
   }
@@ -5970,16 +5982,16 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final IfStatement n) {
     int nRes = 0;
     // f0 -> "if"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> "("
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> Expression()
     final Expression n2 = n.f2;
     nRes = n2.accept(this);
     // f3 -> ")"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     nRes = n3.accept(this);
     // f4 -> Statement()
     final Statement n4 = n.f4;
@@ -6016,16 +6028,16 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final WhileStatement n) {
     int nRes = 0;
     // f0 -> "while"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> "("
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> Expression()
     final Expression n2 = n.f2;
     nRes = n2.accept(this);
     // f3 -> ")"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     nRes = n3.accept(this);
     // f4 -> Statement()
     final Statement n4 = n.f4;
@@ -6053,25 +6065,25 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final DoStatement n) {
     int nRes = 0;
     // f0 -> "do"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> Statement()
     final Statement n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> "while"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     nRes = n2.accept(this);
     // f3 -> "("
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     nRes = n3.accept(this);
     // f4 -> Expression()
     final Expression n4 = n.f4;
     nRes = n4.accept(this);
     // f5 -> ")"
-    final NodeToken n5 = n.f5;
+    final Token n5 = n.f5;
     nRes = n5.accept(this);
     // f6 -> ";"
-    final NodeToken n6 = n.f6;
+    final Token n6 = n.f6;
     nRes = n6.accept(this);
     return nRes;
   }
@@ -6099,10 +6111,10 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final ForStatement n) {
     int nRes = 0;
     // f0 -> "for"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> "("
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> ( %0 #0 VariableModifiers() #1 Type() #2 < IDENTIFIER > #3 ":" #4 Expression()
     // .. .. | %1 #0 [ ForInit() ]
@@ -6170,7 +6182,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
         throw new ShouldNotOccurException(nch);
     }
     // f3 -> ")"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     nRes = n3.accept(this);
     // f4 -> Statement()
     final Statement n4 = n.f4;
@@ -6281,7 +6293,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final BreakStatement n) {
     int nRes = 0;
     // f0 -> "break"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> [ < IDENTIFIER > ]
     final NodeOptional n1 = n.f1;
@@ -6289,7 +6301,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       nRes = n1.accept(this);
     }
     // f2 -> ";"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     nRes = n2.accept(this);
     return nRes;
   }
@@ -6310,7 +6322,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final ContinueStatement n) {
     int nRes = 0;
     // f0 -> "continue"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> [ < IDENTIFIER > ]
     final NodeOptional n1 = n.f1;
@@ -6318,7 +6330,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       nRes = n1.accept(this);
     }
     // f2 -> ";"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     nRes = n2.accept(this);
     return nRes;
   }
@@ -6339,7 +6351,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final ReturnStatement n) {
     int nRes = 0;
     // f0 -> "return"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> [ Expression() ]
     final NodeOptional n1 = n.f1;
@@ -6347,7 +6359,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       nRes = n1.accept(this);
     }
     // f2 -> ";"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     nRes = n2.accept(this);
     return nRes;
   }
@@ -6368,13 +6380,13 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final ThrowStatement n) {
     int nRes = 0;
     // f0 -> "throw"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> Expression()
     final Expression n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> ";"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     nRes = n2.accept(this);
     return nRes;
   }
@@ -6397,16 +6409,16 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final SynchronizedStatement n) {
     int nRes = 0;
     // f0 -> "synchronized"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> "("
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> Expression()
     final Expression n2 = n.f2;
     nRes = n2.accept(this);
     // f3 -> ")"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     nRes = n3.accept(this);
     // f4 -> Block()
     final Block n4 = n.f4;
@@ -6431,7 +6443,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final TryStatement n) {
     int nRes = 0;
     // f0 -> "try"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> Block()
     final Block n1 = n.f1;
@@ -6531,13 +6543,13 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final NormalAnnotation n) {
     int nRes = 0;
     // f0 -> "@"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> Name()
     final Name n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> "("
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     nRes = n2.accept(this);
     // f3 -> [ MemberValuePairs() ]
     final NodeOptional n3 = n.f3;
@@ -6545,7 +6557,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       nRes = n3.accept(this);
     }
     // f4 -> ")"
-    final NodeToken n4 = n.f4;
+    final Token n4 = n.f4;
     nRes = n4.accept(this);
     return nRes;
   }
@@ -6565,7 +6577,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final MarkerAnnotation n) {
     int nRes = 0;
     // f0 -> "@"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> Name()
     final Name n1 = n.f1;
@@ -6591,19 +6603,19 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final SingleMemberAnnotation n) {
     int nRes = 0;
     // f0 -> "@"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> Name()
     final Name n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> "("
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     nRes = n2.accept(this);
     // f3 -> MemberValue()
     final MemberValue n3 = n.f3;
     nRes = n3.accept(this);
     // f4 -> ")"
-    final NodeToken n4 = n.f4;
+    final Token n4 = n.f4;
     nRes = n4.accept(this);
     return nRes;
   }
@@ -6658,10 +6670,10 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final MemberValuePair n) {
     int nRes = 0;
     // f0 -> < IDENTIFIER >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> "="
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> MemberValue()
     final MemberValue n2 = n.f2;
@@ -6727,7 +6739,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final MemberValueArrayInitializer n) {
     int nRes = 0;
     // f0 -> "{"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> MemberValue()
     final MemberValue n1 = n.f1;
@@ -6752,7 +6764,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       nRes = n3.accept(this);
     }
     // f4 -> "}"
-    final NodeToken n4 = n.f4;
+    final Token n4 = n.f4;
     nRes = n4.accept(this);
     return nRes;
   }
@@ -6774,13 +6786,13 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final AnnotationTypeDeclaration n) {
     int nRes = 0;
     // f0 -> "@"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> "interface"
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     nRes = n1.accept(this);
     // f2 -> < IDENTIFIER >
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     nRes = n2.accept(this);
     // f3 -> AnnotationTypeBody()
     final AnnotationTypeBody n3 = n.f3;
@@ -6804,7 +6816,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final AnnotationTypeBody n) {
     int nRes = 0;
     // f0 -> "{"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> ( AnnotationTypeMemberDeclaration() )*
     final NodeListOptional n1 = n.f1;
@@ -6815,7 +6827,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
       }
     }
     // f2 -> "}"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     nRes = n2.accept(this);
     return nRes;
   }
@@ -6951,7 +6963,7 @@ public class DepthFirstIntVisitor implements IIntVisitor {
   public int visit(final DefaultValue n) {
     int nRes = 0;
     // f0 -> "default"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     nRes = n0.accept(this);
     // f1 -> MemberValue()
     final MemberValue n1 = n.f1;

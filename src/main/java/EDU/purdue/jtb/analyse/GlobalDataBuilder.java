@@ -86,7 +86,7 @@ import EDU.purdue.jtb.parser.syntaxtree.NodeList;
 import EDU.purdue.jtb.parser.syntaxtree.NodeListOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.parser.syntaxtree.NodeToken;
+import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.PackageDeclaration;
 import EDU.purdue.jtb.parser.syntaxtree.PrimitiveType;
 import EDU.purdue.jtb.parser.syntaxtree.Production;
@@ -131,7 +131,9 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  * @version 1.4.8 : 10/2012 : MMa : added JavaCodeProduction class generation if requested ; modified error
  *          checking and messages
  * @version 1.5.0 : 01-06/2017 : MMa : changed some iterator based for loops to enhanced for loops ; fixed
- *          processing of nodes not to be created
+ *          processing of nodes not to be created<br>
+ * @version 1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
+ *          replacement by Token
  */
 public class GlobalDataBuilder extends DepthFirstVoidVisitor {
   
@@ -179,7 +181,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
   
   /**
    * The map of tokens (key = token name, value = regular expression or {@link #DONT_CREATE} for tokens not to
-   * be created as NodeToken nodes)
+   * be created as Token nodes)
    */
   private final Map<String, String> tokenHM = new HashMap<>();
   
@@ -187,8 +189,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
   private String tokenName = "";
   
   /**
-   * The current token's regular expression ; set to {@link #DONT_CREATE} for a NodeToken node not to be
-   * created
+   * The current token's regular expression ; set to {@link #DONT_CREATE} for a Token node not to be created
    */
   private String regExpr = "";
   
@@ -287,7 +288,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
   })
   public void visit(final JavaCCInput n) {
     // retrieve parser name
-    parserName = n.f3.f0.tokenImage;
+    parserName = n.f3.f0.image;
     // visit CompilationUnit for package name
     n.f5.accept(this);
     // visit Productions
@@ -347,7 +348,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
   })
   public void visit(final JavaCodeProduction n) {
     // f3 -> IdentifierAsString()
-    final String ident = n.f3.f0.tokenImage;
+    final String ident = n.f3.f0.image;
     if (firstPass) {
       // controls and global data
       if (prodHM.containsKey(ident)) {
@@ -427,7 +428,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
   })
   public void visit(final BNFProduction n) {
     // f2 -> IdentifierAsString()
-    final String ident = n.f2.f0.tokenImage;
+    final String ident = n.f2.f0.image;
     if (firstPass) {
       // controls and global data
       if (prodHM.containsKey(ident)) {
@@ -508,7 +509,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       String s;
       // f0 -> JavaIdentifier()
       final JavaIdentifier ji0 = ((PackageDeclaration) n0.node).f1.f0;
-      s = ((NodeToken) ji0.f0.choice).tokenImage;
+      s = ((Token) ji0.f0.choice).image;
       // f1 -> ( #0 "." #1 JavaIdentifier() )*
       final NodeListOptional nlo = ((PackageDeclaration) n0.node).f1.f1;
       if (nlo.present()) {
@@ -523,7 +524,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
           final INode seq2 = seq.elementAt(1);
           // seq2.accept(this);
           final JavaIdentifier ji1 = (JavaIdentifier) seq2;
-          s += ((NodeToken) ji1.f0.choice).tokenImage;
+          s += ((Token) ji1.f0.choice).image;
         }
       }
       packageName = s;
@@ -672,7 +673,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       427914477, JTB_SIG_PRIMITIVETYPE, JTB_USER_PRIMITIVETYPE
   })
   public void visit(final PrimitiveType n) {
-    resultType = resultType + ((NodeToken) n.f0.choice).tokenImage;
+    resultType = resultType + ((Token) n.f0.choice).image;
   }
   
   /**
@@ -691,7 +692,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       -1178309727, JTB_SIG_CLASSORINTERFACETYPE, JTB_USER_CLASSORINTERFACETYPE
   })
   public void visit(final ClassOrInterfaceType n) {
-    resultType = resultType + n.f0.tokenImage;
+    resultType = resultType + n.f0.image;
     // f1 -> [ TypeArguments() ]
     final NodeOptional n1 = n.f1;
     if (n1.present()) {
@@ -708,7 +709,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
         // #1 < IDENTIFIER >
         final INode seq2 = seq.elementAt(1);
         seq2.accept(this);
-        resultType = resultType + ((NodeToken) seq2).tokenImage;
+        resultType = resultType + ((Token) seq2).image;
         final NodeOptional opt = (NodeOptional) seq.elementAt(2);
         if (opt.present()) {
           opt.accept(this);
@@ -1020,7 +1021,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       -1580059612, JTB_SIG_IDENTIFIERASSTRING, JTB_USER_IDENTIFIERASSTRING
   })
   public void visit(final IdentifierAsString n) {
-    tokenName = n.f0.tokenImage;
+    tokenName = n.f0.image;
   }
   
   /**
@@ -1036,7 +1037,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       241433948, JTB_SIG_STRINGLITERAL, JTB_USER_STRINGLITERAL
   })
   public void visit(final StringLiteral n) {
-    regExpr = n.f0.tokenImage;
+    regExpr = n.f0.image;
   }
   
   /*
@@ -1074,7 +1075,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
   
   /**
    * @return * The map of tokens (key = token name, value = regular expression or {@link #DONT_CREATE} for
-   *         tokens not to be created as NodeToken nodes)
+   *         tokens not to be created as Token nodes)
    */
   public Map<String, String> getTokenHM() {
     return tokenHM;
@@ -1237,6 +1238,10 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       }
       
       int nRes = 0;
+      
+      // f0 -> ( #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" )?<
+      // we do not create trees for the ExpansionChoices in a LocalLookahead()
+      
       // f1 -> ( ExpansionUnit() )+
       final NodeList n1 = n.f1;
       for (int i = 0; i < n1.size(); i++) {
@@ -1286,9 +1291,11 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       final INode ich = nch.choice;
       switch (nch.which) {
       case 0:
+        // we do not create trees for the ExpansionChoices in a LocalLookahead()
         nRes = 0;
         break;
       case 1:
+        // we do not create trees for blocks
         nRes = 0;
         break;
       case 2:
@@ -1324,7 +1331,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
             break;
           }
           final IdentifierAsString ias = (IdentifierAsString) ((NodeSequence) ich1).elementAt(0);
-          if (gdbv.getNotTbcNodesHM().containsKey(ias.f0.tokenImage)) {
+          if (gdbv.getNotTbcNodesHM().containsKey(ias.f0.image)) {
             nRes = 0;
             break;
           } else {
@@ -1375,16 +1382,17 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
      * f2 -> ExpansionChoices()<br>
      * f3 -> "}"<br>
      * f4 -> ( #0 "catch" #1 "("<br>
-     * .. .. . #2 [ "final" ]<br>
-     * .. .. . #3 Name() #4 < IDENTIFIER > #5 ")" #6 Block() )*<br>
+     * .. .. . #2 ( Annotation() )*<br>
+     * .. .. . #3 [ "final" ]<br>
+     * .. .. . #4 Name() #5 < IDENTIFIER > #6 ")" #7 Block() )*<br>
      * f5 -> [ #0 "finally" #1 Block() ]<br>
-     * s: -1347962218<br>
+     * s: 1601707097<br>
      *
      * @param n - the node to visit
      */
     @Override
     @NodeFieldsSignature({
-        -1347962218, JTB_SIG_EXPANSIONUNITTCF, JTB_USER_EXPANSIONUNITTCF
+        1601707097, JTB_SIG_EXPANSIONUNITTCF, JTB_USER_EXPANSIONUNITTCF
     })
     public int visit(final ExpansionUnitTCF n) {
       return n.f2.accept(this) > 0 ? 1 : 0;
@@ -1434,7 +1442,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
         final NodeSequence seq9 = (NodeSequence) ich;
         // #1 IdentifierAsString()
         final INode seq11 = seq9.elementAt(1);
-        final String ias = ((IdentifierAsString) seq11).f0.tokenImage;
+        final String ias = ((IdentifierAsString) seq11).f0.image;
         int ret = DONT_CREATE.equals(gdbv.getTokenHM().get(ias)) //
             || gdbv.getNotTbcNodesHM().containsKey(ias) //
                 ? 0 //

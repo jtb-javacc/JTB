@@ -2,10 +2,10 @@
 package EDU.purdue.jtb.parser.visitor;
 
 import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.*;
-
+import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.*;
-
 import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
+
 /**
  * Provides default methods which visit each node in the tree in depth-first order.<br>
  * In your "Void" visitors extend this class and override part or all of these methods.
@@ -86,14 +86,14 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   }
 
   /**
-   * Visits a {@link NodeToken} node.
+   * Visits a {@link Token} node.
    *
    * @param n - the node to visit
    */
   @Override
-  public void visit(final NodeToken n) {
+  public void visit(final Token n) {
     @SuppressWarnings("unused")
-    final String tkIm = n.tokenImage;
+    final String tkIm = n.image;
     return;
   }
 
@@ -127,31 +127,31 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
     final JavaCCOptions n0 = n.f0;
     n0.accept(this);
     // f1 -> "PARSER_BEGIN"
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     n1.accept(this);
     // f2 -> "("
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     n2.accept(this);
     // f3 -> IdentifierAsString()
     final IdentifierAsString n3 = n.f3;
     n3.accept(this);
     // f4 -> ")"
-    final NodeToken n4 = n.f4;
+    final Token n4 = n.f4;
     n4.accept(this);
     // f5 -> CompilationUnit()
     final CompilationUnit n5 = n.f5;
     n5.accept(this);
     // f6 -> "PARSER_END"
-    final NodeToken n6 = n.f6;
+    final Token n6 = n.f6;
     n6.accept(this);
     // f7 -> "("
-    final NodeToken n7 = n.f7;
+    final Token n7 = n.f7;
     n7.accept(this);
     // f8 -> IdentifierAsString()
     final IdentifierAsString n8 = n.f8;
     n8.accept(this);
     // f9 -> ")"
-    final NodeToken n9 = n.f9;
+    final Token n9 = n.f9;
     n9.accept(this);
     // f10 -> ( Production() )+
     final NodeList n10 = n.f10;
@@ -160,7 +160,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       lsteai.accept(this);
     }
     // f11 -> < EOF >
-    final NodeToken n11 = n.f11;
+    final Token n11 = n.f11;
     n11.accept(this);
   }
 
@@ -252,7 +252,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
         throw new ShouldNotOccurException(nch);
     }
     // f1 -> "="
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     n1.accept(this);
     // f2 -> ( %0 IntegerLiteral()
     // .. .. | %1 BooleanLiteral()
@@ -278,7 +278,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
         throw new ShouldNotOccurException(nch1);
     }
     // f3 -> ";"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     n3.accept(this);
   }
 
@@ -345,7 +345,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -763138104, JTB_SIG_JAVACODEPRODUCTION, JTB_USER_JAVACODEPRODUCTION })
   public void visit(final JavaCodeProduction n) {
     // f0 -> "JAVACODE"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> AccessModifier()
     final AccessModifier n1 = n.f1;
@@ -463,19 +463,19 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       n5.accept(this);
     }
     // f6 -> ":"
-    final NodeToken n6 = n.f6;
+    final Token n6 = n.f6;
     n6.accept(this);
     // f7 -> Block()
     final Block n7 = n.f7;
     n7.accept(this);
     // f8 -> "{"
-    final NodeToken n8 = n.f8;
+    final Token n8 = n.f8;
     n8.accept(this);
     // f9 -> ExpansionChoices()
     final ExpansionChoices n9 = n.f9;
     n9.accept(this);
     // f10 -> "}"
-    final NodeToken n10 = n.f10;
+    final Token n10 = n.f10;
     n10.accept(this);
   }
 
@@ -624,10 +624,10 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       nd11.accept(this);
     }
     // f3 -> ":"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     n3.accept(this);
     // f4 -> "{"
-    final NodeToken n4 = n.f4;
+    final Token n4 = n.f4;
     n4.accept(this);
     // f5 -> RegExprSpec()
     final RegExprSpec n5 = n.f5;
@@ -647,7 +647,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       }
     }
     // f7 -> "}"
-    final NodeToken n7 = n.f7;
+    final Token n7 = n.f7;
     n7.accept(this);
   }
 
@@ -665,10 +665,10 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -1566997219, JTB_SIG_TOKENMANAGERDECLS, JTB_USER_TOKENMANAGERDECLS })
   public void visit(final TokenManagerDecls n) {
     // f0 -> "TOKEN_MGR_DECLS"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> ":"
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     n1.accept(this);
     // f2 -> ClassOrInterfaceBody()
     final ClassOrInterfaceBody n2 = n.f2;
@@ -1108,16 +1108,16 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 1601707097, JTB_SIG_EXPANSIONUNITTCF, JTB_USER_EXPANSIONUNITTCF })
   public void visit(final ExpansionUnitTCF n) {
     // f0 -> "try"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> "{"
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     n1.accept(this);
     // f2 -> ExpansionChoices()
     final ExpansionChoices n2 = n.f2;
     n2.accept(this);
     // f3 -> "}"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     n3.accept(this);
     // f4 -> ( #0 "catch" #1 "("
     // .. .. . #2 ( Annotation() )*
@@ -1489,7 +1489,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       n0.accept(this);
     }
     // f1 -> "["
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     n1.accept(this);
     // f2 -> [ #0 CharacterDescriptor()
     // .. .. . #1 ( $0 "," $1 CharacterDescriptor() )* ]
@@ -1516,7 +1516,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       }
     }
     // f3 -> "]"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     n3.accept(this);
   }
 
@@ -1560,7 +1560,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -1580059612, JTB_SIG_IDENTIFIERASSTRING, JTB_USER_IDENTIFIERASSTRING })
   public void visit(final IdentifierAsString n) {
     // f0 -> < IDENTIFIER >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
   }
 
@@ -1706,13 +1706,13 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -2133750237, JTB_SIG_PACKAGEDECLARATION, JTB_USER_PACKAGEDECLARATION })
   public void visit(final PackageDeclaration n) {
     // f0 -> "package"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> Name()
     final Name n1 = n.f1;
     n1.accept(this);
     // f2 -> ";"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     n2.accept(this);
   }
 
@@ -1732,7 +1732,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -1592912780, JTB_SIG_IMPORTDECLARATION, JTB_USER_IMPORTDECLARATION })
   public void visit(final ImportDeclaration n) {
     // f0 -> "import"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> [ "static" ]
     final NodeOptional n1 = n.f1;
@@ -1754,7 +1754,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       nd1.accept(this);
     }
     // f4 -> ";"
-    final NodeToken n4 = n.f4;
+    final Token n4 = n.f4;
     n4.accept(this);
   }
 
@@ -1957,7 +1957,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
         throw new ShouldNotOccurException(nch);
     }
     // f1 -> < IDENTIFIER >
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     n1.accept(this);
     // f2 -> [ TypeParameters() ]
     final NodeOptional n2 = n.f2;
@@ -1993,7 +1993,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 24279225, JTB_SIG_EXTENDSLIST, JTB_USER_EXTENDSLIST })
   public void visit(final ExtendsList n) {
     // f0 -> "extends"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> ClassOrInterfaceType()
     final ClassOrInterfaceType n1 = n.f1;
@@ -2028,7 +2028,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 1830366786, JTB_SIG_IMPLEMENTSLIST, JTB_USER_IMPLEMENTSLIST })
   public void visit(final ImplementsList n) {
     // f0 -> "implements"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> ClassOrInterfaceType()
     final ClassOrInterfaceType n1 = n.f1;
@@ -2064,10 +2064,10 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 359041865, JTB_SIG_ENUMDECLARATION, JTB_USER_ENUMDECLARATION })
   public void visit(final EnumDeclaration n) {
     // f0 -> "enum"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> < IDENTIFIER >
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     n1.accept(this);
     // f2 -> [ ImplementsList() ]
     final NodeOptional n2 = n.f2;
@@ -2097,7 +2097,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -1338633176, JTB_SIG_ENUMBODY, JTB_USER_ENUMBODY })
   public void visit(final EnumBody n) {
     // f0 -> "{"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> [ #0 EnumConstant()
     // .. .. . #1 ( $0 "," $1 EnumConstant() )* ]
@@ -2147,7 +2147,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       }
     }
     // f4 -> "}"
-    final NodeToken n4 = n.f4;
+    final Token n4 = n.f4;
     n4.accept(this);
   }
 
@@ -2169,7 +2169,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
     final Modifiers n0 = n.f0;
     n0.accept(this);
     // f1 -> < IDENTIFIER >
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     n1.accept(this);
     // f2 -> [ Arguments() ]
     final NodeOptional n2 = n.f2;
@@ -2198,7 +2198,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 1962566888, JTB_SIG_TYPEPARAMETERS, JTB_USER_TYPEPARAMETERS })
   public void visit(final TypeParameters n) {
     // f0 -> "<"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> TypeParameter()
     final TypeParameter n1 = n.f1;
@@ -2218,7 +2218,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       }
     }
     // f3 -> ">"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     n3.accept(this);
   }
 
@@ -2235,7 +2235,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 1306471903, JTB_SIG_TYPEPARAMETER, JTB_USER_TYPEPARAMETER })
   public void visit(final TypeParameter n) {
     // f0 -> < IDENTIFIER >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> [ TypeBound() ]
     final NodeOptional n1 = n.f1;
@@ -2258,7 +2258,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -2080520397, JTB_SIG_TYPEBOUND, JTB_USER_TYPEBOUND })
   public void visit(final TypeBound n) {
     // f0 -> "extends"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> ClassOrInterfaceType()
     final ClassOrInterfaceType n1 = n.f1;
@@ -2293,7 +2293,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 1154515364, JTB_SIG_CLASSORINTERFACEBODY, JTB_USER_CLASSORINTERFACEBODY })
   public void visit(final ClassOrInterfaceBody n) {
     // f0 -> "{"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> ( ClassOrInterfaceBodyDeclaration() )*
     final NodeListOptional n1 = n.f1;
@@ -2304,7 +2304,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       }
     }
     // f2 -> "}"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     n2.accept(this);
   }
 
@@ -2439,7 +2439,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       }
     }
     // f3 -> ";"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     n3.accept(this);
   }
 
@@ -2484,7 +2484,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 416704472, JTB_SIG_VARIABLEDECLARATORID, JTB_USER_VARIABLEDECLARATORID })
   public void visit(final VariableDeclaratorId n) {
     // f0 -> < IDENTIFIER >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> ( #0 "[" #1 "]" )*
     final NodeListOptional n1 = n.f1;
@@ -2549,7 +2549,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -251326055, JTB_SIG_ARRAYINITIALIZER, JTB_USER_ARRAYINITIALIZER })
   public void visit(final ArrayInitializer n) {
     // f0 -> "{"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> [ #0 VariableInitializer()
     // .. .. . #1 ( $0 "," $1 VariableInitializer() )* ]
@@ -2581,7 +2581,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       n2.accept(this);
     }
     // f3 -> "}"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     n3.accept(this);
   }
 
@@ -2657,7 +2657,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -837793747, JTB_SIG_METHODDECLARATOR, JTB_USER_METHODDECLARATOR })
   public void visit(final MethodDeclarator n) {
     // f0 -> < IDENTIFIER >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> FormalParameters()
     final FormalParameters n1 = n.f1;
@@ -2693,7 +2693,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -97312104, JTB_SIG_FORMALPARAMETERS, JTB_USER_FORMALPARAMETERS })
   public void visit(final FormalParameters n) {
     // f0 -> "("
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> [ #0 FormalParameter()
     // .. .. . #1 ( $0 "," $1 FormalParameter() )* ]
@@ -2720,7 +2720,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       }
     }
     // f2 -> ")"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     n2.accept(this);
   }
 
@@ -2778,7 +2778,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       n0.accept(this);
     }
     // f1 -> < IDENTIFIER >
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     n1.accept(this);
     // f2 -> FormalParameters()
     final FormalParameters n2 = n.f2;
@@ -2795,7 +2795,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       nd1.accept(this);
     }
     // f4 -> "{"
-    final NodeToken n4 = n.f4;
+    final Token n4 = n.f4;
     n4.accept(this);
     // f5 -> [ ExplicitConstructorInvocation() ]
     final NodeOptional n5 = n.f5;
@@ -2811,7 +2811,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       }
     }
     // f7 -> "}"
-    final NodeToken n7 = n.f7;
+    final Token n7 = n.f7;
     n7.accept(this);
   }
 
@@ -3081,7 +3081,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -1178309727, JTB_SIG_CLASSORINTERFACETYPE, JTB_USER_CLASSORINTERFACETYPE })
   public void visit(final ClassOrInterfaceType n) {
     // f0 -> < IDENTIFIER >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> [ TypeArguments() ]
     final NodeOptional n1 = n.f1;
@@ -3126,7 +3126,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 131755052, JTB_SIG_TYPEARGUMENTS, JTB_USER_TYPEARGUMENTS })
   public void visit(final TypeArguments n) {
     // f0 -> "<"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> TypeArgument()
     final TypeArgument n1 = n.f1;
@@ -3146,7 +3146,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       }
     }
     // f3 -> ">"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     n3.accept(this);
   }
 
@@ -3163,10 +3163,10 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 859421181, JTB_SIG_EMPTYTYPEARGUMENTS, JTB_USER_EMPTYTYPEARGUMENTS })
   public void visit(final EmptyTypeArguments n) {
     // f0 -> "<"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> ">"
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     n1.accept(this);
   }
 
@@ -3925,35 +3925,47 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   }
 
   /**
-   * Visits a {@link RSignedShift} node, whose child is the following :
+   * Visits a {@link RSignedShift} node, whose children are the following :
    * <p>
-   * f0 -> ">>"<br>
-   * s: -699026311<br>
+   * f0 -> ">"<br>
+   * f1 -> ">"<br>
+   * s: 1560485759<br>
    *
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({ -699026311, JTB_SIG_RSIGNEDSHIFT, JTB_USER_RSIGNEDSHIFT })
+  @NodeFieldsSignature({ 1560485759, JTB_SIG_RSIGNEDSHIFT, JTB_USER_RSIGNEDSHIFT })
   public void visit(final RSignedShift n) {
-    // f0 -> ">>"
-    final NodeToken n0 = n.f0;
+    // f0 -> ">"
+    final Token n0 = n.f0;
     n0.accept(this);
+    // f1 -> ">"
+    final Token n1 = n.f1;
+    n1.accept(this);
   }
 
   /**
-   * Visits a {@link RUnsignedShift} node, whose child is the following :
+   * Visits a {@link RUnsignedShift} node, whose children are the following :
    * <p>
-   * f0 -> ">>>"<br>
-   * s: -194978259<br>
+   * f0 -> ">"<br>
+   * f1 -> ">"<br>
+   * f2 -> ">"<br>
+   * s: -171434548<br>
    *
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({ -194978259, JTB_SIG_RUNSIGNEDSHIFT, JTB_USER_RUNSIGNEDSHIFT })
+  @NodeFieldsSignature({ -171434548, JTB_SIG_RUNSIGNEDSHIFT, JTB_USER_RUNSIGNEDSHIFT })
   public void visit(final RUnsignedShift n) {
-    // f0 -> ">>>"
-    final NodeToken n0 = n.f0;
+    // f0 -> ">"
+    final Token n0 = n.f0;
     n0.accept(this);
+    // f1 -> ">"
+    final Token n1 = n.f1;
+    n1.accept(this);
+    // f2 -> ">"
+    final Token n2 = n.f2;
+    n2.accept(this);
   }
 
   /**
@@ -4146,7 +4158,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 2138182184, JTB_SIG_PREINCREMENTEXPRESSION, JTB_USER_PREINCREMENTEXPRESSION })
   public void visit(final PreIncrementExpression n) {
     // f0 -> "++"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> PrimaryExpression()
     final PrimaryExpression n1 = n.f1;
@@ -4166,7 +4178,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -743030168, JTB_SIG_PREDECREMENTEXPRESSION, JTB_USER_PREDECREMENTEXPRESSION })
   public void visit(final PreDecrementExpression n) {
     // f0 -> "--"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> PrimaryExpression()
     final PrimaryExpression n1 = n.f1;
@@ -4505,13 +4517,13 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 257570924, JTB_SIG_MEMBERSELECTOR, JTB_USER_MEMBERSELECTOR })
   public void visit(final MemberSelector n) {
     // f0 -> "."
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> TypeArguments()
     final TypeArguments n1 = n.f1;
     n1.accept(this);
     // f2 -> < IDENTIFIER >
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     n2.accept(this);
   }
 
@@ -4752,7 +4764,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -1048223857, JTB_SIG_INTEGERLITERAL, JTB_USER_INTEGERLITERAL })
   public void visit(final IntegerLiteral n) {
     // f0 -> < INTEGER_LITERAL >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
   }
 
@@ -4799,7 +4811,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 241433948, JTB_SIG_STRINGLITERAL, JTB_USER_STRINGLITERAL })
   public void visit(final StringLiteral n) {
     // f0 -> < STRING_LITERAL >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
   }
 
@@ -4815,7 +4827,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -1703344686, JTB_SIG_NULLLITERAL, JTB_USER_NULLLITERAL })
   public void visit(final NullLiteral n) {
     // f0 -> "null"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
   }
 
@@ -4833,7 +4845,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 2046130821, JTB_SIG_ARGUMENTS, JTB_USER_ARGUMENTS })
   public void visit(final Arguments n) {
     // f0 -> "("
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> [ ArgumentList() ]
     final NodeOptional n1 = n.f1;
@@ -4841,7 +4853,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       n1.accept(this);
     }
     // f2 -> ")"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     n2.accept(this);
   }
 
@@ -5207,7 +5219,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -579866328, JTB_SIG_ASSERTSTATEMENT, JTB_USER_ASSERTSTATEMENT })
   public void visit(final AssertStatement n) {
     // f0 -> "assert"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> Expression()
     final Expression n1 = n.f1;
@@ -5224,7 +5236,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       nd1.accept(this);
     }
     // f3 -> ";"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     n3.accept(this);
   }
 
@@ -5242,10 +5254,10 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -1956923191, JTB_SIG_LABELEDSTATEMENT, JTB_USER_LABELEDSTATEMENT })
   public void visit(final LabeledStatement n) {
     // f0 -> < IDENTIFIER >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> ":"
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     n1.accept(this);
     // f2 -> Statement()
     final Statement n2 = n.f2;
@@ -5266,7 +5278,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -47169424, JTB_SIG_BLOCK, JTB_USER_BLOCK })
   public void visit(final Block n) {
     // f0 -> "{"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> ( BlockStatement() )*
     final NodeListOptional n1 = n.f1;
@@ -5277,7 +5289,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       }
     }
     // f2 -> "}"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     n2.accept(this);
   }
 
@@ -5412,7 +5424,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 2055660624, JTB_SIG_EMPTYSTATEMENT, JTB_USER_EMPTYSTATEMENT })
   public void visit(final EmptyStatement n) {
     // f0 -> ";"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
   }
 
@@ -5516,19 +5528,19 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 645895087, JTB_SIG_SWITCHSTATEMENT, JTB_USER_SWITCHSTATEMENT })
   public void visit(final SwitchStatement n) {
     // f0 -> "switch"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> "("
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     n1.accept(this);
     // f2 -> Expression()
     final Expression n2 = n.f2;
     n2.accept(this);
     // f3 -> ")"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     n3.accept(this);
     // f4 -> "{"
-    final NodeToken n4 = n.f4;
+    final Token n4 = n.f4;
     n4.accept(this);
     // f5 -> ( #0 SwitchLabel()
     // .. .. . #1 ( BlockStatement() )* )*
@@ -5552,7 +5564,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       }
     }
     // f6 -> "}"
-    final NodeToken n6 = n.f6;
+    final Token n6 = n.f6;
     n6.accept(this);
   }
 
@@ -5619,16 +5631,16 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -1906079982, JTB_SIG_IFSTATEMENT, JTB_USER_IFSTATEMENT })
   public void visit(final IfStatement n) {
     // f0 -> "if"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> "("
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     n1.accept(this);
     // f2 -> Expression()
     final Expression n2 = n.f2;
     n2.accept(this);
     // f3 -> ")"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     n3.accept(this);
     // f4 -> Statement()
     final Statement n4 = n.f4;
@@ -5662,16 +5674,16 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 503551312, JTB_SIG_WHILESTATEMENT, JTB_USER_WHILESTATEMENT })
   public void visit(final WhileStatement n) {
     // f0 -> "while"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> "("
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     n1.accept(this);
     // f2 -> Expression()
     final Expression n2 = n.f2;
     n2.accept(this);
     // f3 -> ")"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     n3.accept(this);
     // f4 -> Statement()
     final Statement n4 = n.f4;
@@ -5696,25 +5708,25 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 1162769715, JTB_SIG_DOSTATEMENT, JTB_USER_DOSTATEMENT })
   public void visit(final DoStatement n) {
     // f0 -> "do"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> Statement()
     final Statement n1 = n.f1;
     n1.accept(this);
     // f2 -> "while"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     n2.accept(this);
     // f3 -> "("
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     n3.accept(this);
     // f4 -> Expression()
     final Expression n4 = n.f4;
     n4.accept(this);
     // f5 -> ")"
-    final NodeToken n5 = n.f5;
+    final Token n5 = n.f5;
     n5.accept(this);
     // f6 -> ";"
-    final NodeToken n6 = n.f6;
+    final Token n6 = n.f6;
     n6.accept(this);
   }
 
@@ -5739,10 +5751,10 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 755358653, JTB_SIG_FORSTATEMENT, JTB_USER_FORSTATEMENT })
   public void visit(final ForStatement n) {
     // f0 -> "for"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> "("
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     n1.accept(this);
     // f2 -> ( %0 #0 VariableModifiers() #1 Type() #2 < IDENTIFIER > #3 ":" #4 Expression()
     // .. .. | %1 #0 [ ForInit() ]
@@ -5810,7 +5822,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
         throw new ShouldNotOccurException(nch);
     }
     // f3 -> ")"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     n3.accept(this);
     // f4 -> Statement()
     final Statement n4 = n.f4;
@@ -5909,7 +5921,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 2096828507, JTB_SIG_BREAKSTATEMENT, JTB_USER_BREAKSTATEMENT })
   public void visit(final BreakStatement n) {
     // f0 -> "break"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> [ < IDENTIFIER > ]
     final NodeOptional n1 = n.f1;
@@ -5917,7 +5929,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       n1.accept(this);
     }
     // f2 -> ";"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     n2.accept(this);
   }
 
@@ -5935,7 +5947,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -1991535243, JTB_SIG_CONTINUESTATEMENT, JTB_USER_CONTINUESTATEMENT })
   public void visit(final ContinueStatement n) {
     // f0 -> "continue"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> [ < IDENTIFIER > ]
     final NodeOptional n1 = n.f1;
@@ -5943,7 +5955,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       n1.accept(this);
     }
     // f2 -> ";"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     n2.accept(this);
   }
 
@@ -5961,7 +5973,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -1971167888, JTB_SIG_RETURNSTATEMENT, JTB_USER_RETURNSTATEMENT })
   public void visit(final ReturnStatement n) {
     // f0 -> "return"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> [ Expression() ]
     final NodeOptional n1 = n.f1;
@@ -5969,7 +5981,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       n1.accept(this);
     }
     // f2 -> ";"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     n2.accept(this);
   }
 
@@ -5987,13 +5999,13 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 568421270, JTB_SIG_THROWSTATEMENT, JTB_USER_THROWSTATEMENT })
   public void visit(final ThrowStatement n) {
     // f0 -> "throw"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> Expression()
     final Expression n1 = n.f1;
     n1.accept(this);
     // f2 -> ";"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     n2.accept(this);
   }
 
@@ -6013,16 +6025,16 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 2040551171, JTB_SIG_SYNCHRONIZEDSTATEMENT, JTB_USER_SYNCHRONIZEDSTATEMENT })
   public void visit(final SynchronizedStatement n) {
     // f0 -> "synchronized"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> "("
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     n1.accept(this);
     // f2 -> Expression()
     final Expression n2 = n.f2;
     n2.accept(this);
     // f3 -> ")"
-    final NodeToken n3 = n.f3;
+    final Token n3 = n.f3;
     n3.accept(this);
     // f4 -> Block()
     final Block n4 = n.f4;
@@ -6044,7 +6056,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 1108527850, JTB_SIG_TRYSTATEMENT, JTB_USER_TRYSTATEMENT })
   public void visit(final TryStatement n) {
     // f0 -> "try"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> Block()
     final Block n1 = n.f1;
@@ -6138,13 +6150,13 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -50913587, JTB_SIG_NORMALANNOTATION, JTB_USER_NORMALANNOTATION })
   public void visit(final NormalAnnotation n) {
     // f0 -> "@"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> Name()
     final Name n1 = n.f1;
     n1.accept(this);
     // f2 -> "("
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     n2.accept(this);
     // f3 -> [ MemberValuePairs() ]
     final NodeOptional n3 = n.f3;
@@ -6152,7 +6164,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       n3.accept(this);
     }
     // f4 -> ")"
-    final NodeToken n4 = n.f4;
+    final Token n4 = n.f4;
     n4.accept(this);
   }
 
@@ -6169,7 +6181,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -11544239, JTB_SIG_MARKERANNOTATION, JTB_USER_MARKERANNOTATION })
   public void visit(final MarkerAnnotation n) {
     // f0 -> "@"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> Name()
     final Name n1 = n.f1;
@@ -6192,19 +6204,19 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -1771126382, JTB_SIG_SINGLEMEMBERANNOTATION, JTB_USER_SINGLEMEMBERANNOTATION })
   public void visit(final SingleMemberAnnotation n) {
     // f0 -> "@"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> Name()
     final Name n1 = n.f1;
     n1.accept(this);
     // f2 -> "("
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     n2.accept(this);
     // f3 -> MemberValue()
     final MemberValue n3 = n.f3;
     n3.accept(this);
     // f4 -> ")"
-    final NodeToken n4 = n.f4;
+    final Token n4 = n.f4;
     n4.accept(this);
   }
 
@@ -6253,10 +6265,10 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -476335468, JTB_SIG_MEMBERVALUEPAIR, JTB_USER_MEMBERVALUEPAIR })
   public void visit(final MemberValuePair n) {
     // f0 -> < IDENTIFIER >
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> "="
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     n1.accept(this);
     // f2 -> MemberValue()
     final MemberValue n2 = n.f2;
@@ -6316,7 +6328,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 111140055, JTB_SIG_MEMBERVALUEARRAYINITIALIZER, JTB_USER_MEMBERVALUEARRAYINITIALIZER })
   public void visit(final MemberValueArrayInitializer n) {
     // f0 -> "{"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> MemberValue()
     final MemberValue n1 = n.f1;
@@ -6341,7 +6353,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       n3.accept(this);
     }
     // f4 -> "}"
-    final NodeToken n4 = n.f4;
+    final Token n4 = n.f4;
     n4.accept(this);
   }
 
@@ -6360,13 +6372,13 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ 383718196, JTB_SIG_ANNOTATIONTYPEDECLARATION, JTB_USER_ANNOTATIONTYPEDECLARATION })
   public void visit(final AnnotationTypeDeclaration n) {
     // f0 -> "@"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> "interface"
-    final NodeToken n1 = n.f1;
+    final Token n1 = n.f1;
     n1.accept(this);
     // f2 -> < IDENTIFIER >
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     n2.accept(this);
     // f3 -> AnnotationTypeBody()
     final AnnotationTypeBody n3 = n.f3;
@@ -6387,7 +6399,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -667465535, JTB_SIG_ANNOTATIONTYPEBODY, JTB_USER_ANNOTATIONTYPEBODY })
   public void visit(final AnnotationTypeBody n) {
     // f0 -> "{"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> ( AnnotationTypeMemberDeclaration() )*
     final NodeListOptional n1 = n.f1;
@@ -6398,7 +6410,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
       }
     }
     // f2 -> "}"
-    final NodeToken n2 = n.f2;
+    final Token n2 = n.f2;
     n2.accept(this);
   }
 
@@ -6528,7 +6540,7 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   @NodeFieldsSignature({ -1936312236, JTB_SIG_DEFAULTVALUE, JTB_USER_DEFAULTVALUE })
   public void visit(final DefaultValue n) {
     // f0 -> "default"
-    final NodeToken n0 = n.f0;
+    final Token n0 = n.f0;
     n0.accept(this);
     // f1 -> MemberValue()
     final MemberValue n1 = n.f1;

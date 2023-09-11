@@ -32,6 +32,7 @@
 package EDU.purdue.jtb.generate;
 
 import static EDU.purdue.jtb.analyse.GlobalDataBuilder.DONT_CREATE;
+import static EDU.purdue.jtb.common.Constants.DEBUG_CLASS;
 import static EDU.purdue.jtb.common.Constants.fileHeaderComment;
 import static EDU.purdue.jtb.common.Constants.iEnterExitHook;
 import static EDU.purdue.jtb.common.Constants.jjToken;
@@ -46,7 +47,6 @@ import static EDU.purdue.jtb.common.Constants.nodeList;
 import static EDU.purdue.jtb.common.Constants.nodeListOptional;
 import static EDU.purdue.jtb.common.Constants.nodeOptional;
 import static EDU.purdue.jtb.common.Constants.nodeSequence;
-import static EDU.purdue.jtb.common.Constants.nodeToken;
 import static EDU.purdue.jtb.common.Constants.ptHM;
 import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_BLOCK;
 import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_BLOCKSTATEMENT;
@@ -159,7 +159,7 @@ import EDU.purdue.jtb.parser.syntaxtree.NodeList;
 import EDU.purdue.jtb.parser.syntaxtree.NodeListOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.parser.syntaxtree.NodeToken;
+import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.PrimitiveType;
 import EDU.purdue.jtb.parser.syntaxtree.ReferenceType;
 import EDU.purdue.jtb.parser.syntaxtree.RegularExprProduction;
@@ -208,7 +208,7 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  * @version 1.4.6 : 01/2011 : FA/MMa : add -va and -npfx and -nsfx options
  * @version 1.4.7 : 12/2011 : MMa : commented the JavaCodeProduction visit method ;<br>
  *          optimized JTBToolkit class's code<br>
- *          1.4.7 : 07/2012 : MMa : followed changes in jtbgram.jtb (IndentifierAsString(), ForStatement()),
+ *          1.4.7 : 07/2012 : MMa : followed changes in JTBParser.jtb (IndentifierAsString(), ForStatement()),
  *          updated grammar comments in the code<br>
  *          1.4.7 : 08-09/2012 : MMa : fixed soft errors for empty NodeChoice (bug JTB-1) ;<br>
  *          fixed error on return statement for a void production ; added non node creation ;<br>
@@ -226,8 +226,11 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  *          ExpressionUnitTypeCounter reference ; fixed lines indentations and newlines ; added final in
  *          ExpansionUnitTCF's catch ; removed NodeTCF related code<br>
  *          10-11/2022 : MMa : fixed many issues while improving test grammars
- * @version 1.5.1 : 07/2023 : MMa : fixed issue on expansion choices with choices ; added optional annotations
- *          in catch of ExpansionUnitTCF
+ * @version 1.5.1 : 07/2023 : MMa : fixed issue on expansion choices with choices and on expansion unit ;
+ *          added optional annotations in catch of ExpansionUnitTCF<br>
+ *          1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
+ *          replacement by Token, suppressed Token nodes generation
+ * @version 1.5.1 : 09/2023 : MMa : dropped attempts to join annotated & user blocks
  */
 public class JJFileAnnotator extends JavaCCPrinter {
   
@@ -258,8 +261,8 @@ public class JJFileAnnotator extends JavaCCPrinter {
    * The list of all "outer" variables (production's children nodes) for the production default constructor
    */
   private final List<VarInfo>          outerVars         = new ArrayList<>();
-  /** The last variable (this of the parent) generated so far */
-  private VarInfo                      parentVar;
+  /** The last variable info generated so far (to be added to the parent - the current variable) */
+  private VarInfo                      lastVar;
   /** The RegularExpression generated token name */
   private String                       reTokenName       = null;
   /**
@@ -268,8 +271,8 @@ public class JJFileAnnotator extends JavaCCPrinter {
    */
   private boolean                      createRENode      = true;
   /**
-   * True to tell the upper layers that an ExpansionUnit or NodeSequence node has just been created (so to add
-   * it to the NodeSequence), false otherwise
+   * True to tell the upper layers that a child ExpansionUnit or NodeSequence node has just been created or
+   * filled (so to add it to the NodeSequence), false otherwise
    */
   private boolean                      isEUNSNodeCreated = false;
   /** The name of the current production (JavaCodeProduction or BNFProduction) */
@@ -278,7 +281,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
   private String                       curProdFixed;
   /** The JavaCodeProduction or BNFProduction result type */
   private String                       resultType        = null;
-  /** The flag to print only once (in the parser main class) the makeNodeToken method */
+  /** The flag to print only once (in the parser main class) the makeToken method */
   boolean                              inMainClass       = true;
   /** The number of direct ExpansionUnit (s) under the top level Expansion, 0 otherwise */
   int                                  nbEU;
@@ -326,21 +329,18 @@ public class JJFileAnnotator extends JavaCCPrinter {
   }
   
   /**
-   * Reset the variable generator counter
-   */
-  private final void resetVarNum() {
-    varNum = 0;
-  }
-  
-  /**
    * Returns the java block for adding a node to its parent.
    *
-   * @param parentName - the parent node
-   * @param varName - the node's variable name
+   * @param parent - the parent node's info
+   * @param var - the node's info
    * @return the java block
    */
-  private static final String addNodeToParent(final String parentName, final String varName) {
-    return "{ ".concat(parentName).concat(".addNode(").concat(varName).concat("); }");
+  private static final String addNodeToParent(final VarInfo parent, final VarInfo var) {
+    if (DEBUG_CLASS)
+      return "{ /* ".concat(parent.getType()).concat(" */ ").concat(parent.getName()).concat(".addNode( /* ")
+          .concat(var.getType()).concat(" */ ").concat(var.getName()).concat(" ); }");
+    else
+      return "{ ".concat(parent.getName()).concat(".addNode(").concat(var.getName()).concat("); }");
   }
   
   /*
@@ -438,7 +438,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       return;
     }
     // node to be generated
-    curProd = n.f3.f0.tokenImage;
+    curProd = n.f3.f0.image;
     curProdFixed = gdbv.getFixedName(curProd);
     // f0 -> "JAVACODE"
     sb.append(spc.spc);
@@ -534,7 +534,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       // add exit node scope hook method
       sb.append(spc.spc);
       sb.append(curProdFixed).append(' ').append(jtbNodeVar).append(" = new ")
-          .append(gdbv.getFixedName(n.f3.f0.tokenImage)).append("();");
+          .append(gdbv.getFixedName(n.f3.f0.image)).append("();");
       oneNewLine(n, "generateJcRHS d");
       sb.append(spc.spc);
       sb.append("if (").append(jtbHookVar).append(" != null) ").append(jtbHookVar).append(".")
@@ -544,7 +544,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       sb.append("return ").append(jtbNodeVar).append(";");
     } else {
       sb.append(spc.spc);
-      sb.append("return new ").append(gdbv.getFixedName(n.f3.f0.tokenImage)).append("();");
+      sb.append("return new ").append(gdbv.getFixedName(n.f3.f0.image)).append("();");
     }
     oneNewLine(n, "generateJcRHS f");
     // in Block f2 -> "}"
@@ -588,11 +588,11 @@ public class JJFileAnnotator extends JavaCCPrinter {
     // node to be generated
     varList.clear();
     outerVars.clear();
-    parentVar = null;
-    resetVarNum();
+    lastVar = null;
+    varNum = 0;
     varLvl = 0;
     isTopExp = false;
-    curProd = n.f2.f0.tokenImage;
+    curProd = n.f2.f0.image;
     curProdFixed = gdbv.getFixedName(curProd);
     isUserNodeGenerated = false;
     
@@ -719,9 +719,9 @@ public class JJFileAnnotator extends JavaCCPrinter {
     switch (n.f0.which) {
     case 0:
       // %0 "void"
-      final NodeToken tk = (NodeToken) n.f0.choice;
+      final Token tk = (Token) n.f0.choice;
       // resultTypeSpecials = tk.getSpecials(spc.spc);
-      return tk.tokenImage;
+      return tk.image;
     case 1:
       // %1 Type()
       return getType((Type) n.f0.choice);
@@ -825,9 +825,9 @@ public class JJFileAnnotator extends JavaCCPrinter {
       427914477, JTB_SIG_PRIMITIVETYPE, JTB_USER_PRIMITIVETYPE
   })
   private static String getPrimitiveType(final PrimitiveType n) {
-    final NodeToken tk = (NodeToken) n.f0.choice;
+    final Token tk = (Token) n.f0.choice;
     // resultTypeSpecials = tk.getSpecials(spc.spc);
-    return tk.tokenImage;
+    return tk.image;
   }
   
   /**
@@ -847,7 +847,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
   })
   private String getClassOrInterfaceType(final ClassOrInterfaceType n) {
     // resultTypeSpecials = n.f0.getSpecials(spc.spc);
-    String coits = n.f0.tokenImage;
+    String coits = n.f0.image;
     // f1 -> [ TypeArguments() ]
     final NodeOptional n1 = n.f1;
     if (n1.present()) {
@@ -862,7 +862,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
         // #0 "."
         coits = coits + ".";
         // #1 < IDENTIFIER >
-        coits = coits + ((NodeToken) seq.elementAt(1)).tokenImage;
+        coits = coits + ((Token) seq.elementAt(1)).image;
         // #2 [ TypeArguments() ] )*
         final NodeOptional opt = (NodeOptional) seq.elementAt(2);
         if (opt.present()) {
@@ -1096,7 +1096,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     if (varLvl == 0) {
       outerVars.add(varInfo);
     } else {
-      parentVar = varInfo;
+      lastVar = varInfo;
     }
   }
   
@@ -1136,7 +1136,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
         }
         genExpChoicesWithChoices(n, varName);
         if (varLvl != 0) {
-          parentVar = varInfo;
+          lastVar = varInfo;
         }
       }
     } else {
@@ -1164,7 +1164,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       oneNewLine(n, "c, extra )");
     }
     isTopExp = oldIsTopExp;
-    oneDebugClassNewLine(n, ",d, isTopExp <- " + isTopExp);
+    oneDebugClassNewLine(n, "d, isTopExp <- " + isTopExp);
   }
   
   /**
@@ -1201,19 +1201,19 @@ public class JJFileAnnotator extends JavaCCPrinter {
     appendSbLB();
     spc.updateSpc(-1);
     ++which;
-    parentVar = null;
+    lastVar = null;
     
     // visit the remaining choices (f1)
     // f1 -> ( #0 "|" #1 Expansion() )*
     final int sz = n.f1.nodes.size();
     for (int i = 0; i < sz; i++) {
       final NodeSequence seq = (NodeSequence) n.f1.nodes.get(i);
-      // "|"
+      // #0 "|"
       sb.append(spc.spc);
       seq.elementAt(0).accept(this);
       oneNewLine(n, "genExpChWithChoices |");
       spc.updateSpc(+1);
-      // Expansion()
+      // #1 Expansion()
       // NodeChoice must be created before the last Block
       deferLB = true;
       oneDebugClassNewLine(n, "fi, deferLB <- true");
@@ -1224,7 +1224,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       appendSbLB();
       spc.updateSpc(-1);
       ++which;
-      parentVar = null;
+      lastVar = null;
     }
     isEUNSNodeCreated = true;
     
@@ -1255,7 +1255,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       final int total) {
     sb.append(spc.spc);
     sb.append("{ ").append(varName).append(" = new NodeChoice(")
-        .append(parentVar == null ? "null" : parentVar.getName()).append(", ").append(String.valueOf(which))
+        .append(lastVar == null ? "null" : lastVar.getName()).append(", ").append(String.valueOf(which))
         .append(", ").append(String.valueOf(total)).append("); }");
     oneNewLine(n, "genNodeChoiceCreation yes, isEUNSNodeCreated = " + isEUNSNodeCreated);
   }
@@ -1310,13 +1310,22 @@ public class JJFileAnnotator extends JavaCCPrinter {
         for (int i = 0; i < sz; i++) {
           n.f1.elementAt(i).accept(this);
         }
+      } else if (nbSubNodesTbc == 1) {
+        // one node to generate
+        for (int i = 0; i < sz; i++) {
+          // could we inc/dec only for nodes to be constructed?
+          ++varLvl;
+          n.f1.elementAt(i).accept(this);
+          --varLvl;
+        }
       } else {
         // a NodeSequence to generate
         final String varName = genNewVarName();
         final VarInfo varInfo = new VarInfo(nodeSequence, varName, "null");
         varList.add(varInfo);
-        genExpSequence(n, varName);
-        parentVar = varInfo;
+        // genExpSequence(n, varName);
+        genExpSequence(n, varInfo);
+        lastVar = varInfo;
       }
     }
   }
@@ -1330,14 +1339,14 @@ public class JJFileAnnotator extends JavaCCPrinter {
    * s: -2134365682<br>
    *
    * @param n - the node to process
-   * @param varName - the variable name
+   * @param var - the variable info
    */
   @NodeFieldsSignature({
       -2134365682, JTB_SIG_EXPANSION, JTB_USER_EXPANSION
   })
-  private void genExpSequence(final Expansion n, final String varName) {
+  private void genExpSequence(final Expansion n, final VarInfo var) {
     // f0 -> ( #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" )?
-    // nothing done for f0 (done in Expansion)
+    // nothing done for f0 (done in visit(Expansion))
     
     // f1 -> ( ExpansionUnit() )+
     final Iterator<INode> e = n.f1.elements();
@@ -1350,31 +1359,31 @@ public class JJFileAnnotator extends JavaCCPrinter {
       // if the ExpansionUnit is a LOOKAHEAD or a Block, visit it before generating the declaration
       // and do not increment the bnf level
       firstExpUnit.accept(this);
-      // sb.append(spc.spc);
-      genNewNodeSequenceVarDecl(varName, gdbv.getNbSubNodesTbc(n));
+      sb.append(spc.spc);
+      genNewNodeSequenceVarDecl(var.getName(), gdbv.getNbSubNodesTbc(n));
       oneNewLine(n, "genExpSequence vardecl lh||b, i = 0");
       
     } else {
       
+      final boolean oldIsEUNSNodeCreated = isEUNSNodeCreated;
       // the ExpansionUnit is not a LOOKAHEAD nor a Block, generate the declaration and then visit it
       sb.append(spc.spc);
-      genNewNodeSequenceVarDecl(varName, gdbv.getNbSubNodesTbc(n));
+      genNewNodeSequenceVarDecl(var.getName(), gdbv.getNbSubNodesTbc(n));
       oneNewLine(n, "genExpSequence vardecl !(lh||b), i = 0" + ", isEUNSNodeCreated = " + isEUNSNodeCreated
           + " <- false");
       isEUNSNodeCreated = false;
       ++varLvl;
       firstExpUnit.accept(this);
       --varLvl;
-      if (isEUNSNodeCreated) {
+      if (isEUNSNodeCreated) { // TESTCASE looks it is always true
         sb.append(spc.spc);
-        sb.append(addNodeToParent(varName, parentVar.getName()));
+        sb.append(addNodeToParent(var, lastVar));
         oneNewLine(n, "genExpSequence antp c, isEUNSNodeCreated == true, i = 0");
       } else {
         oneDebugClassNewLine(n, "genExpSequence d, isEUNSNodeCreated == false, i = 0");
       }
-      // for the NodeSequence declaration has been generated
-      isEUNSNodeCreated = true;
-      oneDebugClassNewLine(n, "genExpSequence e, isEUNSNodeCreated <- true");
+      isEUNSNodeCreated = oldIsEUNSNodeCreated;
+      oneDebugClassNewLine(n, "genExpSequence e, isEUNSNodeCreated <= " + isEUNSNodeCreated);
       
     }
     
@@ -1382,7 +1391,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     while (e.hasNext()) {
       i++;
       final ExpansionUnit expUnit = (ExpansionUnit) e.next();
-      final boolean oldIsEUNodeCreated = isEUNSNodeCreated;
+      final boolean oldIsEUNSNodeCreated = isEUNSNodeCreated;
       isEUNSNodeCreated = false;
       ++varLvl;
       expUnit.accept(this);
@@ -1391,7 +1400,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
         // add node only if not lookahead nor block
         if (isEUNSNodeCreated) {
           sb.append(spc.spc);
-          sb.append(addNodeToParent(varName, parentVar.getName()));
+          sb.append(addNodeToParent(var, lastVar));
           oneNewLine(n, "genExpSequence antp f, isEUNSNodeCreated == true, , i = " + i);
         } else {
           oneDebugClassNewLine(n, "genExpSequence g, isEUNSNodeCreated == false, , expUnit.f0.which = "
@@ -1400,7 +1409,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       } else {
         oneDebugClassNewLine(n, "genExpSequence h, expUnit.f0.which = " + expUnit.f0.which + ", i = " + i);
       }
-      isEUNSNodeCreated = oldIsEUNodeCreated;
+      isEUNSNodeCreated = oldIsEUNSNodeCreated;
       oneDebugClassNewLine(n, "genExpSequence i, isEUNSNodeCreated <= " + isEUNSNodeCreated);
     }
   }
@@ -1514,6 +1523,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       // .. .. | &1 $0 RegularExpression()
       // .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
       // .. .. . .. $2 [ "!" ] )
+      oneDebugClassNewLine(n, "4a, isEUNSNodeCreated = " + isEUNSNodeCreated);
       genExpUnitCase4IasRe(n);
       genUserNodeCreation(n);
       return;
@@ -1555,7 +1565,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
             final Iterator<VarInfo> e = outerVars.iterator();
             if (e.hasNext()) {
               sb.append(e.next().getName());
-              while (e.hasNext()) {
+              while (e.hasNext()) { // TESTCASE looks never more than 1 outervar ?
                 sb.append(", ").append(e.next().getName());
               }
             }
@@ -1667,14 +1677,14 @@ public class JJFileAnnotator extends JavaCCPrinter {
       if (extraVarsList == null) {
         // top level additional variables
         varInfo = creNewVarInfoForBracket(varName, true);
-      } else {
+      } else { // TESTCASE this branch
         // nested additional variables
         varInfo = creNewVarInfoForBracket(varName, false);
         extraVarsList.add(varInfo);
       }
       varList.add(varInfo);
     }
-    if (!isExpChWithCh //
+    if (!isExpChWithCh // TESTCASE the other branch
         && expLA.present()) {
       // without an ExpansionChoices choice and with an Expansion Lookahead
       sb.append(spc.spc);
@@ -1696,7 +1706,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       // // without an ExpansionChoices choice and with an ExpansionUnit Lookahead
       // // MMa 02/2017 : I do not see how we could fall into this case as the Lookahead
       // // would have been matched in the Expansion above, so I raise an error
-      // NodeToken ntk = (NodeToken) seq.elementAt(0); // #0 "["
+      // Token ntk = (Token) seq.elementAt(0); // #0 "["
       // mess.softErr(
       // "Unexpected case 2 'without an ExpansionChoices choice and with an ExpansionUnit Lookahead'",
       // ntk.beginLine, ntk.beginColumn);
@@ -1706,7 +1716,8 @@ public class JJFileAnnotator extends JavaCCPrinter {
     }
     if (nbSubNodesTbc > 0) {
       sb.append(spc.spc);
-      sb.append(addNodeToParent(varName, parentVar.getName()));
+      sb.append(addNodeToParent(varInfo, lastVar));
+      isEUNSNodeCreated = true;
       bnfFinalActions(varInfo);
     }
     oneNewLine(n, "genExpUnitCase2Bracket 3");
@@ -1752,8 +1763,8 @@ public class JJFileAnnotator extends JavaCCPrinter {
     switch (ch.which) {
     case 0:
       // &0 $0 IdentifierAsString() $1 Arguments() $2 [ "!" ]
-      final NodeToken nt = ((IdentifierAsString) seq1.elementAt(0)).f0;
-      final String ident = nt.tokenImage;
+      final Token nt = ((IdentifierAsString) seq1.elementAt(0)).f0;
+      final String ident = nt.image;
       // $0 IdentifierAsString()
       // generate 'ni = JavaCodeProduction()' if node is to be created, otherwise 'JavaCodeProduction()'
       // generate 'BNFProduction()' if node is not to be created, otherwise 'ni = Production()'
@@ -1860,7 +1871,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
           // above has not generated "ni = RegularExpression;", and JavaCC will not allow opt1
           if (opt1.present()) {
             // coverage: we could have added a testcase, but we would have to manage the JJ compile failure
-            NodeToken ntk = (NodeToken) ((NodeSequence) opt1.node).elementAt(0); // ?0 "."
+            Token ntk = (Token) ((NodeSequence) opt1.node).elementAt(0); // ?0 "."
             mess.softErr(
                 "JavaCC will not allow RegularExpression.IDENTIFIER without assigning it to a PrimaryExpression",
                 ntk.beginLine, ntk.beginColumn);
@@ -2049,7 +2060,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
           final VarInfo varInfo = new VarInfo(nodeSequence, varName);
           varList.add(varInfo);
           sb.append(spc.spc);
-          genExpSequence(expCh.f0, varName);
+          genExpSequence(expCh.f0, varInfo);
           bnfFinalActions(varInfo);
           oneNewLine(n, "genExpUnitCase5Parenth 2");
         } else {
@@ -2106,7 +2117,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
         // // MMa 02/2017 : I do not see how we could fall into this case as the Lookahead
         // // would have been matched above in the Expansion, so I raise an error
         // // %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"
-        // NodeToken ntk = (NodeToken) ((NodeSequence) firstExpUnit.f0.choice).elementAt(0);
+        // Token ntk = (Token) ((NodeSequence) firstExpUnit.f0.choice).elementAt(0);
         // mess.softErr(
         // "Unexpected case 5 'without an ExpansionChoices choice and with an ExpansionUnit Lookahead'",
         // ntk.beginLine, ntk.beginColumn);
@@ -2116,8 +2127,9 @@ public class JJFileAnnotator extends JavaCCPrinter {
       }
       if (nbSubNodesTbc > 0) {
         sb.append(spc.spc);
-        sb.append(addNodeToParent(varName, parentVar.getName()));
+        sb.append(addNodeToParent(varInfo, lastVar));
         oneNewLine(n, "genExpUnitCase5Parenth 6");
+        isEUNSNodeCreated = true;
         bnfFinalActions(varInfo);
       }
       
@@ -2236,7 +2248,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
   private VarInfo creNewVarInfoForBracket(final String varName, final boolean initializer) {
     if (initializer) {
       return new VarInfo(nodeOptional, varName, "new ".concat(nodeOptional).concat("()"));
-    } else {
+    } else { // TESTCASE see the call in genExpUnitCase2Bracket
       return new VarInfo(nodeOptional, varName);
     }
   }
@@ -2268,24 +2280,21 @@ public class JJFileAnnotator extends JavaCCPrinter {
       // %2 #0 "<" #1 IdentifierAsString() #2 ">"
       final NodeSequence seq1 = (NodeSequence) n.f0.choice;
       // create the node only if not requested not to do so
-      final String ident = ((IdentifierAsString) seq1.elementAt(1)).f0.tokenImage;
+      final String ident = ((IdentifierAsString) seq1.elementAt(1)).f0.image;
       if (DONT_CREATE.equals(gdbv.getTokenHM().get(ident))) {
         creThisRENode = false;
       }
     }
-    String nodeName = null;
-    VarInfo nodeTokenInfo = null;
+    VarInfo tokenNameInfo = null;
     sb.append(spc.spc);
     // if the node must be created, create the variable which will be inserted after the specials
     // down further in the tree
     if (creThisRENode) {
-      nodeName = genNewVarName();
       reTokenName = genNewVarName();
-      nodeTokenInfo = new VarInfo(nodeToken, nodeName);
-      final VarInfo tokenNameInfo = new VarInfo(jjToken, reTokenName);
-      varList.add(nodeTokenInfo);
+      tokenNameInfo = new VarInfo(jjToken, reTokenName);
       varList.add(tokenNameInfo);
       jccpv.gvaStr = reTokenName + " = ";
+      lastVar = tokenNameInfo;
     }
     
     switch (n.f0.which) {
@@ -2293,9 +2302,6 @@ public class JJFileAnnotator extends JavaCCPrinter {
       // %0 StringLiteral()
       n.f0.choice.accept(jccpv);
       oneNewLine(n, "0a");
-      sb.append(spc.spc);
-      genNodeTokenCreation(nodeName, reTokenName);
-      oneNewLine(n, "0b");
       break;
     
     case 1:
@@ -2338,9 +2344,6 @@ public class JJFileAnnotator extends JavaCCPrinter {
       }
       seq.elementAt(3).accept(jccpv);
       oneNewLine(n, "1c");
-      sb.append(spc.spc);
-      genNodeTokenCreation(nodeName, reTokenName);
-      oneNewLine(n, "1d");
       break;
     
     case 2:
@@ -2356,21 +2359,16 @@ public class JJFileAnnotator extends JavaCCPrinter {
       // #2 ">"
       seq1.elementAt(2).accept(jccpv);
       oneNewLine(n, "2e");
-      sb.append(spc.spc);
-      if (creThisRENode) {
-        genNodeTokenCreation(nodeName, reTokenName);
-        oneNewLine(n, "2f");
-      }
       break;
     
     case 3:
       // %3 #0 "<" #1 "EOF" #2 ">"
       final NodeSequence seq2 = (NodeSequence) n.f0.choice;
-      final NodeToken nt = (NodeToken) seq2.elementAt(0);
+      final Token nt = (Token) seq2.elementAt(0);
       if (jopt.printSpecialTokensJJ) {
         sb.append(nt.getSpecials(spc.spc));
       }
-      // jtbgram.jtb does not offer to not build the < EOF > token as a node
+      // JTBParser.jtb does not offer to not build the < EOF > token as a node
       sb.append(spc.spc);
       sb.append(reTokenName).append(" = ");
       jccpv.gvaStr = null;
@@ -2382,9 +2380,6 @@ public class JJFileAnnotator extends JavaCCPrinter {
       sb.append(spc.spc);
       sb.append("{ ").append(reTokenName).append(".endColumn++; }");
       oneNewLine(n, "3i");
-      sb.append(spc.spc);
-      genNodeTokenCreation(nodeName, reTokenName);
-      oneNewLine(n, "3j");
       break;
     
     default:
@@ -2394,21 +2389,11 @@ public class JJFileAnnotator extends JavaCCPrinter {
     
     }
     if (creThisRENode) {
-      bnfFinalActions(nodeTokenInfo);
+      bnfFinalActions(tokenNameInfo);
     }
     isEUNSNodeCreated = creThisRENode;
     oneDebugClassNewLine(n,
         "re, isEUNSNodeCreated <= " + isEUNSNodeCreated + ", creThisRENode = " + creThisRENode);
-  }
-  
-  /**
-   * Generate the NodeToken creation.
-   *
-   * @param nodeTokenName - the NodeToken name
-   * @param tokenName - the Token name
-   */
-  private void genNodeTokenCreation(final String nodeTokenName, final String tokenName) {
-    sb.append("{ ").append(nodeTokenName).append(" = (NodeToken) ").append(tokenName).append("; }");
   }
   
   /**
@@ -3180,8 +3165,8 @@ public class JJFileAnnotator extends JavaCCPrinter {
   // // f0 -> ( #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" )?
   // if (n.f0.present()) {
   // final NodeSequence seq = (NodeSequence) n.f0.node;
-  // lnft = ((NodeToken) seq.elementAt(0)).beginLine;
-  // cnft = ((NodeToken) seq.elementAt(0)).beginColumn;
+  // lnft = ((Token) seq.elementAt(0)).beginLine;
+  // cnft = ((Token) seq.elementAt(0)).beginColumn;
   // } else {
   // // f1 -> ( ExpansionUnit() )+
   // n.f1.accept(this);
@@ -3215,7 +3200,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
   // })
   // public void visit(final ExpansionUnit n) {
   // NodeSequence seq;
-  // NodeToken tk;
+  // Token tk;
   // switch (n.f0.which) {
   // case 0:
   // // %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"
@@ -3225,7 +3210,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
   // // %5 #0 "(" #1 ExpansionChoices() #2 ")"
   // // .. #3 ( &0 "+" | &1 "*" | &2 "?" )?
   // seq = (NodeSequence) n.f0.choice;
-  // tk = (NodeToken) seq.elementAt(0);
+  // tk = (Token) seq.elementAt(0);
   // lnft = tk.beginLine;
   // cnft = tk.beginColumn;
   // return;
@@ -3319,8 +3304,8 @@ public class JJFileAnnotator extends JavaCCPrinter {
   // // %2 #0 "<" #1 IdentifierAsString() #2 ">"
   // // %3 #0 "<" #1 "EOF" #2 ">"
   // final NodeSequence seq = (NodeSequence) n.f0.choice;
-  // lnft = ((NodeToken) seq.elementAt(0)).beginLine;
-  // cnft = ((NodeToken) seq.elementAt(0)).beginColumn;
+  // lnft = ((Token) seq.elementAt(0)).beginLine;
+  // cnft = ((Token) seq.elementAt(0)).beginColumn;
   // }
   // }
   //

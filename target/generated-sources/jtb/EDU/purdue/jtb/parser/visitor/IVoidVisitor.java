@@ -2,6 +2,7 @@
 package EDU.purdue.jtb.parser.visitor;
 
 import EDU.purdue.jtb.parser.syntaxtree.*;
+import EDU.purdue.jtb.parser.Token;
 
 /**
  * All "IVoidVisitor" visitors must implement this interface.
@@ -49,11 +50,11 @@ public interface IVoidVisitor {
   public void visit(final NodeSequence n);
 
   /**
-   * Visits a {@link NodeToken} node.
+   * Visits a {@link Token} node.
    *
    * @param n - the node to visit
    */
-  public void visit(final NodeToken n);
+  public void visit(final Token n);
 
   /*
    * User grammar generated visit methods
@@ -1088,20 +1089,23 @@ public interface IVoidVisitor {
   public void visit(final ShiftExpression n);
 
   /**
-   * Visits a {@link RSignedShift} node, whose child is the following :
+   * Visits a {@link RSignedShift} node, whose children are the following :
    * <p>
-   * f0 -> ">>"<br>
-   * s: -699026311<br>
+   * f0 -> ">"<br>
+   * f1 -> ">"<br>
+   * s: 1560485759<br>
    *
    * @param n - the node to visit
    */
   public void visit(final RSignedShift n);
 
   /**
-   * Visits a {@link RUnsignedShift} node, whose child is the following :
+   * Visits a {@link RUnsignedShift} node, whose children are the following :
    * <p>
-   * f0 -> ">>>"<br>
-   * s: -194978259<br>
+   * f0 -> ">"<br>
+   * f1 -> ">"<br>
+   * f2 -> ">"<br>
+   * s: -171434548<br>
    *
    * @param n - the node to visit
    */
