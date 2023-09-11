@@ -46,10 +46,11 @@ See [Support page](doc/wiki/Support.md) in Wiki.
 ## Licenses
 
 JTB 1.3.2 was licensed under the [BSD license](http://compilers.cs.ucla.edu/jtb/license.html).  
+
 JTB  1.4.x+ adds the [GPL license](http://www.gnu.org/licenses/gpl.html) and the [CECILL license](https://opensource.org/licenses/CECILL-2.1).  
-=======
+
 JTB is a syntax tree builder to be used with the Java Compiler Compiler (JavaCC) parser generator. 
-JTB was originally developped at UCLA up to version 1.3.2 (http://compilers.cs.ucla.edu/jtb/) or (http://compilers.cs.ucla.edu/jtb/jtb-2003/).
+JTB was originally developed at UCLA up to version 1.3.2 (http://compilers.cs.ucla.edu/jtb/) or (http://compilers.cs.ucla.edu/jtb/jtb-2003/).
 It has been upgraded in version 1.4.0+ (2009-2010), as an embedded tool within the SourceForge Eclipse JavaCC plugin. 
 From 2011 to 2016 it was provided as a standalone tool in the same hosting environment as JavaCC (java.net), which closed.
 Since 2017 it is provided as a standalone tool in the same new hosting environment as JavaCC (https://github.com/jtb-javacc/JTB).
