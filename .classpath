@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/main/jtb"/>
-	<classpathentry kind="src" path="target/generated-sources/jtb"/>
-	<classpathentry kind="src" path="target/generated-sources/jj"/>
-	<classpathentry kind="src" path="src/main/java">
-		<attributes>
-			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry excluding="grammars/p/" kind="src" path="src/test/jtb"/>
-	<classpathentry kind="src" path="src/test/jtb/grammars/p"/>
-	<classpathentry kind="src" path="src/test/jjt"/>
-	<classpathentry kind="src" path="src/test/jj"/>
-	<classpathentry excluding="grammars/p/|grammars/p/" kind="src" path="target/generated-tests/jtb"/>
-	<classpathentry kind="src" path="target/generated-tests/jtb/grammars/p"/>
-	<classpathentry excluding="grammars/p/" kind="src" path="target/generated-tests/jj"/>
-	<classpathentry kind="src" path="target/generated-tests/jj/grammars/p"/>
-	<classpathentry kind="src" path="target/generated-tests/java"/>
-	<classpathentry kind="src" path="src/test/java">
-		<attributes>
-			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path=".apt_generated">
-		<attributes>
-			<attribute name="optional" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.8.0_361">
-		<attributes>
-			<attribute name="module" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/freemarker-2.3.27.jar"/>
-	<classpathentry kind="lib" path="lib/jacocoant-0.8.10.jar"/>
-	<classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="src" path="src/main/jtb"/>
+  <classpathentry kind="src" path="target/generated-sources/jtb"/>
+  <classpathentry kind="src" path="target/generated-sources/jj"/>
+  <classpathentry kind="src" path="src/main/java">
+    <attributes>
+      <attribute name="optional" value="true"/>
+      <attribute name="maven.pomderived" value="true"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry excluding="grammars/p/" kind="src" path="src/test/jtb"/>
+  <classpathentry kind="src" path="src/test/jtb/grammars/p"/>
+  <classpathentry kind="src" path="src/test/jjt"/>
+  <classpathentry kind="src" path="src/test/jj"/>
+  <classpathentry excluding="grammars/p/|grammars/p/" kind="src" path="target/generated-tests/jtb"/>
+  <classpathentry kind="src" path="target/generated-tests/jtb/grammars/p"/>
+  <classpathentry excluding="grammars/p/" kind="src" path="target/generated-tests/jj"/>
+  <classpathentry kind="src" path="target/generated-tests/jj/grammars/p"/>
+  <classpathentry kind="src" path="target/generated-tests/java"/>
+  <classpathentry kind="src" path="src/test/java">
+    <attributes>
+      <attribute name="optional" value="true"/>
+      <attribute name="maven.pomderived" value="true"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="src" path=".apt_generated">
+    <attributes>
+      <attribute name="optional" value="true"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.8.0_361">
+    <attributes>
+      <attribute name="module" value="true"/>
+      <attribute name="maven.pomderived" value="true"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="lib" path="lib/freemarker-2.3.27.jar"/>
+  <classpathentry kind="lib" path="lib/jacocoant-0.8.10.jar"/>
+  <classpathentry kind="output" path="target/classes"/>
 </classpath>
