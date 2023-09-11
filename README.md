@@ -1,6 +1,5 @@
 # Java Tree Builder (JTB)
 
-<<<<<<< HEAD
 ## Overview
 
 <span style="color:red">JTB</span> is a *syntax tree builder* to be used with the <span style="color:red">JavaCC</span> (Java Compiler Compiler) parser generator.  
@@ -17,7 +16,7 @@ Version 1.5.0 brings interesting new features. See [Overview page](doc/wiki/Over
 
 ## Version
 
-Last update : July, 2023 - version 1.5.1 committed on GitHub (version 1.5.0 was never committed).  
+Last update : Sept, 2023 - version 1.5.1 committed on GitHub (version 1.5.0 was never committed).  
 
 ## Requirements
 
@@ -26,15 +25,15 @@ Previous versions needed JDK 1.7+.
 
 ## Wiki
 
-See the [project's Wiki page](doc/wiki/Home.html).
+See the [project's Wiki page](doc/wiki/Home.md).
 
 ## Release notes
 
-See [Release notes page](doc/wiki/Release_notes.html) in Wiki.
+See [Release notes page](doc/wiki/Release_notes.md) in Wiki.
 
 ## Short history
 
-04/2021 - 1.5.0 : New features, some fixes, internal refactoring, still aligned with JavaCC 5.0 / 7.0.x (see [Release notes](doc/wiki/Release_notes.html) and [How to use](doc/wiki/How_to_use.html)):  
+04/2021 - 1.5.0 : New features, some fixes, internal refactoring, still aligned with JavaCC 5.0 / 7.0.x (see [Release notes](doc/wiki/Release_notes.md) and [How to use](doc/wiki/How_to_use.md)):  
 
 11/2009 - 1.4.0 -> 12/2017 - 1.4.13 : New version published (aligned with JavaCC 4.2 / 5.0), also integrated under the JavaCC Eclipse Plug-in; ongoing fixes  
 
@@ -42,7 +41,7 @@ xx/2005 - 1.3.2 : Last (known) version from UCLA Compilers Group : see JTB 1.3.2
 
 ## Support
 
-See [Support page](doc/wiki/Support.html) in Wiki.
+See [Support page](doc/wiki/Support.md) in Wiki.
 
 ## Licenses
 
@@ -54,4 +53,4 @@ JTB was originally developped at UCLA up to version 1.3.2 (http://compilers.cs.u
 It has been upgraded in version 1.4.0+ (2009-2010), as an embedded tool within the SourceForge Eclipse JavaCC plugin. 
 From 2011 to 2016 it was provided as a standalone tool in the same hosting environment as JavaCC (java.net), which closed.
 Since 2017 it is provided as a standalone tool in the same new hosting environment as JavaCC (https://github.com/jtb-javacc/JTB).
->>>>>>> cbea16d4233b3f598105db1c1c42b1f6d25c0508
+
