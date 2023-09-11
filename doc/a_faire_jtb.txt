@@ -1,4 +1,5 @@
 Notes sur JTB
+<<<<<<< HEAD
 - jtbgram.jtb a Ã©tÃ© Ã©crite Ã  partir de JavaCC.jj de la version JavaCC 4.2, et adaptÃ©e (voir commentaires ModMMa) :
   * renommages de noms de classes et de productions
   * ajout de la syntaxe try-ExpansionChoices-catch-finally (ExpansionUnitInTCF) 
@@ -151,6 +152,58 @@ Fait sur JTB en 1.4.13
 
 Fait sur JTB en 1.4.12 (FA)
 - modifications fichiers XML et autres pour build et maven
+- passage sous Git / GitHub
+=======
+- jtbgram.jtb a été écrite à partir de JavaCC.jj de la version JavaCC 4.2, et adaptée (voir commentaires ModMMa) :
+  * renommages de noms de classes et de productions
+  * ajout de la syntaxe try-ExpansionChoices-catch-finally (ExpansionUnitInTCF) 
+  * ajout des syntaxes ! et % pour ne pas générer des noeuds JTB
+  * corrections sur la grammaire java
+  * ajout des options par défaut
+- Token.java a été modifiée pour l'ajout de GTToken
+- parser.JavaFiles, parser.OtherFilesGen, parser.ParseGen & utils.JavaFileGenerator ont été modifiées pour GTToken
+   (commentaires : // ModMMa : modified for Token.template with GTToken),
+   mais en fait cela ne sert à rien parce c'est JavaCC et non JTB qui génère Token.java (via parser.OtherFilesGen.java), 
+   et bien que le ficher /templates/Token.template n'existe pas cela ne se voit pas car les 4 classes ne sont pas utilisées
+
+A faire sur JTB
+- voir parser.Token.template dans JavaFiles et autres
+- option pour générer le extend dans INode et les serialVersionUID :
+  * ajouter l'option dans parser.Options
+  * factoriser serialUIDDeclaration() de BasesClasses.java et les équivalents (SERIAL_UID) dans ClassInfo, et conditionner
+  * conditionner dans genINodeInterface() de BasesClasses.java
+  * reporter l'option dans le plugin
+- générer les visiteurs DF avec et sans inline dans le même code
+- générer des visiteurs avec les arguments supplémentaires si la production a des arguments
+- générer un visiteur de comptage (ou avec un pre et post hook)
+- générer un tableau et des ordinaux pour tous les noms de noeuds (comme dans JJT) : les générer en fin des visiteurs DF
+   par DepthFirstVisitorsGenerator à partir de classesList
+- générer des listeners
+- générer avec des templates
+- voir indentation ) en toute fin de lookahead ???
+- dans JavaCCPrinter.saveToFile(), tester et créer les répertoires intermédiaires si l'open se plante en FNFE
+- séparer les packages nécessaires à la grammaire de ceux nécessaires pour le générateur (misc / utils / parser / xxx)
+- voir les warnings dans parser
+- voir les ajouts faits par FA ou à faire pour JavaCC 6+ et C++
+- vérifier avec et sans les commentaires de debug
+- vérifier avec les noms longs et les noms courts pour les variables intermédiaires (dans AcceptInliner)
+- vérifier avec et sans inline
+>>>>>>> cbea16d4233b3f598105db1c1c42b1f6d25c0508
+
+Fait sur JTB en 1.4.14
+- créé les pages wiki, mis à jour les différents fichiers de docs et autres
+- ajouté des annotations pour supprimer des warnings et utilisé des try-with-resource
+- supprimé la classe JTBToolkit générée avec le parseur
+- rajouté la nature JavaCC au projet
+- modifié AllocationExpression pour prendre en compte EmptyTypeArguments
+
+Fait sur JTB en 1.4.13
+- ajouté les options dans la grammaire pour une génération correcte directe sous Eclipse
+- ajouté des commentaires dans le fichier Token.java.save
+- corrigé le problème d'espace sur les modifiers de déclaration de variables locales (Annotator:VariableModifiers)
+
+Fait sur JTB en 1.4.12 (FA)
+- modifications fichiers xml et autres pour build et maven
 - passage sous Git / GitHub
 
 Fait sur JTB en 1.4.11

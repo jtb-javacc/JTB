@@ -25,7 +25,7 @@ public class NodeConstants {
   public static final int JTB_USER_TCF2 = 2;
 
   /** The Tcf2 JTB control signature */
-  public static final int JTB_SIG_TCF2 = 803552317;
+  public static final int JTB_SIG_TCF2 = 1058520479;
 
   /** The Tcf3 JTB user node's index */
   public static final int JTB_USER_TCF3 = 3;

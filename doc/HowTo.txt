@@ -1,0 +1,34 @@
+--------------------------------------------------
+--------------------- How to --------------------- 
+--------------------------------------------------
+(for project admins) - Marc Mazas - Jan 13th, 2017
+
+Build a new JTB version
++++++++++++++++++++++++
+
+- Update doc/a_faire_jtb.txt
+- Update releases.notes
+- Update wiki pages wiki/1-last_updates.html and wiki/3-history.html
+- Update doc/jtb_doc.html
+- Update versions: see comments in build.xml: set paths & versions in the 4 different files
+- Build: see comments in build.xml: generate and rename to jtb-x.y.z.jar
+- Commit to the local repository 
+
+Deploy to GitHub the new JTB version
+++++++++++++++++++++++++++++++++++++
+
+- Check doc & wiki updates
+- Push master
+- Update wiki pages (edit & copy/paste the changed ones)
+
+Deploy to the SourceForge plugin the new JTB version
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+- Copy the last jar to the local plugin project lib folder
+- See the plugin HowTo to set the version
+
+Deploy to Maven Central the new JTB version
++++++++++++++++++++++++++++++++++++++++++++
+
+TODO (FA)
+

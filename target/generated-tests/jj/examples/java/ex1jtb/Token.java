@@ -8,122 +8,46 @@ import java.util.NoSuchElementException;
 import examples.java.ex1jtb.syntaxtree.INode;
 import examples.java.ex1jtb.visitor.IGenVisitor;
 
-/**
- * Represents a JavaCC single token in the grammar and a JTB corresponding node.<br>
- * The class holds all the fields and methods generated normally by JavaCC, plus the ones required by JTB.<br>
- * If the "-tk" JTB option is used, it also contains an ArrayList of preceding special tokens.<br>
- */
+@SuppressWarnings("javadoc")
 public class Token  implements INode, java.io.Serializable {
 
   /* JavaCC members declarations */
 
-  /**
-   * The version identifier for this Serializable class.<br>
-   * Increment only if the <i>serialized</i> form of the class changes.
-   */
   private static final long serialVersionUID = 1L;
 
-  /**
-   * An integer that describes the kind of this token.<br>
-   * This numbering system is determined by JavaCCParser,<br>
-   * and a table of these numbers is stored in the class &l;ParserName&gt;Constants.java.
-   */
   public int kind;
 
-  /** The line number of the first character of this token. */
   public int beginLine;
 
-  /** The column number of the first character of this token. */
   public int beginColumn;
 
-  /** The line number of the last character of this token. */
   public int endLine;
 
-  /** The column number of the last character of this token. */
   public int endColumn;
 
-  /** The string image of the token. */
   public String image;
 
-  /**
-   * For a regular token, a reference to the next regular token from the input stream,<br>
-   * or null if this is the last token from the input stream, or if the token manager<br>
-   * has not (yet) read a regular token beyond this one.<p>
-   * For a special token, a reference to the special token that just after it<br>
-   * (without an intervening regular token) if it exists, or null otherwise.
-   */
   public Token next;
 
-  /**
-   * For a regular token, a reference to the special token just before to this token,<br>
-   * (without an intervening regular token), or null if there is no such special token.<p>
-   * For a special token, a reference to the special token just after it<br>
-   * (without an intervening regular token) if it exists, or null otherwise.
-   */
   public Token specialToken;
 
-  /**
-   * An optional attribute value of the Token.<br>
-   * Tokens which are not used as syntactic sugar will often contain meaningful values<br>
-   * that will be used later on by the compiler or interpreter.<br>
-   * This attribute value is often different from the image.<br>
-   * Any subclass of Token that actually wants to return a non-null value<br>
-   * can override this method as appropriate.<br>
-   * Not used in JTB.
-   * 
-   * @return a value
-   */
   public Object getValue() {
     return null;
   }
 
-  /**
-   * No-argument constructor.
-   */
   public Token() {
     /* empty */
   }
 
-  /**
-   * Constructs a new {@link Token} for the specified kind, with a null image.<br>
-   * Not used in JTB nor JavaCC.
-   *
-   * @param ki - the token kind
-   */
   public Token(final int ki) {
     this(ki, null);
   }
 
-  /**
-   * Constructs a {@link Token} with a given kind and image.
-   *
-   * @param ki - the token kind
-   * @param im - the token image
-   */
   public Token(final int ki, final String im) {
     kind = ki;
     image = im;
   }
 
-  /**
-   * Factory method used by JavaCC to create a new {@link Token}<br>
-   * (which is also a JTB node).
-   * By default returns a new {@link Token} object.
-   * You can override it to create and return subclass objects<br>
-   * based on the value of ofKind.<br>
-   * Simply add the cases to the switch for all those special cases.<br>
-   * For example, if you have a subclass of Token called IDToken<br>
-   * that you want to create if ofKind is ID, simply add something like:<br>
-   * case MyParserConstants.ID : return new IDToken(ofKind, image);<br>
-   * to the following switch statement.<br>
-   * Then you can cast matchedToken variable to the appropriate type<br>
-   * and use it in your lexical actions.
-   *
-   * @param ofKind - the token kind
-   * @param image - the token image
-   *
-   * @return a new Token
-   */
   public static Token newToken(int ofKind, String image) {
     switch(ofKind) {
       default:
@@ -131,20 +55,10 @@ public class Token  implements INode, java.io.Serializable {
     }
   }
 
-  /**
-   * Factory method calling {@link Token#newToken(int, String)} with a null image.
-   *
-   * @param ofKind - the token kind
-   *
-   * @return a new Token
-   */
   public static Token newToken(int ofKind) {
     return newToken(ofKind, null);
   }
 
-  /**
-   * @return the token image
-   */
   @Override
   public String toString() {
     return image;
@@ -152,38 +66,22 @@ public class Token  implements INode, java.io.Serializable {
 
   /* JTB members declarations */
 
-  /** The list of special tokens. TODO add explanation */
   public List<Token> specialTokens;
 
-  /** The parent node */
   private INode parent;
 
-  /**
-  * Gets the special token in the special tokens list at a given position.
-  *
-  * @param i - the special token's position
-  * @return the special token
-  */
   public Token getSpecialAt(final int i) {
     if (specialTokens == null)
       throw new NoSuchElementException("No specialTokens in token"); //$NON-NLS-1$
     return specialTokens.get(i);
   }
 
-  /**
-  * @return the number of special tokens
-  */
   public int numSpecials() {
     if (specialTokens == null)
       return 0;
     return specialTokens.size();
   }
 
-  /**
-  * Adds a special token to the special tokens list.
-  *
-  * @param s - the special token to add
-  */
   public void addSpecial(final Token s) {
     if (specialTokens == null)
      specialTokens = new ArrayList<>();
@@ -191,21 +89,12 @@ public class Token  implements INode, java.io.Serializable {
   s.setParent(this);
   }
 
-  /**
-  * Trims the special tokens list.
-  */
   public void trimSpecials() {
     if (specialTokens == null)
       return;
     ((ArrayList<Token>) specialTokens).trimToSize();
   }
 
-  /**
-  * Returns the string of the special tokens of the current {@link Token},
-  * taking in account a given indentation.
-  * @param spc - the indentation
-  * @return the string representing the special tokens list
-  */
   public String getSpecials(final String spc) {
     if (specialTokens == null)
       return ""; //$NON-NLS-1$
@@ -245,25 +134,10 @@ public class Token  implements INode, java.io.Serializable {
     return buf.toString();
   }
 
-  /**
-  * Returns the string of the special tokens and the normal token of the current {@link Token},
-  * taking in account a given indentation.
-  *
-  * @param spc - the indentation
-  * @return the string representing the special tokens list and the token
-  */
   public String withSpecials(final String spc) {
     return withSpecials(spc, null);
   }
 
-  /**
-  * Returns the string of the special tokens and the normal token of the current {@link Token},
-  * taking in account a given indentation and a given assignment.
-  *
-  * @param spc - the indentation
-  * @param var - the variable assignment to be inserted
-  * @return the string representing the special tokens list and the token
-  */
   public String withSpecials(final String spc, final String var) {
     final String specials = getSpecials(spc);
     int len = specials.length() + 1;
@@ -291,12 +165,6 @@ public class Token  implements INode, java.io.Serializable {
    * Visitors accept methods (no -novis option, visitors specification : Gen,void,java.lang.String)
    */
 
-  /**
-   * Accepts a {@link IGenVisitor} visitor with user argument data.
-   *
-   * @param vis - the visitor
-   * @param argu - the user Argument data
-   */
   @Override
   public void accept(final IGenVisitor vis, final String argu) {
     vis.visit(this, argu);
@@ -306,21 +174,11 @@ public class Token  implements INode, java.io.Serializable {
    * Parent pointer getter and setter (-pp option)
    */
 
-  /**
-   * Gets the parent node.
-   *
-   * @return the parent node
-   */
   @Override
   public INode getParent() {
     return parent;
   }
 
-  /**
-   * Sets the parent node.
-   *
-   * @param n - the parent node
-   */
   @Override
   public void setParent(final INode n) {
     parent = n;
@@ -330,60 +188,38 @@ public class Token  implements INode, java.io.Serializable {
    * Children methods (-chm option)
    */
 
-  /** An empty list */
   private final List<INode> emptyList = new ArrayList<>(0);
 
-  /**
-   * @return the number of all direct children (base + user nodes) (always 0)
-   */
   @Override
   public int getNbAllChildren() {
     return 0;
   }
 
-  /**
-   * @return the number of direct base nodes children (always 0)
-   */
   @Override
   public int getNbBaseChildren() {
     return 0;
   }
 
-  /**
-   * @return the number of direct user nodes children (always 0)
-   */
   @Override
   public int getNbUserChildren() {
     return 0;
   }
 
-  /**
-   * @return the list of all direct children (base + user nodes) (always empty)
-   */
   @Override
   public List<INode> getAllChildren() {
     return emptyList;
   }
 
-  /**
-   * @return the list of direct base nodes children (always empty)
-   */
   @Override
   public List<INode> getBaseChildren() {
     return emptyList;
   }
 
-  /**
-   * @return the list of direct user nodes children (always empty)
-   */
   @Override
   public List<INode> getUserChildren() {
     return emptyList;
   }
 
-  /**
-   * @return true if the node is a base node, false otherwise (always true : the node is a base node)
-   */
   @Override
   public boolean isBaseNode() {
     return true;

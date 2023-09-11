@@ -5,43 +5,23 @@ import java.util.ArrayList;
 import java.util.List;
 import examples.java.ex1jtb.visitor.IGenVisitor;
 
-/**
- * Represents a grammar choice (|), e.g. ' ( A | B ) '.<br>
- * The class stores the node and the "which" choice indicator (0, 1, ...).
- */
+@SuppressWarnings("javadoc")
 public class NodeChoice implements INode {
 
-  /** The real node */
   public INode choice;
 
-  /** The "which" choice indicator */
   public int which;
 
-  /** The total number of choices */
   public int total;
 
-  /** The parent node */
   private INode parent;
 
-  /** The serial version UID */
   private static final long serialVersionUID = 151L;
 
-  /**
-   * Constructs the {@link NodeChoice} with a given node and non standard (-1) which choice and total number of choices.
-   *
-   * @param node - the node
-   */
   public NodeChoice(final INode node) {
    this(node, -1, -1);
   }
 
-  /**
-   * Constructs the {@link NodeChoice} with a given node, a which choice and a total (not controlled).
-   *
-   * @param node - the node
-   * @param whichChoice - the which choice
-   * @param totalChoices - the total number of choices
-   */
   public NodeChoice(final INode node, final int whichChoice, final int totalChoices) {
     choice = node;
     which = whichChoice;
@@ -53,12 +33,6 @@ public class NodeChoice implements INode {
    * Visitors accept methods (no -novis option, visitors specification : Gen,void,java.lang.String)
    */
 
-  /**
-   * Accepts a {@link IGenVisitor} visitor with user argument data.
-   *
-   * @param vis - the visitor
-   * @param argu - the user Argument data
-   */
   @Override
   public void accept(final IGenVisitor vis, final String argu) {
     vis.visit(this, argu);
@@ -68,21 +42,11 @@ public class NodeChoice implements INode {
    * Parent pointer getter and setter (-pp option)
    */
 
-  /**
-   * Gets the parent node.
-   *
-   * @return the parent node
-   */
   @Override
   public INode getParent() {
     return parent;
   }
 
-  /**
-   * Sets the parent node.
-   *
-   * @param n - the parent node
-   */
   @Override
   public void setParent(final INode n) {
     parent = n;
@@ -92,42 +56,27 @@ public class NodeChoice implements INode {
    * Children methods (-chm option)
    */
 
-  /** The list of all direct children (base + user nodes) */
   private List<INode> lac = null;
 
-  /** The list of direct base nodes children */
   private List<INode> lbc = null;
 
-  /** The list of direct user nodes children */
   private List<INode> luc = null;
 
-  /**
-   * @return the number of all direct children (base + user nodes) (always 1)
-   */
   @Override
   public int getNbAllChildren() {
     return 1;
   }
 
-  /**
-   * @return the number of direct base nodes children (0 or 1)
-   */
   @Override
   public int getNbBaseChildren() {
     return choice.isBaseNode() ? 1 : 0;
   }
 
-  /**
-   * @return the number of direct user nodes children (0 or 1)
-   */
   @Override
   public int getNbUserChildren() {
     return choice.isBaseNode() ? 0 : 1;
   }
 
-  /**
-   * @return the list of all direct children (base + user nodes) (always one node)
-   */
   @Override
   public List<INode> getAllChildren() {
     if (lac == null) {
@@ -137,9 +86,6 @@ public class NodeChoice implements INode {
     return lac;
   }
 
-  /**
-   * @return the list of direct base nodes children (empty or with 1 node)
-   */
   @Override
   public List<INode> getBaseChildren() {
     if (lbc == null) {
@@ -152,9 +98,6 @@ public class NodeChoice implements INode {
     return lbc;
   }
 
-  /**
-   * @return the list of direct user nodes children (empty or with 1 node)
-   */
   @Override
   public List<INode> getUserChildren() {
     if (luc == null) {
@@ -167,9 +110,6 @@ public class NodeChoice implements INode {
     return luc;
   }
 
-  /**
-   * @return true if the node is a base node, false otherwise (always true : the node is a base node)
-   */
   @Override
   public boolean isBaseNode() {
     return true;

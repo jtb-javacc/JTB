@@ -315,14 +315,14 @@ public class DepthFirstVoidVisitor implements IVoidVisitor {
   /**
    * Visits a {@link Tcf2} node, whose child is the following :
    * <p>
-   * f0 ->   %0 Identifier()<br>
+   * {}f0 ->   %0 Identifier()<br>
    * .. .. | !1 Integer_literal_boum()<br>
-   * s: 803552317<br>
+   * s: 1058520479<br>
    *
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({ 803552317, JTB_SIG_TCF2, JTB_USER_TCF2 })
+  @NodeFieldsSignature({ 1058520479, JTB_SIG_TCF2, JTB_USER_TCF2 })
   public void visit(final Tcf2 n) {
     if (n.f0 != null) {
       final INode ich = n.f0.choice;

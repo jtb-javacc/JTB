@@ -1,221 +1,0 @@
-<?xml version='1.0' encoding='utf-8' ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-		<title>Overview</title>
-		<style type="text/css">* {
-			
-  font-family: arial,helvetica,sans-serif;			
-  font-size:11pt;			
-  color:#006666;			
-}			
-h1 {			
-  font-size:14pt;			
-  color: red;			
-}			
-h2 {			
-  font-size:12pt;			
-  color: blue;			
-}			
-h3 {			
-  font-size:12pt;			
-  color: green;			
-}			
-h4 {			
-  font-size:11pt;			
-  color: maroon;			
-}			
-table {			
-  font-size:10pt;			
-}			
-code {			
-  font-family: courier new;			
-  font-size: 100%;			
-  color: maroon;			
-}			
-.GreenYellow {			
-  background-color: GreenYellow;			
-}			
-.NavajoWhite {			
-  background-color: NavajoWhite;			
-}			
-.PaleTurquoise {			
-  background-color: PaleTurquoise;			
-}			
-.Plum {			
-  background-color: Plum;			
-}			
-.green {			
-  color: green;			
-}			
-.red {			
-  color: red;			
-}			
-.bold-red {			
-  color: red;			
-  font-weight: bold;			
-}			
- </style>
-	</head>
-	<body>
-		<h1 id="java-tree-builder-jtb-overview">Java Tree Builder (JTB) - Overview</h1>
-		<h2 id="what-is-jtb">What is JTB</h2>
-		<p>JTB (Java Tree Builder) is a syntax tree builder and visitors generator to be used in front of JavaCC (Java Compiler Compiler).</p>
-		<p>It takes a JavaCC grammar file as input (you just have to change the extension from 
-			<strong>.jj</strong> to 
-			<strong>.jtb</strong> and add a few options)
-			 and it automatically generates the following:
-		</p>
-		<ul>
-			<li>a set of 
-				<strong>syntax tree classes</strong> based on the BNF and Javacode productions in the grammar (called 
-				<strong>user nodes</strong>)
-			</li>
-			<li>a set of 
-				<strong>base tree</strong> interfaces &amp; classes (called 
-				<strong>base nodes</strong>) allowing to manage the tree classes links in the tree
-				   (
-				<strong>INode</strong>, 
-				<strong>INodeList</strong>, 
-				<strong>NodeChoice</strong>, 
-				<strong>NodeConstants</strong> (since 1.5.0), 
-				<strong>NodeList</strong>, 
-				<strong>NodeListOptional</strong>,
-
-				<br/>
-				<strong>NodeOptional</strong>, 
-				<strong>NodeSequence</strong>, 
-				<strong>NodeToken</strong>)
-			</li>
-			<li>any number of 
-				<strong>interfaces</strong> allowing to use the 
-				<strong>Visitor pattern</strong> (e.g. 
-				<strong>IVoidVisitor</strong>, 
-				<strong>IMyFancyVisitor</strong>), 
-			</li>
-			<li>the corresponding 
-				<strong>depth-first default visitors</strong> (e.g. 
-				<strong>DepthFirstVoidVisitor</strong>, 
-				<strong>DepthFirstMyFancyVisitor</strong>),
-				   whose methods simply visit the children of the current node
-			</li>
-			<li>a JavaCC grammar 
-				<strong>.jj</strong> file (the famous 
-				<strong>jtb.out.jj</strong> by default), with the proper additional code lines
-				   to build the syntax tree during parsing (and which then must be compiled with JavaCC), 
-			</li>
-			<li>if requested (since 1.5.0):</li>
-			<ul>
-				<li>a 
-					<strong>node scope hook</strong> interface 
-					<strong>IEnterExitHook</strong> and calls to 2 
-					<strong>node scope hook</strong> methods
-
-					<br/>
-					<strong>xxxxEnter</strong> and 
-					<strong>xxxxExit</strong> of this interface upon entry and exit of each BNF production
-					       which lead to a JTB node creation
-				</li>
-				<li>and an empty implementation of this interface 
-					<strong>EmptyEnterExitHook</strong> 
-				</li>
-			</ul>
-		</ul>
-		<p>New visitors subclassing any generated one and overriding the default methods can perform various operations
-			 on and manipulate the generated syntax tree.<br>
-			So usually one implements a new visitor for each new need.</p>
-		<h2 id="jtb-javacc">JTB // JavaCC</h2>
-		<p>JTB has its own options, and uses some of JavaCC options; it controls its own options and comments them in the
-			 generated annotated JavaCC grammar file.</p>
-		<p>JTB behaves like JavaCC 5.0 / 7.0.x in the sense that the grammar:</p>
-		<ul>
-			<li>produces a JavaCC grammar with Java parts, not a JavaCC grammar with other language parts
-				 (there has been some development of a C++ version which has not yet been merged)</li>
-			<li>controls the syntax of the Java parts through a Java grammar</li>
-		</ul>
-		<p>JTB 1.5.0 introduces a first step to generate its own classes through a template engine,
-			 but the whole chain of base templates has not yet been produced.</p>
-		<p>JTB generates, along with its own classes, an (annotated) JavaCC grammar, which should be compilable through any JavaCC version;
-			 it has been tested with JavaCC 4.2, 5.0 &amp; 7.0.x; although not tested, it should work with JavaCC 8.</p>
-		<p>So the JTB grammar is exactly the JavaCC grammar (although it is a modified clone of some JavaCC grammar), except:</p>
-		<ul>
-			<li>a few more options,</li>
-			<li>the possibility to add node creation indicators (like in JJTree you can customize node creation):
-				 but one working with JTB would very seldom find the need to customize the nodes creation (see below)</li>
-		</ul>
-		<h2 id="jtb-jjtree">JTB // JJTree</h2>
-		<p>
-			<strong>JTB</strong> can be compared to 
-			<strong>JJTree</strong> as following:
-		</p>
-		<ul>
-			<li>JJTree was designed for allowing manipulation of the abstract syntax tree and the tokens on the fly,
-				   and the visitors partial support was added as a complement
-<p></li>
-			<li>JTB fits with the ideas that, at least for big or reusable projects:</li>
-			<ul>
-				<li>only one grammar file should be coded for a language, taking care of only the parsing,<br> 
-					      so this grammar file should reflect only the grammar and not be polluted by nodes and tree generation tweaks<br>
-					      (otherwise one is likely to have to code another grammar file for new needs:</li>
-				<ul>
-					<li>an example is 
-						<strong>pmd-java</strong>, which has a 
-						<strong>Java.jjt</strong> grammar, tailored to PMD's needs,
-					</li>
-					<li>another example is 
-						<strong>javaparser</strong>, which has a 
-						<strong>java.jj</strong> grammar, tailored to nothing more than just parsing:
-					</li>
-					<li>the first one is not very much reusable for other needs - like JTB! -, the second one is much more reusable)</li>
-				</ul>
-				<li>the abstract syntax tree built upon parsing should reflect the grammar, and if other trees are need
-					       for subsequent phases they should be built after the parsing tree has been built
-					        (but the need for other trees is thought not frequent)</li>
-				<li>the visitors pattern use should be the preferred way of coding analysis or generation logic,
-					       so one should be able to develop different visitors to handle these different aspects
-<p></li>
-			</ul>
-			<li>in JJTree you can access and work with the nodes but also with the tokens, whereas in JTB you only work with the nodes
-<p></li>
-			<li>JJTree's multi mode corresponds to what JTB generates
-<p></li>
-			<li>in JJTree you explicitly define the nodes you want to build; JTB builds by default all of them
-				 (but you can tell it not to build some of them)
-<p></li>
-			<li>the children of a JJTree node are other JJTree nodes, but the children of a JTB user node are other user nodes
-				or base nodes (NodeChoice, NodeList, NodeListOptional, NodeOptional, NodeSequence,NodeTCF, NodeToken),
-				whose children are other JTB user or base nodes,
-<p></li>
-			<li>JJTree's node scope hook is quite similar to JTB node scope hook
-<p></li>
-			<li>JJTree generates only interfaces for visitors and you have to code the visitors, so you "fill" them;
-				   JTB generates interfaces and 
-				<strong>full</strong> visitors (i.e. with all the code to visit the tree),
-				   so you just "modify" them, sometimes just "reducing" them (for not visiting sub-branches),
-				   so in a sense it is faster to develop on an already generated - bullet proof - code,
-<p>
-			</li>
-			<li>in JJTree, you are tempted to tune the tree, i.e. define only the nodes you need, but if you want to develop
-				   different visitors, you have to think about all the nodes you want to traverse for the different purposes
-				   and so you may find yourself sometimes having to enrich the grammar and defeat what you have previously done;<br>
-				   in JTB you have all the tree right from the beginning so adding a new visitor is not disruptive
-<p></li>
-			<li>JTB can 
-				<strong>inline</strong> the 
-				<strong>accept()</strong> methods, i.e. it generates, for each node, the code to work directly on its children,
-				   which is usually the right place to take decisions and to reduce the control logic
-				   (otherwise you usually - in JJTree also - have to access the fathers and check their types);<br>
-				   this also limits the number of class casts one has to do
-<p>
-			</li>
-			<li>JJTree allows to provide custom classes for the nodes (which must extend 
-				<strong>SimpleNode</strong>),
-				   for extending the default behavior node by node;<br>
-				   JTB allows only to define a user nodes' superclass, for extending the default behavior (for all nodes)
-<p>
-			</li>
-			<li>So JJTree may be more adequate when only small trees or only one visitor or tokens modification are needed,<br>
-				and JTB may be more adequate when you have to work on big trees and build many visitors.</li>
-		</ul>
-	</body>
-</html>

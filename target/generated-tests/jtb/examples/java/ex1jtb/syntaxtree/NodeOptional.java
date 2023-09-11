@@ -5,42 +5,23 @@ import java.util.ArrayList;
 import java.util.List;
 import examples.java.ex1jtb.visitor.IGenVisitor;
 
-/**
- * Represents a grammar optional node (? or []), e.g. ' ( A )? ' or ' [ A ] '.<br>
- * The class stores the node.
- */
+@SuppressWarnings("javadoc")
 public class NodeOptional implements INode {
 
-  /** The node (if null there is no node) */
   public INode node;
 
-  /** The parent node */
   private INode parent;
 
-  /** The serial version UID */
   private static final long serialVersionUID = 151L;
 
-  /**
-   * Initializes an empty {@link NodeOptional}.
-   */
   public NodeOptional() {
     node = null;
   }
 
-  /**
-   * Initializes a {@link NodeOptional} with a node.
-   *
-   * @param n - the node
-   */
   public NodeOptional(final INode n) {
     addNode(n);
   }
 
-  /**
-   * Adds a node to the {@link NodeOptional}.
-   *
-   * @param n - the node to add
-   */
   public void addNode(final INode n) {
     if (node != null)
       throw new Error("Attempt to set optional node twice"); //$NON-NLS-1$
@@ -49,9 +30,6 @@ public class NodeOptional implements INode {
       n.setParent(this);
   }
 
-  /**
-   * @return true if the node exists, false otherwise
-   */
   public boolean present() {
     return (node != null); }
 
@@ -59,12 +37,6 @@ public class NodeOptional implements INode {
    * Visitors accept methods (no -novis option, visitors specification : Gen,void,java.lang.String)
    */
 
-  /**
-   * Accepts a {@link IGenVisitor} visitor with user argument data.
-   *
-   * @param vis - the visitor
-   * @param argu - the user Argument data
-   */
   @Override
   public void accept(final IGenVisitor vis, final String argu) {
     vis.visit(this, argu);
@@ -74,21 +46,11 @@ public class NodeOptional implements INode {
    * Parent pointer getter and setter (-pp option)
    */
 
-  /**
-   * Gets the parent node.
-   *
-   * @return the parent node
-   */
   @Override
   public INode getParent() {
     return parent;
   }
 
-  /**
-   * Sets the parent node.
-   *
-   * @param n - the parent node
-   */
   @Override
   public void setParent(final INode n) {
     parent = n;
@@ -98,32 +60,21 @@ public class NodeOptional implements INode {
    * Children methods (-chm option)
    */
 
-  /** The list of all direct children (base + user nodes) */
   private List<INode> lac = null;
 
-  /** The list of direct base nodes children */
   private List<INode> lbc = null;
 
-  /** The list of direct user nodes children */
   private List<INode> luc = null;
 
-  /** The number of direct base nodes children */
   private int nbLbc = -1;
 
-  /** The number of direct user nodes children */
   private int nbLuc = -1;
 
-  /**
-   * @return the number of all direct children (base + user nodes) (0 or 1)
-   */
   @Override
   public int getNbAllChildren() {
     return node == null ? 0 : 1;
   }
 
-  /**
-   * @return the number of direct base nodes children (0 or 1)
-   */
   @Override
   public int getNbBaseChildren() {
     if (lbc == null)
@@ -131,9 +82,6 @@ public class NodeOptional implements INode {
     return nbLbc;
   }
 
-  /**
-   * @return the number of direct user nodes children (0 or 1)
-   */
   @Override
   public int getNbUserChildren() {
     if (luc == null)
@@ -141,9 +89,6 @@ public class NodeOptional implements INode {
     return nbLuc;
   }
 
-  /**
-   * @return the list of all direct children (base + user nodes) (0 or 1)
-   */
   @Override
   public List<INode> getAllChildren() {
     if (lac == null) {
@@ -157,9 +102,6 @@ public class NodeOptional implements INode {
     return lac;
   }
 
-  /**
-   * @return the list of direct base nodes children (0 or 1)
-   */
   @Override
   public List<INode> getBaseChildren() {
     if (lbc == null) {
@@ -173,9 +115,6 @@ public class NodeOptional implements INode {
     return lbc;
   }
 
-  /**
-   * @return the list of direct user nodes children (0 or 1)
-   */
   @Override
   public List<INode> getUserChildren() {
     if (luc == null) {
@@ -189,9 +128,6 @@ public class NodeOptional implements INode {
     return luc;
   }
 
-  /**
-   * @return true if the node is a base node, false otherwise (always true : the node is a base node)
-   */
   @Override
   public boolean isBaseNode() {
     return true;

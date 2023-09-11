@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE fakeforremovingdtdvalidationinfo>
 <!-- Enables building a new version of JTB jar (through a previous JTB version and a compatible JavaCC version).
@@ -2452,5 +2453,441 @@ public class TokenMgrError</replacevalue>
       <arg value="-Pgpg" />
     </artifact:mvn>
   </target>
+=======
+<?xml version='1.0' encoding='ISO-8859-1' ?>
+<!-- build.xml. Enables building a new version of JTB jar (through a previous JTB version and a compatible JavaCC version)
+     Uses jtb.xml & javacc.xml to import (and share) JTB & JavaCC properties
+     Marc Mazas - Sopra Group - 05/2009 - Francis Andre - 01/2017 -->
+
+<project name='jtb'
+         default='build_new_jtb_jar+test_generate_all+compile_java+make_new_jtb_jar'
+         xmlns:artifact='antlib:org.apache.maven.artifact.ant'>
+
+	<path id='maven-ant-tasks.classpath' path='lib/maven-ant-tasks-2.1.3.jar' />
+	<typedef resource='org/apache/maven/artifact/ant/antlib.xml'
+	         uri='antlib:org.apache.maven.artifact.ant'
+	         classpathref='maven-ant-tasks.classpath' />
+
+	<!--
+	 Set the JavaCC jar directory in javacc.xml.
+   Here is how to use targets, to build and test a new version :
+   - in jtb.xml, check / set jtb_last_version to the stable version (the one using jtb-xxx.jar)
+      and jtb_curr_version to the new version (the one which will produce new_jtb-yyy.jar)
+   - in misc.Globals.java, set VERSION to the same as jtb_curr_version and SERIAL_ID also (without the dots)
+   - make code modifications
+   - run build_new_jtb_jar : it will create the new jar (jtb_new_jar) using the stable one (jtb_ok_jar)
+   - if ok run test_generate_all : it will regenerate the files using the new jar (jtb_new_jar)
+   - if ok run compile_java : it will compile the java classes
+   - if ok run make_new_jtb_jar : it will recreate the new jar (jtb_new_jar)
+   - if ok run new_to_prev_jtb_jar : it will rename the new jar in jar-yyy.jar
+   - you may prepare the new version numbers for the next version as above
+   FA : COMMENT TO BE ADDED TO DESCRIBE THE USE OF THE POM.XML TARGETS AND ASSOCIATED PROPERTIES IN JTB.XML
+  -->
+
+	<!-- import JTB properties -->
+	<import file='jtb.xml' />
+
+	<!-- import JavaCC properties -->
+	<import file='javacc.xml' />
+
+	<!-- Build new jar and test regenerate files with new jtb jar and compile -->
+	<target name='build_new_jtb_jar+test_generate_all+compile_java+make_new_jtb_jar'
+	        depends='build_new_jtb_jar,test_generate_all,compile_java'>
+		<antcall target='make_new_jtb_jar' />
+	</target>
+
+	<!-- Compile java classes, make the new jar and test regenerate files with new jtb jar -->
+	<target name='compile_java+make_new_jtb_jar+test_generate_jtb_files'
+	        depends='compile_java, make_new_jtb_jar'>
+		<antcall target='test_generate_all' />
+	</target>
+
+	<!-- Process JavaCC file with ${jtb_ok_jar}, compile java classes, make the new jar
+	 and test regenerate files with new jtb jar -->
+	<target name='generate_all+compile_java+make_new_jtb_jar+test_generate_jtb_files'
+	        depends='generate_all+compile_java, compile_java, make_new_jtb_jar'>
+		<antcall target='test_generate_all' />
+	</target>
+
+	<!-- echo JTB and JavaCC / JJTree properties -->
+	<target name='echo_all_props' depends='echo_jtb_props,echo_javacc_props'>
+	</target>
+
+	<!-- echo some JavaCC / JJTree properties -->
+	<target name='echo_jj_props'>
+		<echo message='javacc_ok_jar=${javacc_ok_jar}' />
+	</target>
+
+
+	<!-- Regenerate with ${jtb_ok_jar}, compile and create ${jtb_new_jar} -->
+	<target name='build_new_jtb_jar' depends='echo_all_props,generate_all+compile_java'>
+		<antcall target='make_new_jtb_jar' />
+	</target>
+
+	<!-- Regenerate with ${jtb_new_jar} and compile -->
+	<target name='test_new_jtb_jar' depends='echo_all_props,test_generate_all,compile_java'>
+	</target>
+
+	<!-- Regenerate with ${jtb_ok_jar} and compile -->
+	<target name='generate_all+compile_java' depends='generate_all'>
+		<antcall target='compile_java' />
+	</target>
+
+	<!-- Generate JTB, JavaCC & java files from the grammar file with ${jtb_ok_jar} -->
+	<target name='generate_all' depends='clean_all_gen_files,process_jtbgram.jtb,process_jtb.out.jj'>
+	</target>
+
+	<!-- Generate JTB, JavaCC & java files from the grammar file with ${jtb_new_jar} -->
+	<target name='test_generate_all'
+	        depends='clean_all_gen_files,test_process_jtbgram.jtb,process_jtb.out.jj'>
+	</target>
+
+	<!-- Process ${jtb_gram}.jtb with ${jtb_ok_jar} -->
+	<target name='process_jtbgram.jtb'>
+		<java classname='${jtb_tool}' classpath='${jtb_ok_jar}' fork='true' failonerror='true'>
+			<!-- generated file -->
+			<arg value='-o' />
+			<arg value='${jtb_src_dir}/${jtb_out}.jj' />
+			<!-- stores special tokens in the tree -->
+			<arg value='-tk' />
+			<!-- prints javadoc comments -->
+			<arg value='-jd' />
+			<!-- suppresses semantic checking -->
+			<arg value='-e' />
+			<!-- prints tree dumper and formatter visitors -->
+			<!-- arg value='-printer' / -->
+			<!-- generates parent pointers -->
+			<!-- arg value='-pp' / -->
+			<!-- generates depth level -->
+			<!-- arg value='-dl' / -->
+			<!-- inlines visitors accept methods on base nodes -->
+			<arg value='-ia' />
+			<!-- syntaxtree and visitor directories parent directory name -->
+			<arg value='-d' />
+			<arg value='${jtb_src_dir}' />
+			<!-- syntaxtree and visitor packages parent package name -->
+			<arg value='-p' />
+			<arg value='${jtb_pkg_name}' />
+			<!-- input file -->
+			<arg value='${jtb_src_dir}/${jtb_gram}.jtb' />
+		</java>
+	</target>
+
+	<!-- Process ${jtb_gram}.jtb with ${jtb_new_jar} -->
+	<target name='test_process_jtbgram.jtb'>
+		<java classname='${jtb_tool}' classpath='${jtb_new_jar}' fork='true' failonerror='true'>
+			<!-- generated file -->
+			<arg value='-o' />
+			<arg value='${jtb_src_dir}/${jtb_out}.jj' />
+			<!-- stores special tokens in the tree -->
+			<arg value='-tk' />
+			<!-- prints javadoc comments -->
+			<arg value='-jd' />
+			<!-- suppresses semantic checking -->
+			<arg value='-e' />
+			<!-- prints tree dumper and formatter visitors -->
+			<!-- arg value='-printer' / -->
+			<!-- generates parent pointers -->
+			<!-- arg value='-pp' / -->
+			<!-- generates depth level -->
+			<!-- arg value='-dl' / -->
+			<!-- inlines visitors accept methods on base nodes -->
+			<arg value='-ia' />
+			<!-- syntaxtree and visitor directories parent directory name -->
+			<arg value='-d' />
+			<arg value='${jtb_src_dir}' />
+			<!-- syntaxtree and visitor packages parent package name -->
+			<arg value='-p' />
+			<arg value='${jtb_pkg_name}' />
+			<!-- input file -->
+			<arg value='${jtb_src_dir}/${jtb_gram}.jtb' />
+			<!-- enable assertions -->
+			<assertions>
+				<enable />
+			</assertions>
+		</java>
+	</target>
+
+	<!-- Process ${jtb_out}.jj with ${javacc_ok_jar} -->
+	<target name='process_jtb.out.jj'>
+		<java classname='${javacc_main}' classpath='${javacc_ok_jar}' fork='true' failonerror='true'>
+			<arg value='-OUTPUT_DIRECTORY=src/EDU/purdue/jtb/parser' />
+			<arg value='-jdk_version=${jdk_version}' />
+			<arg value='${jtb_src_dir}/${jtb_out}.jj' />
+		</java>
+		<antcall target='copy_specific_token_for_jtb' />
+	</target>
+
+	<!-- Copy specific Token.java file for JTBParser -->
+	<target name='copy_specific_token_for_jtb'>
+		<copy file='${jtb_src_dir}/utils/Token.java.save'
+		      tofile='${jtb_src_dir}/parser/Token.java'
+		      overwrite='true' />
+	</target>
+
+	<!-- Copy saved NodeTCF.java file for 1.4.5 -> 1.4.6 ; removed -->
+	<target name='copy_saved_nodetcf'>
+		<copy file='${jtb_src_dir}/utils/NodeTCF.java.save'
+		      tofile='${jtb_src_dir}/syntaxtree/NodeTCF.java'
+		      overwrite='false' />
+	</target>
+
+	<!-- Copy saved NodeToken.java file for 1.4.7 -> 1.4.9 ; removed -->
+	<target name='copy_saved_nodetoken'>
+		<copy file='${jtb_src_dir}/utils/NodeToken.java.save'
+		      tofile='${jtb_src_dir}/syntaxtree/NodeToken.java'
+		      overwrite='true' />
+	</target>
+
+	<!-- Compile Java classes -->
+	<target name='compile_java'>
+		<!-- antcall target='copy_saved_nodetoken' / -->
+		<javac srcdir='${jtb_src_dir}'
+		       destdir='${jtb_bin_dir}'
+		       includeantruntime='false'
+		       encoding='ISO-8859-1'
+		       debug='true'
+		       source='${jdk_version}'
+		       target='${jdk_version}'
+		       classpath='${jtb_bin_dir}'>
+			<!-- compilerarg value='-Xlint:unchecked' / -->
+		</javac>
+	</target>
+
+	<!-- Create ${jtb_new_jar} -->
+	<target name='make_new_jtb_jar' depends='check_jtb_jar' unless='jtb_jar.uptodate'>
+		<jar destfile='${jtb_new_jar}' compress='true' manifest='${jtb_proj_dir}/META-INF/MANIFEST.MF'>
+			<fileset dir='${jtb_bin_dir}'>
+				<exclude name='LICENSE' />
+				<exclude name='${jtb_out}.jj' />
+				<exclude name='${jtb_gram}.jtb' />
+			</fileset>
+			<fileset dir='${jtb_proj_dir}/src' />
+			<fileset dir='${jtb_proj_dir}/doc' />
+			<fileset dir='${jtb_proj_dir}'>
+				<include name='build*.xml' />
+			</fileset>
+		</jar>
+	</target>
+
+	<!-- Check ${jtb_new_jar} is up to date -->
+	<target name='check_jtb_jar'>
+		<uptodate property='jtb_jar.uptodate' targetfile='${jtb_new_jar}'>
+			<srcfiles dir='${jtb_bin_dir}/' />
+		</uptodate>
+	</target>
+
+	<target name='clean' depends='clean_classes, clean_all_gen_files' />
+
+	<!-- Clean all JTB & JavaCC generated files -->
+	<target name='clean_all_gen_files' depends='clean_javacc_gen_files,clean_jtb_gen_files'>
+	</target>
+
+	<!-- Clean Java classes -->
+	<target name='clean_classes'>
+		<delete dir='${jtb_bin_dir}/' />
+		<mkdir dir='${jtb_bin_dir}/' />
+	</target>
+
+	<!-- Clean JavaCC generated files -->
+	<target name='clean_javacc_gen_files'>
+		<!-- sometimes files are generated a level too low ... -->
+		<delete dir='${jtb_src_dir}/parser/parser' />
+		<delete>
+			<fileset dir='${jtb_src_dir}/parser'>
+				<include name='${jtb_out}.jj' />
+			</fileset>
+		</delete>
+		<!-- normally generated files here -->
+		<delete>
+			<fileset dir='${jtb_src_dir}/parser'>
+				<include name='${jtb_parser}.java' />
+				<include name='${jtb_parser}TokenManager.java' />
+				<include name='${jtb_parser}Constants.java' />
+				<include name='*CharStream*.java' />
+				<!-- Token.java has been modified for serialUID and finals -->
+				<exclude name='Token.java' />
+				<include name='TokenMgrError.java' />
+				<include name='ParseException.java' />
+			</fileset>
+		</delete>
+	</target>
+
+	<!-- Clean JTB generated files -->
+	<target name='clean_jtb_gen_files'>
+		<delete>
+			<fileset dir='${jtb_src_dir}/syntaxtree'>
+				<include name='*.java' />
+				<include name='*Visitor.java' />
+				<exclude name='IN*.java' />
+			</fileset>
+		</delete>
+		<delete>
+			<fileset dir='${jtb_src_dir}/visitor'>
+				<include name='Tree*.java' />
+				<include name='*Visitor.java' />
+			</fileset>
+		</delete>
+		<delete>
+			<fileset dir='${jtb_src_dir}'>
+				<include name='${jtb_out}.jj' />
+			</fileset>
+		</delete>
+	</target>
+
+	<!-- Rename ${jtb_new_jar} in ${jtb_prev_jar} - when ${jtb_new_jar} is OK, before changing to a new version  -->
+	<target name='new_to_prev_jtb_jar'>
+		<move file='${jtb_new_jar}' tofile='${jtb_prev_jar}' overwrite='false' />
+	</target>
+
+	<!-- Rename ${jtb_prev_jar} in ${jtb_new_jar} - when ${jtb_prev_jar} was not OK, to revert back to the old version  -->
+	<target name='prev_to_new_jtb_jar'>
+		<move file='${jtb_prev_jar}' tofile='${jtb_new_jar}' overwrite='false' />
+	</target>
+
+	<!-- FA :COMMENT ??? -->
+	<artifact:pom id='jtb.pom' file='pom.xml'>
+	</artifact:pom>
+
+	<!-- FA :COMMENT ??? -->
+	<target name="dist"
+	        depends="build_new_jtb_jar+test_generate_all+compile_java+make_new_jtb_jar, javadoc"
+	        description="build a distribution">
+		<property name="install-name" value="${target-folder}/jtb-${jtb_vp_version}" />
+
+		<!-- FA :COMMENT ??? -->
+		<delete file="${install-name}-distribution.tar.gz" />
+		<tar destfile="${install-name}-distribution.tar.gz" compression="gzip">
+			<tarfileset username="root"
+			            uid="1"
+			            group="root"
+			            prefix="jtb-${jtb_vp_version}/doc"
+			            filemode="444"
+			            dir="doc" />
+			<tarfileset username="root"
+			            uid="1"
+			            group="root"
+			            prefix="jtb-${jtb_vp_version}"
+			            filemode="444"
+			            file="LICENSE" />
+			<tarfileset username="root"
+			            uid="1"
+			            group="root"
+			            prefix="jtb-${jtb_vp_version}/${target-folder}"
+			            filemode="444"
+			            file="${jtb}" />
+		</tar>
+
+		<!-- FA :COMMENT ??? -->
+		<delete file="${install-name}-distribution.zip" />
+		<zip destfile="${install-name}-distribution.zip">
+			<zipfileset prefix="jtb-${jtb_vp_version}/${target-folder}" filemode="444" file="${jtb}" />
+			<zipfileset prefix="jtb-${jtb_vp_version}/doc" filemode="444" dir="doc" />
+			<!-- zipfileset prefix="jtb-${jtb_vp_version}/examples" filemode="444" dir="examples/" / -->
+			<zipfileset prefix="jtb-${jtb_vp_version}" filemode="444" file="LICENSE" />
+		</zip>
+
+		<!-- FA :COMMENT ??? -->
+		<delete dir="." includes="**/*.class" />
+		<delete file="${install-name}-sources.tar.gz" />
+		<tar destfile="${install-name}-sources.tar.gz" compression="gzip">
+			<tarfileset username="root"
+			            uid="1"
+			            group="root"
+			            prefix="jtb-${jtb_vp_version}"
+			            filemode="444"
+			            file="./**"
+			            excludes=".git, target/**, temp/**, .svn, CVS, **/*.zip, **/*.tar.gz" />
+		</tar>
+
+		<!-- FA :COMMENT ??? -->
+		<delete file="${install-name}-sources.jar" />
+		<zip destfile="${install-name}-sources.jar">
+			<zipfileset prefix="jtb-${jtb_vp_version}"
+			            filemode="444"
+			            file="./**"
+			            excludes=".svn,CVS,**/*.zip,**/*.tar.gz, deployment_pom/**, target/**, dist/**, temp/**" />
+		</zip>
+	</target>
+
+
+	<!-- FA :COMMENT ??? -->
+	<target name="javadoc">
+		<property name="install-name" value="${target-folder}/jtb-${jtb_vp_version}" />
+
+		<delete dir="${target-folder}/javadoc" />
+		<mkdir dir="${target-folder}/javadoc" />
+		<javadoc destdir="${target-folder}/javadoc">
+			<!-- fileset dir="${generated-src}" / -->
+			<fileset dir="${jtb-src}" />
+		</javadoc>
+
+		<zip destfile="${install-name}-javadoc.jar" basedir="${target-folder}/javadoc">
+		</zip>
+	</target>
+
+	<!-- COMMENT ??? -->
+	<target name='install' depends=''>
+		<artifact:install file='${jtb_prev_jar}'>
+			<pom refid="jtb.pom" />
+		</artifact:install>
+	</target>
+
+	<!-- COMMENT ??? -->
+	<target name="deploy"
+	        depends="dist"
+	        description="deploy snapshot version to Maven snapshot repository">
+		<artifact:mvn>
+			<arg value="org.apache.maven.plugins:maven-deploy-plugin:2.8:deploy-file" />
+			<arg value="-Durl=${ossrh-snapshots-repository-url}" />
+			<arg value="-DrepositoryId=${ossrh-server-id}" />
+			<arg value="-DpomFile=pom.xml" />
+			<arg value="-Dfile=${jtb-path}" />
+		</artifact:mvn>
+	</target>
+
+	<!-- defined maven snapshots and staging repository id and url -->
+	<property name="ossrh-snapshots-repository-url"
+	          value="https://oss.sonatype.org/content/repositories/snapshots/" />
+	<property name="ossrh-staging-repository-url"
+	          value="https://oss.sonatype.org/service/local/staging/deploy/maven2/" />
+	<!-- there server id in the Maven settings.xml -->
+	<property name="ossrh-server-id" value="ossrh" />
+
+	<!-- before this, update project version (both jtb.xml and pom.xml) from SNAPSHOT to RELEASE -->
+	<target name="stage" depends="" description="deploy release version to Maven staging repository">
+		<!-- sign and deploy the main artifact -->
+		<artifact:mvn>
+			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.5:sign-and-deploy-file" />
+			<arg value="-Durl=${ossrh-staging-repository-url}" />
+			<arg value="-DrepositoryId=${ossrh-server-id}" />
+			<arg value="-DpomFile=pom.xml" />
+			<arg value="-Dfile=${jtb-path}" />
+			<arg value="-Pgpg" />
+		</artifact:mvn>
+
+		<!-- sign and deploy the sources artifact -->
+		<artifact:mvn>
+			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.5:sign-and-deploy-file" />
+			<arg value="-Durl=${ossrh-staging-repository-url}" />
+			<arg value="-DrepositoryId=${ossrh-server-id}" />
+			<arg value="-DpomFile=pom.xml" />
+			<arg value="-Dfile=${jtb-sources-path}" />
+			<arg value="-Dclassifier=sources" />
+			<arg value="-Pgpg" />
+		</artifact:mvn>
+
+		<!-- sign and deploy the javadoc artifact -->
+		<artifact:mvn>
+			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.5:sign-and-deploy-file" />
+			<arg value="-Durl=${ossrh-staging-repository-url}" />
+			<arg value="-DrepositoryId=${ossrh-server-id}" />
+			<arg value="-DpomFile=pom.xml" />
+			<arg value="-Dfile=${jtb-javadoc-path}" />
+			<arg value="-Dclassifier=javadoc" />
+			<arg value="-Pgpg" />
+		</artifact:mvn>
+	</target>
+>>>>>>> cbea16d4233b3f598105db1c1c42b1f6d25c0508
 
 </project>

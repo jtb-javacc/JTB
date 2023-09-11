@@ -8,56 +8,25 @@ import grammars.z.visitor.IVoidVisitor;
 import grammars.z.visitor.IVoidArguVisitor;
 
 
-/**
- * JTB node class for the production classDeclaration:<br>
- * Corresponding grammar:<br>
- * f0 -> "class"<br>
- * f1 -> className()<br>
- * f2 -> "{"<br>
- * f3 -> ( %0 method()<br>
- * .. .. | %1 instruction() )*<br>
- * f4 -> "}"<br>
- * f5 -> "."<br>
- * f6 -> < EOF ><br>
- * s: -98135469<br>
- */
+@SuppressWarnings("javadoc")
 public class classDeclaration implements INode {
 
-  /** Child node 0 */
   public Token f0;
 
-  /** Child node 1 */
   public className f1;
 
-  /** Child node 2 */
   public Token f2;
 
-  /** Child node 3 */
   public NodeListOptional f3;
 
-  /** Child node 4 */
   public Token f4;
 
-  /** Child node 5 */
   public Token f5;
 
-  /** Child node 6 */
   public Token f6;
 
-  /** The serial version UID */
   private static final long serialVersionUID = 151L;
 
-  /**
-   * Constructs the node with all its children nodes.
-   *
-   * @param n0 - first child node
-   * @param n1 - next child node
-   * @param n2 - next child node
-   * @param n3 - next child node
-   * @param n4 - next child node
-   * @param n5 - next child node
-   * @param n6 - next child node
-   */
   public classDeclaration(final Token n0, final className n1, final Token n2, final NodeListOptional n3, final Token n4, final Token n5, final Token n6) {
     f0 = n0;
     f1 = n1;
@@ -71,49 +40,21 @@ public class classDeclaration implements INode {
    * Visitors accept methods (no -novis option, visitors specification : Void,void,None;VoidArgu,void,A;Ret,R,None;RetArgu,R,A)
    */
 
-  /**
-   * Accepts a {@link IRetVisitor} visitor with user return data.
-   *
-   * @param <R> - the return type parameter
-   * @param vis - the visitor
-   * @return the user Return data
-   */
   @Override
   public <R> R accept(final IRetVisitor<R> vis) {
     return vis.visit(this);
   }
 
-  /**
-   * Accepts a {@link IRetArguVisitor} visitor with user return and argument data.
-   *
-   * @param <R> - the return type parameter
-   * @param <A> - The argument 0 type parameter
-   * @param vis - the visitor
-   * @param argu - the user Argument data
-   * @return the user Return data
-   */
   @Override
   public <R, A> R accept(final IRetArguVisitor<R, A> vis, final A argu) {
     return vis.visit(this, argu);
   }
 
-  /**
-   * Accepts a {@link IVoidVisitor} visitor} visitor with user return data.
-   *
-   * @param vis - the visitor
-   */
   @Override
   public void accept(final IVoidVisitor vis) {
     vis.visit(this);
   }
 
-  /**
-   * Accepts a {@link IVoidArguVisitor} visitor with user argument data.
-   *
-   * @param <A> - The argument 0 type parameter
-   * @param vis - the visitor
-   * @param argu - the user Argument data
-   */
   @Override
   public <A> void accept(final IVoidArguVisitor<A> vis, final A argu) {
     vis.visit(this, argu);

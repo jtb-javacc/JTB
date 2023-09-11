@@ -6,36 +6,16 @@ import examples.java.ex1jtb.Token;
 import examples.java.ex1jtb.syntaxtree.*;
 import examples.java.ex1jtb.visitor.signature.NodeFieldsSignature;
 
-/**
- * Provides default methods which visit each node in the tree in depth-first order.<br>
- * In your "Gen" visitors extend this class and override part or all of these methods.
- *
- */
+@SuppressWarnings("javadoc")
 public class DepthFirstGenVisitor implements IGenVisitor {
 
 
-  /*
-   * Base nodes classes visit methods (to be overridden if necessary)
-   */
-
-  /**
-   * Visits a {@link NodeChoice} node.
-   *
-   * @param n - the node to visit
-   * @param argu - the user argument 0
-   */
   @Override
   public void visit(final NodeChoice n, final String argu) {
     n.choice.accept(this, argu);
     return;
   }
 
-  /**
-   * Visits a {@link NodeList} node.
-   *
-   * @param n - the node to visit
-   * @param argu - the user argument 0
-   */
   @Override
   public void visit(final NodeList n, final String argu) {
     for (INode e : n.nodes) {
@@ -44,12 +24,6 @@ public class DepthFirstGenVisitor implements IGenVisitor {
     return;
   }
 
-  /**
-   * Visits a {@link NodeListOptional} node.
-   *
-   * @param n - the node to visit
-   * @param argu - the user argument 0
-   */
   @Override
   public void visit(final NodeListOptional n, final String argu) {
     if (n.present()) {
@@ -61,12 +35,6 @@ public class DepthFirstGenVisitor implements IGenVisitor {
     return;
   }
 
-  /**
-   * Visits a {@link NodeOptional} node.
-   *
-   * @param n - the node to visit
-   * @param argu - the user argument 0
-   */
   @Override
   public void visit(final NodeOptional n, final String argu) {
     if (n.present()) {
@@ -76,12 +44,6 @@ public class DepthFirstGenVisitor implements IGenVisitor {
     return;
   }
 
-  /**
-   * Visits a {@link NodeSequence} node.
-   *
-   * @param n - the node to visit
-   * @param argu - the user argument 0
-   */
   @Override
   public void visit(final NodeSequence n, final String argu) {
     for (INode e : n.nodes) {
@@ -90,12 +52,6 @@ public class DepthFirstGenVisitor implements IGenVisitor {
     return;
   }
 
-  /**
-   * Visits a {@link Token} node.
-   *
-   * @param n - the node to visit
-   * @param argu - the user argument 0
-   */
   @Override
   public void visit(final Token n, @SuppressWarnings("unused") final String argu) {
     @SuppressWarnings("unused")
@@ -103,281 +59,57 @@ public class DepthFirstGenVisitor implements IGenVisitor {
     return;
   }
 
-  /*
-   * User grammar generated visit methods (to be overridden if necessary)
-   */
-
-  /**
-   * Visits a {@link Start} node, whose children are the following :
-   * <p>
-   * f0 -> Expression()<br>
-   * f1 -> ";"<br>
-   * s: 1859009853<br>
-   *
-   * @param n - the node to visit
-   * @param argu - the user argument 0
-   */
   @Override
-  @NodeFieldsSignature({ 1859009853, JTB_SIG_START, JTB_USER_START })
+  @NodeFieldsSignature({ 0, JTB_SIG_START, JTB_USER_START })
   public void visit(final Start n, final String argu) {
-    // f0 -> Expression()
-    final Expression n0 = n.f0;
-    n0.accept(this, argu);
-    // f1 -> ";"
-    final Token n1 = n.f1;
-    n1.accept(this, argu);
+    n.f0.accept(this, argu);
+    n.f1.accept(this, argu);
   }
 
-  /**
-   * Visits a {@link Expression} node, whose child is the following :
-   * <p>
-   * f0 -> AdditiveExpression()<br>
-   * s: -762347234<br>
-   *
-   * @param n - the node to visit
-   * @param argu - the user argument 0
-   */
   @Override
-  @NodeFieldsSignature({ -762347234, JTB_SIG_EXPRESSION, JTB_USER_EXPRESSION })
+  @NodeFieldsSignature({ 0, JTB_SIG_EXPRESSION, JTB_USER_EXPRESSION })
   public void visit(final Expression n, final String argu) {
-    // f0 -> AdditiveExpression()
-    final AdditiveExpression n0 = n.f0;
-    n0.accept(this, argu);
+    n.f0.accept(this, argu);
   }
 
-  /**
-   * Visits a {@link AdditiveExpression} node, whose children are the following :
-   * <p>
-   * f0 -> MultiplicativeExpression()<br>
-   * f1 -> ( #0 ( %0 "+"<br>
-   * .. .. . .. | %1 "-" )<br>
-   * .. .. . #1 MultiplicativeExpression() )*<br>
-   * s: -1807059397<br>
-   *
-   * @param n - the node to visit
-   * @param argu - the user argument 0
-   */
   @Override
-  @NodeFieldsSignature({ -1807059397, JTB_SIG_ADDITIVEEXPRESSION, JTB_USER_ADDITIVEEXPRESSION })
+  @NodeFieldsSignature({ 0, JTB_SIG_ADDITIVEEXPRESSION, JTB_USER_ADDITIVEEXPRESSION })
   public void visit(final AdditiveExpression n, final String argu) {
-    // f0 -> MultiplicativeExpression()
-    final MultiplicativeExpression n0 = n.f0;
-    n0.accept(this, argu);
-    // f1 -> ( #0 ( %0 "+"
-    // .. .. . .. | %1 "-" )
-    // .. .. . #1 MultiplicativeExpression() )*
-    final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
-        //#0 ( %0 "+"
-        //.. | %1 "-" )
-        final INode nd = seq.elementAt(0);
-        final NodeChoice nch = (NodeChoice) nd;
-        final INode ich = nch.choice;
-        switch (nch.which) {
-          case 0:
-            //%0 "+"
-            ich.accept(this, argu);
-            break;
-          case 1:
-            //%1 "-"
-            ich.accept(this, argu);
-            break;
-          default:
-            // should not occur !!!
-            throw new ShouldNotOccurException(nch);
-        }
-        //#1 MultiplicativeExpression()
-        final INode nd1 = seq.elementAt(1);
-        nd1.accept(this, argu);
-      }
-    }
+    n.f0.accept(this, argu);
+    n.f1.accept(this, argu);
   }
 
-  /**
-   * Visits a {@link MultiplicativeExpression} node, whose children are the following :
-   * <p>
-   * f0 -> UnaryExpression()<br>
-   * f1 -> ( #0 ( %0 "*"<br>
-   * .. .. . .. | %1 "/"<br>
-   * .. .. . .. | %2 "%" )<br>
-   * .. .. . #1 UnaryExpression() )*<br>
-   * s: 853643830<br>
-   *
-   * @param n - the node to visit
-   * @param argu - the user argument 0
-   */
   @Override
-  @NodeFieldsSignature({ 853643830, JTB_SIG_MULTIPLICATIVEEXPRESSION, JTB_USER_MULTIPLICATIVEEXPRESSION })
+  @NodeFieldsSignature({ 0, JTB_SIG_MULTIPLICATIVEEXPRESSION, JTB_USER_MULTIPLICATIVEEXPRESSION })
   public void visit(final MultiplicativeExpression n, final String argu) {
-    // f0 -> UnaryExpression()
-    final UnaryExpression n0 = n.f0;
-    n0.accept(this, argu);
-    // f1 -> ( #0 ( %0 "*"
-    // .. .. . .. | %1 "/"
-    // .. .. . .. | %2 "%" )
-    // .. .. . #1 UnaryExpression() )*
-    final NodeListOptional n1 = n.f1;
-    if (n1.present()) {
-      for (int i = 0; i < n1.size(); i++) {
-        final INode nloeai = n1.elementAt(i);
-        final NodeSequence seq = (NodeSequence) nloeai;
-        //#0 ( %0 "*"
-        //.. | %1 "/"
-        //.. | %2 "%" )
-        final INode nd = seq.elementAt(0);
-        final NodeChoice nch = (NodeChoice) nd;
-        final INode ich = nch.choice;
-        switch (nch.which) {
-          case 0:
-            //%0 "*"
-            ich.accept(this, argu);
-            break;
-          case 1:
-            //%1 "/"
-            ich.accept(this, argu);
-            break;
-          case 2:
-            //%2 "%"
-            ich.accept(this, argu);
-            break;
-          default:
-            // should not occur !!!
-            throw new ShouldNotOccurException(nch);
-        }
-        //#1 UnaryExpression()
-        final INode nd1 = seq.elementAt(1);
-        nd1.accept(this, argu);
-      }
-    }
+    n.f0.accept(this, argu);
+    n.f1.accept(this, argu);
   }
 
-  /**
-   * Visits a {@link UnaryExpression} node, whose child is the following :
-   * <p>
-   * f0 -> . %0 #0 "(" #1 Expression() #2 ")"<br>
-   * .. .. | %1 Identifier()<br>
-   * .. .. | %2 EgInteger()<br>
-   * s: 190447292<br>
-   *
-   * @param n - the node to visit
-   * @param argu - the user argument 0
-   */
   @Override
-  @NodeFieldsSignature({ 190447292, JTB_SIG_UNARYEXPRESSION, JTB_USER_UNARYEXPRESSION })
+  @NodeFieldsSignature({ 0, JTB_SIG_UNARYEXPRESSION, JTB_USER_UNARYEXPRESSION })
   public void visit(final UnaryExpression n, final String argu) {
-    // f0 -> . %0 #0 "(" #1 Expression() #2 ")"
-    // .. .. | %1 Identifier()
-    // .. .. | %2 EgInteger()
-    final NodeChoice nch = n.f0;
-    final INode ich = nch.choice;
-    switch (nch.which) {
-      case 0:
-        //%0 #0 "(" #1 Expression() #2 ")"
-        final NodeSequence seq = (NodeSequence) ich;
-        //#0 "("
-        final INode nd = seq.elementAt(0);
-        nd.accept(this, argu);
-        //#1 Expression()
-        final INode nd1 = seq.elementAt(1);
-        nd1.accept(this, argu);
-        //#2 ")"
-        final INode nd2 = seq.elementAt(2);
-        nd2.accept(this, argu);
-        break;
-      case 1:
-        //%1 Identifier()
-        ich.accept(this, argu);
-        break;
-      case 2:
-        //%2 EgInteger()
-        ich.accept(this, argu);
-        break;
-      default:
-        // should not occur !!!
-        throw new ShouldNotOccurException(nch);
-    }
+    n.f0.accept(this, argu);
   }
 
-  /**
-   * Visits a {@link Identifier} node, whose child is the following :
-   * <p>
-   * f0 -> < IDENTIFIER ><br>
-   * s: -1580059612<br>
-   *
-   * @param n - the node to visit
-   * @param argu - the user argument 0
-   */
   @Override
-  @NodeFieldsSignature({ -1580059612, JTB_SIG_IDENTIFIER, JTB_USER_IDENTIFIER })
+  @NodeFieldsSignature({ 0, JTB_SIG_IDENTIFIER, JTB_USER_IDENTIFIER })
   public void visit(final Identifier n, final String argu) {
-    // f0 -> < IDENTIFIER >
-    final Token n0 = n.f0;
-    n0.accept(this, argu);
+    n.f0.accept(this, argu);
   }
 
-  /**
-   * Visits a {@link EgInteger} node, whose children are the following :
-   * <p>
-   * f0 -> < INTEGER_LITERAL ><br>
-   * f1 -> jc_1()<br>
-   * s: 640957941<br>
-   *
-   * @param n - the node to visit
-   * @param argu - the user argument 0
-   */
   @Override
-  @NodeFieldsSignature({ 640957941, JTB_SIG_EGINTEGER, JTB_USER_EGINTEGER })
+  @NodeFieldsSignature({ 0, JTB_SIG_EGINTEGER, JTB_USER_EGINTEGER })
   public void visit(final EgInteger n, final String argu) {
-    // f0 -> < INTEGER_LITERAL >
-    final Token n0 = n.f0;
-    n0.accept(this, argu);
-    // f1 -> jc_1()
-    final jc_1 n1 = n.f1;
-    n1.accept(this, argu);
+    n.f0.accept(this, argu);
+    n.f1.accept(this, argu);
   }
 
-  /**
-   * Visits a {@link jc_1} node, with no child :
-   * <p>
-   * s: 0<br>
-   *
-   * @param n - the node to visit
-   * @param argu - the user argument 0
-   */
   @SuppressWarnings("unused")
   @Override
   @NodeFieldsSignature({ 0, JTB_SIG_JC_1, JTB_USER_JC_1 })
   public void visit(final jc_1 n, final String argu) {
     /* empty node, nothing that can be generated so far */
-  }
-
-  /**
-   * Class handling a programmatic exception. Static for generic outer classes.
-   */
-  public static class ShouldNotOccurException extends RuntimeException {
-
-    /** Default serialVersionUID */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Constructor with no message.
-     */
-    public ShouldNotOccurException() {
-      super();
-    }
-
-    /**
-     * Constructor which outputs a message.
-     *
-     * @param ch - a NodeChoice whose which value is invalid or lead to a fall-through
-     */
-    public ShouldNotOccurException(final NodeChoice ch) {
-      super("Invalid switch value (" + ch.which + ") or fall-through");
-    }
-
   }
 
 }

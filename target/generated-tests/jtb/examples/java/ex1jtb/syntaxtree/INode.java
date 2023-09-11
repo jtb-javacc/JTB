@@ -4,82 +4,41 @@ package examples.java.ex1jtb.syntaxtree;
 import java.util.List;
 import examples.java.ex1jtb.visitor.IGenVisitor;
 
-/**
- * The interface which all syntax tree classes must implement.
- */
+@SuppressWarnings("javadoc")
 public interface INode extends java.io.Serializable {
 
-  /** The OS line separator */
   public static final String LS = System.getProperty("line.separator"); //$NON-NLS-1$
 
   /*
    * Visitors accept methods (no -novis option, visitors specification : Gen,void,java.lang.String)
    */
 
-  /**
-   * Accepts a {@link IGenVisitor} visitor with user argument data.
-   *
-   * @param vis - the visitor
-   * @param argu - the user Argument data
-   */
   public void accept(final IGenVisitor vis, final String argu);
 
   /*
    * Parent pointer getter and setter (-pp option)
    */
 
-  /**
-   * Gets the parent node.
-   *
-   * @return the parent node
-   */
   public INode getParent();
 
-  /**
-   * Sets the parent node. (It is the responsibility of each implementing class
-   * to call setParent() on each of its child nodes.)
-   *
-   * @param n - the parent node
-   */
   public void setParent(final INode n);
 
   /*
    * Children methods (-chm option)
    */
 
-  /**
-   * @return the number of all direct children (base + user nodes)
-   */
   public int getNbAllChildren();
 
-  /**
-   * @return the number of direct base nodes children
-   */
   public int getNbBaseChildren();
 
-  /**
-   * @return the number of direct user nodes children
-   */
   public int getNbUserChildren();
 
-  /**
-   * @return the list of all direct children (base + user nodes)
-   */
   public List<INode> getAllChildren();
 
-  /**
-   * @return the list of direct base nodes children
-   */
   public List<INode> getBaseChildren();
 
-  /**
-   * @return the list of direct user nodes children
-   */
   public List<INode> getUserChildren();
 
-  /**
-   * @return true if the node is a base node, false otherwise
-   */
   public boolean isBaseNode();
 
 }

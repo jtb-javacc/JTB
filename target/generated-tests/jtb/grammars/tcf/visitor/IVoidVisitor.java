@@ -96,9 +96,9 @@ public interface IVoidVisitor {
   /**
    * Visits a {@link Tcf2} node, whose child is the following :
    * <p>
-   * f0 ->   %0 Identifier()<br>
+   * {}f0 ->   %0 Identifier()<br>
    * .. .. | !1 Integer_literal_boum()<br>
-   * s: 803552317<br>
+   * s: 1058520479<br>
    *
    * @param n - the node to visit
    */

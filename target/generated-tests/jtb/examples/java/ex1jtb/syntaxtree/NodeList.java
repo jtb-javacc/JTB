@@ -6,69 +6,37 @@ import java.util.Iterator;
 import java.util.List;
 import examples.java.ex1jtb.visitor.IGenVisitor;
 
-/**
- * Represents a grammar list (+), e.g. ' ( A )+ '.<br>
- * The class stores the nodes list in an ArrayList.
- */
+@SuppressWarnings("javadoc")
 public class NodeList implements INodeList {
 
-  /** The list of nodes */
   public ArrayList<INode> nodes;
 
-  /** The allocation sizes table */
   private  final int allocTb[] = {1, 2, 3, 4, 5, 10, 20, 50};
 
-  /** The allocation number */
   private int allocNb = 0;
 
-  /** The parent node */
   private INode parent;
 
-  /** The serial version UID */
   private static final long serialVersionUID = 151L;
 
-  /**
-   * Initializes an empty list of nodes with a default first allocation.
-   */
   public NodeList() {
     nodes = new ArrayList<>(allocTb[allocNb]);
   }
 
-  /**
-   * Initializes an empty list of nodes with a given allocation.
-   *
-   * @param sz - the list size
-   */
   public NodeList(final int sz) {
     nodes = new ArrayList<>(sz);
   }
 
-  /**
-   * Initializes an empty list of nodes with a default first allocation and adds a first node.
-   *
-   * @param firstNode - the node to add
-   */
   public NodeList(final INode firstNode) {
     nodes = new ArrayList<>(allocTb[allocNb]);
     addNode(firstNode);
   }
 
-  /**
-   * Initializes an empty list of nodes with a given allocation and adds a first node.
-   *
-   * @param sz - the list size
-   * @param firstNode - the node to add
-   */
   public NodeList(final int sz, final INode firstNode) {
     nodes = new ArrayList<>(sz);
     addNode(firstNode);
   }
 
-  /**
-   * Adds a node to the list of nodes, managing progressive allocation increments.
-   *
-   * @param n - the node to add
-   */
   @Override
   public void addNode(final INode n) {
     if (++allocNb < allocTb.length)
@@ -80,30 +48,14 @@ public class NodeList implements INodeList {
       n.setParent(this);
   }
 
-  /**
-   * Gets the node in the list at a given position.
-   *
-   * @param i - the node's position
-   * @return the node
-   */
   @Override
   public INode elementAt(final int i) {
     return nodes.get(i); }
 
-  /**
-   * Returns an iterator on the nodes list.
-   *
-   * @return the iterator
-   */
   @Override
   public Iterator<INode> elements() {
     return nodes.iterator(); }
 
-  /**
-   * Returns the number of nodes in the list.
-   *
-   * @return the list size
-   */
   @Override
   public int size() {
     return nodes.size(); }
@@ -112,12 +64,6 @@ public class NodeList implements INodeList {
    * Visitors accept methods (no -novis option, visitors specification : Gen,void,java.lang.String)
    */
 
-  /**
-   * Accepts a {@link IGenVisitor} visitor with user argument data.
-   *
-   * @param vis - the visitor
-   * @param argu - the user Argument data
-   */
   @Override
   public void accept(final IGenVisitor vis, final String argu) {
     vis.visit(this, argu);
@@ -127,21 +73,11 @@ public class NodeList implements INodeList {
    * Parent pointer getter and setter (-pp option)
    */
 
-  /**
-   * Gets the parent node.
-   *
-   * @return the parent node
-   */
   @Override
   public INode getParent() {
     return parent;
   }
 
-  /**
-   * Sets the parent node.
-   *
-   * @param n - the parent node
-   */
   @Override
   public void setParent(final INode n) {
     parent = n;
@@ -151,32 +87,21 @@ public class NodeList implements INodeList {
    * Children methods (-chm option)
    */
 
-  /** The list of all direct children (base + user nodes) */
   private List<INode> lac = null;
 
-  /** The list of direct base nodes children */
   private List<INode> lbc = null;
 
-  /** The list of direct user nodes children */
   private List<INode> luc = null;
 
-  /** The number of direct base nodes children */
   private int nbLbc = -1;
 
-  /** The number of direct user nodes children */
   private int nbLuc = -1;
 
-  /**
-   * @return the number of all direct children (base + user nodes) (1..N)
-   */
   @Override
   public int getNbAllChildren() {
     return nodes.size();
   }
 
-  /**
-   * @return the number of direct base nodes children (0..N)
-   */
   @Override
   public int getNbBaseChildren() {
     if (lbc == null)
@@ -184,9 +109,6 @@ public class NodeList implements INodeList {
     return nbLbc;
   }
 
-  /**
-   * @return the number of direct user nodes children (0..N)
-   */
   @Override
   public int getNbUserChildren() {
     if (luc == null)
@@ -194,9 +116,6 @@ public class NodeList implements INodeList {
     return nbLuc;
   }
 
-  /**
-   * @return the list of all direct children (base + user nodes) (1..N)
-   */
   @Override
   public List<INode> getAllChildren() {
     if (lac == null) {
@@ -206,9 +125,6 @@ public class NodeList implements INodeList {
     return lac;
   }
 
-  /**
-   * @return the list of direct base nodes children (0..N)
-   */
   @Override
   public List<INode> getBaseChildren() {
     if (lbc == null) {
@@ -224,9 +140,6 @@ public class NodeList implements INodeList {
     return lbc;
   }
 
-  /**
-   * @return the list of direct user nodes children (0..N)
-   */
   @Override
   public List<INode> getUserChildren() {
     if (luc == null) {
@@ -242,9 +155,6 @@ public class NodeList implements INodeList {
     return luc;
   }
 
-  /**
-   * @return true if the node is a base node, false otherwise (always true : the node is a base node)
-   */
   @Override
   public boolean isBaseNode() {
     return true;

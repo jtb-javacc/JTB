@@ -8,9 +8,9 @@ import grammars.tcf.visitor.IVoidVisitor;
 /**
  * JTB node class for the production Tcf2:<br>
  * Corresponding grammar:<br>
- * f0 ->   %0 Identifier()<br>
+ * {}f0 ->   %0 Identifier()<br>
  * .. .. | !1 Integer_literal_boum()<br>
- * s: 803552317<br>
+ * s: 1058520479<br>
  */
 public class Tcf2 implements INode {
 

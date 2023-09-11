@@ -1,3 +1,4 @@
+<<<<<<< HEAD:doc/wiki/Release_notes.md
 # Java Tree Builder (JTB) - Release notes (dd/mm/yy)
 
 ### Version 1.5.1 - jtb-1.5.1.jar of xx/08/2023, to be committed on GitHub, to be included in the Eclipse JavaCC Plug-in v1.6.1
@@ -42,14 +43,39 @@
 - added a test with ("xxx"|{}) (issue #86)
 
 ### Version 1.4.13 - 12/01/2017
+=======
+---------------
+Version 1.4.14  ??
+---------------
+-> xx/xx/2017
+- updated docs (releases.notes, README.md, pom.xml, doc/jtb_doc.html, doc/HowTo.txt), added doc/wiki/*
+- removed some warnings and used try-with-resource
+- suppressed the JTBToolkit class generated in the parser's file but after the parser's class
+
+Version 1.4.13
+---------------
+-> 12/01/2017
+>>>>>>> cbea16d4233b3f598105db1c1c42b1f6d25c0508:releases.notes
 - fixed printing a local variable declaration with a modifier
 - moved properties from build.xml to jtb.xml (dev)
 - added options to generate correctly the grammar in Eclipse (dev)
 
+<<<<<<< HEAD:doc/wiki/Release_notes.md
 ### Version 1.4.12
 - publish JTB as a Maven artifact to Maven Central
 
 ### Version 1.4.11 - xx/04/2016
+=======
+---------------
+Version 1.4.12
+---------------
+Publish JTB as a maven artifact to Maven Central
+
+---------------
+Version 1.4.11
+---------------
+-> xx/04/2016
+>>>>>>> cbea16d4233b3f598105db1c1c42b1f6d25c0508:releases.notes
 - fixed (added) spaces between the '<' and '>' and the token labels in the generated javadoc comments
 - fixed the conditions on displaying the "warning:  Empty choice : a NodeChoice with a 'null' choice member ..."
 - fixed column numbers in messages
