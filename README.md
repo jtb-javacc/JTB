@@ -4,7 +4,7 @@
 
 <span style="color:red">JTB</span> is a *syntax tree builder* to be used with the <span style="color:red">JavaCC</span> (Java Compiler Compiler) parser generator.  
 
-JTB was originally developed at UCLA up to version 1.3.2 [JTB 132](http://compilers.cs.ucla.edu/jtb/) or [JTB < 1.3.2](http://compilers.cs.ucla.edu/jtb/jtb-2003/).  
+JTB was originally developed at UCLA up to version 1.3.2 ([JTB 1.3.2](http://compilers.cs.ucla.edu/jtb/) and [JTB < 1.3.2](http://compilers.cs.ucla.edu/jtb/jtb-2003/)).  
 
 It has been upgraded in version 1.4.0+ (2009-2010), for a real life project - a translator for the Uniface L3G language (PROC) to Java, ran on 5000+ source files in less than 30 mn -, and has been embedded within the [Eclipse JavaCC plugin](https://sourceforge.net/projects/eclipse-javacc/).
 
