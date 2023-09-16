@@ -2,39 +2,40 @@
 <!DOCTYPE fakeforremovingdtdvalidationinfo>
 <!-- jtb_props.xml. Defines JTB properties, imported by build.xml.
      Uses version.properties to import (and share) the to be built JTB version.
-     Marc Mazas - Sopra Steria Group - 05/2009-12/2022 - Francis Andre - 03/2017 -->
+     Marc Mazas - Sopra Steria Group - 05/2009-09/2023 - Francis Andre - 03/2017 -->
 <project name="jtb_props" default="echo_jtb_props">
 
   <!-- JTB directories and packages -->
-  <dirname property="jtb_proj_dir" file="${ant.file.jtb_props}" />
-  <property name="jtb_tgt_cla_dir" value="${jtb_proj_dir}/target/classes" />
-  <property name="jtb_lib_dir" value="${jtb_proj_dir}/lib" />
+  <!-- changed paths to ${basedir} relative -->
+  <!--dirname property="jtb_proj_dir" file="${ant.file.jtb_props}" /-->
+  <property name="jtb_tgt_cla_dir" value="target/classes" />
+  <property name="jtb_lib_dir" value="lib" />
   <property name="jtb_pkg_name" value="EDU.purdue.jtb" />
   <property name="jtb_pkg_dir" value="EDU/purdue/jtb" />
   <property name="jtb_parser_pkg_name" value="${jtb_pkg_name}.parser" />
   <property name="jtb_parser_pkg_dir" value="${jtb_pkg_dir}/parser" />
 
-  <property name="jtb_src_main_jtb_dir" value="${jtb_proj_dir}/src/main/jtb/${jtb_parser_pkg_dir}" />
-  <property name="jtb_src_main_java_dir" value="${jtb_proj_dir}/src/main/java/${jtb_pkg_dir}" />
+  <property name="jtb_src_main_jtb_dir" value="src/main/jtb/${jtb_parser_pkg_dir}" />
+  <property name="jtb_src_main_java_dir" value="src/main/java/${jtb_pkg_dir}" />
   <!--property name="jtb_ap_src_dir" value="${jtb_src_main_jtb_dir}/visitor/signature" /-->
   <property name="jtb_tgt_gensrc_jtb_dir"
-            value="${jtb_proj_dir}/target/generated-sources/jtb/${jtb_parser_pkg_dir}"
+            value="target/generated-sources/jtb/${jtb_parser_pkg_dir}"
   />
   <property name="jtb_tgt_gensrc_jj_dir"
-            value="${jtb_proj_dir}/target/generated-sources/jj/${jtb_parser_pkg_dir}"
+            value="target/generated-sources/jj/${jtb_parser_pkg_dir}"
   />
   <property name="jtb_src_dir"
             value="${jtb_tgt_gensrc_jtb_dir};${jtb_tgt_gensrc_jj_dir};${jtb_src_main_java_dir}"
   />
 
-  <property name="jtb_tgt_gentst_jtb_dir" value="${jtb_proj_dir}/target/generated-tests/jtb" />
-  <property name="jtb_tgt_gentst_jjt_dir" value="${jtb_proj_dir}/target/generated-tests/jjt" />
-  <property name="jtb_tgt_gentst_jj_dir" value="${jtb_proj_dir}/target/generated-tests/jj" />
-  <property name="jtb_tgt_gentst_java_dir" value="${jtb_proj_dir}/target/generated-tests/java" />
-  <property name="jtb_src_tst_jtb_dir" value="${jtb_proj_dir}/src/test/jtb" />
-  <property name="jtb_src_tst_jjt_dir" value="${jtb_proj_dir}/src/test/jjt" />
-  <property name="jtb_src_tst_jj_dir" value="${jtb_proj_dir}/src/test/jj" />
-  <property name="jtb_src_tst_java_dir" value="${jtb_proj_dir}/src/test/java" />
+  <property name="jtb_tgt_gentst_jtb_dir" value="target/generated-tests/jtb" />
+  <property name="jtb_tgt_gentst_jjt_dir" value="target/generated-tests/jjt" />
+  <property name="jtb_tgt_gentst_jj_dir" value="target/generated-tests/jj" />
+  <property name="jtb_tgt_gentst_java_dir" value="target/generated-tests/java" />
+  <property name="jtb_src_tst_jtb_dir" value="src/test/jtb" />
+  <property name="jtb_src_tst_jjt_dir" value="src/test/jjt" />
+  <property name="jtb_src_tst_jj_dir" value="src/test/jj" />
+  <property name="jtb_src_tst_java_dir" value="src/test/java" />
   <property name="jtb_gen_tst_dir"
             value="${jtb_tgt_gentst_jtb_dir};${jtb_tgt_gentst_jj_dir};${jtb_tgt_gentst_java_dir}"
   />
@@ -47,9 +48,9 @@
 
   <!--property name="jtb_last_version" value="1.4.13" /-->
   <!-- temp version saved during 1.5.0 dev as visitors have changed -->
-  <!--property name="jtb_last_version" value="1.5.0" /-->
-  <property name="jtb_last_version" value="1.5.1.temp.1" />
-  <property name="jtb_curr_version" value="1.5.1" />
+  <!--property name="jtb_last_version" value="1.5.1.temp.1" /-->
+  <property name="jtb_last_version" value="1.5.1" />
+  <property name="jtb_curr_version" value="1.5.2" />
 
   <!-- Condition for some targets -->
   <condition property="isLastVersion150">
@@ -75,7 +76,7 @@
 
   <!-- which JTB jar to use -->
   <!-- bootstrap JTB jar -->
-  <property name="jtb_bs_jar" value="${jtb_proj_dir}/lib/jtb132.jar" />
+  <property name="jtb_bs_jar" value="lib/jtb132.jar" />
   <!-- last version JTB jar if exists, otherwise bootstrap JTB jar -->
   <property name="jtb_lv_jar" value="${jtb_lib_dir}/jtb-${jtb_last_version}.jar" />
   <condition property="jtb_last_jar" value="${jtb_lv_jar}">
