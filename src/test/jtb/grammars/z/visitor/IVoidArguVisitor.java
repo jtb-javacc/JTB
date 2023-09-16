@@ -4,29 +4,133 @@ package grammars.z.visitor;
 import grammars.z.syntaxtree.*;
 import grammars.z.Token;
 
-@SuppressWarnings("javadoc")
+/**
+ * All "IVoidArguVisitor" visitors must implement this interface.
+
+ * @param <A> - The argument 0 type parameter
+ */
 public interface IVoidArguVisitor<A> {
 
+  /*
+   * Base nodes visit methods
+   */
+
+  /**
+   * Visits a {@link NodeChoice} node), passing it argument(s).
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   public void visit(final NodeChoice n, final A argu);
 
+  /**
+   * Visits a {@link NodeList} node), passing it argument(s).
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   public void visit(final NodeList n, final A argu);
 
+  /**
+   * Visits a {@link NodeListOptional} node), passing it argument(s).
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   public void visit(final NodeListOptional n, final A argu);
 
+  /**
+   * Visits a {@link NodeOptional} node), passing it argument(s).
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   public void visit(final NodeOptional n, final A argu);
 
+  /**
+   * Visits a {@link NodeSequence} node), passing it argument(s).
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   public void visit(final NodeSequence n, final A argu);
 
+  /**
+   * Visits a {@link Token} node), passing it argument(s).
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   public void visit(final Token n, final A argu);
 
+  /*
+   * User grammar generated visit methods
+   */
+
+  /**
+   * Visits a {@link classDeclaration} node, whose children are the following :
+   * <p>
+   * f0 -> "class"<br>
+   * f1 -> className()<br>
+   * f2 -> "{"<br>
+   * f3 -> ( %0 method()<br>
+   * .. .. | %1 instruction() )*<br>
+   * f4 -> "}"<br>
+   * f5 -> "."<br>
+   * f6 -> < EOF ><br>
+   * s: -98135469<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   public void visit(final classDeclaration n, final A argu);
 
+  /**
+   * Visits a {@link className} node, whose child is the following :
+   * <p>
+   * f0 -> < ID ><br>
+   * s: -1032372970<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   public void visit(final className n, final A argu);
 
+  /**
+   * Visits a {@link method} node, whose children are the following :
+   * <p>
+   * f0 -> methodName()<br>
+   * f1 -> "("<br>
+   * f2 -> ( instruction() )+<br>
+   * f3 -> ")"<br>
+   * s: 128623837<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   public void visit(final method n, final A argu);
 
+  /**
+   * Visits a {@link methodName} node, whose child is the following :
+   * <p>
+   * f0 -> < ID ><br>
+   * s: -1032372970<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   public void visit(final methodName n, final A argu);
 
+  /**
+   * Visits a {@link instruction} node, whose children are the following :
+   * <p>
+   * f0 -> < ID ><br>
+   * f1 -> ";"<br>
+   * s: 1947544793<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   public void visit(final instruction n, final A argu);
 
 }

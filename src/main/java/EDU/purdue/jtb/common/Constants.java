@@ -81,7 +81,7 @@ public class Constants {
   /** Turns on / off printing field and sub comment debug comments */
   public static final boolean DEBUG_COMMENT = false;
   /** The program version */
-  public static final String  JTB_VERSION   = "1.5.1";
+  public static final String  JTB_VERSION   = "1.5.2";
   /** The serial version uid */
   public static final long    SERIALVERSIONUID;
   /** Initialize the serial uid version as the VERSION without the dots */

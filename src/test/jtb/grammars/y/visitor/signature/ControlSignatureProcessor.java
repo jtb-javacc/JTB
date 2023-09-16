@@ -14,16 +14,29 @@ import javax.tools.Diagnostic;
 
 import grammars.y.syntaxtree.NodeConstants;
 
-@SuppressWarnings("javadoc")
+/** 
+ * The {@link ControlSignatureProcessor} annotation processor issues a compile error when the user
+ * visitors' visit methods annotated {@link NodeFieldsSignature} are not coded against the last
+ * nodes definitions.
+ * <p>
+ * Note: the fully qualified name of this class is a line in file
+ * META-INF/services/javax.annotation.processing.Processor.
+ * </p>
+ *
+ * @author Marc Mazas
+ *  @version 1.5.0 : 02/2017 : MMa : created
+ */
 @SupportedAnnotationTypes("grammars.y.visitor.signature.NodeFieldsSignature")
 // Adapt the release to your compiler level
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class ControlSignatureProcessor extends AbstractProcessor {
 
+  /** Standard constructor */
   public ControlSignatureProcessor() {
     super();
   }
 
+    /** {@inheritDoc} */
     @Override
     public boolean process(@SuppressWarnings("unused") final Set<? extends TypeElement> annotations,
                            final RoundEnvironment roundEnv) {

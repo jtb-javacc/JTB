@@ -6,16 +6,37 @@ import grammars.y.Token;
 import grammars.y.syntaxtree.*;
 import grammars.y.visitor.signature.NodeFieldsSignature;
 
-@SuppressWarnings("javadoc")
+/**
+ * Provides default methods which visit each node in the tree in depth-first order.<br>
+ * In your "VoidArgu" visitors extend this class and override part or all of these methods.
+ *
+ * @param <A> - The argument 0 type parameter
+ */
 public class DepthFirstVoidArguVisitor<A> implements IVoidArguVisitor<A> {
 
 
+  /*
+   * Base nodes classes visit methods (to be overridden if necessary)
+   */
+
+  /**
+   * Visits a {@link NodeChoice} node.
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   @Override
   public void visit(final NodeChoice n, final A argu) {
     n.choice.accept(this, argu);
     return;
   }
 
+  /**
+   * Visits a {@link NodeList} node.
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   @Override
   public void visit(final NodeList n, final A argu) {
     for (INode e : n.nodes) {
@@ -24,6 +45,12 @@ public class DepthFirstVoidArguVisitor<A> implements IVoidArguVisitor<A> {
     return;
   }
 
+  /**
+   * Visits a {@link NodeListOptional} node.
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   @Override
   public void visit(final NodeListOptional n, final A argu) {
     if (n.present()) {
@@ -35,6 +62,12 @@ public class DepthFirstVoidArguVisitor<A> implements IVoidArguVisitor<A> {
     return;
   }
 
+  /**
+   * Visits a {@link NodeOptional} node.
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   @Override
   public void visit(final NodeOptional n, final A argu) {
     if (n.present()) {
@@ -44,6 +77,12 @@ public class DepthFirstVoidArguVisitor<A> implements IVoidArguVisitor<A> {
     return;
   }
 
+  /**
+   * Visits a {@link NodeSequence} node.
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   @Override
   public void visit(final NodeSequence n, final A argu) {
     for (INode e : n.nodes) {
@@ -52,6 +91,12 @@ public class DepthFirstVoidArguVisitor<A> implements IVoidArguVisitor<A> {
     return;
   }
 
+  /**
+   * Visits a {@link Token} node.
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   @Override
   public void visit(final Token n, @SuppressWarnings("unused") final A argu) {
     @SuppressWarnings("unused")
@@ -59,63 +104,253 @@ public class DepthFirstVoidArguVisitor<A> implements IVoidArguVisitor<A> {
     return;
   }
 
+  /*
+   * User grammar generated visit methods (to be overridden if necessary)
+   */
+
+  /**
+   * Visits a {@link classDeclaration} node, whose children are the following :
+   * <p>
+   * f0 -> "class"<br>
+   * f1 -> className()<br>
+   * f2 -> "{"<br>
+   * f3 -> ( %0 method()<br>
+   * .. .. | %1 instruction() )*<br>
+   * f4 -> "}"<br>
+   * f5 -> "."<br>
+   * f6 -> jc_0()<br>
+   * f7 -> < EOF ><br>
+   * s: -1372830968<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   @Override
-  @NodeFieldsSignature({ 0, JTB_SIG_CLASSDECLARATION, JTB_USER_CLASSDECLARATION })
+  @NodeFieldsSignature({ -1372830968, JTB_SIG_CLASSDECLARATION, JTB_USER_CLASSDECLARATION })
   public void visit(final classDeclaration n, final A argu) {
-    n.f0.accept(this, argu);
-    n.f1.accept(this, argu);
-    n.f2.accept(this, argu);
-    n.f3.accept(this, argu);
-    n.f4.accept(this, argu);
-    n.f5.accept(this, argu);
-    n.f6.accept(this, argu);
-    n.f7.accept(this, argu);
+    // f0 -> "class"
+    final Token n0 = n.f0;
+    n0.accept(this, argu);
+    // f1 -> className()
+    final className n1 = n.f1;
+    n1.accept(this, argu);
+    // f2 -> "{"
+    final Token n2 = n.f2;
+    n2.accept(this, argu);
+    // f3 -> ( %0 method()
+    // .. .. | %1 instruction() )*
+    final NodeListOptional n3 = n.f3;
+    if (n3.present()) {
+      for (int i = 0; i < n3.size(); i++) {
+        final INode nloeai = n3.elementAt(i);
+        final NodeChoice nch = (NodeChoice) nloeai;
+        final INode ich = nch.choice;
+        switch (nch.which) {
+          case 0:
+            //%0 method()
+            ich.accept(this, argu);
+            break;
+          case 1:
+            //%1 instruction()
+            ich.accept(this, argu);
+            break;
+          default:
+            // should not occur !!!
+            throw new ShouldNotOccurException(nch);
+        }
+      }
+    }
+    // f4 -> "}"
+    final Token n4 = n.f4;
+    n4.accept(this, argu);
+    // f5 -> "."
+    final Token n5 = n.f5;
+    n5.accept(this, argu);
+    // f6 -> jc_0()
+    final jc_0 n6 = n.f6;
+    n6.accept(this, argu);
+    // f7 -> < EOF >
+    final Token n7 = n.f7;
+    n7.accept(this, argu);
   }
 
+  /**
+   * Visits a {@link className} node, whose child is the following :
+   * <p>
+   * f0 -> < ID ><br>
+   * s: -1032372970<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   @Override
-  @NodeFieldsSignature({ 0, JTB_SIG_CLASSNAME, JTB_USER_CLASSNAME })
+  @NodeFieldsSignature({ -1032372970, JTB_SIG_CLASSNAME, JTB_USER_CLASSNAME })
   public void visit(final className n, final A argu) {
-    n.f0.accept(this, argu);
+    // f0 -> < ID >
+    final Token n0 = n.f0;
+    n0.accept(this, argu);
   }
 
+  /**
+   * Visits a {@link method} node, whose children are the following :
+   * <p>
+   * f0 -> methodName()<br>
+   * f1 -> "("<br>
+   * f2 -> ( instruction() )+<br>
+   * f3 -> ")"<br>
+   * s: 128623837<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   @Override
-  @NodeFieldsSignature({ 0, JTB_SIG_METHOD, JTB_USER_METHOD })
+  @NodeFieldsSignature({ 128623837, JTB_SIG_METHOD, JTB_USER_METHOD })
   public void visit(final method n, final A argu) {
-    n.f0.accept(this, argu);
-    n.f1.accept(this, argu);
-    n.f2.accept(this, argu);
-    n.f3.accept(this, argu);
+    // f0 -> methodName()
+    final methodName n0 = n.f0;
+    n0.accept(this, argu);
+    // f1 -> "("
+    final Token n1 = n.f1;
+    n1.accept(this, argu);
+    // f2 -> ( instruction() )+
+    final NodeList n2 = n.f2;
+    for (int i = 0; i < n2.size(); i++) {
+      final INode lsteai = n2.elementAt(i);
+      lsteai.accept(this, argu);
+    }
+    // f3 -> ")"
+    final Token n3 = n.f3;
+    n3.accept(this, argu);
   }
 
+  /**
+   * Visits a {@link methodName} node, whose child is the following :
+   * <p>
+   * f0 -> < ID ><br>
+   * s: -1032372970<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   @Override
-  @NodeFieldsSignature({ 0, JTB_SIG_METHODNAME, JTB_USER_METHODNAME })
+  @NodeFieldsSignature({ -1032372970, JTB_SIG_METHODNAME, JTB_USER_METHODNAME })
   public void visit(final methodName n, final A argu) {
-    n.f0.accept(this, argu);
+    // f0 -> < ID >
+    final Token n0 = n.f0;
+    n0.accept(this, argu);
   }
 
+  /**
+   * Visits a {@link instruction} node, whose child is the following :
+   * <p>
+   * f0 -> . %0 #0 < ID > #1 ";"<br>
+   * .. .. | %1 ","<br>
+   * s: 119476985<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   @Override
-  @NodeFieldsSignature({ 0, JTB_SIG_INSTRUCTION, JTB_USER_INSTRUCTION })
+  @NodeFieldsSignature({ 119476985, JTB_SIG_INSTRUCTION, JTB_USER_INSTRUCTION })
   public void visit(final instruction n, final A argu) {
-    n.f0.accept(this, argu);
+    // f0 -> . %0 #0 < ID > #1 ";"
+    // .. .. | %1 ","
+    final NodeChoice nch = n.f0;
+    final INode ich = nch.choice;
+    switch (nch.which) {
+      case 0:
+        //%0 #0 < ID > #1 ";"
+        final NodeSequence seq = (NodeSequence) ich;
+        //#0 < ID >
+        final INode nd = seq.elementAt(0);
+        nd.accept(this, argu);
+        //#1 ";"
+        final INode nd1 = seq.elementAt(1);
+        nd1.accept(this, argu);
+        break;
+      case 1:
+        //%1 ","
+        ich.accept(this, argu);
+        break;
+      default:
+        // should not occur !!!
+        throw new ShouldNotOccurException(nch);
+    }
   }
 
+  /**
+   * Visits a {@link bp_jual} node, whose child is the following :
+   * <p>
+   * f0 -> < ID ><br>
+   * s: -1032372970<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   @Override
-  @NodeFieldsSignature({ 0, JTB_SIG_BP_JUAL, JTB_USER_BP_JUAL })
+  @NodeFieldsSignature({ -1032372970, JTB_SIG_BP_JUAL, JTB_USER_BP_JUAL })
   public void visit(final bp_jual n, final A argu) {
-    n.f0.accept(this, argu);
+    // f0 -> < ID >
+    final Token n0 = n.f0;
+    n0.accept(this, argu);
   }
 
+  /**
+   * Visits a {@link bp_hm} node, whose child is the following :
+   * <p>
+   * f0 -> < ID ><br>
+   * s: -1032372970<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   @Override
-  @NodeFieldsSignature({ 0, JTB_SIG_BP_HM, JTB_USER_BP_HM })
+  @NodeFieldsSignature({ -1032372970, JTB_SIG_BP_HM, JTB_USER_BP_HM })
   public void visit(final bp_hm n, final A argu) {
-    n.f0.accept(this, argu);
+    // f0 -> < ID >
+    final Token n0 = n.f0;
+    n0.accept(this, argu);
   }
 
+  /**
+   * Visits a {@link jc_0} node, with no child :
+   * <p>
+   * s: 0<br>
+   *
+   * @param n - the node to visit
+   * @param argu - the user argument 0
+   */
   @SuppressWarnings("unused")
   @Override
   @NodeFieldsSignature({ 0, JTB_SIG_JC_0, JTB_USER_JC_0 })
   public void visit(final jc_0 n, final A argu) {
     /* empty node, nothing that can be generated so far */
+  }
+
+  /**
+   * Class handling a programmatic exception. Static for generic outer classes.
+   */
+  public static class ShouldNotOccurException extends RuntimeException {
+
+    /** Default serialVersionUID */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructor with no message.
+     */
+    public ShouldNotOccurException() {
+      super();
+    }
+
+    /**
+     * Constructor which outputs a message.
+     *
+     * @param ch - a NodeChoice whose which value is invalid or lead to a fall-through
+     */
+    public ShouldNotOccurException(final NodeChoice ch) {
+      super("Invalid switch value (" + ch.which + ") or fall-through");
+    }
+
   }
 
 }
