@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE fakeforremovingdtdvalidationinfo>
 <!-- build_jtb_html.xml
-     Used to automatically (on save) generate .html files suited for the Wiki from the .textile file(s)
+     No more used (as GitHub does not show html files
+     Was used to automatically (on save) generate .html files suited for the Wiki from the .textile file(s)
       and for other .md file(s), and to manually delete them;
      for the first the Ant builder must be added / enabled to the project, and for both see further comment.
-     Marc Mazas - Sopra Steria Group - 03/2021 -->
+     Marc Mazas - Sopra Steria Group - 03-09/2021 -->
 
-<project name="jtb_html" default="generate_html">
+<project name="jtb_html" default="generate_html" basedir=".">
+
+  <!-- Set wikitext jars location for the different installations / environments.
+       If under Eclipse the launch command specifies to be run in the project's JRE, ${eclipse.home} will be
+        defined (and this will pick the latest jars), otherwise not (and that will pick the copied jars) -->
+  <condition property="wikitext-jars-dir" value="${eclipse.home}\plugins" else="${basedir}\lib">
+    <isset property="${eclipse.home}"/>
+  </condition>
 
   <!-- Path to jars that must be on the classpath for Wikitext Ant tasks (note it has changed from Neon) -->
   <path id="wikitext.ant.classpath">
-    <!--- this dir setting is ok for the project builder and for manual builds
-          only if the launch command specifies to be run in the project's JRE,
-          otherwise eclipse.home is not defined and dir does not exist! -->
-    <fileset dir="${eclipse.home}\plugins">
+    <fileset dir="${wikitext-jars-dir}">
       <include name="*wikitext*.jar" />
       <include name="*guava*.jar" />
     </fileset>

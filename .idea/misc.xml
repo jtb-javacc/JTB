@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectResources">
+    <resource url="antlib:org.apache.maven.artifact.ant" location="$PROJECT_DIR$/lib/maven-ant-tasks-2.1.3.jar!/org/apache/maven/artifact/ant/antlib.xml" />
+    <resource url="antlib:org.jacoco.ant" location="$PROJECT_DIR$/lib/jacocoant-0.8.10.jar!/org/jacoco/ant/antlib.xml" />
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="11" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/target/classes" />
+  </component>
+</project>

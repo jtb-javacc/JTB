@@ -307,10 +307,10 @@ public class JTBOptions extends Options {
   /**
    * Loads the global variables with the JTB global options from the parsed grammar (which was fed with the
    * command line options and the grammar file options).
-   * 
+   *
    * @param aGrammarDeclaredPackage - the grammar package name in the grammar
    */
-  public void loadJTBGlobalOptions(String aGrammarDeclaredPackage) {
+  public void loadJTBGlobalOptions(final String aGrammarDeclaredPackage) {
     String str = null;
     final Map<String, Object> optMap = getOptions();
     
@@ -416,25 +416,32 @@ public class JTBOptions extends Options {
     
     boolean checkHDN = true;
     if ((grammarDirectoryName != null) && !"".equals(grammarDirectoryName)) {
-      if (DEF_HOOK_DIR_NAME.equals(hookDirName))
+      if (DEF_HOOK_DIR_NAME.equals(hookDirName)) {
         hookDirName = grammarDirectoryName + File.separator + DEF_HOOK_DIR_NAME;
-      if (DEF_ND_DIR_NAME.equals(nodesDirName))
+        checkHDN = false;
+      }
+      if (DEF_ND_DIR_NAME.equals(nodesDirName)) {
         nodesDirName = grammarDirectoryName + File.separator + DEF_ND_DIR_NAME;
-      if (DEF_VIS_DIR_NAME.equals(visitorsDirName))
+      }
+      if (DEF_VIS_DIR_NAME.equals(visitorsDirName)) {
         visitorsDirName = grammarDirectoryName + File.separator + DEF_VIS_DIR_NAME;
-      checkHDN = false;
+      }
     }
     signatureDirName = visitorsDirName + File.separator + DEF_SIG_DIR_NAME;
     
     boolean checkHPN = true;
-    if ((grammarPackageName != null) && !"".equals(grammarPackageName)) {
-      if (DEF_HOOK_PKG_NAME.equals(hookPackageName))
+    if ((grammarPackageName != null) && //
+        !"".equals(grammarPackageName)) {
+      if (DEF_HOOK_PKG_NAME.equals(hookPackageName)) {
         hookPackageName = grammarPackageName + "." + DEF_HOOK_PKG_NAME;
-      if (DEF_ND_PKG_NAME.equals(nodesPackageName))
+        checkHPN = false;
+      }
+      if (DEF_ND_PKG_NAME.equals(nodesPackageName)) {
         nodesPackageName = grammarPackageName + "." + DEF_ND_PKG_NAME;
-      if (DEF_VIS_PKG_NAME.equals(visitorsPackageName))
+      }
+      if (DEF_VIS_PKG_NAME.equals(visitorsPackageName)) {
         visitorsPackageName = grammarPackageName + "." + DEF_VIS_PKG_NAME;
-      checkHPN = false;
+      }
     }
     signaturePackageName = visitorsPackageName + "." + DEF_SIG_PKG_NAME;
     
@@ -446,6 +453,7 @@ public class JTBOptions extends Options {
         // (the second one will generate classes that will conflict even if they are the same)
         hookDirName = nodesDirName = visitorsDirName = signatureDirName = grammarDirectoryName;
         hookPackageName = nodesPackageName = visitorsPackageName = signaturePackageName = null;
+        checkHDN = checkHPN = false;
       } else {
         // a -p / JTB_P option set, use it
         mess.warning(
@@ -457,12 +465,16 @@ public class JTBOptions extends Options {
       if (grammarPackageName == null) {
         // no -p / JTB_P option set; take it in the grammar package declaration
         grammarPackageName = aGrammarDeclaredPackage;
-        if (DEF_HOOK_PKG_NAME.equals(hookPackageName))
+        if (DEF_HOOK_PKG_NAME.equals(hookPackageName)) {
           hookPackageName = grammarPackageName + "." + DEF_HOOK_PKG_NAME;
-        if (DEF_ND_PKG_NAME.equals(nodesPackageName))
+          checkHPN = false;
+        }
+        if (DEF_ND_PKG_NAME.equals(nodesPackageName)) {
           nodesPackageName = grammarPackageName + "." + DEF_ND_PKG_NAME;
-        if (DEF_VIS_PKG_NAME.equals(visitorsPackageName))
+        }
+        if (DEF_VIS_PKG_NAME.equals(visitorsPackageName)) {
           visitorsPackageName = grammarPackageName + "." + DEF_VIS_PKG_NAME;
+        }
         signaturePackageName = visitorsPackageName + "." + DEF_SIG_PKG_NAME;
       } else {
         if (!aGrammarDeclaredPackage.equals(grammarPackageName)) {
@@ -475,11 +487,13 @@ public class JTBOptions extends Options {
     }
     
     if (!hook) {
-      if (checkHDN && !DEF_HOOK_DIR_NAME.equals(hookDirName)) {
-        mess.warning("Hook directory name set but hook generation not set; ignored");
+      if (checkHDN && //
+          !DEF_HOOK_DIR_NAME.equals(hookDirName)) {
+        mess.warning("Hook directory name set (" + hookDirName + ") but hook generation not set; ignored");
       }
-      if (checkHPN && !DEF_HOOK_PKG_NAME.equals(hookPackageName)) {
-        mess.warning("Hook package name set but hook generation not set; ignored");
+      if (checkHPN && //
+          !DEF_HOOK_PKG_NAME.equals(hookPackageName)) {
+        mess.warning("Hook package name set (" + hookPackageName + ") but hook generation not set; ignored");
       }
     }
     

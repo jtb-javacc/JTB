@@ -110,7 +110,8 @@ import EDU.purdue.jtb.parser.syntaxtree.INode;
  *          FileExistsException ; moved to non static ; changed default true values to false<br>
  *          1.5.0 : 10-2020 : MMa : create directories only if needed ; normalized file names
  * @version 1.5.1 : 07/2023 : MMa : changed no overwrite management ; fixed issue on JTB_VP/JTB_VD<br>
- *          1.5.1 : 08/2023 : MMa : changes due to the NodeToken replacement by Token
+ *          1.5.1 : 08/2023 : MMa : changes due to the NodeToken replacement by Token<br>
+ *          1.5.1 : 09/2023 : MMa : fixed directories values
  */
 public class JTB {
   
@@ -1012,7 +1013,7 @@ public class JTB {
    * normalized absolute paths.
    */
   private void convertPathsToAbsolute() {
-    final String dir = inDir + File.separator;
+    String dir = inDir + File.separator;
     if (jopt.grammarDirectoryName != null) {
       File ndn = new File(jopt.grammarDirectoryName);
       if (!ndn.isAbsolute()) {
@@ -1020,6 +1021,7 @@ public class JTB {
         jopt.grammarDirectoryName = ndn.toPath().normalize().toString();
       }
     }
+    dir = jopt.jjOutDirName + File.separator;
     if (jopt.nodesDirName != null) {
       File ndn = new File(jopt.nodesDirName);
       if (!ndn.isAbsolute()) {

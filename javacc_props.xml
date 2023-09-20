@@ -1,5 +1,4 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE fakeforremovingdtdvalidationinfo> 
 <!-- javacc_props.xml. Defines JavaCC properties, imported by build.xml.
      Marc Mazas - Sopra Steria Group - 10/2020-04/2021 - Francis Andre - 03/2017 -->
 <project name="javacc_props" default="echo_javacc_props">

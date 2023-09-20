@@ -1,31 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!-- Enables building a new version of JTB jar (through a previous JTB version and a compatible JavaCC version).
      Uses jtb_props.xml & javacc_props.xml to import (and share) JTB & JavaCC properties.
-     Uses build_jtb_html.xml for building the wiki documentation.
      Allows to be used along with the SF JavaCC Plug-in which integrates with the Eclipse incremental Build
       System, ie the proper Eclipse settings of the project and the launch configuation can trigger a refresh
       at the end of the ant build which can recompile jtb/jjt/jj/java files and allow markers to be shown in
       the source files - what the standard ant build does not.
-     Not tested under an IDEA installation.
+     Tested under IDEA & VSCode installation&.
      Marc Mazas - Sopra Steria Group - 05/2009 - 12/2022 - 09/2023
-     Francis Andre - 03/2017 -->
-
+     Francis Andre - 03-09/2017
+-->
 <!--
-   Some preliminary notes:
-   - In the launch configuration uncheck "build project before", and
-      choose removing the project's JavaCC nature or automatic build, otherwise a new build will occur
-      with the project's JTB jar, which can be different from this build.xml's one
+   Some settings notes:
    - Check/set that the lib/freemarker-x.y.z & lib/jacocoant-x.y.z jars are on the project's build path in
       Eclipse (Properties / Java Build Path / Libraries)
-   - Check/set the JavaCC jar directory in javacc.xml.
-   - The tests grammars are aimed at covering the JTB features; the examples grammars are aimed at showing
-      the JTB equivalent grammars to the JJTree example grammars found in the JavaCC distrib.
+   - Check/set the JavaCC jar in javacc.xml.
    - If you want to use properties for paths in taskdef (jacoco) or typdef (maven), you have to add these
       paths (lib/jacocoant-x.y.z.jar and lib/maven-ant-tasks-2.1.3.jar) as new entries in Global Entries list
       of entries in Eclipse (Preferences / Ant / Runtime / Classpath), but you will have ant warnings if the
       project is closed.
   -->
-
 <!--
    Here is how to use targets, to build and test a new version:
    
@@ -44,31 +37,32 @@
    - finish docs, deactivate the ant builder for html files
    - if ok and version finished, run rename_new_to_prev_jtb_jar: it will rename the new jar in jar-yyy.jar
    - if after this need to revert back, run revert_prev_to_new_jar: it will rename the jar-yyy.jar in the new jar 
-   - and you may prepare the new version numbers for the next version as above
+   - then you may prepare the new version numbers for the next version as above
    - the (default) target build_all will chain the first four previous targets with code coverage, the target 
       build_all_core will do the same without code coverage
    
+   FAn: COMMENT TO BE ADDED HERE TO DESCRIBE THE USE OF THE POM.XML TARGETS AND ASSOCIATED PROPERTIES IN JTB.XML
+-->
+<!--
+   - Unlike JavaCC or CongoCC, we choosed not to use a bootstrap JTB jar but use as much as possible the
+      last generated jar.
+     This may lead to generate files (.jj, syntaxtree or visitor) with errors; we deal with them by custom tasks
+      (patching the files or replacing them by full files from the src/main/java/.../saves directory)
+      (however in an Eclipse build these steps need to be performed manually)
+
+   - The tests grammars are aimed at covering the JTB features; the examples grammars are aimed at showing
+      the JTB equivalent grammars to the JJTree example grammars found in the JavaCC distrib.
+
    - JaCoCo is used to perform the code coverage analysis and produce the HTML report (on the new JTB version,
       not on the current one) under target/jacoco/report/index.html
    - under Eclipse, with the plugin EclEmma, one can import (File/Import.../Run/Debug/Coverage session) the
       execution file and see the coverage of each java file in the java editors (no way to exclude files like
       with the jacoco report, can only hide unused elements in the coverage view)
    - to get rid of code coverage comment/uncomment some lines (see further)
-   - note that the Eclipse Coverage view can not show any coverage for target-generated/*; this is probably
-      because the (kept) Eclipse automatic build modifies these files after this build.xml is run
+   - note that the Eclipse Coverage view usually do not show any coverage for target-generated/*; this is
+      probably because the Eclipse automatic build modifies these files after this build.xml is run
       (as a proof of this ASTMyID in jjt is a manual overriding, so not regenerated, and is indeed covered)
-        
-   MMa : 04/2021 : adapted to javacc 7.0.10 output; factored gen_xx compilation & add_suppresswarnings
-   MMa : 07/2023 : improved gen_y / gen_z, and some minor stuff
-   MMa : 08/2023 : renamed jtb grammar and out files; moved call to copy_specific_token_for_jtb before generation
-   MMa : 09/2023 : fixed visitors list to be compiled with annotation processor;
-                   changed paths to ${basedir} relative; removed properties for paths in taskdef & typedef;
-                   changed manifest file generation
-   
-   
-   FAn: COMMENT TO BE ADDED HERE TO DESCRIBE THE USE OF THE POM.XML TARGETS AND ASSOCIATED PROPERTIES IN JTB.XML
-  -->
-
+-->
 <!--
    How to use this build script while developing under Eclipse:
    - in the project's JavaCC properties:
@@ -89,9 +83,27 @@
       is quite long) will not be triggered twice (once by the ant build and once by the Eclipse build)
    - set the Project / Properties / Java Compiler / Annotation Processing / Factory Path with the 2 jarx
       ap.jar (which should not change much) and the appropriate jtb-x.y.z.jar or new-jtb-x.y.z.jar
-   - whenb doing code coverage, set the project not to be built automatically by the JDT
-  -->
-
+   - when doing code coverage, set the project not to be built automatically by the JDT
+   - in the build path, the test & generated-tests folders are not considered containing test sources
+      (otherwise we would have to manage output folders target/generated-classes in this script)
+-->
+<!--
+   How to use this build script while developing under Idea or VSCode:
+   - Idea:
+     * care must be taken not to let Idea associate output folder target/test-classes to test sources, i.e.
+        use java sources, not test sources, for src/test and target/generated-tests (it is suspected that Idea
+        can change the .classpath file contents under some configuration)
+     * looks like Idea is able to compile with the project's JDK settings, i.e. JDK 11, so we can use the
+        mylyn jars copied under lib for generating html
+     * code coverage data can be imported in the IDE
+   - VSCode:
+     * looks like VSCode says it is a Maven project and sets the JDK accordingly
+     * looks like the Ant Target Runner is not able to parse this build.xml file, so it must be launched from
+        the terminal, which requires the ANT_HOME / JDK_HOME / PATH to be set appropriately; as the current
+        mylin jars in lib require JDK 11, the build_jtb_html.xml import and targets have been conditioned to
+        be excluded outside Eclipse and therefore a JDK 1.8 can be used
+     * does not look that VSCode is able to import Jacoco coverage data
+-->
 <!--
    How to debug JTB: there are 3 flags in the Java code:
    - in Constants.java:
@@ -101,18 +113,27 @@
    - in CommentsPrinter.java:
      * DEBUG_CHARS: to change prefix and field names strings (useful to see where they are produced)
         (see target rebuild_jtbparser)
-  -->
+-->
+<!--
+   MMa : 04/2021 : adapted to javacc 7.0.10 output; factored gen_xx compilation & add_suppresswarnings
+   MMa : 07/2023 : improved gen_y / gen_z, and some minor stuff
+   MMa : 08/2023 : renamed jtb grammar and out files; moved call to copy_specific_token_for_jtb before generation
+   MMa : 09/2023 : fixed visitors list to be compiled with annotation processor;
+                   changed paths to ${basedir} relative; removed properties for paths in taskdef & typedef;
+                   changed manifest file generation; adapted to Idea & VSCode
+-->
 
 <project name="jtb"
          basedir="."
          default="build_all"
          xmlns:jacoco="antlib:org.jacoco.ant"
          xmlns:artifact="antlib:org.apache.maven.artifact.ant"
->
+         xmlns:if="ant:if"
+         xmlns:unless="ant:unless">
 
   <!-- Ant tasks definition for JaCoCo tasks (m2e does not process property for path) -->
   <taskdef resource="org/jacoco/ant/antlib.xml" uri="antlib:org.jacoco.ant">
-    <classpath path="lib/jacocoant-0.8.10.jar" />
+    <classpath path="lib/jacocoant-0.8.10.jar"/>
   </taskdef>
   <!-- Note: to enable/disable the code coverage, we found shorter to use the agent, versus the coverage tasks
        Note: looks we cannot use properties here in the values -->
@@ -130,60 +151,62 @@
 
   <!-- Ant type definition for Maven tasks (m2e does not process property for path) -->
   <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="antlib:org.apache.maven.artifact.ant">
-    <classpath path="lib/maven-ant-tasks-2.1.3.jar" />
+    <classpath path="lib/maven-ant-tasks-2.1.3.jar"/>
   </typedef>
 
   <!-- Import JTB properties -->
-  <import file="jtb_props.xml" />
+  <import file="jtb_props.xml"/>
 
   <!-- Import JavaCC properties -->
-  <import file="javacc_props.xml" />
+  <import file="javacc_props.xml"/>
 
-  <!-- Import build file for html  -->
-  <import file="build_jtb_html.xml" />
+  <!-- Import build file for html
+  <import file="build_jtb_html.xml" if:set="eclipse.home"/>
+  -->
 
   <!-- Echo JTB and JavaCC / JJTree properties -->
   <target name="echo_all_props">
-    <antcall target="echo_jtb_props" />
-    <antcall target="echo_javacc_props" />
+    <antcall target="echo_jtb_props"/>
+    <antcall target="echo_javacc_props"/>
+    <!--echoproperties/-->
   </target>
 
   <!-- Echo some JavaCC / JJTree properties -->
   <target name="echo_jj_props">
-    <echo message="javacc_ok_jar=${javacc_ok_jar}" />
+    <echo message="javacc_ok_jar=${javacc_ok_jar}"/>
   </target>
 
   <!-- THE full build (jtb parser + tests parsers + examples parsers) (with code coverage) -->
   <target name="build_all">
-    <echo message="jacocoagentvmparam=${jacocoagentvmparam}" />
-    <antcall target="clean_jacoco" />
-    <antcall target="build_all_core" />
-    <antcall target="report_jacoco" />
+    <echo message="jacocoagentvmparam=${jacocoagentvmparam}"/>
+    <antcall target="clean_jacoco"/>
+    <antcall target="build_all_core"/>
+    <antcall target="report_jacoco"/>
     <antcall target="msg_date_time">
-      <param name="message" value="build ended at " />
+      <param name="message" value="build ended at "/>
     </antcall>
   </target>
 
   <!-- The full build core (jtb parser + tests parsers + examples parsers) (no code coverage)-->
   <target name="build_all_core">
-    <antcall target="check_versions" />
-    <antcall target="clean_classes" />
-    <antcall target="build_new_jtb_jar" />
-    <antcall target="compile_test_jtb_java" />
-    <antcall target="run_jtb_tvs" />
-    <antcall target="rebuild_jtbparser" />
+    <antcall target="check_versions"/>
+    <antcall target="clean_classes"/>
+    <antcall target="build_new_jtb_jar"/>
+    <antcall target="compile_test_jtb_java"/>
+    <antcall target="run_jtb_tvs"/>
+    <antcall target="rebuild_jtbparser"/>
     <!-- TODO see if this influences eclemma reporting -->
     <!--antcall target="re-rebuild_jtbparser"/-->
-    <antcall target="build_testparsers" />
-    <antcall target="build_examplesparsers" />
-    <antcall target="run_testparsers" />
-    <antcall target="run_examplesparsers" />
-    <antcall target="generate_html" />
+    <antcall target="build_testparsers"/>
+    <antcall target="build_examplesparsers"/>
+    <antcall target="run_testparsers"/>
+    <antcall target="run_examplesparsers"/>
+    <!--antcall target="generate_html" if:set="eclipse.home"/-->
   </target>
 
   <!-- Check the versions set in 3 places - see jtb_props.xml -->
   <target name="check_versions">
-    <loadfile property="constants" srcFile="${jtb_src_main_java_dir}/common/Constants.java" />
+    <loadfile property="constants" srcFile="${jtb_src_main_java_dir}/common/Constants.java"/>
     <condition property="const-v_eq_build-v">
       <matches pattern='public static final String +JTB_VERSION += "${jtb_curr_version}";'
                string="${constants}"
@@ -194,7 +217,7 @@
     />
 
     <condition property="v-props_eq_build-v">
-      <equals arg1="${jtb_curr_version}" arg2="${jtb_vp_version}" />
+      <equals arg1="${jtb_curr_version}" arg2="${jtb_vp_version}"/>
     </condition>
     <fail message="version in version.properties differs from jtb_version in build.xml"
           unless="${v-props_eq_build-v}"
@@ -203,62 +226,62 @@
 
   <!-- Build: generate with ${jtb_ok_jar}, compile, create ${jtb_new_jar} -->
   <target name="build_new_jtb_jar">
-    <antcall target="echo_all_props" />
-    <antcall target="generate_jtbparser" />
+    <antcall target="echo_all_props"/>
+    <antcall target="generate_jtbparser"/>
     <!-- kept although clean_jtb_gen_files does not delete it, but Eclipse do sometimes -->
     <!-- FIX ME remove this temporary fix needed for 1.5.0 -> 1.5.1 
     <antcall target="temp_copy_specific_nodetoken-150_for_jtbparser" />
     -->
-    <antcall target="compile_main_jtb_java" />
-    <antcall target="make_new_jtb_jar" />
+    <antcall target="compile_main_jtb_java"/>
+    <antcall target="make_new_jtb_jar"/>
   </target>
 
   <!-- Rebuild : regenerate jtb parser files with ${jtb_new_jar} and compile -->
-  <!-- Note: if JTB nodes signatures change: you can skip the signature contol by setting skip_ap to true, -->
+  <!-- Note: if JTB nodes signatures change: you can skip the signature control by setting skip_ap to true, -->
   <!-- then work, then set back skip_ap to false -->
-  <!-- (when debuging with DEBUG_CHARS = true in CommentsPrinter, signatures do change) -->
-  <property name="skip_ap" value="false" />
+  <!-- (when debugging with DEBUG_CHARS = true in CommentsPrinter, signatures do change) -->
+  <property name="skip_ap" value="false"/>
   <target name="rebuild_jtbparser">
-    <antcall target="regenerate_jtbparser" />
-    <antcall target="compile_visitors_with_ap" />
-    <antcall target="compile_main_jtb_java" />
+    <antcall target="regenerate_jtbparser"/>
+    <antcall target="compile_visitors_with_ap"/>
+    <antcall target="compile_main_jtb_java"/>
   </target>
 
   <!-- Re-rebuild : re-regenerate jtb parser files with new jtb classes (${jtb_tgt_cla_dir}) and compile -->
   <target name="re-rebuild_jtbparser">
-    <antcall target="re-regenerate_jtbparser" />
-    <antcall target="compile_visitors_with_ap" />
-    <antcall target="compile_main_jtb_java" />
+    <antcall target="re-regenerate_jtbparser"/>
+    <antcall target="compile_visitors_with_ap"/>
+    <antcall target="compile_main_jtb_java"/>
   </target>
 
   <!-- Regenerate and compile test parsers -->
   <target name="build_testparsers">
-    <antcall target="regenerate_testparsers" />
-    <antcall target="compile_test_grammars_java" />
+    <antcall target="regenerate_testparsers"/>
+    <antcall target="compile_test_grammars_java"/>
   </target>
 
   <!-- Regenerate and compile examples parsers -->
   <target name="build_examplesparsers">
-    <antcall target="regenerate_examplesparsers" />
-    <antcall target="compile_test_examples_java" />
+    <antcall target="regenerate_examplesparsers"/>
+    <antcall target="compile_test_examples_java"/>
   </target>
 
   <!-- Run all test parsers after regenerating and compiling test grammars -->
   <target name="build_and_run_all_tests">
-    <antcall target="build_testparsers" />
-    <antcall target="run_testparsers" />
+    <antcall target="build_testparsers"/>
+    <antcall target="run_testparsers"/>
   </target>
 
   <!-- Run all examples parsers after regenerating and compiling examples grammars -->
   <target name="build_and_run_all_examples">
-    <antcall target="build_examplesparsers" />
-    <antcall target="run_examplesparsers" />
+    <antcall target="build_examplesparsers"/>
+    <antcall target="run_examplesparsers"/>
   </target>
 
   <!-- Generate: process JTB with ${jtb_ok_jar}, then JavaCC & java files -->
   <target name="generate_jtbparser">
-    <antcall target="clean_all_gen_files" />
-    <antcall target="process_jtbparser_with_jtb_ok_jar" />
+    <antcall target="clean_all_gen_files"/>
+    <antcall target="process_jtbparser_with_jtb_ok_jar"/>
     <!-- FIX ME remove this temporary fix needed for 1.5.0 -> 1.5.1
     <antcall target="temp_copy_specific_visitors-150_for_jtbparser" />
      -->
@@ -269,32 +292,32 @@
     <!-- FIX ME remove this temporary fix needed for 1.5.0 -> 1.5.1 
     <antcall target="temp_fix_jtbparser.jj_150" />
     -->
-    <antcall target="process_jtbparser.jj" />
+    <antcall target="process_jtbparser.jj"/>
     <antcall target="add_suppresswarnings_jcs">
-      <param name="fdir" value="${jtb_tgt_gensrc_jj_dir}" />
-      <param name="gname" value="JTBParser" />
+      <param name="gdir" value="${jtb_tgt_gensrc_jj_dir}"/>
+      <param name="gname" value="JTBParser"/>
     </antcall>
   </target>
 
   <!-- Regenerate: process JTB with ${jtb_new_jar}, then JavaCC & java files -->
   <target name="regenerate_jtbparser">
-    <antcall target="clean_all_gen_files" />
-    <antcall target="process_jtbparser_with_jtb_new_jar" />
-    <antcall target="process_jtbparser.jj" />
+    <antcall target="clean_all_gen_files"/>
+    <antcall target="process_jtbparser_with_jtb_new_jar"/>
+    <antcall target="process_jtbparser.jj"/>
     <antcall target="add_suppresswarnings_jcs">
-      <param name="fdir" value="${jtb_tgt_gensrc_jj_dir}" />
-      <param name="gname" value="JTBParser" />
+      <param name="gdir" value="${jtb_tgt_gensrc_jj_dir}"/>
+      <param name="gname" value="JTBParser"/>
     </antcall>
   </target>
 
   <!-- Re-regenerate: process JTB with ${jtb_tgt_cla_dir}, then JavaCC & java files -->
   <target name="re-regenerate_jtbparser">
-    <antcall target="clean_all_gen_files" />
-    <antcall target="process_jtbparser_with_curr_cp" />
-    <antcall target="process_jtbparser.jj" />
+    <antcall target="clean_all_gen_files"/>
+    <antcall target="process_jtbparser_with_curr_cp"/>
+    <antcall target="process_jtbparser.jj"/>
     <antcall target="add_suppresswarnings_jcs">
-      <param name="fdir" value="${jtb_tgt_gensrc_jj_dir}" />
-      <param name="gname" value="JTBParser" />
+      <param name="gdir" value="${jtb_tgt_gensrc_jj_dir}"/>
+      <param name="gname" value="JTBParser"/>
     </antcall>
   </target>
 
@@ -302,15 +325,15 @@
   <target name="process_jtbparser_with_jtb_ok_jar">
     <java classname="${jtb_tool}" classpath="${jtb_ok_jar}" fork="true" failonerror="true">
       <!-- suppresses semantic checking -->
-      <arg value="-e" />
+      <arg value="-e"/>
       <!-- input file -->
       <!-- FIX ME remove this temporary fix needed for 1.5.0 -> 1.5.1 
       <arg value="${jtb_src_main_java_dir}/saves/${jtb_parser}.jtb-150.save" />
       -->
-      <arg value="${jtb_src_main_jtb_dir}/${jtb_parser}.jtb" />
+      <arg value="${jtb_src_main_jtb_dir}/${jtb_parser}.jtb"/>
       <!-- enable assertions -->
       <assertions>
-        <enable />
+        <enable/>
       </assertions>
       <!-- no code coverage on current JTB version -->
     </java>
@@ -320,12 +343,12 @@
   <target name="process_jtbparser_with_jtb_new_jar">
     <java classname="${jtb_tool}" classpath="${jtb_new_jar}" fork="true" failonerror="true">
       <!-- suppresses semantic checking -->
-      <arg value="-e" />
+      <arg value="-e"/>
       <!-- input file -->
-      <arg value="${jtb_src_main_jtb_dir}/${jtb_parser}.jtb" />
+      <arg value="${jtb_src_main_jtb_dir}/${jtb_parser}.jtb"/>
       <!-- enable assertions -->
       <assertions>
-        <enable />
+        <enable/>
       </assertions>
       <!-- jacocoagent vm arguments
       <jvmarg value="${jacocoagentvmparam}" />
@@ -337,12 +360,12 @@
   <target name="process_jtbparser_with_curr_cp">
     <java classname="${jtb_tool}" classpath="${jtb_tgt_cla_dir}" fork="true" failonerror="true">
       <!-- suppresses semantic checking -->
-      <arg value="-e" />
+      <arg value="-e"/>
       <!-- input file -->
-      <arg value="${jtb_src_main_jtb_dir}/${jtb_parser}.jtb" />
+      <arg value="${jtb_src_main_jtb_dir}/${jtb_parser}.jtb"/>
       <!-- enable assertions -->
       <assertions>
-        <enable />
+        <enable/>
       </assertions>
       <!-- no code coverage really needed.
            Also, if we use the same ${jacocoagentvmparam} property with the same classdumpdir, we get an error
@@ -356,16 +379,16 @@
   <target name="process_jtbparser_with_curr_cp_debug">
     <java classname="${jtb_tool}" classpath="${jtb_tgt_cla_dir}" fork="true" failonerror="true">
       <!-- suppresses semantic checking -->
-      <arg value="-e" />
+      <arg value="-e"/>
       <!-- input file -->
-      <arg value="${jtb_src_main_jtb_dir}/${jtb_parser}.jtb" />
+      <arg value="${jtb_src_main_jtb_dir}/${jtb_parser}.jtb"/>
       <!-- enable assertions -->
       <assertions>
-        <enable />
+        <enable/>
       </assertions>
       <!-- debug vm arguments -->
-      <jvmarg value="-Xdebug" />
-      <jvmarg value="-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y" />
+      <jvmarg value="-Xdebug"/>
+      <jvmarg value="-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y"/>
     </java>
   </target>
 
@@ -373,14 +396,14 @@
   <target name="profile_jtbparser_with_jtb_new_jar">
     <java classname="${jtb_tool}" classpath="${jtb_new_jar}" fork="true" failonerror="true">
       <!-- profiling info -->
-      <jvmarg value="${jprofiler_args}" />
+      <jvmarg value="${jprofiler_args}"/>
       <!-- suppresses semantic checking -->
-      <arg value="-e" />
+      <arg value="-e"/>
       <!-- input file -->
-      <arg value="${jtb_src_main_jtb_dir}/${jtb_parser}.jtb" />
+      <arg value="${jtb_src_main_jtb_dir}/${jtb_parser}.jtb"/>
       <!-- enable assertions -->
       <assertions>
-        <enable />
+        <enable/>
       </assertions>
       <!-- no need for code coverage while profiling -->
     </java>
@@ -432,9 +455,9 @@
   <target name="process_jtbparser.jj">
 
     <java classname="${javacc_main}" classpath="${javacc_ok_jar}" fork="true" failonerror="true">
-      <arg value="-OUTPUT_DIRECTORY=${jtb_tgt_gensrc_jj_dir}" />
-      <arg value="-jdk_version=${jdk_version}" />
-      <arg value="${jtb_tgt_gensrc_jtb_dir}/${jtb_parser}.jj" />
+      <arg value="-OUTPUT_DIRECTORY=${jtb_tgt_gensrc_jj_dir}"/>
+      <arg value="-jdk_version=${jdk_version}"/>
+      <arg value="${jtb_tgt_gensrc_jtb_dir}/${jtb_parser}.jj"/>
       <!-- no code coverage on JavaCC -->
     </java>
   </target>
@@ -487,12 +510,12 @@
            classpath="${jtb_tgt_cla_dir}"
            listfiles="false"
     >
-      <compilerarg value="-proc:none" />
-      <compilerarg value="-Xlint:deprecation" />
+      <compilerarg value="-proc:none"/>
+      <compilerarg value="-Xlint:deprecation"/>
       <!-- compilerarg value="-Xlint:unchecked" / -->
     </javac>
     <antcall target="msg_date_time">
-      <param name="message" value="compile_main_jtb_java at " />
+      <param name="message" value="compile_main_jtb_java at "/>
     </antcall>
   </target>
 
@@ -507,13 +530,13 @@
            classpath="${jtb_tgt_cla_dir};${freemarker_jar}"
            listfiles="false"
     >
-      <compilerarg value="-proc:none" />
-      <compilerarg value="-Xlint:deprecation" />
+      <compilerarg value="-proc:none"/>
+      <compilerarg value="-Xlint:deprecation"/>
       <!-- excludes="**/templates/*" -->
       <!-- compilerarg value="-Xlint:unchecked" / -->
     </javac>
     <antcall target="msg_date_time">
-      <param name="message" value="compile_test_jtb_java at " />
+      <param name="message" value="compile_test_jtb_java at "/>
     </antcall>
   </target>
 
@@ -529,12 +552,12 @@
            classpath="${jtb_tgt_cla_dir};${freemarker_jar}"
            listfiles="false"
     >
-      <compilerarg value="-proc:none" />
+      <compilerarg value="-proc:none"/>
       <!-- excludes="**/templates/*" -->
       <!-- compilerarg value="-Xlint:unchecked" / -->
     </javac>
     <antcall target="msg_date_time">
-      <param name="message" value="compile_test_grammars_java at " />
+      <param name="message" value="compile_test_grammars_java at "/>
     </antcall>
   </target>
 
@@ -550,12 +573,12 @@
            classpath="${jtb_tgt_cla_dir}"
            listfiles="false"
     >
-      <compilerarg value="-proc:none" />
+      <compilerarg value="-proc:none"/>
       <!-- excludes="**/templates/*" -->
       <!-- compilerarg value="-Xlint:unchecked" / -->
     </javac>
     <antcall target="msg_date_time">
-      <param name="message" value="compile_test_examples_java at " />
+      <param name="message" value="compile_test_examples_java at "/>
     </antcall>
   </target>
 
@@ -573,7 +596,7 @@
     >
     </javac>
     <antcall target="msg_date_time">
-      <param name="message" value="compile_ap_pkg at " />
+      <param name="message" value="compile_ap_pkg at "/>
     </antcall>
   </target>
 
@@ -581,10 +604,10 @@
   <target name="make_ap_jar" depends="compile_ap_pkg">
     <jar destfile="${jtb_ap_jar}">
       <fileset dir="${basedir}">
-        <include name="/META-INF/services/*" />
+        <include name="/META-INF/services/*"/>
       </fileset>
       <fileset dir="${jtb_tgt_cla_dir}">
-        <include name="**/signature/*" />
+        <include name="**/signature/*"/>
       </fileset>
     </jar>
   </target>
@@ -602,11 +625,11 @@
            target="${jdk_version}"
            listfiles="false"
     >
-      <compilerarg value="-proc:only" />
-      <compilerarg line="-processorpath ${jtb_ap_jar};${jtb_tgt_cla_dir}" />
+      <compilerarg value="-proc:only"/>
+      <compilerarg line="-processorpath ${jtb_ap_jar};${jtb_tgt_cla_dir}"/>
     </javac>
     <antcall target="msg_date_time">
-      <param name="message" value="compile_visitors_with_ap at " />
+      <param name="message" value="compile_visitors_with_ap at "/>
     </antcall>
   </target>
 
@@ -631,85 +654,85 @@
   <!-- Regenerate JTB, JavaCC & java files from the test grammars with ${jtb_new_jar} -->
   <target name="regenerate_testparsers">
     <!-- src/test/jtb/grammars/a/SmallGrammar.jtb -->
-    <antcall target="gen_ga" />
+    <antcall target="gen_ga"/>
     <!-- src/test/jtb/grammars/b/FullGrammar.jtb -->
-    <antcall target="gen_gb" />
+    <antcall target="gen_gb"/>
     <!-- src/test/jtb/grammars/fm/EGTGrammar.jtb -->
-    <antcall target="gen_gfm" />
+    <antcall target="gen_gfm"/>
     <!-- src/test/jtb/grammars/tcf/TcfGrammar.jtb -->
-    <antcall target="gen_gtcf" />
+    <antcall target="gen_gtcf"/>
     <!-- src/test/jjt/grammars/jjttcf/TcfGrammar.jjjt -->
-    <antcall target="gen_gjjttcf" />
+    <antcall target="gen_gjjttcf"/>
     <!-- src/test/jj/grammars/j/TinyGrammar.jj -->
-    <antcall target="gen_gj" />
+    <antcall target="gen_gj"/>
     <!-- src/test/jtb/grammars/p/NoPackageGrammar.jtb -->
-    <antcall target="gen_gp" />
+    <antcall target="gen_gp"/>
     <!-- src/test/jtb/grammars/q/NoDecOptPackageGrammar.jtb -->
-    <antcall target="gen_gq" />
+    <antcall target="gen_gq"/>
     <!-- src/test/jtb/grammars/y/NoOptionGrammar.jtb -->
-    <antcall target="gen_gy" />
+    <antcall target="gen_gy"/>
     <!-- src/test/jtb/grammars/z/NoOptionsSectionGrammar.jtb -->
-    <antcall target="gen_gz" />
+    <antcall target="gen_gz"/>
   </target>
 
   <!-- Regenerate JTB, JavaCC & java files from the JJT/JTB examples grammars with ${jtb_new_jar} -->
   <target name="regenerate_examplesparsers">
-    <antcall target="gen_x1jtb" />
+    <antcall target="gen_x1jtb"/>
     <!-- src/test/jtb/examples/java/ex1jjt/eg1.jjt -->
-    <antcall target="gen_x1jjt" />
+    <antcall target="gen_x1jjt"/>
     <!-- src/test/jtb/examples/java/ex2jtb/eg2.jtb -->
-    <antcall target="gen_x2jtb" />
+    <antcall target="gen_x2jtb"/>
     <!-- src/test/jtb/examples/java/ex3jtb/eg3.jtb -->
-    <antcall target="gen_x3jtb" />
+    <antcall target="gen_x3jtb"/>
     <!-- src/test/jtb/examples/java/ex2jjt/eg2.jjt -->
-    <antcall target="gen_x2jjt" />
+    <antcall target="gen_x2jjt"/>
     <!-- src/test/jtb/examples/java/ex3jjt/eg3.jjt -->
-    <antcall target="gen_x3jjt" />
+    <antcall target="gen_x3jjt"/>
   </target>
 
   <!-- Run test parsers on some inputs -->
   <target name="run_testparsers">
     <!-- Run freemarker.tpt.TemplateProcessorTester.java -->
-    <antcall target="run_tpt" />
+    <antcall target="run_tpt"/>
     <!-- run grammars.a.SmallGrammar on small input -->
-    <antcall target="run_ga" />
+    <antcall target="run_ga"/>
     <!-- run grammars.b.FullGrammar on small input -->
-    <antcall target="run_gb" />
+    <antcall target="run_gb"/>
     <!-- run grammars.fm.EGTGrammar on small input -->
-    <antcall target="run_gfm" />
+    <antcall target="run_gfm"/>
     <!-- run JTB grammars.tcf.TcfGrammar on small input -->
-    <antcall target="run_gtcf" />
+    <antcall target="run_gtcf"/>
     <!-- run JJT grammars.jjttcf.TcfGrammar on small input -->
-    <antcall target="run_gjjttcf" />
+    <antcall target="run_gjjttcf"/>
     <!-- run grammars.j.TinyGrammar on small input -->
-    <antcall target="run_gj" />
+    <antcall target="run_gj"/>
     <!-- run grammars.p.NoPackageGrammar on small input -->
-    <antcall target="run_gp" />
+    <antcall target="run_gp"/>
     <!-- run grammars.q.NoDecOptPackageGrammar on small input -->
-    <antcall target="run_gq" />
+    <antcall target="run_gq"/>
     <!-- compile generated java classes (by tpt & EGTGrammar) -->
-    <antcall target="compile_test_grammars_java" />
+    <antcall target="compile_test_grammars_java"/>
   </target>
 
   <!-- Run JJT/JTB examples parsers on some inputs -->
   <target name="run_examplesparsers">
     <!-- run examples.java.eg1jtb.Eg1 on small input -->
-    <antcall target="run_x1jtb" />
+    <antcall target="run_x1jtb"/>
     <!-- run examples.java.eg1jjt.Eg1 on small input -->
-    <antcall target="run_x1jjt" />
+    <antcall target="run_x1jjt"/>
     <!-- run examples.java.eg2jtb.Eg2 on small input -->
-    <antcall target="run_x2jtb" />
+    <antcall target="run_x2jtb"/>
     <!-- run examples.java.eg3jtb.Eg3 on small input -->
-    <antcall target="run_x3jtb" />
+    <antcall target="run_x3jtb"/>
     <!-- run examples.java.eg2jjt.Eg2 on small input -->
-    <antcall target="run_x2jjt" />
+    <antcall target="run_x2jjt"/>
     <!-- run examples.java.eg3jjt.Eg2 on small input -->
-    <antcall target="run_x3jjt" />
+    <antcall target="run_x3jjt"/>
   </target>
 
   <!-- Clean JaCoCo execution file and reports, unless no code coverage has been specified  -->
   <target name="clean_jacoco" unless="no_code_coverage">
-    <delete dir="${jacoco_dir}" />
+    <delete dir="${jacoco_dir}"/>
   </target>
 
   <!-- Produce the JaCoCo report, unless no code coverage has been specified
@@ -718,65 +741,67 @@
   <target name="report_jacoco" unless="no_code_coverage">
     <jacoco:report>
       <executiondata>
-        <file file="${jacoco_dir}/jacoco.exec" />
+        <file file="${jacoco_dir}/jacoco.exec"/>
       </executiondata>
       <structure name="Exec on new JTB on JTB and test grammars, and exec of test grammars">
         <group name="JTB">
           <classfiles>
             <fileset dir="${jacoco_dump_dir}/EDU">
-              <exclude name="**/*ControlSignatureProcessor*" />
+              <exclude name="**/*ControlSignatureProcessor*"/>
             </fileset>
           </classfiles>
           <sourcefiles encoding="UTF-8">
-            <fileset dir="src/main/java" />
+            <fileset dir="src/main/java"/>
             <fileset dir="target/generated-sources/jtb">
-              <exclude name="**/*ControlSignatureProcessor*" />
+              <exclude name="**/*ControlSignatureProcessor*"/>
             </fileset>
-            <fileset dir="target/generated-sources/jj" />
+            <fileset dir="target/generated-sources/jj"/>
             <fileset dir="target/generated-tests/jtb">
-              <exclude name="**/*ControlSignatureProcessor*" />
+              <exclude name="**/*ControlSignatureProcessor*"/>
             </fileset>
-            <fileset dir="target/generated-tests/jj" />
-            <fileset dir="target/generated-tests/java" />
-            <fileset dir="src/test/java" />
+            <fileset dir="target/generated-tests/jj"/>
+            <fileset dir="target/generated-tests/java"/>
+            <fileset dir="src/test/java"/>
           </sourcefiles>
         </group>
         <group name="Test and examples grammars">
           <classfiles>
             <fileset dir="${jacoco_dump_dir}/grammars">
-              <exclude name="**/*ControlSignatureProcessor*" />
-              <exclude name="${jacoco_dump_dir}/grammars.x*" />
-              <exclude name="${jacoco_dump_dir}/grammars.y*" />
-              <exclude name="${jacoco_dump_dir}/grammars.z*" />
+              <exclude name="**/*ControlSignatureProcessor*"/>
+              <exclude name="${jacoco_dump_dir}/grammars.x*"/>
+              <exclude name="${jacoco_dump_dir}/grammars.y*"/>
+              <exclude name="${jacoco_dump_dir}/grammars.z*"/>
             </fileset>
             <fileset dir="${jacoco_dump_dir}/examples">
-              <exclude name="**/*ControlSignatureProcessor*" />
+              <exclude name="**/*ControlSignatureProcessor*"/>
             </fileset>
             <!--fileset dir="${jacoco_dump_dir}/freemarker" /-->
           </classfiles>
           <sourcefiles encoding="UTF-8">
-            <fileset dir="src/main/java" />
+            <fileset dir="src/main/java"/>
             <fileset dir="target/generated-sources/jtb">
-              <exclude name="**/*ControlSignatureProcessor*" />
+              <exclude name="**/*ControlSignatureProcessor*"/>
             </fileset>
-            <fileset dir="target/generated-sources/jj" />
+            <fileset dir="target/generated-sources/jj"/>
             <fileset dir="target/generated-tests/jtb">
-              <exclude name="**/*ControlSignatureProcessor*" />
-              <exclude name="${jacoco_dump_dir}/grammars.y*" />
-              <exclude name="${jacoco_dump_dir}/grammars.z*" />
+              <exclude name="**/*ControlSignatureProcessor*"/>
+              <exclude name="${jacoco_dump_dir}/grammars.y*"/>
+              <exclude name="${jacoco_dump_dir}/grammars.z*"/>
             </fileset>
             <fileset dir="target/generated-tests/jj">
-              <exclude name="${jacoco_dump_dir}/grammars.x*" />
+              <exclude name="${jacoco_dump_dir}/grammars.x*"/>
             </fileset>
-            <fileset dir="target/generated-tests/java" />
-            <fileset dir="src/test/java" />
+            <fileset dir="target/generated-tests/java"/>
+            <fileset dir="src/test/java"/>
           </sourcefiles>
         </group>
       </structure>
-      <html destdir="${jacoco_report_dir}" />
+      <html destdir="${jacoco_report_dir}"/>
     </jacoco:report>
-    <echo message="JaCoCo formated report is in ${jacoco_report_dir}\index.html" />
+    <echo message="JaCoCo formated report is in ${jacoco_report_dir}\index.html"/>
     <echo message="In Eclipse, use File/Import/Run+Debug/Coverage Session on target\jacoco\jacoco.exec to see the results in each class"
+    />
+    <echo message="In Idea, use Run/Show Coverage Data/Add the file target\jacoco\jacoco.exec to see the results in each class"
     />
   </target>
 
@@ -801,7 +826,7 @@
           classpath="${jtb_tgt_cla_dir};${freemarker_jar}"
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
   </target>
 
@@ -810,21 +835,21 @@
 
     <!-- grammars/a/SmallGrammar.jtb -->
     <antcall target="gen_jtb_gram">
-      <param name="fdir" value="${jtb_src_tst_jtb_dir}/grammars/a" />
-      <param name="gname" value="SmallGrammar" />
+      <param name="gdir" value="${jtb_src_tst_jtb_dir}/grammars/a"/>
+      <param name="gname" value="SmallGrammar"/>
     </antcall>
 
     <!-- grammars/a/SmallGrammar.jj -->
     <antcall target="gen_jj_gram">
-      <param name="fdir" value="${jtb_tgt_gentst_jtb_dir}/grammars/a" />
-      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/a" />
-      <param name="gname" value="SmallGrammar" />
+      <param name="gdir" value="${jtb_tgt_gentst_jtb_dir}/grammars/a"/>
+      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/a"/>
+      <param name="gname" value="SmallGrammar"/>
     </antcall>
 
     <!-- add @SuppressWarnings -->
     <antcall target="add_suppresswarnings_scs">
-      <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/grammars/a" />
-      <param name="gname" value="SmallGrammar" />
+      <param name="gdir" value="${jtb_tgt_gentst_jj_dir}/grammars/a"/>
+      <param name="gname" value="SmallGrammar"/>
     </antcall>
 
   </target>
@@ -841,13 +866,13 @@
           inputstring="tut tut class c {a(i;j;) n; b (k;) end;}."
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should have produced a Oops! -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc1}" />
-      <param name="exp_rc" value="-1" />
-      <param name="add_msg" value='with a "Oops!"' />
+      <param name="act_rc" value="${rc1}"/>
+      <param name="exp_rc" value="-1"/>
+      <param name="add_msg" value='with a "Oops!"'/>
     </antcall>
 
     <echo>
@@ -862,13 +887,13 @@
           inputstring="class c {a(i;j;) b (k;) bp, end;}."
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc2}" />
-      <param name="exp_rc" value="0" />
-      <param name="add_msg" value='with a "SmallGrammar ended."' />
+      <param name="act_rc" value="${rc2}"/>
+      <param name="exp_rc" value="0"/>
+      <param name="add_msg" value='with a "SmallGrammar ended."'/>
     </antcall>
 
   </target>
@@ -878,21 +903,21 @@
 
     <!-- grammars/b/FullGrammar.jtb -->
     <antcall target="gen_jtb_gram">
-      <param name="fdir" value="${jtb_src_tst_jtb_dir}/grammars/b" />
-      <param name="gname" value="FullGrammar" />
+      <param name="gdir" value="${jtb_src_tst_jtb_dir}/grammars/b"/>
+      <param name="gname" value="FullGrammar"/>
     </antcall>
 
     <!-- grammars/b/FullGrammar.jj -->
     <antcall target="gen_jj_gram">
-      <param name="fdir" value="${jtb_tgt_gentst_jtb_dir}/grammars/b" />
-      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/b" />
-      <param name="gname" value="FullGrammar" />
+      <param name="gdir" value="${jtb_tgt_gentst_jtb_dir}/grammars/b"/>
+      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/b"/>
+      <param name="gname" value="FullGrammar"/>
     </antcall>
 
     <!-- add @SuppressWarnings -->
     <antcall target="add_suppresswarnings_scs">
-      <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/grammars/b" />
-      <param name="gname" value="FullGrammar" />
+      <param name="gdir" value="${jtb_tgt_gentst_jj_dir}/grammars/b"/>
+      <param name="gname" value="FullGrammar"/>
     </antcall>
 
   </target>
@@ -909,13 +934,13 @@
           inputstring="23 bla bla"
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should have produced a Oops! -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc1}" />
-      <param name="exp_rc" value="-1" />
-      <param name="add_msg" value='with a "Oops!"' />
+      <param name="act_rc" value="${rc1}"/>
+      <param name="exp_rc" value="-1"/>
+      <param name="add_msg" value='with a "Oops!"'/>
     </antcall>
 
     <echo>
@@ -930,13 +955,13 @@
           inputstring=""
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc2}" />
-      <param name="exp_rc" value="0" />
-      <param name="add_msg" value='with a "FullGrammar ended."' />
+      <param name="act_rc" value="${rc2}"/>
+      <param name="exp_rc" value="0"/>
+      <param name="add_msg" value='with a "FullGrammar ended."'/>
     </antcall>
 
     <!-- run Ok, on string (2nd choice of Start()) -->
@@ -948,13 +973,13 @@
           inputstring="v vV vVV 01 10 V VV VVV  :y:  !y!  :y:  !y!  _bar id1 _bar _bar  _foo _bar id3 _bar id4  ui uI  s sS sa v1 v2 v3a v3b s1 s2 s3a s3b c ca h haa l laaL d da f faF al jual hm"
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc3}" />
-      <param name="exp_rc" value="0" />
-      <param name="add_msg" value='with a "FullGrammar ended."' />
+      <param name="act_rc" value="${rc3}"/>
+      <param name="exp_rc" value="0"/>
+      <param name="add_msg" value='with a "FullGrammar ended."'/>
     </antcall>
 
     <!-- run Ok, on string (3rd choice of Start() -->
@@ -966,13 +991,13 @@
           inputstring=";is1 sbb1 sbb2 js1 js2 v1 v2 vV1 idid xyz iid1 iid2 90 xid dtid1 dtid0 jdtid1 jdtid0 sbbid jsid"
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc4}" />
-      <param name="exp_rc" value="0" />
-      <param name="add_msg" value='with a "FullGrammar ended."' />
+      <param name="act_rc" value="${rc4}"/>
+      <param name="exp_rc" value="0"/>
+      <param name="add_msg" value='with a "FullGrammar ended."'/>
     </antcall>
 
     <!-- run Ok, on string (4th choice of Start() -->
@@ -984,13 +1009,13 @@
           inputstring=",!abc ?ab  345 !NUM_3_9!  id0 i==0 id9 j==3  id8 i==1 id7 j==3  id6 i==1 id5 j==3 id4 j==3  654 *39*"
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc5}" />
-      <param name="exp_rc" value="0" />
-      <param name="add_msg" value='with a "FullGrammar ended."' />
+      <param name="act_rc" value="${rc5}"/>
+      <param name="exp_rc" value="0"/>
+      <param name="add_msg" value='with a "FullGrammar ended."'/>
     </antcall>
 
     <!-- run Ok, on string (5th choice of Start() -->
@@ -1002,13 +1027,13 @@
           inputstring=".:poi / :uyt / :rez // ;abc xcba  fed  ;def  ;ghi ;x  ghi ;x  ,mno ,pqr"
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc6}" />
-      <param name="exp_rc" value="0" />
-      <param name="add_msg" value='with a "FullGrammar ended."' />
+      <param name="act_rc" value="${rc6}"/>
+      <param name="exp_rc" value="0"/>
+      <param name="add_msg" value='with a "FullGrammar ended."'/>
     </antcall>
 
   </target>
@@ -1023,26 +1048,26 @@
           failonerror="true"
     >
       <!-- Input file -->
-      <arg value="${jtb_src_tst_jtb_dir}/grammars/fm/EGTGrammar.jtb" />
+      <arg value="${jtb_src_tst_jtb_dir}/grammars/fm/EGTGrammar.jtb"/>
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
       <!-- enable assertions -->
       <assertions>
-        <enable />
+        <enable/>
       </assertions>
     </java>
 
     <!-- grammars/fm/EGTGrammar.jj -->
     <antcall target="gen_jj_gram">
-      <param name="fdir" value="${jtb_tgt_gentst_jtb_dir}/grammars/fm" />
-      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/fm" />
-      <param name="gname" value="EGTGrammar" />
+      <param name="gdir" value="${jtb_tgt_gentst_jtb_dir}/grammars/fm"/>
+      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/fm"/>
+      <param name="gname" value="EGTGrammar"/>
     </antcall>
 
     <!-- add @SuppressWarnings -->
     <antcall target="add_suppresswarnings_scs">
-      <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/grammars/fm" />
-      <param name="gname" value="EGTGrammar" />
+      <param name="gdir" value="${jtb_tgt_gentst_jj_dir}/grammars/fm"/>
+      <param name="gname" value="EGTGrammar"/>
     </antcall>
 
   </target>
@@ -1059,13 +1084,13 @@
           inputstring="skipped notskipped class c {m (i;j;) n (k;)}."
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should have produced a Oops! -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc1}" />
-      <param name="exp_rc" value="-1" />
-      <param name="add_msg" value='with a "Oops!"' />
+      <param name="act_rc" value="${rc1}"/>
+      <param name="exp_rc" value="-1"/>
+      <param name="add_msg" value='with a "Oops!"'/>
     </antcall>
 
     <echo>
@@ -1080,13 +1105,13 @@
           inputstring="skipped class c {m (i;j;) n (k;)}."
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc2}" />
-      <param name="exp_rc" value="0" />
-      <param name="add_msg" value='with a "EGTGrammar ended."' />
+      <param name="act_rc" value="${rc2}"/>
+      <param name="exp_rc" value="0"/>
+      <param name="add_msg" value='with a "EGTGrammar ended."'/>
     </antcall>
 
   </target>
@@ -1096,21 +1121,21 @@
 
     <!-- grammars/tcf/TcfGrammar.jtb -->
     <antcall target="gen_jtb_gram">
-      <param name="fdir" value="${jtb_src_tst_jtb_dir}/grammars/tcf" />
-      <param name="gname" value="TcfGrammar" />
+      <param name="gdir" value="${jtb_src_tst_jtb_dir}/grammars/tcf"/>
+      <param name="gname" value="TcfGrammar"/>
     </antcall>
 
     <!-- grammars/tcf/TcfGrammar.jj -->
     <antcall target="gen_jj_gram">
-      <param name="fdir" value="${jtb_tgt_gentst_jtb_dir}/grammars/tcf" />
-      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/tcf" />
-      <param name="gname" value="TcfGrammar" />
+      <param name="gdir" value="${jtb_tgt_gentst_jtb_dir}/grammars/tcf"/>
+      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/tcf"/>
+      <param name="gname" value="TcfGrammar"/>
     </antcall>
 
     <!-- add @SuppressWarnings -->
     <antcall target="add_suppresswarnings_scs">
-      <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/grammars/tcf" />
-      <param name="gname" value="TcfGrammar" />
+      <param name="gdir" value="${jtb_tgt_gentst_jj_dir}/grammars/tcf"/>
+      <param name="gname" value="TcfGrammar"/>
     </antcall>
 
   </target>
@@ -1127,13 +1152,13 @@
           inputstring="abc 9 8 ; def 7 6 ."
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should have produced a Oops! -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc1}" />
-      <param name="exp_rc" value="-2" />
-      <param name="add_msg" value='with a "Oops!"' />
+      <param name="act_rc" value="${rc1}"/>
+      <param name="exp_rc" value="-2"/>
+      <param name="add_msg" value='with a "Oops!"'/>
     </antcall>
 
     <echo>
@@ -1148,13 +1173,13 @@
           inputstring="abc def ; 3 ghi jkl ; mno 4 : ."
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc2}" />
-      <param name="exp_rc" value="0" />
-      <param name="add_msg" value='with a "TcfGrammar ending."' />
+      <param name="act_rc" value="${rc2}"/>
+      <param name="exp_rc" value="0"/>
+      <param name="add_msg" value='with a "TcfGrammar ending."'/>
     </antcall>
 
     <!-- run Ok, on string (2nd choice of Start()) -->
@@ -1166,13 +1191,13 @@
           inputstring="1* 21n 1$ 4321n 2* 32n 3_ 654n 3$ 543n 4* 54n 6$ 9876n"
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc3}" />
-      <param name="exp_rc" value="0" />
-      <param name="add_msg" value='with a "TcfGrammar ending."' />
+      <param name="act_rc" value="${rc3}"/>
+      <param name="exp_rc" value="0"/>
+      <param name="add_msg" value='with a "TcfGrammar ending."'/>
     </antcall>
 
   </target>
@@ -1182,22 +1207,22 @@
 
     <!-- grammars/jjttcf/TcfGrammar.jjt -->
     <antcall target="gen_jjtree_gram">
-      <param name="fdir" value="${jtb_src_tst_jjt_dir}/grammars/jjttcf" />
-      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/jjttcf/ast_vis" />
-      <param name="gname" value="TcfGrammar" />
+      <param name="gdir" value="${jtb_src_tst_jjt_dir}/grammars/jjttcf"/>
+      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/jjttcf/ast_vis"/>
+      <param name="gname" value="TcfGrammar"/>
     </antcall>
 
     <!-- grammars/jjttcf/TcfGrammar.jj -->
     <antcall target="gen_jj_gram">
-      <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/grammars/jjttcf/ast_vis" />
-      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/jjttcf" />
-      <param name="gname" value="TcfGrammar" />
+      <param name="gdir" value="${jtb_tgt_gentst_jj_dir}/grammars/jjttcf/ast_vis"/>
+      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/jjttcf"/>
+      <param name="gname" value="TcfGrammar"/>
     </antcall>
 
     <!-- add @SuppressWarnings -->
     <antcall target="add_suppresswarnings_scs">
-      <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/grammars/jjttcf" />
-      <param name="gname" value="TcfGrammar" />
+      <param name="gdir" value="${jtb_tgt_gentst_jj_dir}/grammars/jjttcf"/>
+      <param name="gname" value="TcfGrammar"/>
     </antcall>
 
   </target>
@@ -1214,13 +1239,13 @@
           inputstring="abc 9 8 ; def 7 6 ."
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should have produced a Oops! -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc1}" />
-      <param name="exp_rc" value="-2" />
-      <param name="add_msg" value='with a "Oops!"' />
+      <param name="act_rc" value="${rc1}"/>
+      <param name="exp_rc" value="-2"/>
+      <param name="add_msg" value='with a "Oops!"'/>
     </antcall>
 
     <echo>
@@ -1235,13 +1260,13 @@
           inputstring="abc def ; ghi jkl 3."
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc2}" />
-      <param name="exp_rc" value="0" />
-      <param name="add_msg" value='with a "TcfGrammar ending."' />
+      <param name="act_rc" value="${rc2}"/>
+      <param name="exp_rc" value="0"/>
+      <param name="add_msg" value='with a "TcfGrammar ending."'/>
     </antcall>
 
     <!-- run Ok, on string (2nd choice of Start()) -->
@@ -1253,13 +1278,13 @@
           inputstring="1* 21n 1$ 4321n 2* 32n 3_ 654n 3$ 543n 4* 54n 6$ 9876n"
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc3}" />
-      <param name="exp_rc" value="0" />
-      <param name="add_msg" value='with a "TcfGrammar ending."' />
+      <param name="act_rc" value="${rc3}"/>
+      <param name="exp_rc" value="0"/>
+      <param name="add_msg" value='with a "TcfGrammar ending."'/>
     </antcall>
 
   </target>
@@ -1269,15 +1294,15 @@
 
     <!-- grammars/j/TinyGrammar.jj -->
     <antcall target="gen_jj_gram">
-      <param name="fdir" value="${jtb_src_tst_jj_dir}/grammars/j" />
-      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/j" />
-      <param name="gname" value="TinyGrammar" />
+      <param name="gdir" value="${jtb_src_tst_jj_dir}/grammars/j"/>
+      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/j"/>
+      <param name="gname" value="TinyGrammar"/>
     </antcall>
 
     <!-- add @SuppressWarnings -->
     <antcall target="add_suppresswarnings_scs">
-      <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/grammars/j" />
-      <param name="gname" value="TinyGrammar" />
+      <param name="gdir" value="${jtb_tgt_gentst_jj_dir}/grammars/j"/>
+      <param name="gname" value="TinyGrammar"/>
     </antcall>
 
   </target>
@@ -1292,13 +1317,13 @@
           inputstring="1+(2*3)-4/5;."
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc}" />
-      <param name="exp_rc" value="1" />
-      <param name="add_msg" value='with a "EOF."' />
+      <param name="act_rc" value="${rc}"/>
+      <param name="exp_rc" value="1"/>
+      <param name="add_msg" value='with a "EOF."'/>
     </antcall>
   </target>
 
@@ -1307,21 +1332,21 @@
 
     <!-- grammars/p/NoPackageGrammar.jtb -->
     <antcall target="gen_jtb_gram">
-      <param name="fdir" value="${jtb_src_tst_jtb_dir}/grammars/p" />
-      <param name="gname" value="NoPackageGrammar" />
+      <param name="gdir" value="${jtb_src_tst_jtb_dir}/grammars/p"/>
+      <param name="gname" value="NoPackageGrammar"/>
     </antcall>
 
     <!-- grammars/p/NoPackageGrammar.jj -->
     <antcall target="gen_jj_gram">
-      <param name="fdir" value="${jtb_tgt_gentst_jtb_dir}/grammars/p" />
-      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/p" />
-      <param name="gname" value="NoPackageGrammar" />
+      <param name="gdir" value="${jtb_tgt_gentst_jtb_dir}/grammars/p"/>
+      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/p"/>
+      <param name="gname" value="NoPackageGrammar"/>
     </antcall>
 
     <!-- add @SuppressWarnings -->
     <antcall target="add_suppresswarnings_scs">
-      <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/grammars/p" />
-      <param name="gname" value="NoPackageGrammar" />
+      <param name="gdir" value="${jtb_tgt_gentst_jj_dir}/grammars/p"/>
+      <param name="gname" value="NoPackageGrammar"/>
     </antcall>
 
   </target>
@@ -1338,13 +1363,13 @@
           inputstring="tut tut class c {a(i;j;) n; b (k;) end;}."
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should have produced a Oops! -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc1}" />
-      <param name="exp_rc" value="-1" />
-      <param name="add_msg" value='with a "Oops!"' />
+      <param name="act_rc" value="${rc1}"/>
+      <param name="exp_rc" value="-1"/>
+      <param name="add_msg" value='with a "Oops!"'/>
     </antcall>
 
     <echo>
@@ -1359,13 +1384,13 @@
           inputstring="class c {a(i;j;) b (k;) bp, end;}."
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc2}" />
-      <param name="exp_rc" value="0" />
-      <param name="add_msg" value='with a "NoPackageGrammar ended."' />
+      <param name="act_rc" value="${rc2}"/>
+      <param name="exp_rc" value="0"/>
+      <param name="add_msg" value='with a "NoPackageGrammar ended."'/>
     </antcall>
 
   </target>
@@ -1375,21 +1400,21 @@
 
     <!-- grammars/q/NoDecOptPackageGrammar.jtb -->
     <antcall target="gen_jtb_gram">
-      <param name="fdir" value="${jtb_src_tst_jtb_dir}/grammars/q" />
-      <param name="gname" value="NoDecOptPackageGrammar" />
+      <param name="gdir" value="${jtb_src_tst_jtb_dir}/grammars/q"/>
+      <param name="gname" value="NoDecOptPackageGrammar"/>
     </antcall>
 
     <!-- grammars/q/NoDecOptPackageGrammar.jj -->
     <antcall target="gen_jj_gram">
-      <param name="fdir" value="${jtb_tgt_gentst_jtb_dir}/grammars/q" />
-      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/q" />
-      <param name="gname" value="NoDecOptPackageGrammar" />
+      <param name="gdir" value="${jtb_tgt_gentst_jtb_dir}/grammars/q"/>
+      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/grammars/q"/>
+      <param name="gname" value="NoDecOptPackageGrammar"/>
     </antcall>
 
     <!-- add @SuppressWarnings -->
     <antcall target="add_suppresswarnings_scs">
-      <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/grammars/q" />
-      <param name="gname" value="NoDecOptPackageGrammar" />
+      <param name="gdir" value="${jtb_tgt_gentst_jj_dir}/grammars/q"/>
+      <param name="gname" value="NoDecOptPackageGrammar"/>
     </antcall>
 
   </target>
@@ -1406,13 +1431,13 @@
           inputstring="tut tut class c {a(i;j;) n; b (k;) end;}."
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should have produced a Oops! -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc1}" />
-      <param name="exp_rc" value="-1" />
-      <param name="add_msg" value='with a "Oops!"' />
+      <param name="act_rc" value="${rc1}"/>
+      <param name="exp_rc" value="-1"/>
+      <param name="add_msg" value='with a "Oops!"'/>
     </antcall>
 
     <echo>
@@ -1427,13 +1452,13 @@
           inputstring="class c {a(i;j;) b (k;) bp, end;}."
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc2}" />
-      <param name="exp_rc" value="0" />
-      <param name="add_msg" value='with a "NoDecOptPackageGrammar ended."' />
+      <param name="act_rc" value="${rc2}"/>
+      <param name="exp_rc" value="0"/>
+      <param name="add_msg" value='with a "NoDecOptPackageGrammar ended."'/>
     </antcall>
 
   </target>
@@ -1442,21 +1467,21 @@
 
     <!-- examples/java/ex1jtb/Eg1.jtb -->
     <antcall target="gen_jtb_gram">
-      <param name="fdir" value="${jtb_src_tst_jtb_dir}/examples/java/ex1jtb" />
-      <param name="gname" value="Eg1" />
+      <param name="gdir" value="${jtb_src_tst_jtb_dir}/examples/java/ex1jtb"/>
+      <param name="gname" value="Eg1"/>
     </antcall>
 
     <!-- examples/java/ex1jtb/Eg1.jj -->
     <antcall target="gen_jj_gram">
-      <param name="fdir" value="${jtb_tgt_gentst_jtb_dir}/examples/java/ex1jtb" />
-      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex1jtb" />
-      <param name="gname" value="Eg1" />
+      <param name="gdir" value="${jtb_tgt_gentst_jtb_dir}/examples/java/ex1jtb"/>
+      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex1jtb"/>
+      <param name="gname" value="Eg1"/>
     </antcall>
 
     <!-- add @SuppressWarnings -->
     <antcall target="add_suppresswarnings_scs">
-      <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex1jtb" />
-      <param name="gname" value="Eg1" />
+      <param name="gdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex1jtb"/>
+      <param name="gname" value="Eg1"/>
     </antcall>
 
   </target>
@@ -1471,13 +1496,13 @@
           inputstring="a+(2*3)-zero/5;."
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc}" />
-      <param name="exp_rc" value="0" />
-      <param name="add_msg" value='with a "Thank you."' />
+      <param name="act_rc" value="${rc}"/>
+      <param name="exp_rc" value="0"/>
+      <param name="add_msg" value='with a "Thank you."'/>
     </antcall>
   </target>
 
@@ -1486,22 +1511,22 @@
 
     <!-- examples/java/ex1jjt/Eg1.jjt -->
     <antcall target="gen_jjtree_gram">
-      <param name="fdir" value="${jtb_src_tst_jjt_dir}/examples/java/ex1jjt" />
-      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex1jjt" />
-      <param name="gname" value="Eg1" />
+      <param name="gdir" value="${jtb_src_tst_jjt_dir}/examples/java/ex1jjt"/>
+      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex1jjt"/>
+      <param name="gname" value="Eg1"/>
     </antcall>
 
     <!-- examples/java/ex1jjt/Eg1.jj -->
     <antcall target="gen_jj_gram">
-      <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex1jjt" />
-      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex1jjt" />
-      <param name="gname" value="Eg1" />
+      <param name="gdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex1jjt"/>
+      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex1jjt"/>
+      <param name="gname" value="Eg1"/>
     </antcall>
 
     <!-- add @SuppressWarnings -->
     <antcall target="add_suppresswarnings_scs">
-      <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex1jjt" />
-      <param name="gname" value="Eg1" />
+      <param name="gdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex1jjt"/>
+      <param name="gname" value="Eg1"/>
     </antcall>
 
   </target>
@@ -1516,13 +1541,13 @@
           inputstring="a+(2*3)-zero/5;."
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc}" />
-      <param name="exp_rc" value="0" />
-      <param name="add_msg" value='with a "Thank you."' />
+      <param name="act_rc" value="${rc}"/>
+      <param name="exp_rc" value="0"/>
+      <param name="add_msg" value='with a "Thank you."'/>
     </antcall>
   </target>
 
@@ -1537,21 +1562,21 @@
 
     <!-- examples/java/ex2jtb/Eg2.jtb -->
     <antcall target="gen_jtb_gram">
-      <param name="fdir" value="${jtb_src_tst_jtb_dir}/examples/java/ex2jtb" />
-      <param name="gname" value="Eg2" />
+      <param name="gdir" value="${jtb_src_tst_jtb_dir}/examples/java/ex2jtb"/>
+      <param name="gname" value="Eg2"/>
     </antcall>
 
     <!-- examples/java/ex2jtb/Eg2.jj -->
     <antcall target="gen_jj_gram">
-      <param name="fdir" value="${jtb_tgt_gentst_jtb_dir}/examples/java/ex2jtb" />
-      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex2jtb" />
-      <param name="gname" value="Eg2" />
+      <param name="gdir" value="${jtb_tgt_gentst_jtb_dir}/examples/java/ex2jtb"/>
+      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex2jtb"/>
+      <param name="gname" value="Eg2"/>
     </antcall>
 
     <!-- add @SuppressWarnings -->
     <antcall target="add_suppresswarnings_scs">
-      <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex2jtb" />
-      <param name="gname" value="Eg2" />
+      <param name="gdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex2jtb"/>
+      <param name="gname" value="Eg2"/>
     </antcall>
 
   </target>
@@ -1566,13 +1591,13 @@
           inputstring="a+(2*3)-zero/5;."
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc}" />
-      <param name="exp_rc" value="0" />
-      <param name="add_msg" value='with a "Thank you."' />
+      <param name="act_rc" value="${rc}"/>
+      <param name="exp_rc" value="0"/>
+      <param name="add_msg" value='with a "Thank you."'/>
     </antcall>
   </target>
 
@@ -1587,21 +1612,21 @@
 
     <!-- examples/java/ex3jtb/Eg3.jtb -->
     <antcall target="gen_jtb_gram">
-      <param name="fdir" value="${jtb_src_tst_jtb_dir}/examples/java/ex3jtb" />
-      <param name="gname" value="Eg3" />
+      <param name="gdir" value="${jtb_src_tst_jtb_dir}/examples/java/ex3jtb"/>
+      <param name="gname" value="Eg3"/>
     </antcall>
 
     <!-- examples/java/ex3jtb/Eg3.jj -->
     <antcall target="gen_jj_gram">
-      <param name="fdir" value="${jtb_tgt_gentst_jtb_dir}/examples/java/ex3jtb" />
-      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex3jtb" />
-      <param name="gname" value="Eg3" />
+      <param name="gdir" value="${jtb_tgt_gentst_jtb_dir}/examples/java/ex3jtb"/>
+      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex3jtb"/>
+      <param name="gname" value="Eg3"/>
     </antcall>
 
     <!-- add @SuppressWarnings -->
     <antcall target="add_suppresswarnings_scs">
-      <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex3jtb" />
-      <param name="gname" value="Eg3" />
+      <param name="gdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex3jtb"/>
+      <param name="gname" value="Eg3"/>
     </antcall>
 
   </target>
@@ -1616,13 +1641,13 @@
           inputstring="a+(2*3)-zero/5;."
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc}" />
-      <param name="exp_rc" value="0" />
-      <param name="add_msg" value='with a "Thank you."' />
+      <param name="act_rc" value="${rc}"/>
+      <param name="exp_rc" value="0"/>
+      <param name="add_msg" value='with a "Thank you."'/>
     </antcall>
   </target>
 
@@ -1637,22 +1662,22 @@
 
     <!-- examples/java/ex2jjt/Eg2.jjt -->
     <antcall target="gen_jjtree_gram">
-      <param name="fdir" value="${jtb_src_tst_jjt_dir}/examples/java/ex2jjt" />
-      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex2jjt" />
-      <param name="gname" value="Eg2" />
+      <param name="gdir" value="${jtb_src_tst_jjt_dir}/examples/java/ex2jjt"/>
+      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex2jjt"/>
+      <param name="gname" value="Eg2"/>
     </antcall>
 
     <!-- examples/java/ex2jjt/Eg2.jj -->
     <antcall target="gen_jj_gram">
-      <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex2jjt" />
-      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex2jjt" />
-      <param name="gname" value="Eg2" />
+      <param name="gdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex2jjt"/>
+      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex2jjt"/>
+      <param name="gname" value="Eg2"/>
     </antcall>
 
     <!-- add @SuppressWarnings -->
     <antcall target="add_suppresswarnings_scs">
-      <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex2jjt" />
-      <param name="gname" value="Eg2" />
+      <param name="gdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex2jjt"/>
+      <param name="gname" value="Eg2"/>
     </antcall>
 
   </target>
@@ -1667,13 +1692,13 @@
           inputstring="a+(2*3)-zero/5;."
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc}" />
-      <param name="exp_rc" value="0" />
-      <param name="add_msg" value='with a "Thank you."' />
+      <param name="act_rc" value="${rc}"/>
+      <param name="exp_rc" value="0"/>
+      <param name="add_msg" value='with a "Thank you."'/>
     </antcall>
   </target>
 
@@ -1688,22 +1713,22 @@
 
     <!-- examples/java/ex3jjt/Eg3.jjt -->
     <antcall target="gen_jjtree_gram">
-      <param name="fdir" value="${jtb_src_tst_jjt_dir}/examples/java/ex3jjt" />
-      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex3jjt" />
-      <param name="gname" value="Eg3" />
+      <param name="gdir" value="${jtb_src_tst_jjt_dir}/examples/java/ex3jjt"/>
+      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex3jjt"/>
+      <param name="gname" value="Eg3"/>
     </antcall>
 
     <!-- examples/java/ex3jjt/Eg3.jj -->
     <antcall target="gen_jj_gram">
-      <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex3jjt" />
-      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex3jjt" />
-      <param name="gname" value="Eg3" />
+      <param name="gdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex3jjt"/>
+      <param name="jdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex3jjt"/>
+      <param name="gname" value="Eg3"/>
     </antcall>
 
     <!-- add @SuppressWarnings -->
     <antcall target="add_suppresswarnings_scs">
-      <param name="fdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex3jjt" />
-      <param name="gname" value="Eg3" />
+      <param name="gdir" value="${jtb_tgt_gentst_jj_dir}/examples/java/ex3jjt"/>
+      <param name="gname" value="Eg3"/>
     </antcall>
 
   </target>
@@ -1718,13 +1743,13 @@
           inputstring="a+(2*3)-zero/5;."
     >
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
     </java>
     <!-- Run should end normally -->
     <antcall target="check_rc">
-      <param name="act_rc" value="${rc}" />
-      <param name="exp_rc" value="0" />
-      <param name="add_msg" value='with a "Thank you."' />
+      <param name="act_rc" value="${rc}"/>
+      <param name="exp_rc" value="0"/>
+      <param name="add_msg" value='with a "Thank you."'/>
     </antcall>
   </target>
 
@@ -1733,24 +1758,24 @@
   <target name="gen_gy" depends="clean_gy_gen_files">
 
     <!-- grammars/y/NoOptionGrammar.jtb -->
-    <antcall target="gen_jtb_gram_options_spe">
-      <param name="fdir" value="${jtb_src_tst_jtb_dir}/grammars/y" />
-      <param name="ofile" value="jtb.out.jj" />
-      <param name="odir" value="${jtb_src_tst_jtb_dir}/grammars/y" />
-      <param name="gname" value="NoOptionGrammar" />
+    <antcall target="gen_jtb_gram_options">
+      <param name="gdir" value="${jtb_src_tst_jtb_dir}/grammars/y"/>
+      <param name="ofile" value="jtb.out.jj"/>
+      <param name="odir" value="."/>
+      <param name="gname" value="NoOptionGrammar"/>
     </antcall>
 
     <!-- grammars/y/NoOptionGrammar.jj -->
     <antcall target="gen_jj_gram">
-      <param name="fdir" value="${jtb_src_tst_jtb_dir}/grammars/y" />
-      <param name="jdir" value="${jtb_src_tst_jtb_dir}/grammars/y" />
-      <param name="gname" value="jtb.out" />
+      <param name="gdir" value="${jtb_src_tst_jtb_dir}/grammars/y"/>
+      <param name="jdir" value="${jtb_src_tst_jtb_dir}/grammars/y"/>
+      <param name="gname" value="jtb.out"/>
     </antcall>
 
     <!-- add @SuppressWarnings -->
     <antcall target="add_suppresswarnings_scs">
-      <param name="fdir" value="${jtb_src_tst_jtb_dir}/grammars/y" />
-      <param name="gname" value="NoOptionGrammar" />
+      <param name="gdir" value="${jtb_src_tst_jtb_dir}/grammars/y"/>
+      <param name="gname" value="NoOptionGrammar"/>
     </antcall>
 
   </target>
@@ -1760,24 +1785,24 @@
   <target name="gen_gz" depends="clean_gz_gen_files">
 
     <!-- grammars/z/NoOptionsSectionGrammar.jtb -->
-    <antcall target="gen_jtb_gram_options_spe">
-      <param name="fdir" value="${jtb_src_tst_jtb_dir}/grammars/z" />
-      <param name="ofile" value="jtb.out.jj" />
-      <param name="odir" value="${jtb_src_tst_jtb_dir}/grammars/z" />
-      <param name="gname" value="NoOptionsSectionGrammar" />
+    <antcall target="gen_jtb_gram_options">
+      <param name="gdir" value="${jtb_src_tst_jtb_dir}/grammars/z"/>
+      <param name="ofile" value="jtb.out.jj"/>
+      <param name="odir" value="."/>
+      <param name="gname" value="NoOptionsSectionGrammar"/>
     </antcall>
 
     <!-- grammars/z/NoOptionsSectionGrammar.jj -->
     <antcall target="gen_jj_gram">
-      <param name="fdir" value="${jtb_src_tst_jtb_dir}/grammars/z" />
-      <param name="jdir" value="${jtb_src_tst_jtb_dir}/grammars/z" />
-      <param name="gname" value="jtb.out" />
+      <param name="gdir" value="${jtb_src_tst_jtb_dir}/grammars/z"/>
+      <param name="jdir" value="${jtb_src_tst_jtb_dir}/grammars/z"/>
+      <param name="gname" value="jtb.out"/>
     </antcall>
 
     <!-- add @SuppressWarnings -->
     <antcall target="add_suppresswarnings_scs">
-      <param name="fdir" value="${jtb_src_tst_jtb_dir}/grammars/z" />
-      <param name="gname" value="NoOptionsSectionGrammar" />
+      <param name="gdir" value="${jtb_src_tst_jtb_dir}/grammars/z"/>
+      <param name="gname" value="NoOptionsSectionGrammar"/>
     </antcall>
 
   </target>
@@ -1785,20 +1810,20 @@
   <!-- Create ${jtb_new_jar} ; contains only classes -->
   <target name="make_new_jtb_jar" depends="check_jtb_jar" unless="jtb_jar.uptodate">
     <tstamp>
-      <format property="timestamp" pattern="yyyy/MM/dd hh:mm:ss" />
+      <format property="timestamp" pattern="yyyy/MM/dd hh:mm:ss"/>
     </tstamp>
     <jar destfile="${jtb_new_jar}" compress="true">
       <fileset dir="${jtb_tgt_cla_dir}">
-        <include name="EDU/**" />
-        <exclude name="**/${jtb_parser}.jj" />
-        <exclude name="**/${jtb_parser}.jtb" />
+        <include name="EDU/**"/>
+        <exclude name="**/${jtb_parser}.jj"/>
+        <exclude name="**/${jtb_parser}.jtb"/>
       </fileset>
       <manifest>
-        <attribute name="Built-By" value="SF Eclipse JavaCC Plug-in" />
-        <attribute name="Build-Date" value="${timestamp}" />
-        <attribute name="Main-Class" value="${jtb_tool}" />
-        <attribute name="Sealed" value="true" />
-        <attribute name="JTB-Version" value="${jtb_curr_version}" />
+        <attribute name="Built-By" value="SF Eclipse JavaCC Plug-in"/>
+        <attribute name="Build-Date" value="${timestamp}"/>
+        <attribute name="Main-Class" value="${jtb_tool}"/>
+        <attribute name="Sealed" value="true"/>
+        <attribute name="JTB-Version" value="${jtb_curr_version}"/>
       </manifest>
     </jar>
   </target>
@@ -1806,27 +1831,27 @@
   <!-- Create ${jtb_new_jar_src} ; contains sources and classes -->
   <target name="make_new_jtb_jar_src">
     <tstamp>
-      <format property="timestamp-src" pattern="yyyy/MM/dd hh:mm:ss" />
+      <format property="timestamp-src" pattern="yyyy/MM/dd hh:mm:ss"/>
     </tstamp>
     <jar destfile="${jtb_new_jar_src}" compress="true">
       <fileset dir="${jtb_tgt_cla_dir}">
-        <include name="EDU/**" />
-        <include name="grammars/**" />
-        <include name="examples/**" />
-        <exclude name="**/${jtb_parser}.jj" />
-        <exclude name="**/${jtb_parser}.jtb" />
+        <include name="EDU/**"/>
+        <include name="grammars/**"/>
+        <include name="examples/**"/>
+        <exclude name="**/${jtb_parser}.jj"/>
+        <exclude name="**/${jtb_parser}.jtb"/>
       </fileset>
       <fileset dir="${basedir}">
-        <include name="doc/**" />
-        <include name="src/**" />
-        <include name="target/gen*/**" />
-        <include name="*.*" />
-        <exclude name=".*" />
+        <include name="doc/**"/>
+        <include name="src/**"/>
+        <include name="target/gen*/**"/>
+        <include name="*.*"/>
+        <exclude name=".*"/>
         <manifest>
-          <attribute name="Built-By" value="SF Eclipse JavaCC Plug-in" />
-          <attribute name="Build-Date" value="${timestamp-src}" />
-          <attribute name="Main-Class" value="${jtb_tool}" />
-          <attribute name="Sealed" value="true" />
+          <attribute name="Built-By" value="SF Eclipse JavaCC Plug-in"/>
+          <attribute name="Build-Date" value="${timestamp-src}"/>
+          <attribute name="Main-Class" value="${jtb_tool}"/>
+          <attribute name="Sealed" value="true"/>
         </manifest>
       </fileset>
     </jar>
@@ -1835,48 +1860,50 @@
   <!-- Check ${jtb_new_jar} is up to date -->
   <target name="check_jtb_jar">
     <uptodate property="jtb_jar.uptodate" targetfile="${jtb_new_jar}">
-      <srcfiles dir="${jtb_tgt_cla_dir}/" />
+      <srcfiles dir="${jtb_tgt_cla_dir}/"/>
     </uptodate>
   </target>
 
   <!-- Rename ${jtb_new_jar} in ${jtb_prev_jar} - when ${jtb_new_jar} is OK, before changing to a new version  -->
   <target name="rename_new_to_prev_jtb_jar">
-    <move file="${jtb_new_jar}" tofile="${jtb_prev_jar}" overwrite="false" />
+    <move file="${jtb_new_jar}" tofile="${jtb_prev_jar}" overwrite="false"/>
   </target>
 
   <!-- Rename ${jtb_prev_jar} in ${jtb_new_jar} - when ${jtb_prev_jar} was not OK, to revert back to the old version  -->
   <target name="revert_prev_to_new_jtb_jar">
-    <move file="${jtb_prev_jar}" tofile="${jtb_new_jar}" overwrite="false" />
+    <move file="${jtb_prev_jar}" tofile="${jtb_new_jar}" overwrite="false"/>
   </target>
 
   <!-- Rename ${jtb_new_jar_src} in ${jtb_prev_jar_src} - when ${jtb_new_jar_src} is OK, before changing to a new version  -->
   <target name="rename_new_to_prev_jtb_src_jar">
-    <move file="${jtb_new_jar_src}" tofile="${jtb_prev_jar_src}" overwrite="false" />
+    <move file="${jtb_new_jar_src}" tofile="${jtb_prev_jar_src}" overwrite="false"/>
   </target>
 
   <!-- Rename ${jtb_prev_jar_src} in ${jtb_new_jar_src} - when ${jtb_prev_jar} was not OK, to revert back to the old version  -->
   <target name="revert_prev_to_new_jtb_src_jar">
-    <move file="${jtb_prev_jar_src}" tofile="${jtb_new_jar_src}" overwrite="false" />
+    <move file="${jtb_prev_jar_src}" tofile="${jtb_new_jar_src}" overwrite="false"/>
   </target>
 
-  <target name="clean" depends="clean_classes, clean_all_gen_files, clean_html" />
+  <target name="clean" depends="clean_classes, clean_all_gen_files">
+    <!--antcall target="jtb_html.clean_html" unless:set="eclipse.home"/-->
+  </target>
 
   <!-- Clean Java classes -->
   <target name="clean_classes">
-    <delete dir="${jtb_tgt_cla_dir}/" />
-    <mkdir dir="${jtb_tgt_cla_dir}/" />
+    <delete dir="${jtb_tgt_cla_dir}/"/>
+    <mkdir dir="${jtb_tgt_cla_dir}/"/>
   </target>
 
   <!-- Clean all JavaCC & JTB generated files -->
   <target name="clean_all_gen_files">
-    <antcall target="clean_javacc_gen_files" />
-    <antcall target="clean_jtb_gen_files" />
-    <antcall target="clean_java_tst_gen_files" />
+    <antcall target="clean_javacc_gen_files"/>
+    <antcall target="clean_jtb_gen_files"/>
+    <antcall target="clean_java_tst_gen_files"/>
   </target>
 
   <!-- Clean JTB generated files for ${jtb_parser}.jtb -->
   <target name="clean_jtb_gen_files">
-    <delete dir="${jtb_tgt_gensrc_jtb_dir}" />
+    <delete dir="${jtb_tgt_gensrc_jtb_dir}"/>
     <!--delete verbose="false">
       <fileset dir="${jtb_tgt_gensrc_jtb_dir}">
         <exclude name="syntaxtree/NodeToken.java" />
@@ -1887,9 +1914,9 @@
   <!-- Clean JavaCC generated files for ${jtb_parser}.jj -->
   <target name="clean_javacc_gen_files">
     <!-- sometimes files are generated a level too low ... -->
-    <delete dir="${jtb_tgt_gensrc_jj_dir}/parser/parser" />
+    <delete dir="${jtb_tgt_gensrc_jj_dir}/parser/parser"/>
     <!-- normally generated files here -->
-    <delete dir="${jtb_tgt_gensrc_jj_dir}" />
+    <delete dir="${jtb_tgt_gensrc_jj_dir}"/>
     <!--delete>
       <fileset dir="${jtb_tgt_gensrc_jj_dir}">
         <!- - Token.java has been modified, so keep it - ->
@@ -1900,189 +1927,198 @@
 
   <!-- Clean JTB generated java test files -->
   <target name="clean_java_tst_gen_files">
-    <delete dir="${jtb_tgt_gentst_java_dir}" />
-    <mkdir dir="${jtb_tgt_gentst_java_dir}" />
+    <delete dir="${jtb_tgt_gentst_java_dir}"/>
+    <mkdir dir="${jtb_tgt_gentst_java_dir}"/>
   </target>
 
   <!-- Clean generated files for test grammar a -->
   <target name="clean_ga_gen_files">
-    <delete dir="${jtb_tgt_gentst_jtb_dir}/grammars/a" />
-    <delete dir="${jtb_tgt_gentst_jj_dir}/grammars/a" />
+    <delete dir="${jtb_tgt_gentst_jtb_dir}/grammars/a"/>
+    <delete dir="${jtb_tgt_gentst_jj_dir}/grammars/a"/>
   </target>
 
   <!-- Clean generated files for test grammar b -->
   <target name="clean_gb_gen_files">
-    <delete dir="${jtb_tgt_gentst_jtb_dir}/grammars/b" />
-    <delete dir="${jtb_tgt_gentst_jj_dir}/grammars/b" />
+    <delete dir="${jtb_tgt_gentst_jtb_dir}/grammars/b"/>
+    <delete dir="${jtb_tgt_gentst_jj_dir}/grammars/b"/>
   </target>
 
   <!-- Clean generated files for test grammar fm -->
   <target name="clean_gfm_gen_files">
-    <delete dir="${jtb_tgt_gentst_jtb_dir}/grammars/fm" />
-    <delete dir="${jtb_tgt_gentst_jj_dir}/grammars/fm" />
+    <delete dir="${jtb_tgt_gentst_jtb_dir}/grammars/fm"/>
+    <delete dir="${jtb_tgt_gentst_jj_dir}/grammars/fm"/>
   </target>
 
   <!-- Clean generated files for test grammar JTB tcf -->
   <target name="clean_gtcf_gen_files">
-    <delete dir="${jtb_tgt_gentst_jtb_dir}/grammars/tcf" />
-    <delete dir="${jtb_tgt_gentst_jj_dir}/grammars/tcf" />
+    <delete dir="${jtb_tgt_gentst_jtb_dir}/grammars/tcf"/>
+    <delete dir="${jtb_tgt_gentst_jj_dir}/grammars/tcf"/>
   </target>
 
   <!-- Clean generated files for test grammar JJTree tcf -->
   <target name="clean_gjjttcf_gen_files">
-    <delete dir="${jtb_tgt_gentst_jjt_dir}/grammars/jjttcf" />
-    <delete dir="${jtb_tgt_gentst_jj_dir}/grammars/jjttcf" />
+    <delete dir="${jtb_tgt_gentst_jjt_dir}/grammars/jjttcf"/>
+    <delete dir="${jtb_tgt_gentst_jj_dir}/grammars/jjttcf"/>
   </target>
 
   <!-- Clean generated files for test grammar j -->
   <target name="clean_gj_gen_files">
     <delete>
       <fileset dir="${jtb_src_tst_jj_dir}/grammars/j">
-        <include name="*.java" />
+        <include name="*.java"/>
       </fileset>
     </delete>
-    <delete dir="${jtb_tgt_gentst_jj_dir}/grammars/j" />
+    <delete dir="${jtb_tgt_gentst_jj_dir}/grammars/j"/>
   </target>
 
   <!-- Clean generated files for test grammar p (keep directories for Eclipse build path) -->
   <target name="clean_gp_gen_files">
     <delete includeemptydirs="true" failonerror="false">
-      <fileset dir="${jtb_tgt_gentst_jtb_dir}/grammars/p" includes="**/*" />
+      <fileset dir="${jtb_tgt_gentst_jtb_dir}/grammars/p" includes="**/*"/>
     </delete>
     <delete includeemptydirs="true" failonerror="false">
-      <fileset dir="${jtb_tgt_gentst_jj_dir}/grammars/p" includes="**/*" />
+      <fileset dir="${jtb_tgt_gentst_jj_dir}/grammars/p" includes="**/*"/>
     </delete>
   </target>
 
   <!-- Clean generated files for test grammar a -->
   <target name="clean_gq_gen_files">
-    <delete dir="${jtb_tgt_gentst_jtb_dir}/grammars/q" />
-    <delete dir="${jtb_tgt_gentst_jj_dir}/grammars/q" />
+    <delete dir="${jtb_tgt_gentst_jtb_dir}/grammars/q"/>
+    <delete dir="${jtb_tgt_gentst_jj_dir}/grammars/q"/>
   </target>
 
   <!-- Clean generated files for example grammar ex1jtb/Eg1.jtb -->
   <target name="clean_x1jtb_gen_files">
-    <delete dir="${jtb_tgt_gentst_jtb_dir}/examples/java/ex1jtb" />
-    <delete dir="${jtb_tgt_gentst_jj_dir}/examples/java/ex1jtb" />
+    <delete dir="${jtb_tgt_gentst_jtb_dir}/examples/java/ex1jtb"/>
+    <delete dir="${jtb_tgt_gentst_jj_dir}/examples/java/ex1jtb"/>
   </target>
 
   <!-- Clean generated files for example grammar ex1jjt.Eg1.jjt -->
   <target name="clean_x1jjt_gen_files">
-    <delete dir="${jtb_tgt_gentst_jjt_dir}/examples/java/ex1jjt" />
-    <delete dir="${jtb_tgt_gentst_jj_dir}/examples/java/ex1jjt" />
+    <delete dir="${jtb_tgt_gentst_jjt_dir}/examples/java/ex1jjt"/>
+    <delete dir="${jtb_tgt_gentst_jj_dir}/examples/java/ex1jjt"/>
   </target>
 
   <!-- Clean generated files for example grammar ex2jtb/Eg2.jtb -->
   <target name="clean_x2jtb_gen_files">
-    <delete dir="${jtb_tgt_gentst_jtb_dir}/examples/java/ex2jtb" />
-    <delete dir="${jtb_tgt_gentst_jj_dir}/examples/java/ex2jtb" />
+    <delete dir="${jtb_tgt_gentst_jtb_dir}/examples/java/ex2jtb"/>
+    <delete dir="${jtb_tgt_gentst_jj_dir}/examples/java/ex2jtb"/>
   </target>
 
   <!-- Clean generated files for example grammar ex3jtb/Eg3.jtb -->
   <target name="clean_x3jtb_gen_files">
-    <delete dir="${jtb_tgt_gentst_jtb_dir}/examples/java/ex3jtb" />
-    <delete dir="${jtb_tgt_gentst_jj_dir}/examples/java/ex3jtb" />
+    <delete dir="${jtb_tgt_gentst_jtb_dir}/examples/java/ex3jtb"/>
+    <delete dir="${jtb_tgt_gentst_jj_dir}/examples/java/ex3jtb"/>
   </target>
 
   <!-- Clean generated files for example grammar ex2jjt.Eg2.jjt -->
   <target name="clean_x2jjt_gen_files">
-    <delete dir="${jtb_tgt_gentst_jjt_dir}/examples/java/ex2jjt" />
-    <delete dir="${jtb_tgt_gentst_jj_dir}/examples/java/ex2jjt" />
+    <delete dir="${jtb_tgt_gentst_jjt_dir}/examples/java/ex2jjt"/>
+    <delete dir="${jtb_tgt_gentst_jj_dir}/examples/java/ex2jjt"/>
   </target>
 
   <!-- Clean generated files for example grammar ex3jjt.Eg3.jjt -->
   <target name="clean_x3jjt_gen_files">
-    <delete dir="${jtb_tgt_gentst_jjt_dir}/examples/java/ex3jjt" />
-    <delete dir="${jtb_tgt_gentst_jj_dir}/examples/java/ex3jjt" />
+    <delete dir="${jtb_tgt_gentst_jjt_dir}/examples/java/ex3jjt"/>
+    <delete dir="${jtb_tgt_gentst_jj_dir}/examples/java/ex3jjt"/>
   </target>
 
   <!-- Clean generated files for test grammar z -->
   <target name="clean_gy_gen_files">
     <delete>
-      <fileset dir="${jtb_src_tst_jtb_dir}/grammars/y/" includes="**/*.java" />
-      <fileset dir="${jtb_src_tst_jtb_dir}/grammars/y/" includes="jtb.out.jj" />
+      <fileset dir="${jtb_src_tst_jtb_dir}/grammars/y/" includes="**/*.java"/>
+      <fileset dir="${jtb_src_tst_jtb_dir}/grammars/y/" includes="jtb.out.jj"/>
     </delete>
   </target>
 
   <!-- Clean generated files for test grammar z -->
   <target name="clean_gz_gen_files">
     <delete>
-      <fileset dir="${jtb_src_tst_jtb_dir}/grammars/z/" includes="**/*.java" />
-      <fileset dir="${jtb_src_tst_jtb_dir}/grammars/z/" includes="jtb.out.jj" />
+      <fileset dir="${jtb_src_tst_jtb_dir}/grammars/z/" includes="**/*.java"/>
+      <fileset dir="${jtb_src_tst_jtb_dir}/grammars/z/" includes="jtb.out.jj"/>
     </delete>
   </target>
 
   <!-- ****************** Targets to be used as sub-programs, receiving some parameters ****************** -->
 
   <!-- Add some @SuppressWarnings("all") to generated files & JavaCharStream.java (Unicode grammars) -->
-  <!-- fdir : the file directory -->
+  <!-- gdir : the file directory -->
   <!-- gname : the grammar name -->
   <target name="add_suppresswarnings_jcs">
 
-    <replace file="${fdir}/JavaCharStream.java" summary="yes">
+    <replace file="${gdir}/JavaCharStream.java" summary="yes">
       <replacetoken>public
-class JavaCharStream</replacetoken>
+        class JavaCharStream
+      </replacetoken>
       <replacevalue>@SuppressWarnings("all")
-public class JavaCharStream</replacevalue>
+        public class JavaCharStream
+      </replacevalue>
     </replace>
 
     <antcall target="add_suppresswarnings_others">
-      <param name="fdir" value="${fdir}" />
-      <param name="gname" value="${gname}" />
+      <param name="gdir" value="${gdir}"/>
+      <param name="gname" value="${gname}"/>
     </antcall>
 
   </target>
 
   <!-- Add some @SuppressWarnings("all") to generated files & SimpleCharStream.java (non Unicode grammars) -->
-  <!-- fdir : the file directory -->
+  <!-- gdir : the file directory -->
   <!-- gname : the grammar name -->
   <target name="add_suppresswarnings_scs">
 
-    <replace file="${fdir}/SimpleCharStream.java" summary="yes">
+    <replace file="${gdir}/SimpleCharStream.java" summary="yes">
       <replacetoken>public
-class SimpleCharStream</replacetoken>
+        class SimpleCharStream
+      </replacetoken>
       <replacevalue>@SuppressWarnings("all")
-public class SimpleCharStream</replacevalue>
+        public class SimpleCharStream
+      </replacevalue>
     </replace>
 
     <antcall target="add_suppresswarnings_others">
-      <param name="fdir" value="${fdir}" />
-      <param name="gname" value="${gname}" />
+      <param name="gdir" value="${gdir}"/>
+      <param name="gname" value="${gname}"/>
     </antcall>
 
   </target>
 
   <!-- Add some @SuppressWarnings("all") to some JavaCC generated files -->
-  <!-- fdir : the files directory -->
+  <!-- gdir : the files directory -->
   <!-- gname : the grammar name -->
   <target name="add_suppresswarnings_others">
 
-    <replace file="${fdir}/${gname}.java" summary="yes">
-      <replacetoken>public class</replacetoken>
+    <!-- a space after 'class' -->
+    <replace file="${gdir}/${gname}.java" summary="yes">
+      <replacetoken>public class </replacetoken>
       <replacevalue>@SuppressWarnings("all")
-public class</replacevalue>
+        public class 
+      </replacevalue>
     </replace>
 
     <!-- well, JavaCC 7.x introduced a weird annotation (and with a space) -->
-    <replace file="${fdir}/${gname}TokenManager.java" summary="yes">
-      <replacefilter token='@SuppressWarnings ("unused")' value='' />
+    <replace file="${gdir}/${gname}TokenManager.java" summary="yes">
+      <replacefilter token='@SuppressWarnings ("unused")' value=''/>
       <replacefilter>
         <replacetoken>public class</replacetoken>
         <replacevalue>@SuppressWarnings("all")
-public class</replacevalue>
+          public class
+        </replacevalue>
       </replacefilter>
     </replace>
 
-    <replace file="${fdir}/ParseException.java" summary="yes">
-      <replacetoken> */
-public class ParseException</replacetoken>
-      <replacevalue> */
-@SuppressWarnings("all")
-public class ParseException</replacevalue>
+    <replace file="${gdir}/ParseException.java" summary="yes">
+      <replacetoken>*/
+        public class ParseException
+      </replacetoken>
+      <replacevalue>*/
+        @SuppressWarnings("all")
+        public class ParseException
+      </replacevalue>
     </replace>
 
     <!-- no more needed
-    <replace file="${fdir}/Token.java" summary="yes">
+    <replace file="${gdir}/Token.java" summary="yes">
       <replacefilter token='@SuppressWarnings("javadoc")' value='' />
       <replacetoken>public class Token</replacetoken>
       <replacevalue>@SuppressWarnings("all")
@@ -2090,110 +2126,112 @@ public class Token</replacevalue>
     </replace>
     -->
 
-    <replace file="${fdir}/TokenMgrError.java" summary="yes">
-      <replacetoken> */
-public class TokenMgrError</replacetoken>
-      <replacevalue> */
-@SuppressWarnings("all")
-public class TokenMgrError</replacevalue>
+    <replace file="${gdir}/TokenMgrError.java" summary="yes">
+      <replacetoken>*/
+        public class TokenMgrError
+      </replacetoken>
+      <replacevalue>*/
+        @SuppressWarnings("all")
+        public class TokenMgrError
+      </replacevalue>
     </replace>
 
   </target>
 
   <!-- Generate a JTB grammar -->
-  <!-- fdir : the (src) JTB file directory -->
-  <!-- gname : the grammar name -->
+  <!-- gdir : the (src) JTB grammar file directory -->
+  <!-- gname : the grammar file name -->
   <target name="gen_jtb_gram">
 
     <java classname="${jtb_tool}" classpath="${jtb_new_jar}" fork="true" failonerror="true">
       <!-- Input file -->
-      <arg value="${fdir}/${gname}.jtb" />
+      <arg value="${gdir}/${gname}.jtb"/>
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
       <!-- enable assertions -->
       <assertions>
-        <enable />
+        <enable/>
       </assertions>
     </java>
 
   </target>
 
-  <!-- Generate a JTB grammar, specifying some options -->
-  <!-- fdir : the (src) JTB file directory -->
-  <!-- ofile : the (gen jj) JJ file (with directory) -->
-  <!-- opkg : the (gen JTB) package -->
-  <!-- odir : the (gen JTB) directory -->
+  <!-- Generate a JTB grammar, specifying some options ) -->
+  <!-- gdir : the (src) JTB grammar file directory -->
   <!-- gname : the grammar name -->
+  <!-- odir : the (gen JTB) output directory (absolute or relative to gdir) -->
+  <!-- ofile : the (gen jj) JJ file (absolute or relative to odir) -->
   <target name="gen_jtb_gram_options">
 
     <java classname="${jtb_tool}" classpath="${jtb_new_jar}" fork="true" failonerror="true">
       <!-- Input file -->
-      <arg value="${fdir}/${gname}.jtb" />
-      <!-- Output file -->
-      <arg value="-o=${ofile}" />
-      <!-- Output Package -->
-      <arg value="-p=${opkg}" />
+      <arg value="${gdir}/${gname}.jtb"/>
       <!-- Output directory -->
-      <arg value="-d=${odir}" />
+      <arg value="-d=${odir}"/>
+      <!-- Output file -->
+      <arg value="-o=${ofile}"/>
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
       <!-- enable assertions -->
       <assertions>
-        <enable />
+        <enable/>
       </assertions>
     </java>
 
   </target>
 
-  <!-- Generate a JTB grammar, specifying some options (but not the gen JTB package) -->
-  <!-- fdir : the (src) JTB file directory -->
-  <!-- ofile : the (gen jj) JJ file (with directory) -->
-  <!-- odir : the (gen JTB) directory -->
+  <!-- Generate a JTB grammar, specifying some options and the gen JTB package -->
+  <!-- gdir : the (src) JTB grammar file directory -->
   <!-- gname : the grammar name -->
-  <target name="gen_jtb_gram_options_spe">
+  <!-- opkg : the (gen JTB) package -->
+  <!-- odir : the (gen JTB) output directory (absolute or relative to gdir) -->
+  <!-- ofile : the (gen jj) JJ file (absolute or relative to odir) -->
+  <target name="gen_jtb_gram_options_pkg">
 
     <java classname="${jtb_tool}" classpath="${jtb_new_jar}" fork="true" failonerror="true">
       <!-- Input file -->
-      <arg value="${fdir}/${gname}.jtb" />
-      <!-- Output file -->
-      <arg value="-o=${ofile}" />
+      <arg value="${gdir}/${gname}.jtb"/>
+      <!-- Output Package -->
+      <arg value="-p=${opkg}"/>
       <!-- Output directory -->
-      <arg value="-d=${odir}" />
+      <arg value="-d=${odir}"/>
+      <!-- Output file -->
+      <arg value="-o=${ofile}"/>
       <!-- jacocoagent vm arguments -->
-      <jvmarg value="${jacocoagentvmparam}" />
+      <jvmarg value="${jacocoagentvmparam}"/>
       <!-- enable assertions -->
       <assertions>
-        <enable />
+        <enable/>
       </assertions>
     </java>
 
   </target>
 
   <!-- Generate a JJTree grammar -->
-  <!-- fdir : the (gen jjt) JJTree file directory -->
-  <!-- jdir : the (gen jj) Java file directory -->
+  <!-- gdir : the (gen jjt) JJTree grammar file directory -->
+  <!-- jdir : the (gen jjt) JJTree output directory -->
   <!-- gname : the grammar name -->
   <target name="gen_jjtree_gram">
 
     <java classname="${jjtree_main}" classpath="${javacc_ok_jar}" fork="true" failonerror="true">
-      <arg value="-JJTREE_OUTPUT_DIRECTORY=${jdir}" />
-      <arg value="-jdk_version=${jdk_version}" />
-      <arg value="${fdir}/${gname}.jjt" />
+      <arg value="-JJTREE_OUTPUT_DIRECTORY=${jdir}"/>
+      <arg value="-jdk_version=${jdk_version}"/>
+      <arg value="${gdir}/${gname}.jjt"/>
       <!-- no code coverage on JJTree -->
     </java>
 
   </target>
 
   <!-- Generate a JavaCC grammar -->
-  <!-- fdir : the (gen jtb) JJ file directory -->
-  <!-- jdir : the (gen jj) Java file directory -->
+  <!-- gdir : the (gen jtb) JJ grammar file directory -->
+  <!-- jdir : the (gen jj) JJ output directory -->
   <!-- gname : the grammar name -->
   <target name="gen_jj_gram">
 
     <java classname="${javacc_main}" classpath="${javacc_ok_jar}" fork="true" failonerror="true">
-      <arg value="-OUTPUT_DIRECTORY=${jdir}" />
-      <arg value="-jdk_version=${jdk_version}" />
-      <arg value="${fdir}/${gname}.jj" />
+      <arg value="-OUTPUT_DIRECTORY=${jdir}"/>
+      <arg value="-jdk_version=${jdk_version}"/>
+      <arg value="${gdir}/${gname}.jj"/>
       <!-- no code coverage on JavaCC -->
     </java>
 
@@ -2204,7 +2242,7 @@ public class TokenMgrError</replacevalue>
   <!-- exp_rc : the expected returned code -->
   <!-- add_msg : an additional message -->
   <target name="check_rc" depends="check_rc_ok, check_rc_ko" if="rc_ok">
-    <echo message="Run ended normally as expected (${add_msg})" level="info" />
+    <echo message="Run ended normally as expected (${add_msg})" level="info"/>
   </target>
 
   <!-- Sets property rc_ok to true if java execution returned code is expected one -->
@@ -2213,49 +2251,49 @@ public class TokenMgrError</replacevalue>
   <target name="check_rc_ok">
     <!--echo>act_rc=${act_rc}, exp_rc=${exp_rc},</echo-->
     <condition property="rc_ok">
-      <equals arg1="${act_rc}" arg2="${exp_rc}" />
+      <equals arg1="${act_rc}" arg2="${exp_rc}"/>
     </condition>
   </target>
 
   <!-- Echo fail message if java execution returned code is not expected one -->
   <!-- add_msg : an additional message -->
   <target name="check_rc_ko" unless="rc_ok">
-    <echo message="Run ended NOT as expected (${add_msg})" level="error" />
+    <echo message="Run ended NOT as expected (${add_msg})" level="error"/>
   </target>
 
   <!-- Echo a message with the current date/time -->
   <target name="msg_date_time">
     <tstamp>
-      <format property="current.time" pattern="MM/dd hh:mm:ss" />
+      <format property="current.time" pattern="MM/dd hh:mm:ss"/>
     </tstamp>
-    <echo message="${message} ${current.time}" />
+    <echo message="${message} ${current.time}"/>
   </target>
 
   <!-- ************************************** temporary ant tries ************************************** -->
 
   <target name="toutsans">
     <antcall target="do">
-      <param name="pdo" value="toutsans" />
+      <param name="pdo" value="toutsans"/>
     </antcall>
   </target>
 
   <target name="toutavec">
     <antcall target="do">
-      <param name="pdo" value="toutavec" />
+      <param name="pdo" value="toutavec"/>
     </antcall>
   </target>
 
   <target name="do">
     <echo>do:${pdo}</echo>
     <antcall target="do1">
-      <param name="pdo" value="${pdo}" />
+      <param name="pdo" value="${pdo}"/>
     </antcall>
   </target>
 
   <target name="do1">
     <echo>do1:${pdo}</echo>
     <antcall target="do2">
-      <param name="pdo" value="${pdo}" />
+      <param name="pdo" value="${pdo}"/>
     </antcall>
   </target>
 
@@ -2271,7 +2309,7 @@ public class TokenMgrError</replacevalue>
 
   <target name="toutaveccond">
     <antcall target="docond">
-      <param name="pdocond" value="toutaveccond" />
+      <param name="pdocond" value="toutaveccond"/>
     </antcall>
   </target>
 
@@ -2285,10 +2323,10 @@ public class TokenMgrError</replacevalue>
   <target name="docond1">
     <echo>docond1:${pdocond}</echo>
     <condition property="toto" value="blabla" else="euh">
-      <isset property="pdocond" />
+      <isset property="pdocond"/>
     </condition>
     <antcall target="docond2">
-      <param name="pdo" value="${toto}" />
+      <param name="pdo" value="${toto}"/>
     </antcall>
   </target>
 
@@ -2305,14 +2343,14 @@ public class TokenMgrError</replacevalue>
 
   <target name="toutavecif">
     <antcall target="doif">
-      <param name="pdoif" value="toutavecif" />
+      <param name="pdoif" value="toutavecif"/>
     </antcall>
   </target>
 
   <target name="doif">
     <echo>doif:${pdoif}</echo>
-    <antcall target="doifif" />
-    <antcall target="doifunless" />
+    <antcall target="doifif"/>
+    <antcall target="doifunless"/>
   </target>
   <target name="doifif" if="pdoif">
     <echo>doifif:${pdoif}</echo>
@@ -2323,15 +2361,15 @@ public class TokenMgrError</replacevalue>
                   append="true"
     />
     <antcall target="doif1">
-      <param name="toto" value="${titi}" />
+      <param name="toto" value="${titi}"/>
     </antcall>
   </target>
 
   <target name="doifunless" unless="pdoif">
-    <jacoco:agent property="tutu" enabled="false" />
+    <jacoco:agent property="tutu" enabled="false"/>
     <echo>doifunless:${pdoif}</echo>
     <antcall target="doif1">
-      <param name="toto" value="${tutu}" />
+      <param name="toto" value="${tutu}"/>
     </antcall>
   </target>
 
@@ -2344,14 +2382,14 @@ public class TokenMgrError</replacevalue>
   <!-- never used by MMa -->
 
   <!-- FAn: COMMENT ??? -->
-  <artifact:pom id="jtb.pom" file="pom.xml" />
+  <artifact:pom id="jtb.pom" file="pom.xml"/>
 
   <!-- FAn: COMMENT ??? -->
   <target name="dist" depends="build_all, javadoc" description="build a distribution">
-    <property name="install-name" value="${target-folder}/jtb-${jtb_vp_version}" />
+    <property name="install-name" value="${target-folder}/jtb-${jtb_vp_version}"/>
 
     <!-- FAn: COMMENT ??? -->
-    <delete file="${install-name}-distribution.tar.gz" />
+    <delete file="${install-name}-distribution.tar.gz"/>
     <tar destfile="${install-name}-distribution.tar.gz" compression="gzip">
       <tarfileset username="root"
                   uid="1"
@@ -2377,17 +2415,17 @@ public class TokenMgrError</replacevalue>
     </tar>
 
     <!-- FAn: COMMENT ??? -->
-    <delete file="${install-name}-distribution.zip" />
+    <delete file="${install-name}-distribution.zip"/>
     <zip destfile="${install-name}-distribution.zip">
-      <zipfileset prefix="jtb-${jtb_vp_version}/${target-folder}" filemode="444" file="${jtb}" />
-      <zipfileset prefix="jtb-${jtb_vp_version}/doc" filemode="444" dir="doc" />
+      <zipfileset prefix="jtb-${jtb_vp_version}/${target-folder}" filemode="444" file="${jtb}"/>
+      <zipfileset prefix="jtb-${jtb_vp_version}/doc" filemode="444" dir="doc"/>
       <!-- zipfileset prefix="jtb-${jtb_vp_version}/examples" filemode="444" dir="examples/" / -->
-      <zipfileset prefix="jtb-${jtb_vp_version}" filemode="444" file="LICENSE" />
+      <zipfileset prefix="jtb-${jtb_vp_version}" filemode="444" file="LICENSE"/>
     </zip>
 
     <!-- FAn: COMMENT ??? -->
-    <delete dir="." includes="**/*.class" />
-    <delete file="${install-name}-sources.tar.gz" />
+    <delete dir="." includes="**/*.class"/>
+    <delete file="${install-name}-sources.tar.gz"/>
     <tar destfile="${install-name}-sources.tar.gz" compression="gzip">
       <tarfileset username="root"
                   uid="1"
@@ -2400,7 +2438,7 @@ public class TokenMgrError</replacevalue>
     </tar>
 
     <!-- FAn: COMMENT ??? -->
-    <delete file="${install-name}-sources.jar" />
+    <delete file="${install-name}-sources.jar"/>
     <zip destfile="${install-name}-sources.jar">
       <zipfileset prefix="jtb-${jtb_vp_version}"
                   filemode="444"
@@ -2413,12 +2451,12 @@ public class TokenMgrError</replacevalue>
 
   <!-- FAn: COMMENT ??? -->
   <target name="javadoc">
-    <property name="install-name" value="${target-folder}/jtb-${jtb_vp_version}" />
+    <property name="install-name" value="${target-folder}/jtb-${jtb_vp_version}"/>
 
-    <delete dir="${target-folder}/javadoc" />
-    <mkdir dir="${target-folder}/javadoc" />
+    <delete dir="${target-folder}/javadoc"/>
+    <mkdir dir="${target-folder}/javadoc"/>
     <javadoc destdir="${target-folder}/javadoc">
-      <fileset dir="${jtb_src_dir}" />
+      <fileset dir="${jtb_src_dir}"/>
     </javadoc>
 
     <zip destfile="${install-name}-javadoc.jar" basedir="${target-folder}/javadoc">
@@ -2428,18 +2466,18 @@ public class TokenMgrError</replacevalue>
   <!-- FAn: COMMENT ??? -->
   <target name="install" depends="">
     <artifact:install file="${jtb_prev_jar}">
-      <pom refid="jtb.pom" />
+      <pom refid="jtb.pom"/>
     </artifact:install>
   </target>
 
   <!-- FAn: COMMENT ??? -->
   <target name="deploy" depends="dist" description="deploy snapshot version to Maven snapshot repository">
     <artifact:mvn>
-      <arg value="org.apache.maven.plugins:maven-deploy-plugin:2.8:deploy-file" />
-      <arg value="-Durl=${ossrh-snapshots-repository-url}" />
-      <arg value="-DrepositoryId=${ossrh-server-id}" />
-      <arg value="-DpomFile=pom.xml" />
-      <arg value="-Dfile=${jtb-path}" />
+      <arg value="org.apache.maven.plugins:maven-deploy-plugin:2.8:deploy-file"/>
+      <arg value="-Durl=${ossrh-snapshots-repository-url}"/>
+      <arg value="-DrepositoryId=${ossrh-server-id}"/>
+      <arg value="-DpomFile=pom.xml"/>
+      <arg value="-Dfile=${jtb-path}"/>
     </artifact:mvn>
   </target>
 
@@ -2451,40 +2489,40 @@ public class TokenMgrError</replacevalue>
             value="https://oss.sonatype.org/service/local/staging/deploy/maven2/"
   />
   <!-- there server id in the Maven settings.xml -->
-  <property name="ossrh-server-id" value="ossrh" />
+  <property name="ossrh-server-id" value="ossrh"/>
 
   <!-- before this, update project version (both jtb_props.xml and pom.xml) from SNAPSHOT to RELEASE -->
   <target name="stage" depends="" description="deploy release version to Maven staging repository">
     <!-- sign and deploy the main artifact -->
     <artifact:mvn>
-      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.5:sign-and-deploy-file" />
-      <arg value="-Durl=${ossrh-staging-repository-url}" />
-      <arg value="-DrepositoryId=${ossrh-server-id}" />
-      <arg value="-DpomFile=pom.xml" />
-      <arg value="-Dfile=${jtb-path}" />
-      <arg value="-Pgpg" />
+      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.5:sign-and-deploy-file"/>
+      <arg value="-Durl=${ossrh-staging-repository-url}"/>
+      <arg value="-DrepositoryId=${ossrh-server-id}"/>
+      <arg value="-DpomFile=pom.xml"/>
+      <arg value="-Dfile=${jtb-path}"/>
+      <arg value="-Pgpg"/>
     </artifact:mvn>
 
     <!-- sign and deploy the sources artifact -->
     <artifact:mvn>
-      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.5:sign-and-deploy-file" />
-      <arg value="-Durl=${ossrh-staging-repository-url}" />
-      <arg value="-DrepositoryId=${ossrh-server-id}" />
-      <arg value="-DpomFile=pom.xml" />
-      <arg value="-Dfile=${jtb-sources-path}" />
-      <arg value="-Dclassifier=sources" />
-      <arg value="-Pgpg" />
+      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.5:sign-and-deploy-file"/>
+      <arg value="-Durl=${ossrh-staging-repository-url}"/>
+      <arg value="-DrepositoryId=${ossrh-server-id}"/>
+      <arg value="-DpomFile=pom.xml"/>
+      <arg value="-Dfile=${jtb-sources-path}"/>
+      <arg value="-Dclassifier=sources"/>
+      <arg value="-Pgpg"/>
     </artifact:mvn>
 
     <!-- sign and deploy the javadoc artifact -->
     <artifact:mvn>
-      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.5:sign-and-deploy-file" />
-      <arg value="-Durl=${ossrh-staging-repository-url}" />
-      <arg value="-DrepositoryId=${ossrh-server-id}" />
-      <arg value="-DpomFile=pom.xml" />
-      <arg value="-Dfile=${jtb-javadoc-path}" />
-      <arg value="-Dclassifier=javadoc" />
-      <arg value="-Pgpg" />
+      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.5:sign-and-deploy-file"/>
+      <arg value="-Durl=${ossrh-staging-repository-url}"/>
+      <arg value="-DrepositoryId=${ossrh-server-id}"/>
+      <arg value="-DpomFile=pom.xml"/>
+      <arg value="-Dfile=${jtb-javadoc-path}"/>
+      <arg value="-Dclassifier=javadoc"/>
+      <arg value="-Pgpg"/>
     </artifact:mvn>
   </target>
 

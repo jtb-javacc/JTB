@@ -13,19 +13,18 @@ import examples.java.ex1jtb.visitor.signature.NodeFieldsSignature;
 
 /**
  * A simple dump visitor corresponding to the JJTree SimpleNode.dump() and others.<br>
- * The user nodes visit methods are overriden by adding the dump() call, incrementing/decrementing
- * the indentation, and for some stopping the walk-down.<br>
+ * The user nodes visit methods are overridden by adding the dump() call, incrementing/decrementing the
+ * indentation, and for some stopping the walk-down.<br>
  * No need to check missing visit methods.
  */
 public class DumpVisitor extends DepthFirstGenVisitor {
-
+  
   /*
    * Added methods (come from JJTree examples)
    */
-
-  @SuppressWarnings("javadoc")
-  private int indent = 0;
-
+  
+  @SuppressWarnings("javadoc") private int indent = 0;
+  
   @SuppressWarnings("javadoc")
   private String indentString() {
     final StringBuffer sb = new StringBuffer();
@@ -34,24 +33,24 @@ public class DumpVisitor extends DepthFirstGenVisitor {
     }
     return sb.toString();
   }
-
+  
   @SuppressWarnings("javadoc")
   private void dump(final int nid, final String argu) {
     System.out.println(argu + indentString() + JTB_USER_NODE_NAME[nid]);
     return;
   }
-
+  
   @SuppressWarnings("javadoc")
   private void dump(final String name, final String argu) {
     System.out.println(argu + indentString() + name);
     return;
   }
-
+  
   /*
-   * Copied then overriden user grammar generated visit methods
-   * added the dump() calls and ++/--indent, and removed some walk-downs
+   * Copied then overriden user grammar generated visit methods added the dump() calls and ++/--indent, and
+   * removed some walk-downs
    */
-
+  
   /**
    * Visits a {@link Start} node, whose children are the following :
    * <p>
@@ -63,7 +62,9 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({ 1859009853, JTB_SIG_START, JTB_USER_START })
+  @NodeFieldsSignature({
+      1859009853, JTB_SIG_START, JTB_USER_START
+  })
   public void visit(final Start n, final String argu) {
     dump(JTB_USER_START, argu);
     ++indent;
@@ -73,7 +74,7 @@ public class DumpVisitor extends DepthFirstGenVisitor {
     n.f1.accept(this, argu);
     --indent;
   }
-
+  
   /**
    * Visits a {@link Expression} node, whose child is the following :
    * <p>
@@ -84,7 +85,9 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({ -762347234, JTB_SIG_EXPRESSION, JTB_USER_EXPRESSION })
+  @NodeFieldsSignature({
+      -762347234, JTB_SIG_EXPRESSION, JTB_USER_EXPRESSION
+  })
   public void visit(final Expression n, final String argu) {
     dump(JTB_USER_EXPRESSION, argu);
     ++indent;
@@ -92,7 +95,7 @@ public class DumpVisitor extends DepthFirstGenVisitor {
     n.f0.accept(this, argu);
     --indent;
   }
-
+  
   /**
    * Visits a {@link AdditiveExpression} node, whose children are the following :
    * <p>
@@ -106,7 +109,9 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({ -1807059397, JTB_SIG_ADDITIVEEXPRESSION, JTB_USER_ADDITIVEEXPRESSION })
+  @NodeFieldsSignature({
+      -1807059397, JTB_SIG_ADDITIVEEXPRESSION, JTB_USER_ADDITIVEEXPRESSION
+  })
   public void visit(final AdditiveExpression n, final String argu) {
     dump(JTB_USER_ADDITIVEEXPRESSION, argu);
     ++indent;
@@ -118,7 +123,7 @@ public class DumpVisitor extends DepthFirstGenVisitor {
     n.f1.accept(this, argu);
     --indent;
   }
-
+  
   /**
    * Visits a {@link MultiplicativeExpression} node, whose children are the following :
    * <p>
@@ -133,8 +138,9 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({ 853643830, JTB_SIG_MULTIPLICATIVEEXPRESSION,
-                         JTB_USER_MULTIPLICATIVEEXPRESSION })
+  @NodeFieldsSignature({
+      853643830, JTB_SIG_MULTIPLICATIVEEXPRESSION, JTB_USER_MULTIPLICATIVEEXPRESSION
+  })
   public void visit(final MultiplicativeExpression n, final String argu) {
     dump(JTB_USER_MULTIPLICATIVEEXPRESSION, argu);
     ++indent;
@@ -147,7 +153,7 @@ public class DumpVisitor extends DepthFirstGenVisitor {
     n.f1.accept(this, argu);
     --indent;
   }
-
+  
   /**
    * Visits a {@link UnaryExpression} node, whose child is the following :
    * <p>
@@ -160,7 +166,9 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({ 190447292, JTB_SIG_UNARYEXPRESSION, JTB_USER_UNARYEXPRESSION })
+  @NodeFieldsSignature({
+      190447292, JTB_SIG_UNARYEXPRESSION, JTB_USER_UNARYEXPRESSION
+  })
   public void visit(final UnaryExpression n, final String argu) {
     dump(JTB_USER_UNARYEXPRESSION, argu);
     ++indent;
@@ -170,7 +178,7 @@ public class DumpVisitor extends DepthFirstGenVisitor {
     n.f0.accept(this, argu);
     --indent;
   }
-
+  
   /**
    * Visits a {@link Identifier} node, whose child is the following :
    * <p>
@@ -181,14 +189,16 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({ -1580059612, JTB_SIG_IDENTIFIER, JTB_USER_IDENTIFIER })
+  @NodeFieldsSignature({
+      -1580059612, JTB_SIG_IDENTIFIER, JTB_USER_IDENTIFIER
+  })
   public void visit(@SuppressWarnings("unused") final Identifier n, final String argu) {
     dump(JTB_USER_IDENTIFIER, argu);
     // no need to go further down
-    //    // f0 -> < IDENTIFIER >
-    //    n.f0.accept(this, argu);
+    // // f0 -> < IDENTIFIER >
+    // n.f0.accept(this, argu);
   }
-
+  
   /**
    * Visits a {@link EgInteger} node, whose child is the following :
    * <p>
@@ -199,12 +209,14 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({ -1048223857, JTB_SIG_EGINTEGER, JTB_USER_EGINTEGER })
+  @NodeFieldsSignature({
+      -1048223857, JTB_SIG_EGINTEGER, JTB_USER_EGINTEGER
+  })
   public void visit(@SuppressWarnings("unused") final EgInteger n, final String argu) {
     dump("Integer", argu);
     // no need to go further down
-    //    // f0 -> < INTEGER_LITERAL >
-    //    n.f0.accept(this, argu);
+    // // f0 -> < INTEGER_LITERAL >
+    // n.f0.accept(this, argu);
   }
-
+  
 }

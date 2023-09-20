@@ -5,13 +5,17 @@
 
   <groupId>edu.purdue.cs</groupId>
   <artifactId>jtb</artifactId>
-  <version>1.5.0</version>
+  <version>1.5.2</version>
   <name>JTB: Java Tree Builder</name>
   <url>https://github.com/jtb-javacc/JTB</url>
 
   <properties>
+  <!-- For platform independent builds -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+    <!-- For VSCode -->
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+</properties>
 
   <organization>
     <name>jtb-javacc</name>
@@ -37,14 +41,14 @@
     <developer>
       <name>Wanjun Wang</name>
     </developer>
+    <developer>
+      <name>Marc MAZAS</name>
+      <organization>Sopra Steria Group</organization>
+      <email>marc.mazas@soprasteria.com</email>
+    </developer>
   </developers>
 
   <contributors>
-    <contributor>
-      <name>Marc MAZAS</name>
-      <organization>Sopra</organization>
-      <email>marc.mazas@soprasteria.com</email>
-    </contributor>
     <contributor>
       <name>Francis ANDRE</name>
       <email>francis.andre.kampbell@orange.fr</email>
@@ -67,7 +71,7 @@
     <dependency>
       <groupId>net.java.dev.javacc</groupId>
       <artifactId>javacc</artifactId>
-      <version>7.0.9</version>
+      <version>7.0.12</version>
     </dependency>
   </dependencies>
   <description>JTB is a syntax tree builder to be used with the Java Compiler Compiler (JavaCC) parser generator. 

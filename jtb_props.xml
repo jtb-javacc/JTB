@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE fakeforremovingdtdvalidationinfo>
 <!-- jtb_props.xml. Defines JTB properties, imported by build.xml.
      Uses version.properties to import (and share) the to be built JTB version.
      Marc Mazas - Sopra Steria Group - 05/2009-09/2023 - Francis Andre - 03/2017 -->

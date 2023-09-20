@@ -47,25 +47,21 @@ Idées futuristes sur JTB/JavaCC
 - voir à faire un LSP
 
 A faire prochainement sur JTB
-- voir pourquoi signature/* ne sont pas marqués dérivés
+- l'utiliser sous IDEA
 - tcf avec autres options
 - tests exhaustifs sur suppression / ajout de noeuds
-- changer le NodeToken pour qu'il référence le Token au lieu de copier ses propriétés (vérifier que les Tokens sont GCed bien avant les NodeTokens), ou mieux (?) faire hériter Token d'un NodeToken 
-- supprimer les intern() dans makeNodeToken
 - corriger le bug rencontré sur la 1.5.0 sur BindVariable du parser PL/SQL (mauvaise génération du jj annotation finale n11 = ... au lieu de n2 = ...)
 - générer correctement les commentaires lorsque l'on utilise un noeud JAVACODE (%)
 - ajouter la gestion du chaînage des parseurs, passer JTB en un parseur pur JTB et un parseur Java, mettre à jour la grammaire Java 13+
 - corriger le type de retour lorsqu'il est qualifié par son package BNF et JavaCode productions a.b.Cd Cd() ...
 - corriger le NPE sur syntaxe [ "x" ! ] ou [ Prod() ! ] ou [ Prod() ] sur une Prod() !
 - changer la syntaxe ! par #void, % par #xyz, ajouter #xyz pour permettre la surcharge du noeud 
-- ajouter une option pour le chaînage des NodeTokens comme pour les Tokens de JavaCC
 - revoir la gestion des specials en visitant tous les identifieurs et en imprimant les specials à ce moment là
 - voir à accepter les noms de production qui posent conflit, ex String
 - voir le NPE dans les visiteurs lorsque le nœud n'est pas créé
 - construire des exemples de grammaire avec des Lookahead dans Expansion et dans ExpansionUnit, et avec (<TK> | {})
 - voir pourquoi les classes ne sont pas générées pour les productions orphelines
 - voir les options par défaut jtb (options/wiki) et plugin ia/jd/tk true ou false ?
-- mettre à jour le wiki (overview, // 1.5.0, et ajouter une doc plus complète, en particulier différences // JJT)
 - mettre à jour le plugin maven
 - choisir un repository maven pour publier jtb et son plugin maven
 - écrire une doc pour target ant via une task java
@@ -77,6 +73,10 @@ A faire prochainement sur JTB
 - voir à ajouter des benchmarks jmh
 - voir à améliorer les indicateurs de qualité
 - voir les aspects sécurité
+- voir le multi-release jar https://www.baeldung.com/java-multi-release-jar
+
+Fait sur JTB en 1.5.2
+- changé la gestion du manifest
 
 Fait sur JTB en 1.5.1
 - corrigé des problèmes de génération de node (node choice, EUNS)

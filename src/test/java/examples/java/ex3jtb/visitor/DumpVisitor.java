@@ -23,7 +23,7 @@ import examples.java.ex3jtb.syntaxtree.ASTUnaryExpression;
 
 /**
  * A simple dump visitor corresponding to the JJTree SimpleNode.dump() and others.<br>
- * The user nodes visit methods are overriden by adding the dump() call, incrementing/decrementing the
+ * The user nodes visit methods are overridden by adding the dump() call, incrementing/decrementing the
  * indentation, and for some stopping the walk-down.<br>
  * No need to check missing visit methods.
  */
