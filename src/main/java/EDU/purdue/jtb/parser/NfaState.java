@@ -1581,10 +1581,8 @@ public class NfaState {
             break;
           }
         }
-        
-        for (int k = i; k > j; k--) {
-          cardinalities[k] = cardinalities[k - 1];
-        }
+
+        if (i - j >= 0) System.arraycopy(cardinalities, j, cardinalities, j + 1, i - j);
         
         cardinalities[j] = p;
         
