@@ -262,7 +262,6 @@ public class VisitorInfo implements Comparable<VisitorInfo> {
    * @param aRI - the ReturnInfo
    */
   private static void genInitializer(final ReturnInfo aRI) {
-    final StringBuilder str = new StringBuilder(16);
     if ("boolean".equals(aRI.type)) {
       if (!aRI.isArray) {
         aRI.initializer = "false";
@@ -277,10 +276,6 @@ public class VisitorInfo implements Comparable<VisitorInfo> {
       } else {
         aRI.initializer = "{ 0 }";
       }
-    } else if (!aRI.isArray) {
-      str.append("null");
-    } else {
-      str.append("{ null }");
     }
   }
   
