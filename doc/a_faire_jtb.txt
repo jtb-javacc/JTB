@@ -47,6 +47,7 @@ Idées futuristes sur JTB/JavaCC
 - voir à faire un LSP
 
 A faire prochainement sur JTB
+- màj grammaire jtb // javacc
 - l'utiliser sous IDEA
 - tcf avec autres options
 - tests exhaustifs sur suppression / ajout de noeuds

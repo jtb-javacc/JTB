@@ -63,7 +63,8 @@
 
   <!-- JTB files and classes -->
   <property name="jtb_parser" value="JTBParser" />
-  <property name="jtb_tool" value="EDU.purdue.jtb.JTB" />
+  <property name="jtb_pkg" value="EDU.purdue.jtb" />
+  <property name="jtb_tool" value="${jtb_pkg}.JTB" />
 
   <property name="jtb-path" value="lib/jtb-${jtb_curr_version}.jar" />
 
@@ -115,9 +116,33 @@
   <property name="mavenanttasks_jar" value="${jtb_lib_dir}/maven-an-tasks-2.1.3.jar" />
 
   <!-- JProfiler arguments -->
-  <property name="jprofiler_args"
-            value="-agentpath:C:\PROGRA~1\JPROFI~1\bin\WINDOW~1\jprofilerti.dll=wait,id=175,config=d:\Profiles\mmazas\.jprofiler9\config.xml"
+  <!-- listening on local port -->
+  <property name="jprofiler_args_port"
+            value="-agentpath:C:\Users\mmazas\AppData\Local\Programs\jprofiler14\bin\windows-x64\jprofilerti.dll=port=8849"
   />
+  <!-- offline profiling: session with triggers -->
+  <property name="jprofiler_args_offline"
+            value="-agentpath:C:\Users\mmazas\AppData\Local\Programs\jprofiler14\bin\windows-x64\jprofilerti.dll=offline,id=175,config=C:\Users\mmazas\.jprofiler14\jprofiler_config.xml"
+  />
+  <!-- old -->
+  <property name="jprofiler_args_id"
+            value="-agentpath:C:\Users\mmazas\AppData\Local\Programs\jprofiler14\bin\windows-x64\jprofilerti.dll=id=175,config=C:\Users\mmazas\.jprofiler14\jprofiler_config.xml"
+  />
+  <!-- old -->
+  <property name="jprofiler_args_id_nowait"
+            value="-agentpath:C:\Users\mmazas\AppData\Local\Programs\jprofiler14\bin\windows-x64\jprofilerti.dll=nowait,id=175,config=C:\Users\mmazas\.jprofiler14\jprofiler_config.xml"
+  />
+  <!-- the argument used, that references one of the above -->
+  <property name="jprofiler_args" value="${jprofiler_args_offline}" />
+
+  <!-- GraalVM properties -->
+  <property name="GVM_JDK" value="C:\Program Files\Java\graalvm-jdk-23+37.1" />
+  <property name="classes-gvm" value="target/classes-gvm" />
+  <property name="gvm" value="target/graalvm" />
+  <property name="ni-gvm" value="${gvm}/META-INF/native-image" />
+  <property name="temp-gvm" value="${gvm}/temp" />
+  <property name="jtb_gvm_jar" value="${gvm}/gvm_jtb.jar" />
+  <property name="jtb_gvm_ni" value="${gvm}/gvm_jtb-ni" />
 
   <!-- echo some JTB version related properties -->
   <target name="echo_jtb_props">
