@@ -4,7 +4,7 @@
      Was used to automatically (on save) generate .html files suited for the Wiki from the .textile file(s)
       and for other .md file(s), and to manually delete them;
      for the first the Ant builder must be added / enabled to the project, and for both see further comment.
-     Marc Mazas - Sopra Steria Group - 03-09/2021 -->
+     Marc Mazas - 03-09/2021 -->
 
 <project name="jtb_html" default="generate_html" basedir=".">
 

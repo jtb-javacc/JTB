@@ -1,67 +1,71 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- Enables building a new version of JTB jar (through a previous JTB version and a compatible JavaCC version).
+<!-- Enables building a new version of JTB jar (through a previous JTB version and a compatible
+      JavaCC version).
      Uses jtb_props.xml & javacc_props.xml to import (and share) JTB & JavaCC properties.
-     Allows to be used along with the SF JavaCC Plug-in which integrates with the Eclipse incremental Build
-      System, ie the proper Eclipse settings of the project and the launch configuation can trigger a refresh
-      at the end of the ant build which can recompile jtb/jjt/jj/java files and allow markers to be shown in
-      the source files - what the standard ant build does not.
+     Allows to be used along with the SF JavaCC Plug-in which integrates with the Eclipse incremental
+      Build System, ie the proper Eclipse settings of the project and the launch configuation can
+      trigger a refresh at the end of the ant build which can recompile jtb/jjt/jj/java files and
+      allow markers to be shown in the source files - what the standard ant build does not.
      Tested under IDEA & VSCode installations.
-     Marc Mazas - Sopra Steria Group - 05/2009 - 12/2022 - 09/2023
-     Francis Andre - 03-09/2017
+     Marc Mazas - 05/2009 - 12/2022 - 09/2023 - 05/2025.
+     Francis Andre - 03-09/2017.
 -->
 <!--
    Some settings notes:
-   - Check/set that the lib/freemarker-x.y.z & lib/jacocoant-x.y.z jars are on the project's build path in
-      Eclipse (Properties / Java Build Path / Libraries)
+   - Check/set that the lib/freemarker-x.y.z & lib/jacocoant-x.y.z jars are on the project's build
+      path in Eclipse (Properties / Java Build Path / Libraries)
    - Check/set the JavaCC jar in javacc.xml.
-   - If you want to use properties for paths in taskdef (jacoco) or typdef (maven), you have to add these
-      paths (lib/jacocoant-x.y.z.jar and lib/maven-ant-tasks-2.1.3.jar) as new entries in Global Entries list
-      of entries in Eclipse (Preferences / Ant / Runtime / Classpath), but you will have ant warnings if the
-      project is closed.
+   - If you want to use properties for paths in taskdef (jacoco) or typdef (maven), you have to add
+      these paths (lib/jacocoant-x.y.z.jar and lib/maven-ant-tasks-2.1.3.jar) as new entries in
+      Global Entries list of entries in Eclipse (Preferences / Ant / Runtime / Classpath),
+      but you will have ant warnings if the project is closed.
   -->
 <!--
    Here is how to use targets, to build and test a new version:
    
-   - in jtb.xml, check/set jtb_last_version to the stable version (the one using jtb-xyz.jar)
+   - in jtb_props.xml, check/set jtb_last_version to the stable version (the one using jtb-xyz.jar)
       and jtb_curr_version to the new version (the one which will produce new_jtb-yyy.jar)
    - in src/main/java/.../common.Constants.java, set VERSION to the same as jtb_curr_version
    - make code modifications
-   - run build_new_jtb_jar: it will create the new JTB parser jar (jtb_new_jar) using the stable one (jtb_ok_jar)
-   - if ok, run rebuild_jtbparser: it will regenerate the JTB parser files using the new jar (jtb_new_jar)
-      and compile them
-   - if ok, run compile_test_jtb_java, then build_testparsers, then build_examplesparsers : it will test
-      regenerating test and examples parsers and compile them
-   - if ok, run run_testparsers and run_examplesparsers: it will test executing the test and examples parsers
-      on small inputs
+   - run build_new_jtb_jar: it will create the new JTB parser jar (jtb_new_jar) using the stable one
+      (jtb_ok_jar)
+   - if ok, run rebuild_jtbparser: it will regenerate the JTB parser files using the new jar
+      (jtb_new_jar) and compile them
+   - if ok, run compile_test_jtb_java, then build_testparsers, then build_examplesparsers:
+      it will test regenerating test and examples parsers and compile them
+   - if ok, run run_testparsers and run_examplesparsers: it will test executing the test and
+      examples parsers on small inputs
    - if ok, run make_new_jtb_jar: it will recreate the new jar (jtb_new_jar)
    - finish docs, deactivate the ant builder for html files
-   - if ok and version finished, run rename_new_to_prev_jtb_jar: it will rename the new jar in jar-yyy.jar
-   - if after this need to revert back, run revert_prev_to_new_jar: it will rename the jar-yyy.jar in the new jar 
+   - if ok and version finished, run rename_new_to_acc_jtb_jar: it will rename the new jar in
+      jar-yyy.jar
+   - if after this need to revert back, run revert_acc_to_new_jar: it will rename the jar-yyy.jar
+      in the new jar 
    - then you may prepare the new version numbers for the next version as above
-   - the (default) target build_all will chain the first four previous targets with code coverage, the target 
-      build_all_core will do the same without code coverage
-   
-   FAn: COMMENT TO BE ADDED HERE TO DESCRIBE THE USE OF THE POM.XML TARGETS AND ASSOCIATED PROPERTIES IN JTB.XML
+   - the (default) target build_all will chain the first four previous targets with code coverage,
+      the target  build_all_core will do the same without code coverage
 -->
 <!--
-   - Unlike JavaCC or CongoCC, we choosed not to use a bootstrap JTB jar but use as much as possible the
-      last generated jar.
-     This may lead to generate files (.jj, syntaxtree or visitor) with errors; we deal with them by custom tasks
-      (patching the files or replacing them by full files from the src/main/java/.../saves directory)
+   - Unlike JavaCC or CongoCC, we choosed not to use a bootstrap JTB jar but use as much as possible
+      the last generated jar.
+     This may lead to generate files (.jj, syntaxtree or visitor) with errors; we deal with them by
+      custom tasks (patching the files or replacing them by full files from the
+       src/main/java/.../saves directory)
       (however in an Eclipse build these steps need to be performed manually)
 
-   - The tests grammars are aimed at covering the JTB features; the examples grammars are aimed at showing
-      the JTB equivalent grammars to the JJTree example grammars found in the JavaCC distrib.
+   - The tests grammars are aimed at covering the JTB features; the examples grammars are aimed at
+      showing the JTB equivalent grammars to the JJTree example grammars found in the JavaCC distrib.
 
-   - JaCoCo is used to perform the code coverage analysis and produce the HTML report (on the new JTB version,
-      not on the current one) under target/jacoco/report/index.html
-   - under Eclipse, with the plugin EclEmma, one can import (File/Import.../Run/Debug/Coverage session) the
-      execution file and see the coverage of each java file in the java editors (no way to exclude files like
-      with the jacoco report, can only hide unused elements in the coverage view)
+   - JaCoCo is used to perform the code coverage analysis and produce the HTML report (on the new JTB
+      version, not on the current one) under target/jacoco/report/index.html
+   - under Eclipse, with the plugin EclEmma, one can import (File/Import.../Run/Debug/Coverage session)
+      the execution file and see the coverage of each java file in the java editors (no way to exclude
+      files like with the jacoco report, can only hide unused elements in the coverage view)
    - to get rid of code coverage comment/uncomment some lines (see further)
-   - note that the Eclipse Coverage view usually do not show any coverage for target-generated/*; this is
-      probably because the Eclipse automatic build modifies these files after this build.xml is run
-      (as a proof of this ASTMyID in jjt is a manual overriding, so not regenerated, and is indeed covered)
+   - note that the Eclipse Coverage view usually do not show any coverage for target-generated/*;
+      this is probably because the Eclipse automatic build modifies these files after this build.xml
+      is run (as a proof of this ASTMyID in jjt is a manual overriding, so not regenerated,
+      and is indeed covered)
 -->
 <!--
    How to use this build script while developing under Eclipse:
@@ -73,16 +77,17 @@
      * set Refresh the project containing the selected resources upon completion
      * unset the Build before launch
    - after modification of a test or example grammar:
-     * either manually compile the grammar, and then the JDT should do the remaining (and JTB & JavaCC markers
-        will appear in the files)
-     * or run appropriate build targets (and as the grammar will be compiled and the Eclipse build triggered,
-        then the JDT will compile the generated java classes and JTB & JavaCC markers
+     * either manually compile the grammar, and then the JDT should do the remaining (and JTB &
+        JavaCC markers will appear in the files)
+     * or run appropriate build targets (and as the grammar will be compiled and the Eclipse build
+        triggered, then the JDT will compile the generated java classes and JTB & JavaCC markers
         will appear in the files))
    - after modification of the jtb grammar or the other java classes: run appropriate build targets
-   - so Java problems will appear in the files as in usual Java development and the JavaCC compilation (which
-      is quite long) will not be triggered twice (once by the ant build and once by the Eclipse build)
-   - set the Project / Properties / Java Compiler / Annotation Processing / Factory Path with the 2 jarx
-      ap.jar (which should not change much) and the appropriate jtb-x.y.z.jar or new-jtb-x.y.z.jar
+   - so Java problems will appear in the files as in usual Java development and the JavaCC compilation
+      (which is quite long) will not be triggered twice (once by the ant build and once by the Eclipse
+      build)
+   - set the Project / Properties / Java Compiler / Annotation Processing / Factory Path with the 2
+      jars ap.jar (which should not change much) and the appropriate jtb-x.y.z.jar or new-jtb-x.y.z.jar
    - when doing code coverage, set the project not to be built automatically by the JDT
    - in the build path, the test & generated-tests folders are not considered containing test sources
       (otherwise we would have to manage output folders target/generated-classes in this script)
@@ -90,44 +95,63 @@
 <!--
    How to use this build script while developing under Idea or VSCode:
    - Idea:
-     * care must be taken not to let Idea associate output folder target/test-classes to test sources, i.e.
-        use java sources, not test sources, for src/test and target/generated-tests (it is suspected that Idea
-        can change the .classpath file contents under some configuration)
-     * looks like Idea is able to compile with the project's JDK settings, i.e. JDK 11, so we can use the
-        mylyn jars copied under lib for generating html
+     * care must be taken not to let Idea associate output folder target/test-classes to test sources,
+        i.e. use java sources, not test sources, for src/test and target/generated-tests (it is
+        suspected that Idea can change the .classpath file contents under some configuration)
+     * looks like Idea is able to compile with the project's JDK settings, i.e. JDK 11, so we can
+        use the mylyn jars copied under lib for generating html
      * code coverage data can be imported in the IDE
    - VSCode:
      * looks like VSCode says it is a Maven project and sets the JDK accordingly
-     * looks like the Ant Target Runner is not able to parse this build.xml file, so it must be launched from
-        the terminal, which requires the ANT_HOME / JDK_HOME / PATH to be set appropriately; as the current
-        mylin jars in lib require JDK 11, the build_jtb_html.xml import and targets have been conditioned to
-        be excluded outside Eclipse and therefore a JDK 1.8 can be used
+     * looks like the Ant Target Runner is not able to parse this build.xml file, so it must be
+        launched from the terminal, which requires the ANT_HOME / JDK_HOME / PATH to be set
+        appropriately; as the current mylin jars in lib require JDK 11, the build_jtb_html.xml import
+        and targets have been conditioned to be excluded outside Eclipse and therefore a JDK 1.8
+        can be used
      * does not look that VSCode is able to import Jacoco coverage data
 -->
 <!--
    How to debug JTB: there are 3 flags in the Java code:
    - in Constants.java:
-     * DEBUG_CLASS: to turn on/off printing class debug comments (useful to find where each line is produced)
-     * DEBUG_COMMENT: to turn on/off printing field and sub comment debug comments (useful to find where
-        comments are produced)
+     * DEBUG_CLASS: to turn on/off printing class debug comments 
+        (useful to find where each line is produced)
+     * DEBUG_COMMENT: to turn on/off printing field and sub comment debug comments
+        (useful to find where comments are produced)
    - in CommentsPrinter.java:
-     * DEBUG_CHARS: to change prefix and field names strings (useful to see where they are produced)
-        (see target rebuild_jtbparser)
+     * DEBUG_CHARS: to change prefix and field names strings
+        (useful to see where they are produced) (see target rebuild_jtbparser)
+-->
+<!--
+   Here is how to use targets, to install, sign and deploy to Sonatype Central Portal:
+   
+   - targets are not chained and must be executed manually
+   - user's settings.xml must contain
+      2 servers with id centralportal & centralportalsnapshots with proper urls, and
+      1 profile activated by default with the gpg.keyname set to the 8 hex digits short key
+   - run rename_new_to_acc_jar to rename new jar to accepted jar
+   - versions must be set in both jtb_props.xml and pom.xml; run check_pom_build_versions to check
+   - comment/uncomment ${mvn-just-test-publish} (in jtb_props.xml) for real/dummy publishing
+   - run publish_snapshot to publish a snapshot
+   - run install_release, then make_bundle, then manually publish the bundle with 
+      https://central.sonatype.com/publishing/deployments to publish a release
 -->
 <!--
    MMa : 04/2021 : adapted to javacc 7.0.10 output; factored gen_xx compilation & add_suppresswarnings
    MMa : 07/2023 : improved gen_y / gen_z, and some minor stuff
-   MMa : 08/2023 : renamed jtb grammar and out files; moved call to copy_specific_token_for_jtb before generation
+   MMa : 08/2023 : renamed jtb grammar and out files; moved call to copy_specific_token_for_jtb
+                    before generation
    MMa : 09/2023 : fixed visitors list to be compiled with annotation processor;
                    changed paths to ${basedir} relative; removed properties for paths in taskdef & typedef;
-                   changed manifest file generation; adapted to Idea & VSCode
+                   changed manifest file generation; adapted to Idea & VSCode; added JProfiler profiling
+   MMa : 05/2025 : reworked to publish to Sonatype Central Portal with the reworked pom.xml called
+                    through the Maven Artifact Resolver Ant Tasks (replacing the retired Maven Ant Tasks)
 -->
 
 <project name="jtb"
          basedir="."
          default="build_all"
          xmlns:jacoco="antlib:org.jacoco.ant"
-         xmlns:artifact="antlib:org.apache.maven.artifact.ant"
+         xmlns:resolver="antlib:org.apache.maven.resolver.ant"
          xmlns:if="ant:if"
          xmlns:unless="ant:unless"
 >
@@ -154,13 +178,15 @@
        so we use the workaround of passing a no impact jvm argument
   <jacoco:agent property="jacocoagentvmparam" enabled="false" />
   -->
-
-  <!-- Ant type definition for Maven tasks (m2e does not accept a property in path) -->
-  <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
-           uri="antlib:org.apache.maven.artifact.ant"
-  >
-    <classpath path="lib/maven-ant-tasks-2.1.3.jar" />
-  </typedef>
+  <!--  New taskdef for Maven tasks; see:
+        https://maven.apache.org/resolver-ant-tasks/
+        https://repo1.maven.org/maven2/org/apache/maven/resolver/maven-resolver-ant-tasks/
+        https://github.com/apache/maven-resolver-ant-tasks/blob/master/build.xml
+  -->
+  <taskdef resource="org/apache/maven/resolver/ant/antlib.xml"
+           uri="antlib:org.apache.maven.resolver.ant"
+           classpath="lib/maven-resolver-ant-tasks-1.5.2-uber.jar"
+  />
 
   <!-- Import JTB properties -->
   <import file="jtb_props.xml" />
@@ -376,8 +402,9 @@
         <enable />
       </assertions>
       <!-- no code coverage really needed.
-           Also, if we use the same ${jacocoagentvmparam} property with the same classdumpdir, we get an error
-            as some of the classes appear twice (see https://www.jacoco.org/jacoco/trunk/doc/faq.html)
+           Also, if we use the same ${jacocoagentvmparam} property with the same classdumpdir,
+            we get an error as some of the classes appear twice
+            (see https://www.jacoco.org/jacoco/trunk/doc/faq.html)
             (java.lang.IllegalStateException: Can't add different class with same name: EDU/purdue/jtb/...)
       -->
     </java>
@@ -1964,24 +1991,28 @@
     </uptodate>
   </target>
 
-  <!-- Rename ${jtb_new_jar} in ${jtb_prev_jar} - when ${jtb_new_jar} is OK, before changing to a new version  -->
-  <target name="rename_new_to_prev_jtb_jar">
-    <move file="${jtb_new_jar}" tofile="${jtb_prev_jar}" overwrite="false" />
+  <!-- Rename ${jtb_new_jar} into ${jtb_acc_jar} -
+        when ${jtb_new_jar} is OK, before changing to a new version  -->
+  <target name="rename_new_to_acc_jtb_jar">
+    <move file="${jtb_new_jar}" tofile="${jtb_acc_jar}" overwrite="false" />
   </target>
 
-  <!-- Rename ${jtb_prev_jar} in ${jtb_new_jar} - when ${jtb_prev_jar} was not OK, to revert back to the old version  -->
-  <target name="revert_prev_to_new_jtb_jar">
-    <move file="${jtb_prev_jar}" tofile="${jtb_new_jar}" overwrite="false" />
+  <!-- Rename ${jtb_acc_jar} into ${jtb_new_jar} -
+        when ${jtb_acc_jar} was not OK, to revert back to the old version  -->
+  <target name="revert_acc_to_new_jtb_jar">
+    <move file="${jtb_acc_jar}" tofile="${jtb_new_jar}" overwrite="false" />
   </target>
 
-  <!-- Rename ${jtb_new_jar_src} in ${jtb_prev_jar_src} - when ${jtb_new_jar_src} is OK, before changing to a new version  -->
-  <target name="rename_new_to_prev_jtb_src_jar">
-    <move file="${jtb_new_jar_src}" tofile="${jtb_prev_jar_src}" overwrite="false" />
+  <!-- Rename ${jtb_new_jar_src} into ${jtb_acc_jar_src} -
+        when ${jtb_new_jar_src} is OK, before changing to a new version  -->
+  <target name="rename_new_to_acc_jtb_src_jar">
+    <move file="${jtb_new_jar_src}" tofile="${jtb_acc_jar_src}" overwrite="false" />
   </target>
 
-  <!-- Rename ${jtb_prev_jar_src} in ${jtb_new_jar_src} - when ${jtb_prev_jar} was not OK, to revert back to the old version  -->
-  <target name="revert_prev_to_new_jtb_src_jar">
-    <move file="${jtb_prev_jar_src}" tofile="${jtb_new_jar_src}" overwrite="false" />
+  <!-- Rename ${jtb_acc_jar_src} into ${jtb_new_jar_src} -
+        when ${jtb_acc_jar} was not OK, to revert back to the old version  -->
+  <target name="revert_acc_to_new_jtb_src_jar">
+    <move file="${jtb_acc_jar_src}" tofile="${jtb_new_jar_src}" overwrite="false" />
   </target>
 
   <target name="clean" depends="clean_classes, clean_all_gen_files">
@@ -2139,7 +2170,7 @@
     </delete>
   </target>
 
-  <!-- ****************** Targets to be used as sub-programs, receiving some parameters ****************** -->
+  <!-- *************** Targets to be used as sub-programs, receiving some parameters *************** -->
 
   <!-- Add some @SuppressWarnings("all") to generated files & JavaCharStream.java (Unicode grammars) -->
   <!-- gdir : the file directory -->
@@ -2330,7 +2361,6 @@ public class Token</replacevalue>
 
     <java classname="${javacc_main}" classpath="${javacc_ok_jar}" fork="true" failonerror="true">
       <arg value="-OUTPUT_DIRECTORY=${jdir}" />
-      <arg value='JAVA_TEMPLATE_TYPE="modern"' />
       <arg value="-jdk_version=${jdk_version}" />
       <arg value="${gdir}/${gname}.jj" />
       <!-- no code coverage on JavaCC -->
@@ -2370,7 +2400,7 @@ public class Token</replacevalue>
     <echo message="${message} ${current.time}" />
   </target>
 
-  <!-- ************************************** temporary ant tries ************************************** -->
+  <!-- ******************************** temporary ant tries ******************************** -->
 
   <target name="toutsans">
     <antcall target="do">
@@ -2479,155 +2509,211 @@ public class Token</replacevalue>
     <echo>toto:${toto}</echo>
   </target>
 
-  <!-- ************************************** maven related targets ************************************** -->
-  <!-- never used by MMa -->
+  <!-- **************************** maven publishing related targets **************************** -->
 
-  <!-- FAn: COMMENT ??? -->
-  <artifact:pom id="jtb.pom" file="pom.xml" />
-
-  <!-- FAn: COMMENT ??? -->
-  <target name="dist" depends="build_all, javadoc" description="build a distribution">
-    <property name="install-name" value="${target-folder}/jtb-${jtb_vp_version}" />
-
-    <!-- FAn: COMMENT ??? -->
-    <delete file="${install-name}-distribution.tar.gz" />
-    <tar destfile="${install-name}-distribution.tar.gz" compression="gzip">
-      <tarfileset username="root"
-                  uid="1"
-                  group="root"
-                  prefix="jtb-${jtb_vp_version}/doc"
-                  filemode="444"
-                  dir="doc"
-      />
-      <tarfileset username="root"
-                  uid="1"
-                  group="root"
-                  prefix="jtb-${jtb_vp_version}"
-                  filemode="444"
-                  file="LICENSE"
-      />
-      <tarfileset username="root"
-                  uid="1"
-                  group="root"
-                  prefix="jtb-${jtb_vp_version}/${target-folder}"
-                  filemode="444"
-                  file="${jtb}"
-      />
-    </tar>
-
-    <!-- FAn: COMMENT ??? -->
-    <delete file="${install-name}-distribution.zip" />
-    <zip destfile="${install-name}-distribution.zip">
-      <zipfileset prefix="jtb-${jtb_vp_version}/${target-folder}" filemode="444" file="${jtb}" />
-      <zipfileset prefix="jtb-${jtb_vp_version}/doc" filemode="444" dir="doc" />
-      <!-- zipfileset prefix="jtb-${jtb_vp_version}/examples" filemode="444" dir="examples/" / -->
-      <zipfileset prefix="jtb-${jtb_vp_version}" filemode="444" file="LICENSE" />
-    </zip>
-
-    <!-- FAn: COMMENT ??? -->
-    <delete dir="." includes="**/*.class" />
-    <delete file="${install-name}-sources.tar.gz" />
-    <tar destfile="${install-name}-sources.tar.gz" compression="gzip">
-      <tarfileset username="root"
-                  uid="1"
-                  group="root"
-                  prefix="jtb-${jtb_vp_version}"
-                  filemode="444"
-                  file="./**"
-                  excludes=".git, target/**, temp/**, .svn, CVS, **/*.zip, **/*.tar.gz"
-      />
-    </tar>
-
-    <!-- FAn: COMMENT ??? -->
-    <delete file="${install-name}-sources.jar" />
-    <zip destfile="${install-name}-sources.jar">
-      <zipfileset prefix="jtb-${jtb_vp_version}"
-                  filemode="444"
-                  file="./**"
-                  excludes=".svn,CVS,**/*.zip,**/*.tar.gz, deployment_pom/**, target/**, dist/**, temp/**"
-      />
-    </zip>
+  <!-- Copy the ${jtb_lib_dir}/jtb-${ant-version}.jar jar to the ${mvn-jar} -->
+  <target name="copy_jtb_jar_to_mvn_jar">
+    <copy file="${jtb_lib_dir}/jtb-${ant-version}.jar" tofile="${mvn-jar}" overwrite="true" />
   </target>
 
+  <!-- Generate the sources jar -->
+  <target name="sources_jar">
+    <jar destfile="${mvn-sources-jar}"
+         basedir="${basedir}"
+         includes="src/**,*.md,*.xml,*properties,doc/**"
+    />
+  </target>
 
-  <!-- FAn: COMMENT ??? -->
-  <target name="javadoc">
-    <property name="install-name" value="${target-folder}/jtb-${jtb_vp_version}" />
-
-    <delete dir="${target-folder}/javadoc" />
-    <mkdir dir="${target-folder}/javadoc" />
-    <javadoc destdir="${target-folder}/javadoc">
-      <fileset dir="${jtb_src_dir}" />
+  <!-- Generate the javadoc jar -->
+  <target name="javadoc_jar">
+    <delete dir="${jtb_dist_dir}/javadoc" />
+    <mkdir dir="${jtb_dist_dir}/javadoc" />
+    <javadoc destdir="${jtb_dist_dir}/javadoc">
+      <fileset dir="src/main/java" />
+      <fileset dir="target/generated-sources/jtb" />
+      <fileset dir="target/generated-sources/jj" />
     </javadoc>
-
-    <zip destfile="${install-name}-javadoc.jar" basedir="${target-folder}/javadoc">
-    </zip>
+    <jar jarfile="${mvn-javadoc-jar}">
+      <fileset dir="${jtb_dist_dir}/javadoc" />
+    </jar>
   </target>
 
-  <!-- FAn: COMMENT ??? -->
-  <target name="install" depends="">
-    <artifact:install file="${jtb_prev_jar}">
-      <pom refid="jtb.pom" />
-    </artifact:install>
+  <!-- Check that the jar required for a Maven snapshot publishing is present -->
+  <target name="check_mvn_jar_snapshot">
+    <condition property="mvn-jar-present">
+      <available file="${mvn-jar}" />
+    </condition>
+    <fail message="Jar ${mvn-jar} for a snapshot is NOT present" unless="${mvn-jar-present}" />
+    <echo message="Jar ${mvn-jar} for a snapshot is present" />
   </target>
 
-  <!-- FAn: COMMENT ??? -->
-  <target name="deploy"
-          depends="dist"
-          description="deploy snapshot version to Maven snapshot repository"
+  <!-- Check that the 3 jars required for a Maven release publishing are present -->
+  <target name="check_mvn_jars_release">
+    <condition property="mvn-jars-present">
+      <and>
+        <available file="${mvn-jar}" />
+        <available file="${mvn-javadoc-jar}" />
+        <available file="${mvn-sources-jar}" />
+      </and>
+    </condition>
+    <fail message="Some jar(s) for a release is(are) NOT present" unless="${mvn-jars-present}" />
+    <echo message="All jars for a release are present" />
+  </target>
+
+  <!-- Check that the pom.xml & build.xml artifact versions are the same -->
+  <target name="check_pom_build_versions">
+    <resolver:pom id="jtb.pom" file="pom.xml" />
+    <condition property="pom-ver-eq-build-ver">
+      <equals arg1="${jtb.pom.version}" arg2="${mvn-version}" />
+    </condition>
+    <fail message="Version in pom ${jtb.pom.version} is NOT the same as the build version ${mvn-version}"
+          unless="${pom-ver-eq-build-ver}"
+    />
+    <echo message="Version in pom ${jtb.pom.version} is the same as the build version ${mvn-version}"
+    />
+  </target>
+
+  <!-- Check that the pom.xml & build.xml namespaces directories are the same -->
+  <target name="check_pom_build_nsd">
+    <resolver:pom id="jtb.pom" file="pom.xml" />
+    <condition property="pom-nsd-eq-build-nsd">
+      <equals arg1="${jtb.pom.groupId}.${jtb.pom.artifactId}" arg2="${mvn-ns-pkg}" />
+    </condition>
+    <fail message="Namespace in pom ${jtb.pom.groupId}.${jtb.pom.artifactId} is NOT the same as in the build ${mvn-ns-pkg}"
+          unless="${pom-nsd-eq-build-nsd}"
+    />
+    <echo message="Namespace in pom ${jtb.pom.groupId}.${jtb.pom.artifactId} is the same as in the build ${mvn-ns-pkg}"
+    />
+  </target>
+
+  <!-- Check that the build.xml artifact version is a snapshot -->
+  <target name="check_snapshot_version">
+    <condition property="build-ver-is-snapshot">
+      <contains substring="-SNAPSHOT" string="${mvn-version}" />
+    </condition>
+    <fail message="Build version ${mvn-version} is NOT a snapshot"
+          unless="${build-ver-is-snapshot}"
+    />
+    <echo message="Build version ${mvn-version} is a snapshot" />
+  </target>
+
+  <!-- Check that the build.xml artifact version is a release -->
+  <target name="check_release_version">
+    <condition property="build-ver-is-release">
+      <not>
+        <contains substring="-SNAPSHOT" string="${mvn-version}" />
+      </not>
+    </condition>
+    <fail message="Build version ${mvn-version} is NOT a release"
+          unless="${build-ver-is-release}"
+    />
+    <echo message="Build version ${mvn-version} is a release" />
+  </target>
+
+  <!-- Define the artifacts (Maven Resolver Ant Plugin implicitely handles artifact pom.xml) -->
+  <resolver:artifact file="${mvn-jar}" type="jar" id="mvn-jar-ref" />
+  <resolver:artifact file="${mvn-jar}" type="jar" classifier="sources" id="mvn-sources-jar-ref" />
+  <resolver:artifact file="${mvn-jar}" type="jar" classifier="javadoc" id="mvn-javadoc-jar-ref" />
+  <resolver:artifact file="${mvn-jar}.asc" type="jar.asc" id="mvn-jar-asc-ref" />
+  <resolver:artifact file="${mvn-jar}.asc"
+                     type="jar.asc"
+                     classifier="sources"
+                     id="mvn-sources-jar-asc-ref"
+  />
+  <resolver:artifact file="${mvn-jar}.asc"
+                     type="jar.asc"
+                     classifier="javadoc"
+                     id="mvn-javadoc-jar-asc-ref"
+  />
+  <resolver:artifact file="pom.xml.asc" type="pom.asc" id="mvn-pom-asc-ref" />
+  <resolver:artifacts id="snapshotArtifact">
+    <artifact refid="mvn-jar-ref" />
+  </resolver:artifacts>
+  <resolver:artifacts id="releaseArtifacts">
+    <artifact refid="mvn-jar-ref" />
+    <artifact refid="mvn-javadoc-jar-ref" />
+    <artifact refid="mvn-sources-jar-ref" />
+    <artifact refid="mvn-jar-asc-ref" />
+    <artifact refid="mvn-javadoc-jar-asc-ref" />
+    <artifact refid="mvn-sources-jar-asc-ref" />
+    <artifact refid="mvn-pom-asc-ref" />
+  </resolver:artifacts>
+
+  <!-- Ask Maven to install the main artifact in the local repository -->
+  <!-- before this, update project versions (both jtb_props.xml and pom.xml) to ${mvn-version} -->
+  <target name="install_snapshot"
+          depends="check_snapshot_version, check_pom_build_versions, copy_jtb_jar_to_mvn_jar, check_mvn_jar_snapshot"
   >
-    <artifact:mvn>
-      <arg value="org.apache.maven.plugins:maven-deploy-plugin:2.8:deploy-file" />
-      <arg value="-Durl=${ossrh-snapshots-repository-url}" />
-      <arg value="-DrepositoryId=${ossrh-server-id}" />
-      <arg value="-DpomFile=pom.xml" />
-      <arg value="-Dfile=${jtb-path}" />
-    </artifact:mvn>
+    <fail message="Main artifact ${mvn-jar} not generated! Cannot be deployed."
+          unless="${mvn-jar-present}"
+    />
+    <resolver:install artifactsref="snapshotArtifact" />
   </target>
 
-  <!-- defined maven snapshots and staging repository id and url -->
-  <property name="ossrh-snapshots-repository-url"
-            value="https://oss.sonatype.org/content/repositories/snapshots/"
-  />
-  <property name="ossrh-staging-repository-url"
-            value="https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-  />
-  <!-- there server id in the Maven settings.xml -->
-  <property name="ossrh-server-id" value="ossrh" />
+  <!-- Ask Maven to deploy the main artifact in the Central Portal snapshots repository -->
+  <!-- before this, update project versions (both jtb_props.xml and pom.xml) from RELEASE to SNAPSHOT
+       and comment/uncomment ${mvn-just-test-publish} (in jtb_props.xml) -->
+  <!-- Directory listing can be found here:
+       https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/edu/purdue/cs/jtb/ -->
+  <target name="publish_snapshot" depends="install_snapshot">
+    <resolver:deploy artifactsref="snapshotArtifact">
+      <resolver:remoterepo id="centralportalsnapshots${mvn-just-test-publish}"
+                           url="https://central.sonatype.com/repository/maven-snapshots/"
+      >
+        <snapshots enabled="true" />
+      </resolver:remoterepo>
+    </resolver:deploy>
+  </target>
 
-  <!-- before this, update project version (both jtb_props.xml and pom.xml) from SNAPSHOT to RELEASE -->
-  <target name="stage" depends="" description="deploy release version to Maven staging repository">
-    <!-- sign and deploy the main artifact -->
-    <artifact:mvn>
-      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.5:sign-and-deploy-file" />
-      <arg value="-Durl=${ossrh-staging-repository-url}" />
-      <arg value="-DrepositoryId=${ossrh-server-id}" />
-      <arg value="-DpomFile=pom.xml" />
-      <arg value="-Dfile=${jtb-path}" />
-      <arg value="-Pgpg" />
-    </artifact:mvn>
+  <!-- Sign and then ask Maven to install the 8 artifacts in the local repository -->
+  <!-- before this, update project versions (both jtb_props.xml and pom.xml) to ${mvn-version} -->
+  <target name="install_release"
+          depends="check_release_version, check_pom_build_versions, copy_jtb_jar_to_mvn_jar, sources_jar, javadoc_jar"
+  >
+    <!-- gpg / pinnentry may ask for the passphrase if no more in its cache -->
+    <exec executable="gpg">
+      <arg value="-sba" />
+      <arg value="--yes" />
+      <arg value="${mvn-jar}" />
+    </exec>
+    <exec executable="gpg">
+      <arg value="-sba" />
+      <arg value="--yes" />
+      <arg value="${mvn-sources-jar}" />
+    </exec>
+    <exec executable="gpg">
+      <arg value="-sba" />
+      <arg value="--yes" />
+      <arg value="${mvn-javadoc-jar}" />
+    </exec>
+    <exec executable="gpg">
+      <arg value="-sba" />
+      <arg value="--yes" />
+      <arg value="pom.xml" />
+    </exec>
+    <resolver:install artifactsref="releaseArtifacts" />
+  </target>
 
-    <!-- sign and deploy the sources artifact -->
-    <artifact:mvn>
-      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.5:sign-and-deploy-file" />
-      <arg value="-Durl=${ossrh-staging-repository-url}" />
-      <arg value="-DrepositoryId=${ossrh-server-id}" />
-      <arg value="-DpomFile=pom.xml" />
-      <arg value="-Dfile=${jtb-sources-path}" />
-      <arg value="-Dclassifier=sources" />
-      <arg value="-Pgpg" />
-    </artifact:mvn>
-
-    <!-- sign and deploy the javadoc artifact -->
-    <artifact:mvn>
-      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.5:sign-and-deploy-file" />
-      <arg value="-Durl=${ossrh-staging-repository-url}" />
-      <arg value="-DrepositoryId=${ossrh-server-id}" />
-      <arg value="-DpomFile=pom.xml" />
-      <arg value="-Dfile=${jtb-javadoc-path}" />
-      <arg value="-Dclassifier=javadoc" />
-      <arg value="-Pgpg" />
-    </artifact:mvn>
+  <!-- Creates the bundle from the installed artifacts (to keep the proper structure) -->
+  <target name="make_bundle" depends="check_pom_build_nsd">
+    <checksum algorithm="MD5" fileext=".md5">
+      <fileset dir="${user.home}/.m2/repository/">
+        <include name="${mvn-ns-dir}/${mvn-version}/*.jar" />
+        <include name="${mvn-ns-dir}/${mvn-version}/*.pom" />
+      </fileset>
+    </checksum>
+    <checksum algorithm="SHA-1" fileext=".sha1">
+      <fileset dir="${user.home}/.m2/repository/">
+        <include name="${mvn-ns-dir}/${mvn-version}/*.jar" />
+        <include name="${mvn-ns-dir}/${mvn-version}/*.pom" />
+      </fileset>
+    </checksum>
+    <zip destfile="${mvn-bundle-zip}"
+         basedir="${user.home}/.m2/repository/"
+         includes="${mvn-ns-dir}/${mvn-version}/**"
+         excludes="**/_remote.repositories"
+    >
+    </zip>
   </target>
 
 </project>

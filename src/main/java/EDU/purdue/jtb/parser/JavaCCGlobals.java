@@ -40,35 +40,35 @@ import java.util.Map;
  * @author Marc Mazas
  * @version 1.4.0 : 05/2009 : MMa : adapted to JavaCC v4.2 grammar
  * @version 1.4.8 : 12/2014 : MMa : improved javadoc
- * @version 1.5.0 : 01/2017 : MMa : added suppress warnings; used try-with-resource & enhanced for
+ * @version 1.5.0 : 01/2017 : MMa : added suppress warnings; used try-with-resource &amp; enhanced for
  */
 public class JavaCCGlobals {
-  
+
   /**
    * String that identifies the JavaCC generated files.
    */
   protected static final String toolName = "JavaCC";
-  
+
   /**
    * The name of the grammar file being processed.
    */
   static public String fileName;
-  
+
   /**
    * The name of the original file (before processing by JJTree). Currently this is the same as fileName.
    */
   static public String origFileName;
-  
+
   /**
    * Set to true if this file has been processed by JJTree.
    */
   static public boolean jjtreeGenerated;
-  
+
   /**
    * The list of tools that have participated in generating the input grammar file.
    */
   static public List<String> toolNames;
-  
+
   /**
    * This prints the banner line when the various tools are invoked.
    *
@@ -82,82 +82,82 @@ public class JavaCCGlobals {
     }
     System.out.println(")");
   }
-  
+
   /**
    * The name of the parser class (what appears in PARSER_BEGIN and PARSER_END).
    */
   static public String cu_name;
-  
+
   /**
    * This is a list of tokens that appear after "PARSER_BEGIN(name)" all the way until (but not including) the
    * opening brace "{" of the class "name".
    */
   static public List<Token> cu_to_insertion_point_1 = new ArrayList<>();
-  
+
   /**
    * This is the list of all tokens that appear after the tokens in "cu_to_insertion_point_1" and until (but
    * not including) the closing brace "}" of the class "name".
    */
   static public List<Token> cu_to_insertion_point_2 = new ArrayList<>();
-  
+
   /**
    * This is the list of all tokens that appear after the tokens in "cu_to_insertion_point_2" and until
    * "PARSER_END(name)".
    */
   static public List<Token> cu_from_insertion_point_2 = new ArrayList<>();
-  
+
   /**
    * A list of all grammar productions - normal and JAVACODE - in the order they appear in the input file.
    * Each entry here will be a subclass of "NormalProduction".
    */
   static public List<NormalProduction> bnfproductions = new ArrayList<>();
-  
+
   /**
    * A symbol table of all grammar productions - normal and JAVACODE. The symbol table is indexed by the name
    * of the left hand side non-terminal. Its contents are of type "NormalProduction".
    */
   static public Map<String, NormalProduction> production_table = new HashMap<>();
-  
+
   /**
    * A mapping of lexical state strings to their integer internal representation. Integers are stored as
    * java.lang.Integer's.
    */
   static public Map<String, Integer> lexstate_S2I = new Hashtable<>();
-  
+
   /**
    * A mapping of the internal integer representations of lexical states to their strings. Integers are stored
    * as java.lang.Integer's.
    */
   static public Hashtable<Integer, String> lexstate_I2S = new Hashtable<>();
-  
+
   /**
    * The declarations to be inserted into the TokenManager class.
    */
   static public List<Token> token_mgr_decls;
-  
+
   /**
    * The list of all TokenProductions from the input file. This list includes implicit TokenProductions that
    * are created for uses of regular expressions within BNF productions.
    */
   static public List<TokenProduction> rexprlist = new ArrayList<>();
-  
+
   /**
    * The total number of distinct tokens. This is therefore one more than the largest assigned token ordinal.
    */
   static public int tokenCount;
-  
+
   /**
    * This is a symbol table that contains all named tokens (those that are defined with a label). The index to
    * the table is the image of the label and the contents of the table are of type "RegularExpression_".
    */
   static public Map<String, RegularExpression_> named_tokens_table = new HashMap<>();
-  
+
   /**
    * Contains the same entries as "named_tokens_table", but this is an ordered list which is ordered by the
    * order of appearance in the input file.
    */
   static public List<RegularExpression_> ordered_named_tokens = new ArrayList<>();
-  
+
   /**
    * A mapping of ordinal values (represented as objects of type "Integer") to the corresponding labels (of
    * type "String"). An entry exists for an ordinal value only if there is a labeled token corresponding to
@@ -165,13 +165,13 @@ public class JavaCCGlobals {
    * stored.
    */
   static public Map<Integer, String> names_of_tokens = new HashMap<>();
-  
+
   /**
    * A mapping of ordinal values (represented as objects of type "Integer") to the corresponding
    * RegularExpression_'s.
    */
   static public Map<Integer, RegularExpression_> rexps_of_tokens = new HashMap<>();
-  
+
   /**
    * This is a three-level symbol table that contains all simple tokens (those that are defined using a single
    * string (with or without a label). The index to the first level table is a lexical state which maps to a
@@ -180,7 +180,7 @@ public class JavaCCGlobals {
    * the actual string of the simple token and maps it to its RegularExpression_.
    */
   static public Map<String, Hashtable<String, Hashtable<String, RegularExpression_>>> simple_tokens_table = new Hashtable<>();
-  
+
   /** Mask index shared between ParseEngine and ParseGen */
   static protected int         maskindex = 0;
   /** jj2 methods calls index shared between ParseEngine and ParseGen */
@@ -189,14 +189,14 @@ public class JavaCCGlobals {
   public static boolean        lookaheadNeeded;
   /** Mask values shared between ParseEngine and ParseGen */
   static protected List<int[]> maskVals  = new ArrayList<>();
-  
+
   /** The {@link Action} on end of file */
   static Action actForEof;
   /** The next state for end of file */
   static String nextStateForEof;
-  
+
   // Some general purpose utilities follow.
-  
+
   /**
    * @param tn - a toolname
    * @param fn - a file name
@@ -207,7 +207,7 @@ public class JavaCCGlobals {
     tns.add(tn);
     return getIdString(tns, fn);
   }
-  
+
   /**
    * @param tns - a list of toolnames
    * @param fn - a file name
@@ -216,20 +216,20 @@ public class JavaCCGlobals {
   public static String getIdString(final List<String> tns, final String fn) {
     int i;
     String toolNamePrefix = "Generated By:";
-    
+
     for (i = 0; i < (tns.size() - 1); i++) {
       toolNamePrefix += tns.get(i) + "&";
     }
     toolNamePrefix += tns.get(i) + ":";
-    
+
     if (toolNamePrefix.length() > 200) {
       System.out.println("Tool names too long.");
       throw new Error();
     }
-    
+
     return toolNamePrefix + " Do not edit this line. " + addUnicodeEscapes(fn);
   }
-  
+
   /**
    * @param tn - a toolname
    * @param fn - a file name
@@ -238,23 +238,23 @@ public class JavaCCGlobals {
    */
   public static boolean isGeneratedBy(final String tn, final String fn) {
     final List<String> v = getToolNames(fn);
-    
+
     for (int i = 0; i < v.size(); i++) {
       if (tn.equals(v.get(i))) {
         return true;
       }
     }
-    
+
     return false;
   }
-  
+
   /**
    * @param str - a string containing toolnames
    * @return - a list of toolnames from the string splitted around ':' and '&'
    */
   private static List<String> makeToolNameList(final String str) {
     final List<String> retVal = new ArrayList<>();
-    
+
     int limit1 = str.indexOf('\n');
     if (limit1 == -1) {
       limit1 = 1000;
@@ -264,40 +264,40 @@ public class JavaCCGlobals {
       limit2 = 1000;
     }
     final int limit = limit1 < limit2 ? limit1 : limit2;
-    
+
     String tmp;
     if (limit == 1000) {
       tmp = str;
     } else {
       tmp = str.substring(0, limit);
     }
-    
+
     if (tmp.indexOf(':') == -1) {
       return retVal;
     }
-    
+
     tmp = tmp.substring(tmp.indexOf(':') + 1);
-    
+
     if (tmp.indexOf(':') == -1) {
       return retVal;
     }
-    
+
     tmp = tmp.substring(0, tmp.indexOf(':'));
-    
+
     int i = 0, j = 0;
-    
+
     while ((j < tmp.length()) && ((i = tmp.indexOf('&', j)) != -1)) {
       retVal.add(tmp.substring(j, i));
       j = i + 1;
     }
-    
+
     if (j < tmp.length()) {
       retVal.add(tmp.substring(j));
     }
-    
+
     return retVal;
   }
-  
+
   /**
    * @param fn - a file name
    * @return the list of names of the tools that have been used to generate the given file
@@ -305,9 +305,9 @@ public class JavaCCGlobals {
   public static List<String> getToolNames(final String fn) {
     final char[] buf = new char[256];
     int read, total = 0;
-    
+
     try (FileReader stream = new FileReader(fn)) {
-      
+
       for (;;) {
         if ((read = stream.read(buf, total, buf.length - total)) != -1) {
           if ((total += read) == buf.length) {
@@ -317,7 +317,7 @@ public class JavaCCGlobals {
           break;
         }
       }
-      
+
       return makeToolNameList(new String(buf, 0, total));
     } catch (@SuppressWarnings("unused") final FileNotFoundException e1) {
       // swallowed
@@ -326,10 +326,10 @@ public class JavaCCGlobals {
         return makeToolNameList(new String(buf, 0, total));
       }
     }
-    
+
     return new ArrayList<>();
   }
-  
+
   /**
    * Creates an output directory.
    *
@@ -338,24 +338,24 @@ public class JavaCCGlobals {
   public static void createOutputDir(final File outputDir) {
     if (!outputDir.exists()) {
       JavaCCErrors.warning("Output directory \"" + outputDir + "\" does not exist. Creating the directory.");
-      
+
       if (!outputDir.mkdirs()) {
         JavaCCErrors.semantic_error("Cannot create the output directory : " + outputDir);
         return;
       }
     }
-    
+
     if (!outputDir.isDirectory()) {
       JavaCCErrors.semantic_error("\"" + outputDir + " is not a valid output directory.");
       return;
     }
-    
+
     if (!outputDir.canWrite()) {
       JavaCCErrors.semantic_error("Cannot write to the output output directory : \"" + outputDir + "\"");
       return;
     }
   }
-  
+
   // /**
   // * @return the "static " string if the static option is set, otherwise the empty string
   // */
@@ -366,7 +366,7 @@ public class JavaCCGlobals {
   // return "";
   // }
   // }
-  
+
   /**
    * @param str - a string
    * @return the escaped string for common characters
@@ -401,7 +401,7 @@ public class JavaCCGlobals {
     }
     return retval;
   }
-  
+
   /**
    * @param str - a string
    * @return the escaped string for unicode characters
@@ -421,12 +421,12 @@ public class JavaCCGlobals {
     }
     return retval.toString();
   }
-  
+
   /** The character's line */
   static protected int cline;
   /** The character's column */
   static protected int ccol;
-  
+
   /**
    * Sets up line and column information for a given token.
    *
@@ -440,7 +440,7 @@ public class JavaCCGlobals {
     cline = tt.beginLine;
     ccol = tt.beginColumn;
   }
-  
+
   /**
    * Prints a token on a {@link PrintWriter} without the specials.
    *
@@ -469,7 +469,7 @@ public class JavaCCGlobals {
       ccol = 1;
     }
   }
-  
+
   /**
    * Prints a token on a {@link PrintWriter} including the specials.
    *
@@ -489,7 +489,7 @@ public class JavaCCGlobals {
     }
     printTokenOnly(t, out);
   }
-  
+
   /**
    * Prints a list of tokens on a {@link PrintWriter} without the specials.
    *
@@ -502,12 +502,12 @@ public class JavaCCGlobals {
       t = it;
       printToken(t, out);
     }
-    
+
     if (t != null) {
       printTrailingComments(t, out);
     }
   }
-  
+
   /**
    * Prints the leading specials of a token on a {@link PrintWriter}.
    *
@@ -532,7 +532,7 @@ public class JavaCCGlobals {
       ccol = 1;
     }
   }
-  
+
   /**
    * Prints the trailing specials of a token on a {@link PrintWriter}.
    *
@@ -546,7 +546,7 @@ public class JavaCCGlobals {
     // printLeadingComments(t.next);
     printLeadingComments(t.next, out);
   }
-  
+
   /**
    * @param t - a token
    * @return a printing of a token without the specials
@@ -575,7 +575,7 @@ public class JavaCCGlobals {
     }
     return retval;
   }
-  
+
   /**
    * @param t - a token
    * @return a printing of a token including the specials
@@ -595,7 +595,7 @@ public class JavaCCGlobals {
     retval += printTokenOnly(t);
     return retval;
   }
-  
+
   /**
    * @param t - a token
    * @return a printing of the leading specials of a token
@@ -620,7 +620,7 @@ public class JavaCCGlobals {
     }
     return retval;
   }
-  
+
   /**
    * @param t - a token
    * @return a printing of the trailing specials of a token
@@ -631,7 +631,7 @@ public class JavaCCGlobals {
     }
     return printLeadingComments(t.next);
   }
-  
+
   /** Reinitializes */
   public static void reInit() {
     fileName = null;
@@ -662,5 +662,5 @@ public class JavaCCGlobals {
     actForEof = null;
     nextStateForEof = null;
   }
-  
+
 }

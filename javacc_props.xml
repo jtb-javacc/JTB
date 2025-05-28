@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!-- javacc_props.xml. Defines JavaCC properties, imported by build.xml.
-     Marc Mazas - Sopra Steria Group - 10/2020-04/2021 - Francis Andre - 03/2017 -->
+     Marc Mazas - 10/2020-04/2021 - Francis Andre - 03/2017 -->
 <project name="javacc_props" default="echo_javacc_props">
 
   <!-- Set this JavaCC jar's directory according to your environment -->

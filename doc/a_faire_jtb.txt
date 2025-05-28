@@ -64,8 +64,6 @@ A faire prochainement sur JTB
 - voir pourquoi les classes ne sont pas générées pour les productions orphelines
 - voir les options par défaut jtb (options/wiki) et plugin ia/jd/tk true ou false ?
 - mettre à jour le plugin maven
-- choisir un repository maven pour publier jtb et son plugin maven
-- écrire une doc pour target ant via une task java
 - mettre des tests JUnit dans le build ?
 - voir si corrections bugs JavaCC dont char e = 'é';
 - voir les ajouts faits par FA ou à faire pour JavaCC 6+ et C++
@@ -78,6 +76,7 @@ A faire prochainement sur JTB
 
 Fait sur JTB en 1.5.2
 - changé la gestion du manifest
+- ajouté la publication sur Sonatype Central Portal, et effectué cette publication snapshots/release
 
 Fait sur JTB en 1.5.1
 - corrigé des problèmes de génération de node (node choice, EUNS)

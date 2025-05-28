@@ -1,6 +1,10 @@
 # Java Tree Builder (JTB) - Release notes (dd/mm/yy)
 
-### Version 1.5.1 - jtb-1.5.1.jar of xx/08/2023, to be committed on GitHub, to be included in the Eclipse JavaCC Plug-in v1.6.1
+### Version 1.5.2 - jtb-1.5.2.jar of 26/05/2025, committed on GitHub, published as a snapshot and a release on Sonatype Central Portal
+- changed manifest management
+- added publishing on Sonatype Central Portal
+
+### Version 1.5.1 - jtb-1.5.1.jar of xx/08/2023, committed on GitHub, included in the Eclipse JavaCC Plug-in v1.6.1
 - fixed node generation issues
 - changed package, grammar and out file names to be more aligned
 - improved imports generation with different combinations of options

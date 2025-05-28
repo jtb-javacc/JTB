@@ -1,21 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>edu.purdue.cs</groupId>
+  <!-- NOTHING should be done directly with Maven, EVERYTHING is done with Ant or manually;
+        see build.xml, where the Maven Artifact Resolver Ant Tasks will
+         read this pom for the model data,
+         build the artifacts and run the implicit install phase on them for snapshots or releases,
+         run the implicit deploy phase for snapshots (to the Central Portal snapshots repository),
+         for releases build a bundle zip that must be deployed manually (to the Central Portal
+          staging repository)
+       the only thing to be changed here is the version -->
+
+  <!-- Migrated namespaces from OSSRH to Central Portal: edu.purdue.jtb and edu.purdue.cs.jtb
+        and was not able to register new namespace edu.purdue.cs; so this groupId-->
+  <groupId>edu.purdue.jtb</groupId>
   <artifactId>jtb</artifactId>
+  <!-- <version>1.5.2-SNAPSHOT</version> -->
   <version>1.5.2</version>
   <name>JTB: Java Tree Builder</name>
-  <url>https://github.com/jtb-javacc/JTB</url>
+  <packaging>pom</packaging>
 
-  <properties>
-  <!-- For platform independent builds -->
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!-- For VSCode -->
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <maven.compiler.source>1.8</maven.compiler.source>
-</properties>
+  <description>JTB is a syntax tree builder to be used with the Java Compiler Compiler (JavaCC)
+    parser generator. JTB was originally developped at UCLA up to version 1.3.2
+    http://compilers.cs.ucla.edu/jtb/) or (http://compilers.cs.ucla.edu/jtb/jtb-2003/). It has been
+    upgraded in version 1.4.0+ (2009-2010), as an embedded tool within the SourceForge Eclipse
+    JavaCC plugin. From 2011 to 2016 it was provided as a standalone tool in the same hosting
+    environment as JavaCC (java.net). Since 2017 it is provided as a standalone tool in the same new
+    hosting environment as JavaCC (GitHub : https://github.com/jtb-javacc/JTB). Version 1.4.12 had
+    been deployed to Maven Central (https://central.sonatype.com/artifact/edu.purdue.cs/jtb).
+    Versions 1.5.2+ will be deployed to Central Portal (https://central.sonatype.com for releases,
+    https://central.sonatype.com/repository/maven-snapshots for snapshots).</description>
+  <url>https://github.com/jtb-javacc/JTB</url>
 
   <organization>
     <name>jtb-javacc</name>
@@ -24,8 +41,32 @@
 
   <scm>
     <url>https://github.com/jtb-javacc/JTB</url>
-    <connection>scm:git:git@github.com/jtb-javacc/JTB.git</connection>
+    <connection>scm:git:https://github.com/jtb-javacc/JTB.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/jtb-javacc/JTB.git</developerConnection>
+    <tag>HEAD</tag>
   </scm>
+
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/jtb-javacc/JTB/issues</url>
+  </issueManagement>
+
+  <!-- For projects wanting to configure JTB as a dependency -->
+  <!--  <repositories>-->
+  <!--    <repository>-->
+  <!--      <id>centralportal</id>-->
+  <!--      <name>Central Portal (releases)</name>-->
+  <!--      <url>https://central.sonatype.com/</url>-->
+  <!--    </repository>-->
+  <!--    <repository>-->
+  <!--      <id>centralportalsnapshots</id>-->
+  <!--      <name>Central Portal Snapshots</name>-->
+  <!--      <url>https://central.sonatype.com/repository/maven-snapshots/</url>-->
+  <!--    </repository>-->
+  <!--  </repositories>-->
+
+  <!-- Central Portal keeps snapshots during 90 days; current available snapshots browsable at
+    https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/ -->
 
   <developers>
     <developer>
@@ -43,8 +84,7 @@
     </developer>
     <developer>
       <name>Marc MAZAS</name>
-      <organization>Sopra Steria Group</organization>
-      <email>marc.mazas@soprasteria.com</email>
+      <email>mazas.marc@gmail.com</email>
     </developer>
   </developers>
 
@@ -55,10 +95,6 @@
       <organization>Kampbell</organization>
     </contributor>
   </contributors>
-  <issueManagement>
-    <url>https://github.com/jtb-javacc/JTB/issues</url>
-    <system>GitHub</system>
-  </issueManagement>
 
   <licenses>
     <license>
@@ -67,16 +103,4 @@
     </license>
   </licenses>
 
-  <dependencies>
-    <dependency>
-      <groupId>net.java.dev.javacc</groupId>
-      <artifactId>javacc</artifactId>
-      <version>7.0.12</version>
-    </dependency>
-  </dependencies>
-  <description>JTB is a syntax tree builder to be used with the Java Compiler Compiler (JavaCC) parser generator. 
-JTB was originally developped at UCLA up to version 1.3.2 http://compilers.cs.ucla.edu/jtb/) or (http://compilers.cs.ucla.edu/jtb/jtb-2003/).
-It has been upgraded in version 1.4.0+ (2009-2010), as an embedded tool within the SourceForge Eclipse JavaCC plugin. 
-From 2011 to 2016 it was provided as a standalone tool in the same hosting environment as JavaCC (java.net).
-Since 2017 it is provided as a standalone tool in the same new hosting environment as JavaCC (GitHub : https://github.com/jtb-javacc/JTB).</description>
 </project>

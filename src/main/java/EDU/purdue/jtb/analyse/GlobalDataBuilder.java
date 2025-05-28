@@ -66,6 +66,7 @@ import java.util.Map;
 import EDU.purdue.jtb.common.JTBOptions;
 import EDU.purdue.jtb.common.Messages;
 import EDU.purdue.jtb.common.ProgrammaticError;
+import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.BNFProduction;
 import EDU.purdue.jtb.parser.syntaxtree.ClassOrInterfaceType;
 import EDU.purdue.jtb.parser.syntaxtree.CompilationUnit;
@@ -86,7 +87,6 @@ import EDU.purdue.jtb.parser.syntaxtree.NodeList;
 import EDU.purdue.jtb.parser.syntaxtree.NodeListOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.PackageDeclaration;
 import EDU.purdue.jtb.parser.syntaxtree.PrimitiveType;
 import EDU.purdue.jtb.parser.syntaxtree.Production;
@@ -115,8 +115,8 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  * <li>a list ({@link #retVarInfo}) of return variables declarations (for all non "void" JavaCodeProductions
  * for which the node creation has been asked and BNFProductions for which the node creation has not been
  * forbidden)</li>
- * <li>a HashMap ({@link #tokenHM}) of tokens which have a constant regular expression, e.g. < PLUS : "+" >,
- * which will be used to generate a default constructor,</li>
+ * <li>a HashMap ({@link #tokenHM}) of tokens which have a constant regular expression, e.g. &lt; PLUS : "+"
+ * &gt;, which will be used to generate a default constructor,</li>
  * <li>a HashMap ({@link #nbSubNodesTbcHM}) of
  * ({@link ExpansionChoices}/{@link Expansion}/{@link ExpansionUnit}) nodes with their number of sub-nodes to
  * be created.</li>
@@ -136,75 +136,75 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  *          replacement by Token
  */
 public class GlobalDataBuilder extends DepthFirstVoidVisitor {
-  
+
   /** The global JTB options (not thread safe but used only in read-access) */
   public final JTBOptions jopt;
-  
+
   /** The {@link SubNodesToBeCreatedCounter} visitor */
   private final SubNodesToBeCreatedCounter sntbccv;
-  
+
   /** The parser name */
   public String parserName;
-  
+
   /** The parser's package name (from the grammar or the command line) */
   public String packageName;
-  
+
   /**
    * The map of nodes which must not be created : JavaCodeProductions with no "%" indicator and BNFProductions
    * with "!" indicator<br>
    * key = identifier, value = {@link #JC_IND} for JavaCodeProductions or {@link #BNF_IND} for BNFProduction
    */
   private final Map<String, String> notTbcNodesHM = new HashMap<>();
-  
+
   /**
    * The map of all nodes : JavaCodeProductions and BNFProductions<br>
    * key = identifier, value = {@link #JC_IND} or {@link #BNF_IND} + ResultType (which can be an array)
    */
   private final Map<String, String> prodHM = new HashMap<>(100);
-  
+
   /** The map of nodes with their number of sub-nodes to be created */
   final Map<INode, Integer> nbSubNodesTbcHM = new HashMap<>(100);
-  
+
   /**
    * The indicator for JavaCodeProduction in the {@link #notTbcNodesHM} and {@link #prodHM} tables
    */
   public static final String JC_IND = "/";
-  
+
   /** The indicator for BNFProduction in the {@link #notTbcNodesHM} and {@link #prodHM} tables */
   public static final String BNF_IND = "&";
-  
+
   /**
    * The list of all return variables information (for all non "void" JavaCodeProductions and BNFProductions
    * for which the node creation has not been forbidden)
    */
   private final List<RetVarInfo> retVarInfo = new ArrayList<>();
-  
+
   /**
    * The map of tokens (key = token name, value = regular expression or {@link #DONT_CREATE} for tokens not to
    * be created as Token nodes)
    */
   private final Map<String, String> tokenHM = new HashMap<>();
-  
+
   /** The current token's name */
   private String tokenName = "";
-  
+
   /**
    * The current token's regular expression ; set to {@link #DONT_CREATE} for a Token node not to be created
    */
   private String regExpr = "";
-  
+
   /** The specific regular expression for a token node not to be created */
   public static final String DONT_CREATE = "!";
-  
+
   /** True to tell to create a node from RegExprSpec, false otherwise */
   private boolean cnfres = true;
-  
+
   /** True for first pass, false for the second */
   private boolean firstPass = true;
-  
+
   /** The JavaCodeProduction or BNFProduction result type */
   private String resultType;
-  
+
   /**
    * Constructor.
    *
@@ -215,12 +215,12 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
     jopt = aJopt;
     sntbccv = new SubNodesToBeCreatedCounter(this);
   }
-  
+
   /**
    * The map caching the fixed class names
    */
   private final Map<String, String> fnMap = new HashMap<>();
-  
+
   /**
    * Builds a (class) name with the default prefix and/or suffix, except for the base (class) names.
    *
@@ -232,13 +232,13 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
     if (!jopt.isPfxOrSfx) {
       return aName;
     }
-    
+
     // see in cache if already computed
     String fn = fnMap.get(aName);
     if (fn != null) {
       return fn;
     }
-    
+
     // see if base class or node not to be created: no prefix / suffix for them CODEJAVA ?
     if (aName.equals(jjToken) //
         || aName.equals(nodeToken) //
@@ -251,7 +251,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       fnMap.put(aName, aName);
       return aName;
     }
-    
+
     // for others : add prefix / suffix and put the result in the cache
     final int len = aName.length() + jopt.nodePrefix.length() + jopt.nodeSuffix.length();
     final StringBuilder sb = new StringBuilder(len);
@@ -262,7 +262,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
     fnMap.put(aName, fn);
     return fn;
   }
-  
+
   /**
    * Visits a {@link JavaCCInput} node, whose children are the following :
    * <p>
@@ -303,7 +303,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       e.accept(this);
     }
   }
-  
+
   /**
    * Visits a {@link Production} node, whose child is the following :
    * <p>
@@ -325,7 +325,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       n.f0.accept(this);
     }
   }
-  
+
   /**
    * Visits a {@link JavaCodeProduction} node, whose children are the following :
    * <p>
@@ -402,7 +402,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       }
     }
   }
-  
+
   /**
    * Visits a {@link BNFProduction} node, whose children are the following :
    * <p>
@@ -486,7 +486,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       sntbccv.visit(n.f9);
     }
   }
-  
+
   /**
    * Visits a {@link CompilationUnit} node, whose children are the following :
    * <p>
@@ -546,7 +546,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
     // }
     // }
   }
-  
+
   /**
    * Visits a {@link ResultType} node, whose child is the following :
    * <p>
@@ -575,7 +575,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       throw new ShouldNotOccurException(n.f0);
     }
   }
-  
+
   /**
    * Visits a {@link Type} node, whose child is the following :
    * <p>
@@ -606,7 +606,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       throw new ShouldNotOccurException(n.f0);
     }
   }
-  
+
   /**
    * Visits a {@link ReferenceType} node, whose child is the following :
    * <p>
@@ -652,7 +652,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       throw new ShouldNotOccurException(n.f0);
     }
   }
-  
+
   /**
    * Visits a {@link PrimitiveType} node, whose child is the following :
    * <p>
@@ -675,7 +675,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
   public void visit(final PrimitiveType n) {
     resultType = resultType + ((Token) n.f0.choice).image;
   }
-  
+
   /**
    * Visits a {@link ClassOrInterfaceType} node, whose children are the following :
    * <p>
@@ -717,7 +717,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       }
     }
   }
-  
+
   /**
    * Visits a {@link TypeArguments} node, whose children are the following :
    * <p>
@@ -751,7 +751,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
     // f3 -> ">"
     resultType = resultType + ">";
   }
-  
+
   /**
    * Visits a {@link TypeArgument} node, whose child is the following :
    * <p>
@@ -791,7 +791,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       throw new ShouldNotOccurException(nch);
     }
   }
-  
+
   /**
    * Visits a {@link WildcardBounds} node, whose child is the following :
    * <p>
@@ -829,7 +829,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       throw new ShouldNotOccurException(nch);
     }
   }
-  
+
   /**
    * Visits a {@link RegularExprProduction} node, whose children are the following :
    * <p>
@@ -863,7 +863,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       }
     }
   }
-  
+
   /**
    * Visits a {@link RegExprSpec} node, whose children are the following :
    * <p>
@@ -886,7 +886,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
     // visit only f0 -> RegularExpression()
     n.f0.accept(this);
   }
-  
+
   /**
    * Visits a {@link RegularExpression} node, whose child is the following :
    * <p>
@@ -931,7 +931,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       }
     }
   }
-  
+
   /**
    * Visits a {@link ComplexRegularExpressionChoices} node, whose children are the following :
    * <p>
@@ -954,7 +954,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       n.f0.accept(this);
     }
   }
-  
+
   /**
    * Visits a {@link ComplexRegularExpression} node, whose child is the following :
    * <p>
@@ -975,7 +975,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       lsteai.accept(this);
     }
   }
-  
+
   /**
    * Visits a {@link ComplexRegularExpressionUnit} node, whose child is the following :
    * <p>
@@ -1007,7 +1007,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       regExpr = "";
     }
   }
-  
+
   /**
    * Visits a {@link IdentifierAsString} node, whose child is the following :
    * <p>
@@ -1023,7 +1023,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
   public void visit(final IdentifierAsString n) {
     tokenName = n.f0.image;
   }
-  
+
   /**
    * Visits a {@link StringLiteral} node, whose child is the following :
    * <p>
@@ -1039,11 +1039,11 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
   public void visit(final StringLiteral n) {
     regExpr = n.f0.image;
   }
-  
+
   /*
    * Getters
    */
-  
+
   /**
    * @return the table of nodes which must not be created : JavaCodeProductions with no "%" indicator and
    *         BNFProductions with "!" indicator
@@ -1051,28 +1051,28 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
   public final Map<String, String> getNotTbcNodesHM() {
     return notTbcNodesHM;
   }
-  
+
   /**
    * @return the table of all BNFProductions and JavaCodeProductions
    */
   public final Map<String, String> getProdHM() {
     return prodHM;
   }
-  
+
   /**
    * @return the map of nodes with their number of sub-nodes to be created
    */
   public final Map<INode, Integer> getNbSubNodesTbcHM() {
     return nbSubNodesTbcHM;
   }
-  
+
   /**
    * @return the list of all return variables information
    */
   public final List<RetVarInfo> getRetVarInfo() {
     return retVarInfo;
   }
-  
+
   /**
    * @return * The map of tokens (key = token name, value = regular expression or {@link #DONT_CREATE} for
    *         tokens not to be created as Token nodes)
@@ -1080,7 +1080,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
   public Map<String, String> getTokenHM() {
     return tokenHM;
   }
-  
+
   /**
    * Returns the count of the nodes to be created below a an {@link ExpansionChoices}.
    *
@@ -1094,7 +1094,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
     }
     return res.intValue();
   }
-  
+
   /**
    * Returns the count of the nodes to be created below a an {@link Expansion}.
    *
@@ -1108,7 +1108,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
     }
     return res.intValue();
   }
-  
+
   /**
    * Returns the count of the nodes to be created below a an {@link ExpansionUnit}.
    *
@@ -1122,7 +1122,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
     }
     return res.intValue();
   }
-  
+
   /**
    * Return variable information.
    *
@@ -1131,14 +1131,14 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
    *          annotator.
    */
   public class RetVarInfo {
-    
+
     /** The production (JavaCodeProduction or BNFProduction) */
     public final String production;
     /** The identifier */
     public final String ident;
     /** The return type */
     public final String type;
-    
+
     /**
      * Standard constructor.
      *
@@ -1152,7 +1152,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       type = aType;
     }
   }
-  
+
   /**
    * The {@link SubNodesToBeCreatedCounter} visitor walks down an {@link ExpansionChoices} or an
    * {@link Expansion} or an {@link ExpansionUnit} and tells how many nodes must be created.<br>
@@ -1163,10 +1163,10 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
    * @version 1.5.0 : 02-06/2017 : MMa : created ; added final in ExpansionUnitTCF's catch
    */
   private class SubNodesToBeCreatedCounter extends DepthFirstIntVisitor {
-    
+
     /** The {@link GlobalDataBuilder} visitor */
     private final GlobalDataBuilder gdbv;
-    
+
     /**
      * Constructor.
      *
@@ -1175,7 +1175,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
     SubNodesToBeCreatedCounter(final GlobalDataBuilder Agdbv) {
       gdbv = Agdbv;
     }
-    
+
     /**
      * Visits a {@link ExpansionChoices} node, whose children are the following :
      * <p>
@@ -1190,12 +1190,12 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
         -1726831935, JTB_SIG_EXPANSIONCHOICES, JTB_USER_EXPANSIONCHOICES
     })
     public int visit(final ExpansionChoices n) {
-      
+
       Integer res = nbSubNodesTbcHM.get(n);
       if (res != null) {
         return res.intValue();
       }
-      
+
       int nRes = 0;
       // f0 -> Expansion()
       if (n.f0.accept(this) > 0) {
@@ -1216,7 +1216,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       nbSubNodesTbcHM.put(n, res);
       return nRes;
     }
-    
+
     /**
      * Visits a {@link Expansion} node, whose children are the following :
      * <p>
@@ -1231,17 +1231,17 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
         -2134365682, JTB_SIG_EXPANSION, JTB_USER_EXPANSION
     })
     public int visit(final Expansion n) {
-      
+
       Integer res = nbSubNodesTbcHM.get(n);
       if (res != null) {
         return res.intValue();
       }
-      
+
       int nRes = 0;
-      
+
       // f0 -> ( #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" )?<
       // we do not create trees for the ExpansionChoices in a LocalLookahead()
-      
+
       // f1 -> ( ExpansionUnit() )+
       final NodeList n1 = n.f1;
       for (int i = 0; i < n1.size(); i++) {
@@ -1253,7 +1253,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       nbSubNodesTbcHM.put(n, res);
       return nRes;
     }
-    
+
     /**
      * Visits a {@link ExpansionUnit} node, whose child is the following :
      * <p>
@@ -1280,12 +1280,12 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
         1116287061, JTB_SIG_EXPANSIONUNIT, JTB_USER_EXPANSIONUNIT
     })
     public int visit(final ExpansionUnit n) {
-      
+
       Integer res = nbSubNodesTbcHM.get(n);
       if (res != null) {
         return res.intValue();
       }
-      
+
       int nRes = 0;
       final NodeChoice nch = n.f0;
       final INode ich = nch.choice;
@@ -1373,7 +1373,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
       nbSubNodesTbcHM.put(n, res);
       return nRes;
     }
-    
+
     /**
      * Visits a {@link ExpansionUnitTCF} node, whose children are the following :
      * <p>
@@ -1397,7 +1397,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
     public int visit(final ExpansionUnitTCF n) {
       return n.f2.accept(this) > 0 ? 1 : 0;
     }
-    
+
     /**
      * Visits a {@link RegularExpression} node, whose child is the following :
      * <p>
@@ -1443,7 +1443,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
         // #1 IdentifierAsString()
         final INode seq11 = seq9.elementAt(1);
         final String ias = ((IdentifierAsString) seq11).f0.image;
-        int ret = DONT_CREATE.equals(gdbv.getTokenHM().get(ias)) //
+        final int ret = DONT_CREATE.equals(gdbv.getTokenHM().get(ias)) //
             || gdbv.getNotTbcNodesHM().containsKey(ias) //
                 ? 0 //
                 : 1;
@@ -1458,9 +1458,9 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
         throw new ProgrammaticError(msg);
       }
     }
-    
+
   }
-  
+
   /**
    * Class handling a programmatic exception. Static for generic outer classes.
    *
@@ -1468,10 +1468,10 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
    * @version 1.5.0 : 06/2017 : MMa : created
    */
   private class InvalidCountException extends RuntimeException {
-    
+
     /** Default serialVersionUID */
     private static final long serialVersionUID = 1L;
-    
+
     /**
      * Constructor which outputs a message.
      *
@@ -1480,7 +1480,7 @@ public class GlobalDataBuilder extends DepthFirstVoidVisitor {
     InvalidCountException(final INode n) {
       super("Non computed count value for node " + n);
     }
-    
+
   }
-  
+
 }

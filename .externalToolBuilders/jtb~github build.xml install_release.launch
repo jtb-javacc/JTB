@@ -2,6 +2,7 @@
 <launchConfiguration type="org.eclipse.ant.AntLaunchConfigurationType">
     <booleanAttribute key="org.eclipse.ant.ui.DEFAULT_VM_INSTALL" value="false"/>
     <booleanAttribute key="org.eclipse.debug.core.ATTR_FORCE_SYSTEM_CONSOLE_ENCODING" value="false"/>
+    <stringAttribute key="org.eclipse.debug.core.ATTR_REFRESH_SCOPE" value="${project}"/>
     <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
         <listEntry value="/jtb~github/build.xml"/>
     </listAttribute>
@@ -13,7 +14,7 @@
     <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.ant.ui.AntClasspathProvider"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="jtb~github"/>
     <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.ant.ui.AntClasspathProvider"/>
-    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_ANT_TARGETS" value="rename_new_to_prev_jtb_jar,rename_new_to_prev_jtb_src_jar,"/>
+    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_ANT_TARGETS" value="install_release,"/>
     <stringAttribute key="org.eclipse.ui.externaltools.ATTR_LAUNCH_CONFIGURATION_BUILD_SCOPE" value="${none}"/>
     <stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${workspace_loc:/jtb~github/build.xml}"/>
     <stringAttribute key="process_factory_id" value="org.eclipse.ant.ui.remoteAntProcessFactory"/>

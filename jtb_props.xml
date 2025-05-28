@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!-- jtb_props.xml. Defines JTB properties, imported by build.xml.
      Uses version.properties to import (and share) the to be built JTB version.
-     Marc Mazas - Sopra Steria Group - 05/2009-09/2023 - Francis Andre - 03/2017 -->
+     Marc Mazas - 05/2009 - 09/2023 - 05/2025.
+     Francis Andre - 03/2017.
+-->
 <project name="jtb_props" default="echo_jtb_props">
 
   <!-- JTB directories and packages -->
@@ -39,11 +41,10 @@
             value="${jtb_tgt_gentst_jtb_dir};${jtb_tgt_gentst_jj_dir};${jtb_tgt_gentst_java_dir}"
   />
   <property name="jtb_tst_dir" value="${jtb_gen_tst_dir};${jtb_src_tst_java_dir}" />
+  <property name="jtb_dist_dir" value="dist" />
+  <property name="jtb_dist_dir_lib" value="${jtb_dist_dir}/lib" />
 
-  <!-- Specific for compile time annotation processing -->
-  <property name="jtb_ap_jar" value="${jtb_lib_dir}/ap.jar" />
-
-  <!-- JTB versions : 3 places : here, version.properties & common.Constants.java !!! -->
+  <!-- JTB VERSIONS : 3 places : here, version.properties & common.Constants.java !!! -->
 
   <!--property name="jtb_last_version" value="1.4.13" /-->
   <!-- temp version saved during 1.5.0 dev as visitors have changed -->
@@ -60,6 +61,39 @@
   <property file="version.properties" />
   <!--property name="jtb_vp_version" value="${version.major}.${version.minor}.${version.patch}-SNAPSHOT" / -->
   <property name="jtb_vp_version" value="${version.major}.${version.minor}.${version.patch}" />
+
+  <!-- Maven publishing -->
+  <!-- SET here AND in the pom.xml the version you want to publish:
+        the built ant-version will be published to the mvn-version
+       May be older than the current one, may be a snapshot...,
+        so set the 2 properties 'mvn-version' & 'ant-version' here and
+        set the 'version' in pom.xml same as 'mvn-version' -->
+  <!--  <property name="mvn-version" value="${jtb_curr_version}-SNAPSHOT" />-->
+  <property name="mvn-version" value="${jtb_curr_version}" />
+  <!--  <property name="mvn-version" value="${jtb_last_version}-SNAPSHOT" />-->
+  <!--  <property name="mvn-version" value="${jtb_last_version}" />-->
+  <property name="ant-version" value="${jtb_curr_version}" />
+  <!--  <property name="ant-version" value="${jtb_last_version}" />-->
+  <property name="mvn-groupId" value="edu.purdue.cs" />
+  <property name="mvn-artifactId" value="jtb" />
+  <!-- Artifacts' name, which follows the convention of Maven -->
+  <property name="mvn-jar" value="${jtb_dist_dir_lib}/${mvn-artifactId}-${mvn-version}.jar" />
+  <property name="mvn-javadoc-jar"
+            value="${jtb_dist_dir_lib}/${mvn-artifactId}-${mvn-version}-javadoc.jar"
+  />
+  <property name="mvn-bundle-zip"
+            value="${jtb_dist_dir_lib}/${mvn-artifactId}-${mvn-version}-bundle.zip"
+  />
+  <property name="mvn-sources-jar"
+            value="${jtb_dist_dir_lib}/${mvn-artifactId}-${mvn-version}-sources.jar"
+  />
+  <!-- must be in sync with pom.xml groupId.artifactId -->
+  <property name="mvn-ns-dir" value="edu/purdue/jtb/jtb" />
+  <property name="mvn-ns-pkg" value="edu.purdue.jtb.jtb" />
+  <!-- use the non empty value for testing publishing (remoterepo will not be found in settings.xml,
+        so that authorization will fail with error code 401), use the empty one for real publishing -->
+  <!--  <property name="mvn-just-test-publish" value="" />-->
+  <property name="mvn-just-test-publish" value="-JUST-TEST" />
 
   <!-- JTB files and classes -->
   <property name="jtb_parser" value="JTBParser" />
@@ -87,20 +121,23 @@
       <available file="${jtb_last_jar}" />
     </not>
   </condition>
-  <!-- current version new JTB jar -->
+  <!-- current version new (working) JTB jar -->
   <property name="jtb_new_jar" value="${jtb_lib_dir}/new_jtb-${jtb_curr_version}.jar" />
   <property name="jtb_new_jar_src" value="${jtb_lib_dir}/new_jtb-src-${jtb_curr_version}.jar" />
-  <!-- current version previous JTB jar if exists, otherwise last version JTB jar -->
-  <property name="jtb_prev_jar" value="${jtb_lib_dir}/jtb-${jtb_curr_version}.jar" />
-  <property name="jtb_prev_jar_src" value="${jtb_lib_dir}/jtb-src-${jtb_curr_version}.jar" />
-  <condition property="jtb_ok_jar" value="${jtb_prev_jar}">
-    <available file="${jtb_prev_jar}" />
+  <!-- current version accepted JTB jar (when new jar is ok) -->
+  <property name="jtb_acc_jar" value="${jtb_lib_dir}/jtb-${jtb_curr_version}.jar" />
+  <property name="jtb_acc_jar_src" value="${jtb_lib_dir}/jtb-src-${jtb_curr_version}.jar" />
+  <condition property="jtb_ok_jar" value="${jtb_acc_jar}">
+    <available file="${jtb_acc_jar}" />
   </condition>
   <condition property="jtb_ok_jar" value="${jtb_last_jar}">
     <not>
       <available file="${jtb_ok_jar}" />
     </not>
   </condition>
+
+  <!-- Specific for compile time annotation processing -->
+  <property name="jtb_ap_jar" value="${jtb_lib_dir}/ap.jar" />
 
   <!-- FreeMarker jar; tar.gz downloaded from Apache FreeMarker site and freemarker.jar extracted/renamed from tar.gz -->
   <property name="freemarker_jar" value="${jtb_lib_dir}/freemarker-2.3.27.jar" />
@@ -111,9 +148,6 @@
   <property name="jacoco_dir" value="target/jacoco" />
   <property name="jacoco_dump_dir" value="${jacoco_dir}/dump" />
   <property name="jacoco_report_dir" value="${jacoco_dir}/report" />
-
-  <!-- Maven ant tasks jar; maven-an-tasks-2.1.3.jar downloaded from Maven site -->
-  <property name="mavenanttasks_jar" value="${jtb_lib_dir}/maven-an-tasks-2.1.3.jar" />
 
   <!-- JProfiler arguments -->
   <!-- listening on local port -->
@@ -153,7 +187,7 @@
     <echo message="jtb_lv_jar=${jtb_lv_jar}" />
     <echo message="jtb_last_jar=${jtb_last_jar}" />
     <echo message="jtb_new_jar=${jtb_new_jar}" />
-    <echo message="jtb_prev_jar=${jtb_prev_jar}" />
+    <echo message="jtb_acc_jar=${jtb_acc_jar}" />
     <echo message="jtb_ok_jar=${jtb_ok_jar}" />
   </target>
 

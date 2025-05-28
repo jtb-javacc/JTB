@@ -132,6 +132,7 @@ import EDU.purdue.jtb.common.JavaPrinter;
 import EDU.purdue.jtb.common.Messages;
 import EDU.purdue.jtb.common.ProgrammaticError;
 import EDU.purdue.jtb.common.Spacing;
+import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.BNFProduction;
 import EDU.purdue.jtb.parser.syntaxtree.Block;
 import EDU.purdue.jtb.parser.syntaxtree.BlockStatement;
@@ -159,7 +160,6 @@ import EDU.purdue.jtb.parser.syntaxtree.NodeList;
 import EDU.purdue.jtb.parser.syntaxtree.NodeListOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.PrimitiveType;
 import EDU.purdue.jtb.parser.syntaxtree.ReferenceType;
 import EDU.purdue.jtb.parser.syntaxtree.RegularExprProduction;
@@ -230,10 +230,10 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  *          added optional annotations in catch of ExpansionUnitTCF<br>
  *          1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
  *          replacement by Token, suppressed Token nodes generation
- * @version 1.5.1 : 09/2023 : MMa : dropped attempts to join annotated & user blocks
+ * @version 1.5.1 : 09/2023 : MMa : dropped attempts to join annotated &amp; user blocks
  */
 public class JJFileAnnotator extends JavaCCPrinter {
-  
+
   /** The messages handler */
   final Messages                       mess;
   /** The {@link CompilationUnitPrinter} visitor for printing the compilation unit */
@@ -299,7 +299,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
   int                                  ixOldJtbRt;
   /** The flag telling whether the user node has already be generated or not */
   boolean                              isUserNodeGenerated;
-  
+
   /**
    * Constructor which will allocate a default buffer and indentation.
    *
@@ -314,11 +314,11 @@ public class JJFileAnnotator extends JavaCCPrinter {
     jccpv = new JavaCCPrinter(aGdbv, aCcg, sb, spc);
     jccpv.JJNCDCP = " //jccpa ";
   }
-  
+
   /*
    * Convenience methods
    */
-  
+
   /**
    * Generates a new variable name (n0, n1, ...)
    *
@@ -327,7 +327,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
   private final String genNewVarName() {
     return "n" + varNum++;
   }
-  
+
   /**
    * Returns the java block for adding a node to its parent.
    *
@@ -336,17 +336,18 @@ public class JJFileAnnotator extends JavaCCPrinter {
    * @return the java block
    */
   private static final String addNodeToParent(final VarInfo parent, final VarInfo var) {
-    if (DEBUG_CLASS)
+    if (DEBUG_CLASS) {
       return "{ /* ".concat(parent.getType()).concat(" */ ").concat(parent.getName()).concat(".addNode( /* ")
           .concat(var.getType()).concat(" */ ").concat(var.getName()).concat(" ); }");
-    else
+    } else {
       return "{ ".concat(parent.getName()).concat(".addNode(").concat(var.getName()).concat("); }");
+    }
   }
-  
+
   /*
    * User grammar generated and overridden visit methods below
    */
-  
+
   /**
    * Visits a {@link JavaCCInput} node, whose children are the following :
    * <p>
@@ -410,7 +411,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       oneNewLine(n);
     }
   }
-  
+
   /**
    * Visits a {@link JavaCodeProduction} node, whose children are the following :
    * <p>
@@ -490,7 +491,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     // reset global variable
     resultType = null;
   }
-  
+
   /**
    * Prints the RHS (the Block) of the current JavaCodeProduction.<br>
    * When this function returns, varList and outerVars will have been built and will be used by the calling
@@ -554,7 +555,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     oneNewLine(n, "generateJcRHS g");
     return;
   }
-  
+
   /**
    * Visits a {@link BNFProduction} node, whose children are the following :
    * <p>
@@ -584,7 +585,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       n.accept(jccpv);
       return;
     }
-    
+
     // node to be generated
     varList.clear();
     outerVars.clear();
@@ -595,10 +596,10 @@ public class JJFileAnnotator extends JavaCCPrinter {
     curProd = n.f2.f0.image;
     curProdFixed = gdbv.getFixedName(curProd);
     isUserNodeGenerated = false;
-    
+
     // f0 -> AccessModifier()
     n.f0.accept(this);
-    
+
     // f1 -> ResultType()
     // node to be generated
     // first print the f1 specials, then print the (fixed) IdentifierAsString instead of the ResultType
@@ -608,13 +609,13 @@ public class JJFileAnnotator extends JavaCCPrinter {
     // }
     sb.append(curProdFixed);
     sb.append(' ');
-    
+
     // f2 -> IdentifierAsString()
     sb.append(curProdFixed);
-    
+
     // f3 -> FormalParameters()
     sb.append(genJavaBranch(n.f3));
-    
+
     // f4 -> [ #0 "throws" #1 Name() #2 ( $0 "," $1 Name() )* ]
     if (n.f4.present()) {
       final NodeSequence seq = (NodeSequence) n.f4.node;
@@ -632,26 +633,26 @@ public class JJFileAnnotator extends JavaCCPrinter {
         }
       }
     }
-    
+
     // f5 -> [ "!" ]
     // should not occur due to first test in the method
-    
+
     // f6 -> ":"
     sb.append(' ');
     n.f6.accept(this);
     oneNewLine(n, ":");
-    
+
     // generate the RHS (f8 -> "{" f9 -> ExpansionChoices() f10 -> "}") into a temporary buffer
     // and collect variables
     ixOldJtbRt = 0;
     final StringBuilder rhsSB = generateBnfRHS(n);
-    
+
     // f7 -> Block() (left brace)
     sb.append(spc.spc);
     n.f7.f0.accept(this);
     oneNewLine(n, "{");
     spc.updateSpc(+1);
-    
+
     // print variables (from RHS plus node)
     if (jopt.printSpecialTokensJJ) {
       sb.append(spc.spc);
@@ -667,7 +668,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     sb.append(spc.spc);
     sb.append(curProdFixed).append(' ').append(jtbNodeVar).append(" = null;");
     oneNewLine(n, "nv");
-    
+
     // f7 -> Block() (user variables declarations)
     if (n.f7.f1.present()) {
       // print block declarations only if non empty
@@ -685,22 +686,22 @@ public class JJFileAnnotator extends JavaCCPrinter {
       }
     }
     spc.updateSpc(-1);
-    
+
     // f7 -> Block() (right brace)
     sb.append(spc.spc);
     n.f7.f2.accept(this);
     oneNewLine(n, "}");
-    
+
     // f8 -> "{"
     // f9 -> ExpansionChoices()
     // f10 -> "}"
     // print the RHS buffer generated above
     sb.append(rhsSB);
-    
+
     // reset global variable
     resultType = null;
   }
-  
+
   /**
    * Gets a {@link ResultType} node string, whose child is the following :
    * <p>
@@ -730,7 +731,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       throw new ShouldNotOccurException(n.f0);
     }
   }
-  
+
   /**
    * Gets a {@link Type} node string, whose child is the following :
    * <p>
@@ -759,7 +760,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       throw new ShouldNotOccurException(n.f0);
     }
   }
-  
+
   /**
    * Gets a {@link ReferenceType} node string, whose child is the following :
    * <p>
@@ -804,7 +805,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       throw new ShouldNotOccurException(n.f0);
     }
   }
-  
+
   /**
    * Gets a {@link PrimitiveType} node string, whose child is the following :
    * <p>
@@ -829,7 +830,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     // resultTypeSpecials = tk.getSpecials(spc.spc);
     return tk.image;
   }
-  
+
   /**
    * Gets a {@link ClassOrInterfaceType} node string, whose children are the following :
    * <p>
@@ -872,7 +873,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     }
     return coits;
   }
-  
+
   /**
    * Gets a {@link TypeArguments} node string, whose children are the following :
    * <p>
@@ -907,7 +908,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     tas = tas + ">";
     return tas;
   }
-  
+
   /**
    * Gets a {@link TypeArgument} node string, whose child is the following :
    * <p>
@@ -946,7 +947,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       throw new ShouldNotOccurException(nch);
     }
   }
-  
+
   /**
    * Gets a {@link WildcardBounds} node string, whose child is the following :
    * <p>
@@ -976,7 +977,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       throw new ShouldNotOccurException(nch);
     }
   }
-  
+
   /**
    * Returns a string with the RHS (after the ":") of the current BNFProduction.<br>
    * When this function returns, varList and outerVars will have been built and will be used by the calling
@@ -1017,7 +1018,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       sb.append("// --- user BNFProduction ExpansionChoices ---");
       oneNewLine(n, "generateBnfRHS b");
     }
-    
+
     // we do not know at this point the outerVars, so we need to switch to a temporary buffer
     final StringBuilder oldSB = sb;
     StringBuilder tempSB = new StringBuilder(512);
@@ -1051,7 +1052,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     sb.append("{ return ").append(jtbNodeVar).append("; }");
     oneNewLine(n, "generateBnfRHS f");
     spc.updateSpc(-1);
-    
+
     // f10 -> "}"
     sb.append(spc.spc);
     n.f10.accept(this);
@@ -1059,7 +1060,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     sb = jccpv.sb = mainSB;
     return newSB;
   }
-  
+
   /**
    * Visits a {@link RegularExprProduction} node, whose children are the following :
    * <p>
@@ -1086,7 +1087,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     // Don't want to annotate under
     n.accept(jccpv);
   }
-  
+
   /**
    * Common end-code for annotation methods
    *
@@ -1099,7 +1100,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       lastVar = varInfo;
     }
   }
-  
+
   /**
    * Visits a {@link ExpansionChoices} node, whose children are the following :
    * <p>
@@ -1166,7 +1167,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     isTopExp = oldIsTopExp;
     oneDebugClassNewLine(n, "d, isTopExp <- " + isTopExp);
   }
-  
+
   /**
    * Visits the {@link ExpansionChoices}, and adds the NodeChoice variable declaration<br>
    * (called only when there is a a node to create and a choice).
@@ -1190,7 +1191,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     sb.append("(");
     oneNewLine(n, "genExpChWithChoices extra (");
     spc.updateSpc(+1);
-    
+
     // NodeChoice must be created before the last Block
     deferLB = true;
     oneDebugClassNewLine(n, "f0, deferLB <- true");
@@ -1202,7 +1203,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     spc.updateSpc(-1);
     ++which;
     lastVar = null;
-    
+
     // visit the remaining choices (f1)
     // f1 -> ( #0 "|" #1 Expansion() )*
     final int sz = n.f1.nodes.size();
@@ -1227,13 +1228,13 @@ public class JJFileAnnotator extends JavaCCPrinter {
       lastVar = null;
     }
     isEUNSNodeCreated = true;
-    
+
     // extra parenthesis needed!
     sb.append(spc.spc);
     sb.append(")");
     oneNewLine(n, "genExpChWithChoices extra ), isEUNSNodeCreated <= " + isEUNSNodeCreated);
   }
-  
+
   /**
    * Appends the last Block creation buffer and does corresponding resets.
    */
@@ -1242,7 +1243,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     sb.append(sbLB);
     sbLB.setLength(0);
   }
-  
+
   /**
    * Generates a new NodeChoice declaration / creation.
    *
@@ -1259,7 +1260,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
         .append(", ").append(String.valueOf(total)).append("); }");
     oneNewLine(n, "genNodeChoiceCreation yes, isEUNSNodeCreated = " + isEUNSNodeCreated);
   }
-  
+
   /**
    * Visits a {@link Expansion} node, whose children are the following :
    * <p>
@@ -1279,7 +1280,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       nbEU = n.f1.size();
     }
     oneDebugClassNewLine(n, "a, isTopExp = " + isTopExp + ", nbEU = " + nbEU + ", varLvl = " + varLvl);
-    
+
     // f0 -> ( #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" )?
     if (n.f0.present()) {
       sb.append(spc.spc);
@@ -1292,7 +1293,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       seq.elementAt(3).accept(this);
       oneNewLine(n, "b, LocalLookahead in Expansion");
     }
-    
+
     // f1 -> ( ExpansionUnit() )+
     final int sz = n.f1.size();
     if (varLvl == 0) {
@@ -1329,7 +1330,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       }
     }
   }
-  
+
   /**
    * Visits the {@link Expansion}, and adds the NodeSequence variable declaration for a given identifier, and
    * adds the nodes to the parent.
@@ -1347,24 +1348,24 @@ public class JJFileAnnotator extends JavaCCPrinter {
   private void genExpSequence(final Expansion n, final VarInfo var) {
     // f0 -> ( #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" )?
     // nothing done for f0 (done in visit(Expansion))
-    
+
     // f1 -> ( ExpansionUnit() )+
     final Iterator<INode> e = n.f1.elements();
     int i = 0;
     // process the first ExpansionUnit, to generate the NodeSequence variable declaration
     final ExpansionUnit firstExpUnit = (ExpansionUnit) e.next();
-    
+
     if (firstExpUnit.f0.which <= 1) {
-      
+
       // if the ExpansionUnit is a LOOKAHEAD or a Block, visit it before generating the declaration
       // and do not increment the bnf level
       firstExpUnit.accept(this);
       sb.append(spc.spc);
       genNewNodeSequenceVarDecl(var.getName(), gdbv.getNbSubNodesTbc(n));
       oneNewLine(n, "genExpSequence vardecl lh||b, i = 0");
-      
+
     } else {
-      
+
       final boolean oldIsEUNSNodeCreated = isEUNSNodeCreated;
       // the ExpansionUnit is not a LOOKAHEAD nor a Block, generate the declaration and then visit it
       sb.append(spc.spc);
@@ -1384,9 +1385,9 @@ public class JJFileAnnotator extends JavaCCPrinter {
       }
       isEUNSNodeCreated = oldIsEUNSNodeCreated;
       oneDebugClassNewLine(n, "genExpSequence e, isEUNSNodeCreated <= " + isEUNSNodeCreated);
-      
+
     }
-    
+
     // visit the other ExpansionUnits that need to be
     while (e.hasNext()) {
       i++;
@@ -1413,7 +1414,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       oneDebugClassNewLine(n, "genExpSequence i, isEUNSNodeCreated <= " + isEUNSNodeCreated);
     }
   }
-  
+
   /**
    * Generates a new NodeSequence variable declaration.
    *
@@ -1423,7 +1424,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
   private void genNewNodeSequenceVarDecl(final String varName, final int nbNodes) {
     sb.append("{ ").append(varName).append(" = new NodeSequence(").append(nbNodes).append("); }");
   }
-  
+
   /**
    * Visits a {@link LocalLookahead} node, whose children are the following :
    * <p>
@@ -1446,7 +1447,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     // Don't want to annotate under
     n.accept(jccpv);
   }
-  
+
   /**
    * Visits a {@link ExpansionUnit} node, whose child is the following :
    * <p>
@@ -1479,7 +1480,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     }
     oneDebugClassNewLine(n,
         "isTopExp = " + isTopExp + ", nbEU = " + nbEU + ", curEU = " + curEU + ", varLvl = " + varLvl);
-    
+
     switch (n.f0.which) {
     case 0:
       // %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"
@@ -1494,28 +1495,28 @@ public class JJFileAnnotator extends JavaCCPrinter {
       oneNewLine(n, "0, LocalLookahead in ExpansionUnit");
       genUserNodeCreation(n);
       return;
-    
+
     case 1:
       // %1 Block()
       // node(s) must always be created before the last block
       genUserNodeCreation(n);
       genExpUnitCase1Block(n);
       return;
-    
+
     case 2:
       // %2 #0 "[" #1 ExpansionChoices() #2 "]"
       oneDebugClassNewLine(n, "2a, isEUNSNodeCreated = " + isEUNSNodeCreated);
       genExpUnitCase2Bracket(n);
       genUserNodeCreation(n);
       return;
-    
+
     case 3:
       // %3 ExpansionUnitTCF()
       oneDebugClassNewLine(n, "3a, isEUNSNodeCreated = " + isEUNSNodeCreated);
       n.f0.choice.accept(this);
       genUserNodeCreation(n);
       return;
-    
+
     case 4:
       // %4 #0 [ $0 PrimaryExpression() $1 "=" ]
       // .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()
@@ -1527,7 +1528,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       genExpUnitCase4IasRe(n);
       genUserNodeCreation(n);
       return;
-    
+
     case 5:
       // %5 #0 "(" #1 ExpansionChoices() #2 ")"
       // .. #3 ( &0 "+" | &1 "*" | &2 "?" )?
@@ -1535,15 +1536,15 @@ public class JJFileAnnotator extends JavaCCPrinter {
       genExpUnitCase5Parenth(n);
       genUserNodeCreation(n);
       return;
-    
+
     default:
       final String msg = "Invalid n.f0.which = " + n.f0.which;
       Messages.hardErr(msg);
       throw new ProgrammaticError(msg);
-    
+
     }
   }
-  
+
   /**
    * Generates the user node creation if it is time, ie in the last ExpansionUnit.
    *
@@ -1576,7 +1577,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       }
     }
   }
-  
+
   /**
    * Generates the user node creation.
    *
@@ -1599,7 +1600,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       oneNewLine(n, "genUserNodeCreation BNF b");
     }
   }
-  
+
   /**
    * @return true if user node must be declared or is needed, false otherwise (void, primitive type).<br>
    *         note that we do not come here if the node is not to be created.)
@@ -1613,7 +1614,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     }
     return true;
   }
-  
+
   /**
    * Generates the last Block creation.
    *
@@ -1635,7 +1636,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     oneNewLine(n, "genExpUnitCase1Block 2");
     sb = oldSb;
   }
-  
+
   /**
    * Generates the ExpansionUnit case 2 (bracketed ExpansionChoices fragment).<br>
    * <p>
@@ -1651,7 +1652,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     // (comment different from case 5 but statement similar)
     // #0 "[" #1 ExpansionChoices() #2 "]"
     final NodeSequence seq = (NodeSequence) n.f0.choice;
-    
+
     // (similar to case 5)
     // #1 ExpansionChoices()
     final ExpansionChoices expCh = (ExpansionChoices) seq.elementAt(1);
@@ -1660,7 +1661,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     final ExpansionUnit firstExpUnit = (ExpansionUnit) expCh.f0.f1.nodes.get(0);
     // count for varList & final actions
     final int nbSubNodesTbc = gdbv.getNbSubNodesTbc(expCh);
-    
+
     // (comment different from case 5 but statements similar)
     // #0 "["
     sb.append(spc.spc);
@@ -1669,9 +1670,9 @@ public class JJFileAnnotator extends JavaCCPrinter {
         ", expLA.present() = " + expLA.present() + ", isExpChWithCh = " + isExpChWithCh
             + ", firstExpUnit.f0.which = " + firstExpUnit.f0.which);
     spc.updateSpc(+1);
-    
+
     // (similar to case 5, but with no modifier, so by default is NodeOptional)
-    String varName = genNewVarName();
+    final String varName = genNewVarName();
     VarInfo varInfo = null;
     if (nbSubNodesTbc > 0) {
       if (extraVarsList == null) {
@@ -1721,16 +1722,16 @@ public class JJFileAnnotator extends JavaCCPrinter {
       bnfFinalActions(varInfo);
     }
     oneNewLine(n, "genExpUnitCase2Bracket 3");
-    
+
     // (comment different from case 5, statements similar, 1 char instead of 2)
     // #2 "]"
     spc.updateSpc(-1);
     sb.append(spc.spc);
     seq.elementAt(2).accept(this);
     oneNewLine(n, "genExpUnitCase2Bracket 4");
-    
+
   }
-  
+
   /**
    * Generates the ExpansionUnit case 4 (IdentifierAsString or RegularExpression fragment).<br>
    * <p>
@@ -1758,7 +1759,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     final NodeSequence seq1 = (NodeSequence) ch.choice;
     // $2 [ "!" ] (for cases &0 & &1)
     final boolean noDoNotCreate = !((NodeOptional) seq1.elementAt(2)).present();
-    
+
     // #1 ...
     switch (ch.which) {
     case 0:
@@ -1792,7 +1793,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
           oneNewLine(n, "genExpUnitCase4IasRe 0b");
           sb.append(spc.spc);
         }
-        String varName = genNewVarName();
+        final String varName = genNewVarName();
         varInfo = new VarInfo(ident, varName);
         varList.add(varInfo);
         sb.append(varName).append(" = ");
@@ -1837,7 +1838,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       oneDebugClassNewLine(n, "genExpUnitCase4IasRe 0f, isEUNSNodeCreated <= " + isEUNSNodeCreated
           + ", creThisIASNode = " + creThisIASNode);
       break;
-    
+
     case 1:
       // &1 $0 RegularExpression() $1 [ ?0 "." ?1 < IDENTIFIER > ] $2 [ "!" ]
       createRENode = noDoNotCreate;
@@ -1871,7 +1872,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
           // above has not generated "ni = RegularExpression;", and JavaCC will not allow opt1
           if (opt1.present()) {
             // coverage: we could have added a testcase, but we would have to manage the JJ compile failure
-            Token ntk = (Token) ((NodeSequence) opt1.node).elementAt(0); // ?0 "."
+            final Token ntk = (Token) ((NodeSequence) opt1.node).elementAt(0); // ?0 "."
             mess.softErr(
                 "JavaCC will not allow RegularExpression.IDENTIFIER without assigning it to a PrimaryExpression",
                 ntk.beginLine, ntk.beginColumn);
@@ -1900,15 +1901,15 @@ public class JJFileAnnotator extends JavaCCPrinter {
         oneNewLine(n, "genExpUnitCase4IasRe 1d");
       }
       break;
-    
+
     default:
       final String msg = "Invalid n.f0.which = " + n.f0.which;
       Messages.hardErr(msg);
       throw new ProgrammaticError(msg);
-    
+
     }
   }
-  
+
   /**
    * Visits a {@link ExpansionUnitTCF} node, whose children are the following :
    * <p>
@@ -1938,13 +1939,13 @@ public class JJFileAnnotator extends JavaCCPrinter {
     n.f1.accept(this);
     spc.updateSpc(+1);
     oneNewLine(n, "a");
-    
+
     // f2 -> ExpansionChoices()
     n.f2.accept(this);
     oneDebugClassNewLine(n, "b");
     spc.updateSpc(-1);
     sb.append(spc.spc);
-    
+
     // f3 -> "}"
     n.f3.accept(this);
     // f4 -> ( #0 "catch" #1 "("
@@ -2005,7 +2006,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     }
     oneNewLine(n, "e");
   }
-  
+
   /**
    * Generates the ExpansionUnit case 5 (parenthesized ExpansionChoices fragment).<br>
    * <p>
@@ -2024,7 +2025,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     // (comment different from case 2 but statement similar)
     // #0 "(" #1 ExpansionChoices() #2 ")" #3 ( &0 "+" | &1 "*" | &2 "?" )?
     final NodeSequence seq = (NodeSequence) n.f0.choice;
-    
+
     // (similar to case 2)
     // #1 ExpansionChoices()
     final ExpansionChoices expCh = (ExpansionChoices) seq.elementAt(1);
@@ -2033,7 +2034,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     final ExpansionUnit firstExpUnit = (ExpansionUnit) expCh.f0.f1.nodes.get(0);
     // count for varList & final actions
     final int nbSubNodesTbc = gdbv.getNbSubNodesTbc(expCh);
-    
+
     // (comment different from case 2 but statements similar)
     // "("
     sb.append(spc.spc);
@@ -2042,12 +2043,12 @@ public class JJFileAnnotator extends JavaCCPrinter {
         ", expLA.present() = " + expLA.present() + ", isExpChWithCh = " + isExpChWithCh
             + ", firstExpUnit.f0.which = " + firstExpUnit.f0.which);
     spc.updateSpc(+1);
-    
+
     // (this test - modifier present - and first branch - yes - do not exist en case 2)
     // #3 ( &0 "+" | &1 "*" | &2 "?" )?
-    NodeOptional nlo = (NodeOptional) seq.elementAt(3);
+    final NodeOptional nlo = (NodeOptional) seq.elementAt(3);
     if (!nlo.present()) {
-      
+
       // No BNF modifier present, so generate a NodeChoice or a NodeSequence
       if (isExpChWithCh) {
         // ExpansionChoice with choices, so generate a NodeChoice
@@ -2056,7 +2057,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
         // ExpansionChoice with no choices
         if (nbSubNodesTbc > 0) {
           // generate a NodeSequence (of 1 or more nodes)
-          String varName = genNewVarName();
+          final String varName = genNewVarName();
           final VarInfo varInfo = new VarInfo(nodeSequence, varName);
           varList.add(varInfo);
           sb.append(spc.spc);
@@ -2073,15 +2074,15 @@ public class JJFileAnnotator extends JavaCCPrinter {
       sb.append(spc.spc);
       seq.elementAt(2).accept(this);
       oneNewLine(n, "genExpUnitCase5Parenth 3");
-      
+
     } else {
-      
+
       // a BNF modifier is present so generate the appropriate structure
       // #3 ( &0 "+" | &1 "*" | &2 "?" )?
       final NodeChoice ch = (NodeChoice) nlo.node;
-      
+
       // (similar to case 2, but with modifier)
-      String varName = genNewVarName();
+      final String varName = genNewVarName();
       VarInfo varInfo = null;
       if (nbSubNodesTbc > 0) {
         if (extraVarsList == null) {
@@ -2132,7 +2133,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
         isEUNSNodeCreated = true;
         bnfFinalActions(varInfo);
       }
-      
+
       // (comment different from case 2, statements similar, 2 chars instead of 1)
       // ")"
       spc.updateSpc(-1);
@@ -2141,7 +2142,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       // "+" or "*" or "?"
       ch.choice.accept(this);
       oneNewLine(n, "genExpUnitCase5Parenth 7");
-      
+
       // (does not exist in case 2)
       if (nbSubNodesTbc > 0) {
         if (ch.which != 2) {
@@ -2152,7 +2153,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       }
     }
   }
-  
+
   /**
    * Common code for generating the ExpansionChoices in choices 2, 3 and 5 of ExpansionUnit.
    * <p>
@@ -2192,7 +2193,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     // print temporary buffer
     sb.append(tempSB);
   }
-  
+
   /**
    * Generates a new NodeOptional or NodeList or NodeListOptional variable declaration.
    *
@@ -2202,7 +2203,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
   private static void genNewNodeOptOrListOrListOptVarDecl(final StringBuilder aSb, final VarInfo aVarInfo) {
     aSb.append("{ ").append(aVarInfo.getName()).append(" = new ").append(aVarInfo.getType()).append("(); }");
   }
-  
+
   /**
    * Creates a new VarInfo object (with the appropriate node type) for a given BNF modifier.
    *
@@ -2237,7 +2238,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       throw new ProgrammaticError(msg);
     }
   }
-  
+
   /**
    * Creates a new VarInfo object for a NodeOptional node.
    *
@@ -2252,7 +2253,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       return new VarInfo(nodeOptional, varName);
     }
   }
-  
+
   /**
    * Visits a {@link RegularExpression} node, whose child is the following :
    * <p>
@@ -2296,19 +2297,19 @@ public class JJFileAnnotator extends JavaCCPrinter {
       jccpv.gvaStr = reTokenName + " = ";
       lastVar = tokenNameInfo;
     }
-    
+
     switch (n.f0.which) {
     case 0:
       // %0 StringLiteral()
       n.f0.choice.accept(jccpv);
       oneNewLine(n, "0a");
       break;
-    
+
     case 1:
       // %1 #0 "<" #1 [ $0 [ "#" ] $1 IdentifierAsString() $2 ":" ]
       // #2 ComplexRegularExpressionChoices() #3 ">"
       final NodeSequence seq = (NodeSequence) n.f0.choice;
-      ComplexRegularExpressionChoices crec = (ComplexRegularExpressionChoices) seq.elementAt(2);
+      final ComplexRegularExpressionChoices crec = (ComplexRegularExpressionChoices) seq.elementAt(2);
       // #0 "<"
       seq.elementAt(0).accept(jccpv);
       sb.append(' ');
@@ -2345,7 +2346,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       seq.elementAt(3).accept(jccpv);
       oneNewLine(n, "1c");
       break;
-    
+
     case 2:
       // %2 #0 "<" #1 IdentifierAsString() #2 ">"
       final NodeSequence seq1 = (NodeSequence) n.f0.choice;
@@ -2360,7 +2361,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       seq1.elementAt(2).accept(jccpv);
       oneNewLine(n, "2e");
       break;
-    
+
     case 3:
       // %3 #0 "<" #1 "EOF" #2 ">"
       final NodeSequence seq2 = (NodeSequence) n.f0.choice;
@@ -2381,12 +2382,12 @@ public class JJFileAnnotator extends JavaCCPrinter {
       sb.append("{ ").append(reTokenName).append(".endColumn++; }");
       oneNewLine(n, "3i");
       break;
-    
+
     default:
       final String msg = "Invalid n.f0.which = " + n.f0.which;
       Messages.hardErr(msg);
       throw new ProgrammaticError(msg);
-    
+
     }
     if (creThisRENode) {
       bnfFinalActions(tokenNameInfo);
@@ -2395,7 +2396,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     oneDebugClassNewLine(n,
         "re, isEUNSNodeCreated <= " + isEUNSNodeCreated + ", creThisRENode = " + creThisRENode);
   }
-  
+
   /**
    * Visits a {@link Statement} node, whose child is the following :
    * <p>
@@ -2439,7 +2440,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       n.f0.choice.accept(this);
     }
   }
-  
+
   /**
    * Visits a {@link LabeledStatement} node, whose children are the following :
    * <p>
@@ -2464,7 +2465,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     // f2 -> Statement()
     n.f2.accept(this);
   }
-  
+
   /**
    * Visits a {@link Block} node, whose children are the following :
    * <p>
@@ -2498,7 +2499,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     // f2 -> "}"
     n.f2.accept(this);
   }
-  
+
   /**
    * Visits a {@link BlockStatement} node, whose child is the following :
    * <p>
@@ -2522,7 +2523,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       sb.append(genJavaBranch(n.f0.choice));
     }
   }
-  
+
   /**
    * Visits a {@link LocalVariableDeclaration} node, whose children are the following :
    * <p>
@@ -2558,7 +2559,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       }
     }
   }
-  
+
   /**
    * Visits a {@link VariableModifiers} node, whose child is the following :
    * <p>
@@ -2583,7 +2584,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       }
     }
   }
-  
+
   /**
    * Visits a {@link TryStatement} node, whose children are the following :
    * <p>
@@ -2635,7 +2636,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       seq.elementAt(1).accept(this);
     }
   }
-  
+
   /**
    * Visits a {@link SwitchStatement} node, whose children are the following :
    * <p>
@@ -2703,7 +2704,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     // f6 -> "}"
     n.f6.accept(this);
   }
-  
+
   /**
    * Visits a {@link IfStatement} node, whose children are the following :
    * <p>
@@ -2772,7 +2773,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       }
     }
   }
-  
+
   /**
    * Visits a {@link WhileStatement} node, whose children are the following :
    * <p>
@@ -2802,7 +2803,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     // f4 -> Statement()
     genStatement(n.f4);
   }
-  
+
   /**
    * Visits a {@link DoStatement} node, whose children are the following :
    * <p>
@@ -2838,7 +2839,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     // f6 -> ";"
     n.f6.accept(this);
   }
-  
+
   /**
    * Visits a {@link ForStatement} node, whose children are the following :
    * <p>
@@ -2912,7 +2913,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     // f4 -> Statement()
     genStatement(n.f4);
   }
-  
+
   /**
    * Visits a {@link ReturnStatement} node, whose children are the following :
    * <p>
@@ -2940,7 +2941,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       sb.append("/* return; statement commented out by JTB */");
     }
   }
-  
+
   /**
    * Visits a {@link SynchronizedStatement} node, whose children are the following :
    * <p>
@@ -2974,7 +2975,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     n.f4.accept(this);
     spc.updateSpc(-1);
   }
-  
+
   /**
    * Generates the source code corresponding to a {@link Statement} node, whose children are the following :
    * <p>
@@ -3020,7 +3021,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       sb.append(' ');
     }
   }
-  
+
   /**
    * Class {@link VarInfo} stores information for a variable : type, name, initializer, and constructs its
    * declaration.<br>
@@ -3032,7 +3033,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
    * @version 1.5.0 : 02/2017 : MMa : moved from misc to inner class
    */
   private class VarInfo {
-    
+
     /** The variable type */
     private final String type;
     /** The variable name */
@@ -3041,7 +3042,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     private final String initializer;
     // /** The whole variable declaration */
     // private String declaration;
-    
+
     /**
      * Creates a new instance with no initializer.
      *
@@ -3051,7 +3052,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     VarInfo(final String tp, final String nm) {
       this(tp, nm, null);
     }
-    
+
     /**
      * Creates a new instance with an initializer.
      *
@@ -3065,21 +3066,21 @@ public class JJFileAnnotator extends JavaCCPrinter {
       initializer = init;
       // declaration = null;
     }
-    
+
     /**
      * @return the variable type
      */
     String getType() {
       return type;
     }
-    
+
     /**
      * @return the variable name
      */
     String getName() {
       return name;
     }
-    
+
     // /**
     // * Same as {@link #generateNodeDeclaration()}.
     // *
@@ -3089,7 +3090,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     // public String toString() {
     // return generateNodeDeclaration();
     // }
-    
+
     /**
      * Generates and stores, if not yet done, and returns the variable declaration string.
      *
@@ -3107,7 +3108,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       return buf.toString();
     }
   }
-  
+
   // /**
   // * The {@link ExpChoicesFirstTokenCoordFinder} visitor finds the line number and column number of the
   // first
@@ -3330,7 +3331,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
   // }
   //
   // } // end ExpansionChoicesLineNumber
-  
+
   /**
    * The {@link CompilationUnitPrinter} visitor<br>
    * determines if import statements for the syntax tree and node scope hook packages are needed in the
@@ -3339,7 +3340,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
    * statements if necessary.
    */
   private class CompilationUnitPrinter extends JavaPrinter {
-    
+
     /**
      * Constructor, with a given buffer and a default indentation.
      *
@@ -3351,11 +3352,11 @@ public class JJFileAnnotator extends JavaCCPrinter {
       super(aJopt, aSb, aSPC);
       JNCDCP = " //cup ";
     }
-    
+
     /*
      * User grammar generated and overridden visit methods below
      */
-    
+
     /**
      * Visits a {@link CompilationUnit} node, whose children are the following :
      * <p>
@@ -3399,7 +3400,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
         }
       }
     }
-    
+
     /**
      * Prints all the {@link ImportDeclaration} nodes and the other needed imports<br>
      * n -> ( ImportDeclaration() )*"<br>
@@ -3407,9 +3408,9 @@ public class JJFileAnnotator extends JavaCCPrinter {
      * @param n - the node to process
      */
     private void printImports(final NodeListOptional n) {
-      
+
       final StringBuilder mainSB = sb;
-      
+
       sb = new StringBuilder(128);
       for (final INode e : n.nodes) {
         final ImportDeclaration dec = (ImportDeclaration) e;
@@ -3419,7 +3420,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
         // gives a strange //ann NodeListOptional Y1
         mainSB.append(s).append(nodeClassComment(n, "Y1")).append(LS);
       }
-      
+
       if (jopt.nodesPackageName != null) {
         boolean foundTreeImport = false;
         final String npn = "import " + jopt.nodesPackageName + ".*;";
@@ -3437,7 +3438,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
           mainSB.append(npn).append(nodeClassComment(n, "Z1")).append(LS);
         }
       }
-      
+
       if (jopt.hookPackageName != null //
           && jopt.hook) {
         boolean foundHookImport = false;
@@ -3456,10 +3457,10 @@ public class JJFileAnnotator extends JavaCCPrinter {
           mainSB.append(hpn).append(nodeClassComment(n, "Z2")).append(LS);
         }
       }
-      
+
       sb = mainSB;
     }
-    
+
     /**
      * Visits a {@link ImportDeclaration} node, whose children are the following :
      * <p>
@@ -3494,7 +3495,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
       // f4 -> ";"
       n.f4.accept(this);
     }
-    
+
     /**
      * Visits a {@link ClassOrInterfaceBody} node, whose children are the following :
      * <p>
@@ -3512,10 +3513,10 @@ public class JJFileAnnotator extends JavaCCPrinter {
     public void visit(final ClassOrInterfaceBody n) {
       // f0 -> "{"
       n.f0.accept(this);
-      
+
       // add main class
       if (inMainClass) {
-        
+
         inMainClass = false;
         twoNewLines(n, "a");
         if (jopt.hook) {
@@ -3526,7 +3527,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
               .append(jtbHookVar).append(";").append(LS).append(LS);
         }
       }
-      
+
       // add return variables declarations
       final List<RetVarInfo> rvil = gdbv.getRetVarInfo();
       final int rvds = rvil.size();
@@ -3560,7 +3561,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
         gdbv.getRetVarInfo().clear();
         spc.updateSpc(-1);
       }
-      
+
       // f1 -> ( ClassOrInterfaceBodyDeclaration() )*
       if (n.f1.present()) {
         spc.updateSpc(+1);
@@ -3583,12 +3584,12 @@ public class JJFileAnnotator extends JavaCCPrinter {
         spc.updateSpc(-1);
       }
       sb.append(spc.spc);
-      
+
       // f2 -> "}"
       n.f2.accept(this);
       oneNewLine(n, "n");
     }
-    
+
     /**
      * Visits a {@link IdentifierAsString} node, whose child is the following :
      * <p>
@@ -3604,7 +3605,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     public void visit(final IdentifierAsString n) {
       n.f0.accept(this);
     }
-    
+
     /**
      * Visits a {@link StringLiteral} node, whose child is the following :
      * <p>
@@ -3620,7 +3621,7 @@ public class JJFileAnnotator extends JavaCCPrinter {
     public void visit(final StringLiteral n) {
       n.f0.accept(this);
     }
-    
+
   } // end CompilationUnitPrinter
-  
+
 }
