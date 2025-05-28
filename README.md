@@ -16,7 +16,7 @@ Version 1.5.0 brings interesting new features. See [Overview page](doc/wiki/Over
 
 ## Version
 
-Last update : Sept, 2023 - version 1.5.1 committed on GitHub (version 1.5.0 was never committed).  
+Last update : May, 2025 - version 1.5.2 committed on GitHub and published on Sonatype Central Portal.
 
 ## Requirements
 
