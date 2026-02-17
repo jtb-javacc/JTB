@@ -20,13 +20,13 @@ import java.util.Map;
  * @author Marc Mazas
  * @version 1.5.0 : 01/2017 : MMa : created
  */
-public class ExternalGeneratorTester { // NO_UCD (unused code)
-  
+public class ExternalGeneratorTester {
+
   /** Standard constructor */
   public ExternalGeneratorTester() {
     // tbd
   }
-  
+
   /**
    * Generates some output from the argument. This is the method that will be called by JTB through the Java
    * Reflection API.

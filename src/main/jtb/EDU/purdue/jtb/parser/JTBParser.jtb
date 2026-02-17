@@ -139,7 +139,9 @@ options
   STATIC = false; // (default true)
 // ModMMa : impossible to use it (too long, too big)
 //  DEBUG_LOOKAHEAD = true;
-
+// ModMMa : added 1.5.3
+  TOKEN_EXTENDS = "EDU.purdue.jtb.parser.syntaxtree.NodeToken";
+  
 // ModMMa : for proper generation by the Eclipse plugin besides the ant task
   JTB_P = "EDU.purdue.jtb.parser"; // nodes and visitors package
   JTB_IA = true; // inline accepts (default false)
@@ -171,7 +173,7 @@ public class JTBParser extends JavaCCParserInternals
   /**
    * The name of the parser class.
    */
-  String parser_class_name;
+  public String parser_class_name; // ModMMa 2025/11 added public
   
   /**
    * The options, shared with JTB.

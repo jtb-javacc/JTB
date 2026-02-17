@@ -31,20 +31,17 @@
  */
 package EDU.purdue.jtb.generate;
 
-import static EDU.purdue.jtb.common.Constants.DEF_SIG_PKG_NAME;
 import static EDU.purdue.jtb.common.Constants.FILE_EXISTS_RC;
 import static EDU.purdue.jtb.common.Constants.INDENT_AMT;
 import static EDU.purdue.jtb.common.Constants.LS;
 import static EDU.purdue.jtb.common.Constants.OK_RC;
-import static EDU.purdue.jtb.common.Constants.fileHeaderComment;
+import static EDU.purdue.jtb.common.Constants.beginHeaderComment;
 import static EDU.purdue.jtb.common.Constants.genDepthLevelVar;
-import static EDU.purdue.jtb.common.Constants.genNodeVar;
+import static EDU.purdue.jtb.common.Constants.*;
 import static EDU.purdue.jtb.common.Constants.genRetVar;
 import static EDU.purdue.jtb.common.Constants.iNode;
 import static EDU.purdue.jtb.common.Constants.jtbSigPfx;
-import static EDU.purdue.jtb.common.Constants.jtbUserPfx;
 import static EDU.purdue.jtb.common.Constants.nodeChoice;
-import static EDU.purdue.jtb.common.Constants.nodeConstants;
 import static EDU.purdue.jtb.common.Constants.nodeList;
 import static EDU.purdue.jtb.common.Constants.nodeListOptional;
 import static EDU.purdue.jtb.common.Constants.nodeOptional;
@@ -59,6 +56,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import EDU.purdue.jtb.analyse.GlobalDataBuilder;
+import EDU.purdue.jtb.common.Constants;
 import EDU.purdue.jtb.common.JTBOptions;
 import EDU.purdue.jtb.common.Messages;
 import EDU.purdue.jtb.common.Spacing;
@@ -71,7 +69,7 @@ import EDU.purdue.jtb.parser.syntaxtree.NodeList;
 import EDU.purdue.jtb.parser.syntaxtree.NodeListOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.parser.Token;
+import EDU.purdue.jtb.parser.syntaxtree.NodeToken;
 
 /**
  * Class {@link VisitorsGenerator} contains methods to generate: CODEJAVA
@@ -107,6 +105,8 @@ import EDU.purdue.jtb.parser.Token;
  * @version 1.5.1 : 07/2023 : MMa : fixed issues with imports / packages on grammars with no package<br>
  *          1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
  *          replacement by Token
+ * @version 1.5.3 : 11/2025 : MMa : NodeConstants replaced by &lt;Parser&gt;NodeConstants and signature code
+ *          made independent of parser
  */
 public class VisitorsGenerator {
   
@@ -195,26 +195,30 @@ public class VisitorsGenerator {
       sb = new StringBuilder(dfVisBufferSize());
     }
     
-    sb.append(fileHeaderComment).append(LS);
+    sb.append(beginHeaderComment).append(" (").append(this.getClass().getSimpleName()).append(") */")
+        .append(LS);
     
-    if (jopt.visitorsPackageName != null)
-      sb.append("package ").append(jopt.visitorsPackageName).append(';').append(LS).append(LS);
+    if (jopt.visitorsPkgName != null) {
+      sb.append("package ").append(jopt.visitorsPkgName).append(';').append(LS).append(LS);
+    }
     
     if (!jopt.noSignature) {
-      if (jopt.nodesPackageName != null)
-        sb.append("import static ").append(jopt.nodesPackageName).append(".").append(nodeConstants)
-            .append(".*;").append(LS);
+      if (jopt.nodesPkgName != null) {
+        sb.append("import static ").append(jopt.nodesPkgName).append(".").append(jopt.parserName)
+            .append(Constants.nodeConstants).append(".*;").append(LS);
+      }
     }
-    ccg.tokenImport(sb);
-    if (jopt.visitorsPackageName != null //
-        && jopt.nodesPackageName != null //
-        && !jopt.visitorsPackageName.equals(jopt.nodesPackageName)) {
-      sb.append("import ").append(jopt.nodesPackageName).append(".").append("*;").append(LS);
+    ccg.nodeTokenImport(sb);
+    ccg.jjTokenImport(sb);
+    if (jopt.visitorsPkgName != null //
+        && jopt.nodesPkgName != null //
+        && !jopt.visitorsPkgName.equals(jopt.nodesPkgName)) {
+      sb.append("import ").append(jopt.nodesPkgName).append(".").append("*;").append(LS);
     }
-    if (jopt.visitorsPackageName != null //
+    if (jopt.visitorsPkgName != null //
         && !jopt.noSignature) {
-      sb.append("import ").append(jopt.visitorsPackageName).append(".").append(DEF_SIG_PKG_NAME).append(".")
-          .append(sigAnnName).append(";").append(LS);
+      sb.append("import ").append(jopt.signaturePkgName).append(".").append(sigAnnName).append(";")
+          .append(LS);
     }
     sb.append(LS);
     
@@ -303,13 +307,12 @@ public class VisitorsGenerator {
     }
     sb.append(aSpc.spc).append("@Override").append(LS);
     if (!jopt.noSignature) {
-      sb.append(aSpc.spc).append("@").append(sigAnnName).append("({ ").append(uci.fieldsHashSig).append(", ");
-      if (jopt.nodesPackageName == null)
-        sb.append(nodeConstants).append(".");
-      sb.append(jtbSigPfx).append(upperCN).append(", ");
-      if (jopt.nodesPackageName == null)
-        sb.append(nodeConstants).append(".");
-      sb.append(jtbUserPfx).append(upperCN).append(" })").append(LS);
+      sb.append(aSpc.spc).append("@").append(sigAnnName).append("(old_sig=").append(uci.fieldsHashSig)
+          .append(", new_sig=");
+      if (jopt.nodesPkgName == null) {
+        sb.append(jopt.parserName).append(Constants.nodeConstants).append(".");
+      }
+      sb.append(jtbSigPfx).append(upperCN).append(", name=\"").append(className).append("\")").append(LS);
     }
     sb.append(aSpc.spc).append("public ").append(aVi.retInfo.fullType).append(" visit(final ")
         .append(className).append(' ').append(genNodeVar).append(aVi.userParameters).append(")").append(" {")
@@ -387,7 +390,7 @@ public class VisitorsGenerator {
     sb.append(LS);
     genNodeSequenceVisit(sb, aSpc, aVi);
     sb.append(LS);
-    genTokenVisit(sb, aSpc, aVi);
+    genNodeTokenVisit(sb, aSpc, aVi);
     sb.append(LS);
     
     return sb;
@@ -620,14 +623,14 @@ public class VisitorsGenerator {
   }
   
   /**
-   * Generates the base node {@link Token} visit method.
+   * Generates the base node {@link NodeToken} visit method.
    *
    * @param aSb - the buffer to append to (will be allocated if null)
    * @param aSpc - the indentation
    * @param aVi - a VisitorInfo defining the visitor to generate
    * @return the buffer with the DepthFirst visitor class source
    */
-  StringBuilder genTokenVisit(final StringBuilder aSb, final Spacing aSpc, final VisitorInfo aVi) {
+  StringBuilder genNodeTokenVisit(final StringBuilder aSb, final Spacing aSpc, final VisitorInfo aVi) {
     StringBuilder sb = aSb;
     if (sb == null) {
       sb = new StringBuilder(680);
@@ -638,8 +641,8 @@ public class VisitorsGenerator {
       sb.append(aSpc.spc).append(aVi.retInfo.fullType).append(' ').append(genRetVar).append(" = ")
           .append(aVi.retInfo.initializer).append(";").append(LS);
     }
-    sb.append(aSpc.spc).append("@SuppressWarnings(\"unused\")").append(LS);
-    sb.append(aSpc.spc).append("final String tkIm = ").append(genNodeVar).append(".image;").append(LS);
+    sb.append(aSpc.spc).append("@SuppressWarnings(\"unused\") final String tkIm = ((").append(jjToken)
+        .append(") ").append(genNodeVar).append(").image;").append(LS);
     sb.append(aSpc.spc).append("return");
     if (!aVi.retInfo.isVoid) {
       sb.append(' ').append(genRetVar);
@@ -805,14 +808,17 @@ public class VisitorsGenerator {
    * @param aVi - a VisitorInfo defining the visitor to generate
    */
   private void genIVisitorBeg(final StringBuilder aSb, final VisitorInfo aVi) {
-    aSb.append(fileHeaderComment).append(LS);
-    if (jopt.visitorsPackageName != null)
-      aSb.append("package ").append(jopt.visitorsPackageName).append(";").append(LS).append(LS);
-    if (jopt.nodesPackageName != null)
-      if (!jopt.visitorsPackageName.equals(jopt.nodesPackageName)) {
-        aSb.append("import ").append(jopt.nodesPackageName).append(".*;").append(LS);
+    aSb.append(beginHeaderComment).append(" (").append(this.getClass().getSimpleName()).append(") */")
+        .append(LS);
+    if (jopt.visitorsPkgName != null) {
+      aSb.append("package ").append(jopt.visitorsPkgName).append(";").append(LS).append(LS);
+    }
+    if (jopt.nodesPkgName != null) {
+      if (!jopt.nodesPkgName.equals(jopt.visitorsPkgName)) {
+        aSb.append("import ").append(jopt.nodesPkgName).append(".*;").append(LS);
       }
-    ccg.tokenImport(aSb);
+    }
+    ccg.nodeTokenImport(aSb);
     aSb.append(aVi.imports);
     aSb.append(LS);
     if (jopt.javaDocComments) {
@@ -981,17 +987,16 @@ public class VisitorsGenerator {
       sb = new StringBuilder(1550);
     }
     
-    sb.append(fileHeaderComment).append(LS);
-    if (jopt.visitorsPackageName != null)
-      sb.append("package ").append(jopt.signaturePackageName).append(";").append(LS).append(LS);
+    sb.append(beginHeaderComment).append(" (").append(this.getClass().getSimpleName()).append(") */")
+        .append(LS);
+    if (jopt.signaturePkgName != null) {
+      sb.append("package ").append(jopt.signaturePkgName).append(";").append(LS).append(LS);
+    }
     sb.append("import java.lang.annotation.ElementType;").append(LS);
     sb.append("import java.lang.annotation.Retention;").append(LS);
     sb.append("import java.lang.annotation.RetentionPolicy;").append(LS);
     sb.append("import java.lang.annotation.Target;").append(LS).append(LS);
     sb.append("import javax.annotation.processing.SupportedAnnotationTypes;").append(LS).append(LS);
-    if (jopt.nodesPackageName != null)
-      sb.append("import ").append(jopt.nodesPackageName).append(".").append(nodeConstants).append(";")
-          .append(LS).append(LS);
     if (jopt.javaDocComments) {
       sb.append("/** ").append(LS);
       sb.append(
@@ -1001,11 +1006,13 @@ public class VisitorsGenerator {
           " * processor to issue a compile error if the user visitors' visit methods are not coded against the")
           .append(LS);
       sb.append(" * last nodes definitions.<br>").append(LS);
-      sb.append(" * The user nodes signatures are generated in the {@link NodeConstants} class,<br>")
+      sb.append(" * The user nodes signatures are generated in the &lt;Parser&gt;NodeConstants class,<br>")
           .append(LS);
       sb.append(" * the default visitors' visit methods are generated with the {@link NodeFieldsSignature}")
           .append(LS);
-      sb.append(" * annotation, with the 3 values {@link #value()},<br>").append(LS);
+      sb.append(
+          " * annotation, with the 3 values {@link #old_sig()}, {@link #new_sig()}, {@link #name()},<br>")
+          .append(LS);
       sb.append(" * and the user visitors' visit methods can be annotated with the same annotation.")
           .append(LS);
       sb.append(" * <p>").append(LS);
@@ -1016,6 +1023,8 @@ public class VisitorsGenerator {
       sb.append(" *").append(LS);
       sb.append(" * @author Marc Mazas").append(LS);
       sb.append(" *  @version 1.5.0 : 02/2017 : MMa : created").append(LS);
+      sb.append(" *  @version 1.5.3 : 11/2025 : MMa : NodeConstants replaced by &lt;Parser&gt;NodeConstants")
+          .append(LS);
       sb.append(" */").append(LS);
     } else {
       sb.append("@SuppressWarnings({\"javadoc\",\"unused\"})").append(LS);
@@ -1028,15 +1037,22 @@ public class VisitorsGenerator {
     spc.updateSpc(+1);
     if (jopt.javaDocComments) {
       sb.append(spc.spc).append("/**").append(LS);
-      sb.append(spc.spc).append(" * The array of").append(LS);
-      sb.append(spc.spc).append(" * <ul>").append(LS);
-      sb.append(spc.spc).append(" * <li>the \"old\" (usually copied) node fields signature</li>").append(LS);
-      sb.append(spc.spc).append(" * <li>the \"new\" (newly generated) node fields signature</li>").append(LS);
-      sb.append(spc.spc).append(" * <li>the JTB node index (in NodeConstants)</li>").append(LS);
-      sb.append(spc.spc).append(" * </ul>").append(LS);
+      sb.append(spc.spc).append(" * The \"old\" (usually copied) node fields signature").append(LS);
       sb.append(spc.spc).append(" */").append(LS);
     }
-    sb.append(spc.spc).append("int[] value();").append(LS).append(LS);
+    sb.append(spc.spc).append("int old_sig();").append(LS).append(LS);
+    if (jopt.javaDocComments) {
+      sb.append(spc.spc).append("/**").append(LS);
+      sb.append(spc.spc).append(" * The \"new\" (newly computed) node fields signature").append(LS);
+      sb.append(spc.spc).append(" */").append(LS);
+    }
+    sb.append(spc.spc).append("int new_sig();").append(LS).append(LS);
+    if (jopt.javaDocComments) {
+      sb.append(spc.spc).append("/**").append(LS);
+      sb.append(spc.spc).append(" * The JTB node name").append(LS);
+      sb.append(spc.spc).append(" */").append(LS);
+    }
+    sb.append(spc.spc).append("String name();").append(LS).append(LS);
     spc.updateSpc(-1);
     sb.append(spc.spc).append("}").append(LS);
     return sb;
@@ -1080,9 +1096,11 @@ public class VisitorsGenerator {
       sb = new StringBuilder(2500);
     }
     
-    sb.append(fileHeaderComment).append(LS);
-    if (jopt.visitorsPackageName != null)
-      sb.append("package ").append(jopt.signaturePackageName).append(";").append(LS).append(LS);
+    sb.append(beginHeaderComment).append(" (").append(this.getClass().getSimpleName()).append(") */")
+        .append(LS);
+    if (jopt.signaturePkgName != null) {
+      sb.append("package ").append(jopt.signaturePkgName).append(";").append(LS).append(LS);
+    }
     sb.append("import java.util.Set;").append(LS).append(LS);
     sb.append("import javax.annotation.processing.AbstractProcessor;").append(LS);
     sb.append("import javax.annotation.processing.RoundEnvironment;").append(LS);
@@ -1092,9 +1110,6 @@ public class VisitorsGenerator {
     sb.append("import javax.lang.model.element.Element;").append(LS);
     sb.append("import javax.lang.model.element.TypeElement;").append(LS);
     sb.append("import javax.tools.Diagnostic;").append(LS).append(LS);
-    if (jopt.nodesPackageName != null)
-      sb.append("import ").append(jopt.nodesPackageName).append(".").append(nodeConstants).append(";")
-          .append(LS).append(LS);
     if (jopt.javaDocComments) {
       sb.append("/** ").append(LS);
       sb.append(
@@ -1111,12 +1126,14 @@ public class VisitorsGenerator {
       sb.append(" *").append(LS);
       sb.append(" * @author Marc Mazas").append(LS);
       sb.append(" *  @version 1.5.0 : 02/2017 : MMa : created").append(LS);
+      sb.append(" *  @version 1.5.3 : 11/2025 : MMa : NodeConstants replaced by &lt;Parser&gt;NodeConstants")
+          .append(LS);
       sb.append(" */").append(LS);
     } else {
       sb.append("@SuppressWarnings(\"javadoc\")").append(LS);
     }
-    sb.append("@SupportedAnnotationTypes(\"").append(jopt.visitorsPackageName).append(".")
-        .append(DEF_SIG_PKG_NAME).append(".").append(sigAnnName).append("\")").append(LS);
+    sb.append("@SupportedAnnotationTypes(\"").append(jopt.signaturePkgName).append(".").append(sigAnnName)
+        .append("\")").append(LS);
     sb.append("// Adapt the release to your compiler level").append(LS);
     sb.append("@SupportedSourceVersion(SourceVersion.RELEASE_8)").append(LS);
     sb.append("public class ").append(sigAnnProcName).append(" extends AbstractProcessor {").append(LS)
@@ -1149,21 +1166,17 @@ public class VisitorsGenerator {
     spc.updateSpc(+1);
     sb.append(spc.spc)
         .append("final NodeFieldsSignature nfs = elem.getAnnotation(NodeFieldsSignature.class);").append(LS);
-    sb.append(spc.spc).append("final int osig = nfs.value()[0];").append(LS);
-    sb.append(spc.spc).append("final int nsig = nfs.value()[1];").append(LS);
-    sb.append(spc.spc).append("final int nix = nfs.value()[2];").append(LS);
+    sb.append(spc.spc).append("final int osig = nfs.old_sig();").append(LS);
+    sb.append(spc.spc).append("final int nsig = nfs.new_sig();").append(LS);
     sb.append(spc.spc).append("if (osig != nsig) {").append(LS);
     spc.updateSpc(+1);
-    sb.append(spc.spc).append(
-        "final String message = \"Different node fields signatures (old=\" + nfs.value()[0] + \", new=\" +")
+    sb.append(spc.spc)
+        .append(
+            "final String message = \"Different node fields signatures (old=\" + osig+ \", new=\" + nsig +")
         .append(LS);
-    sb.append(spc.spc).append("                       nfs.value()[1] + \") in ")
-        .append(jopt.visitorsPackageName).append(".\" +").append(LS);
-    sb.append(spc.spc).append("                       elem.getEnclosingElement().getSimpleName() + \"#\" +")
-        .append(LS);
-    sb.append(spc.spc).append("                       elem.getSimpleName() + \"(final \" +").append(LS);
-    sb.append(spc.spc).append("                       NodeConstants.JTB_USER_NODE_NAME[nix] + \" n)\";")
-        .append(LS);
+    sb.append(spc.spc).append("    \") in ").append(jopt.visitorsPkgName)
+        .append(".\" + elem.getEnclosingElement().getSimpleName() + \"#\" +").append(LS);
+    sb.append(spc.spc).append("    elem.getSimpleName() + \"(final \" + nfs.name() + \" n)\";").append(LS);
     sb.append(spc.spc).append("processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message);")
         .append(LS);
     spc.updateSpc(-1);

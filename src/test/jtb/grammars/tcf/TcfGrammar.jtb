@@ -95,9 +95,9 @@ public class TcfGrammar{  public static void main(String args [])  {    Syst
   
   /** {@inheritDoc} */
   @Override
-  public void visit(Token n)
+  public void visit(NodeToken n)
   {
-    System.err.println("*** Just visited <" + n.image +"> ***");
+    System.err.println("*** Just visited <" + ((Token) n).image +"> ***");
   }
   
   /** {@inheritDoc} */

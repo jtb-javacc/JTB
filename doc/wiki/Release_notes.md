@@ -1,5 +1,11 @@
 # Java Tree Builder (JTB) - Release notes (dd/mm/yy)
 
+### Version 1.5.3 - jtb-1.5.3.jar of 17/02/2026, committed on GitHub, published as a snapshot and a release on Sonatype Central Portal
+- fixed some command line settings handling; changed command line string settings to be surrounded with double quotes
+- passed back to 2 classes NodeToken (JTB) and Token (JavaCC, which now must extend NodeToken) (for easier use under the JavaCC Maven Plugin)
+- fixed directory where to generate Token.java
+- fixed some invalid static attributes
+
 ### Version 1.5.2 - jtb-1.5.2.jar of 26/05/2025, committed on GitHub, published as a snapshot and a release on Sonatype Central Portal
 - changed manifest management
 - added publishing on Sonatype Central Portal

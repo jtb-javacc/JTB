@@ -1,6 +1,6 @@
 package examples.java.ex1jtb.visitor;
 
-import static examples.java.ex1jtb.syntaxtree.NodeConstants.*;
+import static examples.java.ex1jtb.syntaxtree.Eg1NodeConstants.*;
 
 import examples.java.ex1jtb.syntaxtree.AdditiveExpression;
 import examples.java.ex1jtb.syntaxtree.EgInteger;
@@ -62,9 +62,7 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({
-      1859009853, JTB_SIG_START, JTB_USER_START
-  })
+  @NodeFieldsSignature(old_sig = 1859009853, new_sig = JTB_SIG_START, name = "Start")
   public void visit(final Start n, final String argu) {
     dump(JTB_USER_START, argu);
     ++indent;
@@ -85,9 +83,7 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({
-      -762347234, JTB_SIG_EXPRESSION, JTB_USER_EXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = -762347234, new_sig = JTB_SIG_EXPRESSION, name = "Expression")
   public void visit(final Expression n, final String argu) {
     dump(JTB_USER_EXPRESSION, argu);
     ++indent;
@@ -109,9 +105,7 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({
-      -1807059397, JTB_SIG_ADDITIVEEXPRESSION, JTB_USER_ADDITIVEEXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = -1807059397, new_sig = JTB_SIG_ADDITIVEEXPRESSION, name = "AdditiveExpression")
   public void visit(final AdditiveExpression n, final String argu) {
     dump(JTB_USER_ADDITIVEEXPRESSION, argu);
     ++indent;
@@ -138,9 +132,7 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({
-      853643830, JTB_SIG_MULTIPLICATIVEEXPRESSION, JTB_USER_MULTIPLICATIVEEXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = 853643830, new_sig = JTB_SIG_MULTIPLICATIVEEXPRESSION, name = "MultiplicativeExpression")
   public void visit(final MultiplicativeExpression n, final String argu) {
     dump(JTB_USER_MULTIPLICATIVEEXPRESSION, argu);
     ++indent;
@@ -166,9 +158,7 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({
-      190447292, JTB_SIG_UNARYEXPRESSION, JTB_USER_UNARYEXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = 190447292, new_sig = JTB_SIG_UNARYEXPRESSION, name = "UnaryExpression")
   public void visit(final UnaryExpression n, final String argu) {
     dump(JTB_USER_UNARYEXPRESSION, argu);
     ++indent;
@@ -189,9 +179,7 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({
-      -1580059612, JTB_SIG_IDENTIFIER, JTB_USER_IDENTIFIER
-  })
+  @NodeFieldsSignature(old_sig = -1580059612, new_sig = JTB_SIG_IDENTIFIER, name = "Identifier")
   public void visit(@SuppressWarnings("unused") final Identifier n, final String argu) {
     dump(JTB_USER_IDENTIFIER, argu);
     // no need to go further down
@@ -209,9 +197,7 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({
-      -1048223857, JTB_SIG_EGINTEGER, JTB_USER_EGINTEGER
-  })
+  @NodeFieldsSignature(old_sig = -1048223857, new_sig = JTB_SIG_EGINTEGER, name = "EgInteger")
   public void visit(@SuppressWarnings("unused") final EgInteger n, final String argu) {
     dump("Integer", argu);
     // no need to go further down

@@ -128,8 +128,9 @@
    - user's settings.xml must contain
       2 servers with id centralportal & centralportalsnapshots with proper urls, and
       1 profile activated by default with the gpg.keyname set to the 8 hex digits short key
-   - run rename_new_to_acc_jar to rename new jar to accepted jar
-   - versions must be set in both jtb_props.xml and pom.xml; run check_pom_build_versions to check
+   - versions must be set in both jtb_props.xml (${mvn-version}) and pom.xml (version under artifactId);
+      may be snapshots; run check_pom_build_versions to check
+   - run rename_new_to_acc_jtb_jar to rename new jar to accepted jar
    - comment/uncomment ${mvn-just-test-publish} (in jtb_props.xml) for real/dummy publishing
    - run publish_snapshot to publish a snapshot
    - run install_release, then make_bundle, then manually publish the bundle with 
@@ -271,10 +272,9 @@
   </target>
 
   <!-- Rebuild : regenerate jtb parser files with ${jtb_new_jar} and compile -->
-  <!-- Note: if JTB nodes signatures change: you can skip the signature control by setting skip_ap to true, -->
-  <!-- then work, then set back skip_ap to false -->
+  <!-- Note: if JTB nodes signatures change: you can skip the signature control by setting -->
+  <!--  jtb_skip_ap to true (in jtb_props.xml), then work, then unset (comment) back jtb_skip_ap -->
   <!-- (when debugging with DEBUG_CHARS = true in CommentsPrinter, signatures do change) -->
-  <property name="skip_ap" value="false" />
   <target name="rebuild_jtbparser">
     <antcall target="regenerate_jtbparser" />
     <antcall target="compile_visitors_with_ap" />
@@ -326,6 +326,9 @@
     <!-- FIX ME remove this temporary fix needed for 1.5.0 -> 1.5.1 
     <antcall target="temp_fix_jtbparser.jj_150" />
     -->
+    <!-- FIX ME remove this temporary fix needed for 1.5.2 -> 1.5.3 
+    -->
+    <antcall target="temp_fix-152" />
     <antcall target="process_jtbparser.jj" />
     <antcall target="add_suppresswarnings_jcs">
       <param name="gdir" value="${jtb_tgt_gensrc_jj_dir}" />
@@ -589,6 +592,43 @@
     </java>
   </target>
 
+  <!-- Copy / delete specific 1.5.3 files for JTBParser for 1.5.2 -> 1.5.3 -->
+  <target name="temp_fix-152" if="${isLastVersion152}">
+    <copy file="${jtb_src_main_java_dir}/saves/IVoidVisitor.java-153.save"
+          tofile="${jtb_tgt_gensrc_jtb_dir}/visitor/IVoidVisitor.java"
+          overwrite="true"
+    />
+    <copy file="${jtb_src_main_java_dir}/saves/IIntVisitor.java-153.save"
+          tofile="${jtb_tgt_gensrc_jtb_dir}/visitor/IIntVisitor.java"
+          overwrite="true"
+    />
+    <copy file="${jtb_src_main_java_dir}/saves/DepthFirstVoidVisitor.java-153.save"
+          tofile="${jtb_tgt_gensrc_jtb_dir}/visitor/DepthFirstVoidVisitor.java"
+          overwrite="true"
+    />
+    <copy file="${jtb_src_main_java_dir}/saves/DepthFirstIntVisitor.java-153.save"
+          tofile="${jtb_tgt_gensrc_jtb_dir}/visitor/DepthFirstIntVisitor.java"
+          overwrite="true"
+    />
+    <copy file="${jtb_src_main_java_dir}/saves/ControlSignatureProcessor.java-153.save"
+          tofile="${jtb_tgt_gensrc_jtb_dir}/visitor/signature/ControlSignatureProcessor.java"
+          overwrite="true"
+    />
+    <copy file="${jtb_src_main_java_dir}/saves/NodeFieldsSignature.java-153.save"
+          tofile="${jtb_tgt_gensrc_jtb_dir}/visitor/signature/NodeFieldsSignature.java"
+          overwrite="true"
+    />
+    <copy file="${jtb_src_main_java_dir}/saves/JTBParserNodeConstants.java-153.save"
+          tofile="${jtb_tgt_gensrc_jtb_dir}/syntaxtree/JTBParserNodeConstants.java"
+          overwrite="true"
+    />
+    <copy file="${jtb_src_main_java_dir}/saves/NodeToken.java-153.save"
+          tofile="${jtb_tgt_gensrc_jtb_dir}/syntaxtree/NodeToken.java"
+          overwrite="true"
+    />
+    <delete file="${jtb_tgt_gensrc_jj_dir}/Token.java" />
+  </target>
+
   <!-- Copy specific 1.5.0 NodeToken.java file for JTBParser for 1.5.0 -> 1.5.1 -->
   <target name="temp_copy_specific_nodetoken-150_for_jtbparser" if="${isLastVersion150}">
     <copy file="${jtb_src_main_java_dir}/saves/NodeToken.java-150.save"
@@ -710,7 +750,7 @@
   </target>
 
   <!-- Compile the annotation processor package -->
-  <target name="compile_ap_pkg">
+  <target name="compile_ap_pkg" unless="jtb_skip_ap">
     <javac srcdir="${jtb_src_dir}"
            destdir="${jtb_tgt_cla_dir}"
            includes="**/signature/*"
@@ -728,7 +768,7 @@
   </target>
 
   <!-- Create the annotation processor jar ${jtb_ap_jar} -->
-  <target name="make_ap_jar" depends="compile_ap_pkg">
+  <target name="make_ap_jar" depends="compile_ap_pkg" unless="jtb_skip_ap">
     <jar destfile="${jtb_ap_jar}">
       <fileset dir="${basedir}">
         <include name="/META-INF/services/*" />
@@ -740,7 +780,7 @@
   </target>
 
   <!-- Compile the visitors with (only) the annotation processor (= check signatures) -->
-  <target name="compile_visitors_with_ap" depends="make_ap_jar" unless="skip_ap">
+  <target name="compile_visitors_with_ap" depends="make_ap_jar" unless="jtb_skip_ap">
     <javac srcdir="${jtb_src_dir}"
            destdir="${jtb_tgt_cla_dir}"
            includes="**/visitor/*,
@@ -1890,6 +1930,7 @@
       <param name="ofile" value="jtb.out.jj" />
       <param name="odir" value="." />
       <param name="gname" value="NoOptionGrammar" />
+      <param name="gpkg" value="grammars.y" />
     </antcall>
 
     <!-- grammars/y/NoOptionGrammar.jj -->
@@ -1920,10 +1961,11 @@
     </antcall>
 
     <!-- grammars/z/NoOptionsSectionGrammar.jj -->
-    <antcall target="gen_jj_gram">
+    <antcall target="gen_jj_gram_tok_ext">
       <param name="gdir" value="${jtb_src_tst_jtb_dir}/grammars/z" />
       <param name="jdir" value="${jtb_src_tst_jtb_dir}/grammars/z" />
       <param name="gname" value="jtb.out" />
+      <param name="gpkg" value="grammars.z" />
     </antcall>
 
     <!-- add @SuppressWarnings -->
@@ -2295,12 +2337,12 @@ public class Token</replacevalue>
   <target name="gen_jtb_gram_options">
 
     <java classname="${jtb_tool}" classpath="${jtb_new_jar}" fork="true" failonerror="true">
+      <!-- Output directory -->
+      <arg value='-d="${odir}"' />
+      <!-- Output file -->
+      <arg value='-o="${ofile}"' />
       <!-- Input file -->
       <arg value="${gdir}/${gname}.jtb" />
-      <!-- Output directory -->
-      <arg value="-d=${odir}" />
-      <!-- Output file -->
-      <arg value="-o=${ofile}" />
       <!-- jacocoagent vm arguments -->
       <jvmarg value="${jacocoagentvmparam}" />
       <!-- enable assertions -->
@@ -2320,14 +2362,14 @@ public class Token</replacevalue>
   <target name="gen_jtb_gram_options_pkg">
 
     <java classname="${jtb_tool}" classpath="${jtb_new_jar}" fork="true" failonerror="true">
+      <!-- Output Package -->
+      <arg value='-p="${opkg}"' />
+      <!-- Output directory -->
+      <arg value='-d="${odir}"' />
+      <!-- Output file -->
+      <arg value='-o="${ofile}"' />
       <!-- Input file -->
       <arg value="${gdir}/${gname}.jtb" />
-      <!-- Output Package -->
-      <arg value="-p=${opkg}" />
-      <!-- Output directory -->
-      <arg value="-d=${odir}" />
-      <!-- Output file -->
-      <arg value="-o=${ofile}" />
       <!-- jacocoagent vm arguments -->
       <jvmarg value="${jacocoagentvmparam}" />
       <!-- enable assertions -->
@@ -2361,6 +2403,23 @@ public class Token</replacevalue>
 
     <java classname="${javacc_main}" classpath="${javacc_ok_jar}" fork="true" failonerror="true">
       <arg value="-OUTPUT_DIRECTORY=${jdir}" />
+      <arg value="-jdk_version=${jdk_version}" />
+      <arg value="${gdir}/${gname}.jj" />
+      <!-- no code coverage on JavaCC -->
+    </java>
+
+  </target>
+
+  <!-- Generate a JavaCC grammar with the token_extends option -->
+  <!-- gdir : the (gen jtb) JJ grammar file directory -->
+  <!-- jdir : the (gen jj) JJ output directory -->
+  <!-- gname : the grammar name -->
+  <!-- gpkg : the grammar package -->
+  <target name="gen_jj_gram_tok_ext">
+
+    <java classname="${javacc_main}" classpath="${javacc_ok_jar}" fork="true" failonerror="true">
+      <arg value="-OUTPUT_DIRECTORY=${jdir}" />
+      <arg value='-TOKEN_EXTENDS=${gpkg}.syntaxtree.NodeToken' />
       <arg value="-jdk_version=${jdk_version}" />
       <arg value="${gdir}/${gname}.jj" />
       <!-- no code coverage on JavaCC -->
@@ -2513,7 +2572,7 @@ public class Token</replacevalue>
 
   <!-- Copy the ${jtb_lib_dir}/jtb-${ant-version}.jar jar to the ${mvn-jar} -->
   <target name="copy_jtb_jar_to_mvn_jar">
-    <copy file="${jtb_lib_dir}/jtb-${ant-version}.jar" tofile="${mvn-jar}" overwrite="true" />
+    <copy file="${jtb_lib_dir}/jtb-${mvn-version}.jar" tofile="${mvn-jar}" overwrite="true" />
   </target>
 
   <!-- Generate the sources jar -->

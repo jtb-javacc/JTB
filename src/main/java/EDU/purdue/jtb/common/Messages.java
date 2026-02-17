@@ -55,23 +55,24 @@ import static EDU.purdue.jtb.common.Constants.SUPPORT;
  * @version 1.4.7 : 09/2012 : MMa : fixed missing "soft error" label ; added column numbers
  * @version 1.4.8 : 10/2014 : MMa : fixed extra space before column number for "soft error"
  * @version 1.4.10 : 04/2015 : MMa : removed System.exit() in hardErr
+ * @version 1.5.3 : 11/2025 : MMa : minor removals
  */
 public class Messages {
-  
+
   /** The number of errors */
   private int numErrors   = 0;
   /** The number of warnings */
   private int numWarnings = 0;
   /** The number of informations */
   private int numInfos    = 0;
-  
+
   /**
    * Prints on System.err the number of informations, warnings and errors
    */
   public void printSummary() {
     System.err.println(numInfos + " informations, " + numWarnings + " warnings, " + numErrors + " errors.");
   }
-  
+
   /**
    * Prints on System.out an information text.
    *
@@ -80,7 +81,7 @@ public class Messages {
   public void info(final String s) {
     info(s, -1, 0);
   }
-  
+
   /**
    * Prints on System.out an information text and its line number.
    *
@@ -95,16 +96,16 @@ public class Messages {
         + s);
     ++numInfos;
   }
-  
+
   /**
    * Prints on System.err a warning text.
    *
    * @param s - the warning text
    */
-  public void warning(final String s) { // NO_UCD (use default)
+  public void warning(final String s) {
     warning(s, -1, 0);
   }
-  
+
   /**
    * Prints on System.err a warning text and its line number.
    *
@@ -119,7 +120,7 @@ public class Messages {
         + s);
     ++numWarnings;
   }
-  
+
   /**
    * Prints on System.err a soft (non fatal) error text.
    *
@@ -128,7 +129,7 @@ public class Messages {
   public void softErr(final String s) {
     softErr(s, -1, -1);
   }
-  
+
   /**
    * Prints on System.err a soft (non fatal) error text and its line number.
    *
@@ -143,7 +144,7 @@ public class Messages {
         + s);
     ++numErrors;
   }
-  
+
   /**
    * Prints on System.err a fatal error message and the stack trace.
    *
@@ -157,7 +158,7 @@ public class Messages {
     System.err.println();
     new Throwable().printStackTrace();
   }
-  
+
   /**
    * Prints on System.err a fatal error message and the stack trace.
    *
@@ -171,30 +172,30 @@ public class Messages {
     System.err.println();
     t.printStackTrace();
   }
-  
+
   /**
    * @return the number of informations
    */
-  public int infoCount() { // NO_UCD (unused code)
+  public int infoCount() {
     return numInfos;
   }
-  
+
   /**
    * @return the number of warnings
    */
   public int warningCount() {
     return numWarnings;
   }
-  
+
   /**
    * @return the number of errors
    */
   public int errorCount() {
     return numErrors;
   }
-  
+
   /**
-   * Resets to zero the number of errors and warnings.
+   * Resets to zero the number of errors, warnings and infos.
    */
   public void resetCounts() {
     numErrors = numWarnings = numInfos = 0;

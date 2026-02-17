@@ -8,17 +8,16 @@
         see build.xml, where the Maven Artifact Resolver Ant Tasks will
          read this pom for the model data,
          build the artifacts and run the implicit install phase on them for snapshots or releases,
-         run the implicit deploy phase for snapshots (to the Central Portal snapshots repository),
-         for releases build a bundle zip that must be deployed manually (to the Central Portal
+         for snapshots run the implicit deploy phase (to the Sonatype Central Portal
+          snapshots repository),
+         for releases build a bundle zip and deploy it manually (to the Sonatype Central Portal
           staging repository)
        the only thing to be changed here is the version -->
 
-  <!-- Migrated namespaces from OSSRH to Central Portal: edu.purdue.jtb and edu.purdue.cs.jtb
-        and was not able to register new namespace edu.purdue.cs; so this groupId-->
   <groupId>edu.purdue.jtb</groupId>
   <artifactId>jtb</artifactId>
-  <!-- <version>1.5.2-SNAPSHOT</version> -->
-  <version>1.5.2</version>
+  <version>1.5.3</version>
+  <!--   <version>1.5.3-SNAPSHOT</version> -->
   <name>JTB: Java Tree Builder</name>
   <packaging>pom</packaging>
 
@@ -30,8 +29,8 @@
     environment as JavaCC (java.net). Since 2017 it is provided as a standalone tool in the same new
     hosting environment as JavaCC (GitHub : https://github.com/jtb-javacc/JTB). Version 1.4.12 had
     been deployed to Maven Central (https://central.sonatype.com/artifact/edu.purdue.cs/jtb).
-    Versions 1.5.2+ will be deployed to Central Portal (https://central.sonatype.com for releases,
-    https://central.sonatype.com/repository/maven-snapshots for snapshots).</description>
+    Versions 1.5.2+ will be deployed to Sonatype Central Portal (https://central.sonatype.com for
+    releases, https://central.sonatype.com/repository/maven-snapshots for snapshots).</description>
   <url>https://github.com/jtb-javacc/JTB</url>
 
   <organization>
@@ -65,8 +64,8 @@
   <!--    </repository>-->
   <!--  </repositories>-->
 
-  <!-- Central Portal keeps snapshots during 90 days; current available snapshots browsable at
-    https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/ -->
+  <!-- Sonatype Central Portal keeps snapshots during 90 days; current available snapshots browsable
+        at https://central.sonatype.com/service/rest/repository/browse/maven-snapshots/ -->
 
   <developers>
     <developer>

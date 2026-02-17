@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
  *
  * @author Marc Mazas
  * @version 1.5.0 : 02/2017 : MMa : created
+ * @version 1.5.3 : 11/2025 : MMa : minor removal
  */
 public class VisitorInfo implements Comparable<VisitorInfo> {
   
@@ -353,7 +354,7 @@ public class VisitorInfo implements Comparable<VisitorInfo> {
   /**
    * Class holding a return type info.
    */
-  public class ReturnInfo { // NO_UCD (use private)
+  public class ReturnInfo {
     
     /** Return type : void, [A-Z] (type parameter), java primitive types, user class name */
     public String type = null;

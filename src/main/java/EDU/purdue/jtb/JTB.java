@@ -31,12 +31,6 @@
  */
 package EDU.purdue.jtb;
 
-import static EDU.purdue.jtb.common.Constants.DEF_HOOK_DIR_NAME;
-import static EDU.purdue.jtb.common.Constants.DEF_HOOK_PKG_NAME;
-import static EDU.purdue.jtb.common.Constants.DEF_ND_DIR_NAME;
-import static EDU.purdue.jtb.common.Constants.DEF_ND_PKG_NAME;
-import static EDU.purdue.jtb.common.Constants.DEF_VIS_DIR_NAME;
-import static EDU.purdue.jtb.common.Constants.DEF_VIS_PKG_NAME;
 import static EDU.purdue.jtb.common.Constants.JTB_VERSION;
 import static EDU.purdue.jtb.common.Constants.PROG_NAME;
 import static EDU.purdue.jtb.common.Constants.baseNodesClasses;
@@ -110,11 +104,13 @@ import EDU.purdue.jtb.parser.syntaxtree.INode;
  *          FileExistsException ; moved to non static ; changed default true values to false<br>
  *          1.5.0 : 10-2020 : MMa : create directories only if needed ; normalized file names
  * @version 1.5.1 : 07/2023 : MMa : changed no overwrite management ; fixed issue on JTB_VP/JTB_VD<br>
- *          1.5.1 : 08/2023 : MMa : changes due to the NodeToken replacement by Token<br>
+ *          1.5.1 : 08/2023 : MMa : changes due to NodeToken replaced by Token<br>
  *          1.5.1 : 09/2023 : MMa : fixed directories values
+ * @version 1.5.3 : 10-12/2025 : MMa : fixed command line arguments handling, and changes due to Token split
+ *          back to NodeToken and Token; added double quotes management on arguments<br>
  */
 public class JTB {
-  
+
   /** The messages handler */
   private final Messages            mess = new Messages();
   /** The global JTB options */
@@ -128,41 +124,41 @@ public class JTB {
   /** The input file as an InputStream */
   private InputStream               in;
   /**
-   * the input (jtb) file name (must be set in main)
+   * The input (jtb) file name (must be set in main)
    */
   String                            jtbInputFileName;
-  
+
   /** No error */
-  public static final int OK        = 0;     // NO_UCD (unused code)
+  public static final int OK        = 0;
   /** Command line error */
-  public static final int CL_ERR    = -1;    // NO_UCD (use private)
+  public static final int CL_ERR    = -1;
   /** {@link GlobalDataBuilder} error */
-  public static final int GDB_ERR   = -2;    // NO_UCD (use private)
+  public static final int GDB_ERR   = -2;
   /** {@link SemanticChecker} error */
-  public static final int SC_ERR    = -4;    // NO_UCD (use private)
+  public static final int SC_ERR    = -4;
   /** {@link ClassesFinder} error */
-  public static final int CF_ERR    = -8;    // NO_UCD (use private)
+  public static final int CF_ERR    = -8;
   /** {@link JJFileAnnotator} error */
-  public static final int ANN_ERR   = -16;   // NO_UCD (use private)
+  public static final int ANN_ERR   = -16;
   /** {@link UserFilesGenerator} & {@link VisitorsGenerator} directory creation error */
-  public static final int DI_ERR    = -32;   // NO_UCD (use private)
+  public static final int DI_ERR    = -32;
   /** Parsing file options error */
-  public static final int FO_ERR    = -64;   // NO_UCD (use private)
+  public static final int FO_ERR    = -64;
   /** {@link InvalidCmdLineException} exception */
-  public static final int CL_EX     = -128;  // NO_UCD (use private)
+  public static final int CL_EX     = -128;
   /** {@link ParseException} exception */
-  public static final int PARSE_EX  = -256;  // NO_UCD (use private)
+  public static final int PARSE_EX  = -256;
   /** Running external generator error */
-  public static final int EG_ERR    = -512;  // NO_UCD (use private)
+  public static final int EG_ERR    = -512;
   /** IO exception */
-  public static final int IO_EX     = -1024; // NO_UCD (use private)
+  public static final int IO_EX     = -1024;
   /** Programmatic error */
-  public static final int OTHER_EX  = -2048; // NO_UCD (use private)
+  public static final int OTHER_EX  = -2048;
   /** Programmatic error */
-  public static final int PROG_ERR  = -4096; // NO_UCD (use private)
+  public static final int PROG_ERR  = -4096;
   /** Other error */
-  public static final int OTHER_THR = -9192; // NO_UCD (use private)
-  
+  public static final int OTHER_THR = -9192;
+
   /**
    * Standard main method.<br>
    * Calls {@link System#exit(int)} upon termination with the following status:
@@ -180,7 +176,7 @@ public class JTB {
     System.err.flush();
     System.exit(new JTB().internal_main(aArgs));
   }
-  
+
   /**
    * Non standard main static method returning an error code.
    *
@@ -193,10 +189,10 @@ public class JTB {
    *         <li>0 if no error or</li>
    *         <li>the number of errors</li>
    */
-  public static int do_main(final String aArgs[]) { // NO_UCD (unused code)
+  public static int do_main(final String aArgs[]) {
     return new JTB().internal_main(aArgs);
   }
-  
+
   /**
    * Non standard and non static "main" method returning an error code.
    *
@@ -210,7 +206,7 @@ public class JTB {
    *         <li>the number of errors</li>
    */
   private int internal_main(final String aArgs[]) {
-    
+
     try {
       printlnInfo("Version " + JTB_VERSION);
       // get and store the command line arguments
@@ -218,39 +214,34 @@ public class JTB {
       if (!processCommandLine(aArgs)) {
         return CL_ERR;
       }
-      
-      // parse the input file
+
+      // parse the input file (it will read the input file options)
       printlnInfo("Reading jtb input file " + jtbInputFileName);
       final JTBParser jtbParser = new JTBParser(in);
       final INode root = jtbParser.JavaCCInput(jopt);
       printlnInfo("jtb input file parsed successfully.");
-      
-      // Get the output directory JavaCC option (for generating Token.java)
-      File jjOutDir = jtbParser.opt.getOutputDirectory();
-      if (!jjOutDir.isAbsolute()) {
-        jjOutDir = new File(inDir + File.separator + jjOutDir);
-        jopt.jjOutDirName = jjOutDir.toPath().normalize().toString();
-      }
-      
-      // Get the input file JTB options and overwrite command line options
-      jopt.loadJTBGlobalOptions(jtbParser.grammarPackage);
+      jopt.parserName = jtbParser.parser_class_name;
+
+      // compute all the global variables from the (command line & grammar file) options
+      jopt.computeGlobalVariablesFromOptions(jtbParser.grammarPackage, inDir,
+          jtbParser.opt.getOutputDirectory());
       if (mess.errorCount() > 0) {
         mess.printSummary();
         return FO_ERR;
       }
-      
+
       // convert directories and jj output file to absolute paths
       convertPathsToAbsolute();
-      
+
       // create all directories if they do not exist
-      createDirectory(jopt.jjOutDirName);
+      createDirectory(jopt.jjOutputDirName);
       createParentDirectory(jopt.jtbOutputFileName);
-      File visitorDir = null;
+      File visitorsDir = null;
       if (jopt.visitorsDirName != null && !jopt.noVisitors) {
-        visitorDir = createDirectory(jopt.visitorsDirName);
+        visitorsDir = createDirectory(jopt.visitorsDirName);
       }
       File signatureDir = null;
-      if (jopt.visitorsDirName != null && !jopt.noSignature) {
+      if (jopt.signatureDirName != null && !jopt.noSignature) {
         signatureDir = createDirectory(jopt.signatureDirName);
       }
       File nodesDir = null;
@@ -265,16 +256,14 @@ public class JTB {
         mess.printSummary();
         return DI_ERR;
       }
-      
+
       // gather global data
-      mess.resetCounts();
-      
       root.accept(gdbv);
       if (mess.errorCount() > 0) {
         mess.printSummary();
         return GDB_ERR;
       }
-      
+
       // check semantics
       if (!jopt.noSemanticCheck) {
         root.accept(new SemanticChecker(gdbv));
@@ -283,7 +272,7 @@ public class JTB {
           return SC_ERR;
         }
       }
-      
+
       // create the classes list
       final ClassesFinder cfv = new ClassesFinder(gdbv);
       root.accept(cfv);
@@ -292,16 +281,16 @@ public class JTB {
         mess.printSummary();
         return CF_ERR;
       }
-      
+
       // instantiate the UserFilesGenerator
       final UserFilesGenerator ufg = new UserFilesGenerator(jopt, ccg, classes);
-      
+
       // output classes list
       if (jopt.printClassList) {
         printlnInfo("The generated classes and their fields are:");
         ufg.outputFormattedNodesClassesList(new PrintWriter(System.out, true));
       }
-      
+
       // generate the jj annotated file
       final JJFileAnnotator jjfav = new JJFileAnnotator(gdbv, ccg);
       root.accept(jjfav);
@@ -315,46 +304,40 @@ public class JTB {
       } else {
         printlnInfo(PROG_NAME + ": " + jopt.jtbOutputFileName + " file already exists.  Won't overwrite.");
       }
-      
+
       // generate user & base nodes (syntaxtree)
       generateSyntaxtreeNodes(classes, ufg, nodesDir);
-      
+
       // generate visitors and signature annotations
       if (!jopt.noVisitors) {
-        System.err.println();
         final VisitorsGenerator vg = new VisitorsGenerator(gdbv, ccg, classes);
-        generateVisitors(vg, visitorDir);
+        generateVisitors(vg, visitorsDir);
         if (!jopt.noSignature) {
           generateSignatureFiles(vg, signatureDir);
         }
       }
-      
+
       // generate hook files
       if (jopt.hook) {
-        System.err.println();
         generateHookFiles(ufg, hookDir);
       }
-      
+
       // call the external generator
       if (jopt.externalGeneratorClass != null) {
-        System.err.println();
         final int rceg = callExternalGenerator(classes);
         if (rceg < 0) {
           return rceg;
         }
       }
-      
+
       // generate TreeFormatter & Dumper
       if (jopt.printerToolkit) {
-        System.err.println();
         generateTreeFormatterDumper(classes);
       }
-      
-      if ((mess.errorCount() > 0) || (mess.warningCount() > 0)) {
-        mess.printSummary();
-      }
+
+      mess.printSummary();
       return mess.errorCount();
-      
+
     } catch (final InvalidCmdLineException e) {
       printlnError(e.getMessage());
       return CL_EX;
@@ -376,27 +359,29 @@ public class JTB {
       return OTHER_THR;
     }
   }
-  
+
   /**
-   * Processes command line arguments, setting global variables and putting options keys/values in the options
-   * map.<br>
-   * Standalone and cross controls are applied on these command line arguments, leading to
-   * {@link InvalidCmdLineException} exceptions or {@link Messages#warning(String)} warnings.
+   * Processes command line arguments, putting options keys/values in the options map.<br>
+   * Standalone controls are applied on these command line arguments, leading to
+   * {@link InvalidCmdLineException} exceptions or {@link Messages#warning(String)} warnings.<br>
+   * No cross controls are performed here (they are done in
+   * {@link JTBOptions#computeGlobalVariablesFromOptions(String, String, File)}.
    *
    * @param aArgs - the command line arguments
    * @return true if successful, false otherwise
    * @throws InvalidCmdLineException - if any problem with command line arguments
    */
   private boolean processCommandLine(final String[] aArgs) throws InvalidCmdLineException {
-    boolean returnVal = false;
-    
+    boolean success = false;
+
     for (int i = 0; i < aArgs.length; ++i) {
       String arg = aArgs[i];
       final String uppArg = arg.toUpperCase();
       final String lowArg = arg.toLowerCase();
+
       if (arg.charAt(0) != '-') {
-        if (returnVal) {
-          returnVal = false; // 2 filenames passed as arguments?
+        if (success) {
+          success = false; // 2 filenames passed as arguments?
           break;
         } else {
           try {
@@ -408,22 +393,22 @@ public class JTB {
             return false;
           }
           jtbInputFileName = arg;
-          returnVal = true;
+          success = true;
         }
-        
+
       } else {
         if (arg.length() <= 1) {
           throw new InvalidCmdLineException(
               "Unknown option \"" + arg + "\".  Try \"" + PROG_NAME + " -h\" for more " + "information.");
         }
-        
+
         if (lowArg.startsWith("-chm")) {
           if (lowArg.equals("-chm") || lowArg.equals("-chm=true")) {
             jopt.setCmdLineOption("JTB_CHM", true);
           } else if (lowArg.equals("-chm=false")) {
             jopt.setCmdLineOption("JTB_CHM", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-chm).");
           }
         } else if (uppArg.startsWith("-JTB_CHM=")) {
           if (uppArg.equals("-JTB_CHM=TRUE")) {
@@ -431,15 +416,17 @@ public class JTB {
           } else if (uppArg.equals("-JTB_CHM=FALSE")) {
             jopt.setCmdLineOption("JTB_CHM", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-JTB_CHM=).");
           }
-        } else if (lowArg.startsWith("-cl")) {
+        }
+
+        else if (lowArg.startsWith("-cl")) {
           if (lowArg.equals("-cl") || lowArg.equals("-cl=true")) {
             jopt.setCmdLineOption("JTB_CL", true);
           } else if (lowArg.equals("-cl=false")) {
             jopt.setCmdLineOption("JTB_CL", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-cl).");
           }
         } else if (uppArg.startsWith("-JTB_CL=")) {
           if (uppArg.equals("-JTB_CL=TRUE")) {
@@ -447,34 +434,17 @@ public class JTB {
           } else if (uppArg.equals("-JTB_CL=FALSE")) {
             jopt.setCmdLineOption("JTB_CL", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-JTB_CL=).");
           }
-        } else if (lowArg.startsWith("-d")) {
-          if (lowArg.equals("-d")) {
-            if (++i >= aArgs.length) {
-              throw new InvalidCmdLineException("Missing directory name after option \"-d\".");
-            }
-            arg = aArgs[i];
-            jopt.setCmdLineOption("JTB_D", arg);
-            updateDirs(arg);
-          } else if (lowArg.startsWith("-d=")) {
-            jopt.setCmdLineOption("JTB_D", arg.substring(3));
-            updateDirs(arg.substring(3));
-          } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
-          }
-        } else if (uppArg.startsWith("-JTB_D=")) {
-          jopt.setCmdLineOption("JTB_D", arg.substring(7));
-          updateDirs(arg.substring(7));
         }
-        
+
         else if (lowArg.startsWith("-dl")) {
           if (lowArg.equals("-dl") || lowArg.equals("-dl=true")) {
             jopt.setCmdLineOption("JTB_DL", true);
           } else if (lowArg.equals("-dl=false")) {
             jopt.setCmdLineOption("JTB_DL", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-dl).");
           }
         } else if (uppArg.startsWith("-JTB_DL=")) {
           if (uppArg.equals("-JTB_DL=TRUE")) {
@@ -482,15 +452,17 @@ public class JTB {
           } else if (uppArg.equals("-JTB_DL=FALSE")) {
             jopt.setCmdLineOption("JTB_DL", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-JTB_DL=).");
           }
-        } else if (lowArg.startsWith("-do")) {
+        }
+
+        else if (lowArg.startsWith("-do")) {
           if (lowArg.equals("-do") || lowArg.equals("-do=true")) {
             jopt.setCmdLineOption("JTB_DO", true);
           } else if (lowArg.equals("-do=false")) {
             jopt.setCmdLineOption("JTB_DO", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-do).");
           }
         } else if (uppArg.startsWith("-JTB_DO=")) {
           if (uppArg.equals("-JTB_DO=TRUE")) {
@@ -498,28 +470,53 @@ public class JTB {
           } else if (uppArg.equals("-JTB_DO=FALSE")) {
             jopt.setCmdLineOption("JTB_DO", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-JTB_DO=).");
           }
-        } else if (lowArg.startsWith("-eg")) {
+        }
+
+        else if (lowArg.startsWith("-d")) { // after -dl & -do
+          if (lowArg.equals("-d")) {
+            if (++i >= aArgs.length) {
+              throw new InvalidCmdLineException("Missing directory name after option \"-d\".");
+            }
+            arg = removeDoubleQuotes(arg + " " + aArgs[i], aArgs[i]);
+            jopt.setCmdLineOption("JTB_D", arg);
+          } else if (lowArg.startsWith("-d=")) {
+            arg = removeDoubleQuotes(arg, arg.substring(3));
+            jopt.setCmdLineOption("JTB_D", arg);
+          } else {
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-d).");
+          }
+        } else if (uppArg.startsWith("-JTB_D=")) {
+          arg = removeDoubleQuotes(arg, arg.substring(7));
+          jopt.setCmdLineOption("JTB_D", arg);
+        }
+
+        else if (lowArg.startsWith("-eg")) {
           if (lowArg.equals("-eg")) {
             if (++i >= aArgs.length) {
               throw new InvalidCmdLineException("Missing class name after option \"-eg\".");
             }
-            jopt.setCmdLineOption("JTB_EG", aArgs[i]);
+            arg = removeDoubleQuotes(arg + " " + aArgs[i], aArgs[i]);
+            jopt.setCmdLineOption("JTB_EG", arg);
           } else if (lowArg.startsWith("-eg=")) {
-            jopt.setCmdLineOption("JTB_EG", arg.substring(4));
+            arg = removeDoubleQuotes(arg, arg.substring(4));
+            jopt.setCmdLineOption("JTB_EG", arg);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-eg).");
           }
         } else if (uppArg.startsWith("-JTB_EG=")) {
-          jopt.setCmdLineOption("JTB_EG", arg.substring(8));
-        } else if (lowArg.startsWith("-e")) {
+          arg = removeDoubleQuotes(arg, arg.substring(8));
+          jopt.setCmdLineOption("JTB_EG", arg);
+        }
+
+        else if (lowArg.startsWith("-e")) { // after -eg
           if (lowArg.equals("-e") || lowArg.equals("-e=true")) {
             jopt.setCmdLineOption("JTB_E", true);
           } else if (lowArg.equals("-e=false")) {
             jopt.setCmdLineOption("JTB_E", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-e).");
           }
         } else if (uppArg.startsWith("-JTB_E=")) {
           if (uppArg.equals("-JTB_E=TRUE")) {
@@ -527,15 +524,17 @@ public class JTB {
           } else if (uppArg.equals("-JTB_E=FALSE")) {
             jopt.setCmdLineOption("JTB_E", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-JTB_E=).");
           }
-        } else if (lowArg.startsWith("-f")) {
+        }
+
+        else if (lowArg.startsWith("-f")) {
           if (lowArg.equals("-f") || lowArg.equals("-f=true")) {
             jopt.setCmdLineOption("JTB_F", true);
           } else if (lowArg.equals("-f=false")) {
             jopt.setCmdLineOption("JTB_F", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-f).");
           }
         } else if (uppArg.startsWith("-JTB_F=")) {
           if (uppArg.equals("-JTB_F=TRUE")) {
@@ -543,59 +542,57 @@ public class JTB {
           } else if (uppArg.equals("-JTB_F=FALSE")) {
             jopt.setCmdLineOption("JTB_F", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-JTB_F=).");
           }
-        } else if (lowArg.equals("-h")) {
+        }
+
+        else if (lowArg.equals("-h")) {
           printHelp();
-        } else if (lowArg.startsWith("-hkd")) {
-          if (!DEF_HOOK_DIR_NAME.equals(jopt.getOptions().get("JTB_HKD"))) {
-            mess.warning("Option \"-d\" is already set so option \"-hkd dir\" is not used.");
-          } else if (lowArg.equals("-hkd")) {
+        }
+
+        else if (lowArg.startsWith("-hkd")) {
+          if (lowArg.equals("-hkd")) {
             if (++i >= aArgs.length) {
               throw new InvalidCmdLineException("Missing directory name after option \"-hkd\".");
             }
-            jopt.setCmdLineOption("JTB_HKD", aArgs[i]);
+            arg = removeDoubleQuotes(arg + " " + aArgs[i], aArgs[i]);
+            jopt.setCmdLineOption("JTB_HKD", arg);
           } else if (lowArg.startsWith("-hkd=")) {
-            jopt.setCmdLineOption("JTB_HKD", arg.substring(5));
+            arg = removeDoubleQuotes(arg, arg.substring(5));
+            jopt.setCmdLineOption("JTB_HKD", arg);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-hkd).");
           }
         } else if (uppArg.startsWith("-JTB_HKD=")) {
-          if (!DEF_HOOK_DIR_NAME.equals(jopt.getOptions().get("JTB_HKD"))) {
-            mess.warning("Option \"-d\" is already set so option \"-hkd dir\" is not used.");
-          } else {
-            jopt.setCmdLineOption("JTB_HKD", arg.substring(9));
-          }
+          arg = removeDoubleQuotes(arg, arg.substring(9));
+          jopt.setCmdLineOption("JTB_HKD", arg);
         }
-        
+
         else if (lowArg.startsWith("-hkp")) {
-          if (!DEF_HOOK_PKG_NAME.equals(jopt.getOptions().get("JTB_HKP"))) {
-            mess.warning("Option \"-p\" is already set so option \"-hkp pkg\" is not used.");
-          } else if (lowArg.equals("-hkp")) {
+          if (lowArg.equals("-hkp")) {
             if (++i >= aArgs.length) {
               throw new InvalidCmdLineException("Missing package name after option \"-hkp\".");
             }
-            jopt.setCmdLineOption("JTB_HKP", aArgs[i]);
+            arg = removeDoubleQuotes(arg + " " + aArgs[i], aArgs[i]);
+            jopt.setCmdLineOption("JTB_HKP", arg);
           } else if (lowArg.startsWith("-hkp=")) {
-            jopt.setCmdLineOption("JTB_HKP", arg.substring(5));
+            arg = removeDoubleQuotes(arg, arg.substring(5));
+            jopt.setCmdLineOption("JTB_HKP", arg);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-hkp).");
           }
         } else if (uppArg.startsWith("-JTB_HKP=")) {
-          if (!DEF_HOOK_PKG_NAME.equals(jopt.getOptions().get("JTB_HKP"))) {
-            mess.warning("Option \"-p\" is already set so option \"-hkp pkg\" is not used.");
-          } else {
-            jopt.setCmdLineOption("JTB_HKP", arg.substring(9));
-          }
+          arg = removeDoubleQuotes(arg, arg.substring(9));
+          jopt.setCmdLineOption("JTB_HKP", arg);
         }
-        
-        else if (lowArg.startsWith("-hk")) {
+
+        else if (lowArg.startsWith("-hk")) { // after -hkd & -hkp
           if (lowArg.equals("-hk") || lowArg.equals("-hk=true")) {
             jopt.setCmdLineOption("JTB_HK", true);
           } else if (lowArg.equals("-hk=false")) {
             jopt.setCmdLineOption("JTB_HK", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-hk).");
           }
         } else if (uppArg.startsWith("-JTB_HK=")) {
           if (uppArg.equals("-JTB_HK=TRUE")) {
@@ -603,15 +600,17 @@ public class JTB {
           } else if (uppArg.equals("-JTB_HK=FALSE")) {
             jopt.setCmdLineOption("JTB_HK", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-JTB_HK=).");
           }
-        } else if (lowArg.startsWith("-ia")) {
+        }
+
+        else if (lowArg.startsWith("-ia")) {
           if (lowArg.equals("-ia") || lowArg.equals("-ia=true")) {
             jopt.setCmdLineOption("JTB_IA", true);
           } else if (lowArg.equals("-ia=false")) {
             jopt.setCmdLineOption("JTB_IA", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-ia).");
           }
         } else if (uppArg.startsWith("-JTB_IA=")) {
           if (uppArg.equals("-JTB_IA=TRUE")) {
@@ -619,15 +618,17 @@ public class JTB {
           } else if (uppArg.equals("-JTB_IA=FALSE")) {
             jopt.setCmdLineOption("JTB_IA", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-JTB_IA=).");
           }
-        } else if (lowArg.startsWith("-jd")) {
+        }
+
+        else if (lowArg.startsWith("-jd")) {
           if (lowArg.equals("-jd") || lowArg.equals("-jd=true")) {
             jopt.setCmdLineOption("JTB_JD", true);
           } else if (lowArg.equals("-jd=false")) {
             jopt.setCmdLineOption("JTB_JD", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-jd).");
           }
         } else if (uppArg.startsWith("-JTB_JD=")) {
           if (uppArg.equals("-JTB_JD=TRUE")) {
@@ -635,36 +636,35 @@ public class JTB {
           } else if (uppArg.equals("-JTB_JD=FALSE")) {
             jopt.setCmdLineOption("JTB_JD", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-JTB_JD=).");
           }
-        } else if (lowArg.startsWith("-nd")) {
-          if (!DEF_ND_DIR_NAME.equals(jopt.getOptions().get("JTB_ND"))) {
-            mess.warning("Option \"-d\" is already set so option \"-nd dir\" is not used.");
-          } else if (lowArg.equals("-nd")) {
+        }
+
+        else if (lowArg.startsWith("-nd")) {
+          if (lowArg.equals("-nd")) {
             if (++i >= aArgs.length) {
               throw new InvalidCmdLineException("Missing directory name after option \"-nd\".");
             }
-            jopt.setCmdLineOption("JTB_ND", aArgs[i]);
+            arg = removeDoubleQuotes(arg + " " + aArgs[i], aArgs[i]);
+            jopt.setCmdLineOption("JTB_ND", arg);
           } else if (lowArg.startsWith("-nd=")) {
-            jopt.setCmdLineOption("JTB_ND", arg.substring(4));
+            arg = removeDoubleQuotes(arg, arg.substring(4));
+            jopt.setCmdLineOption("JTB_ND", arg);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-JTB_ND=).");
           }
         } else if (uppArg.startsWith("-JTB_ND=")) {
-          if (!DEF_ND_DIR_NAME.equals(jopt.getOptions().get("JTB_ND"))) {
-            mess.warning("Option \"-d\" is already set so option \"-nd dir\" is not used.");
-          } else {
-            jopt.setCmdLineOption("JTB_ND", arg.substring(8));
-          }
+          arg = removeDoubleQuotes(arg, arg.substring(8));
+          jopt.setCmdLineOption("JTB_ND", arg);
         }
-        
+
         else if (lowArg.startsWith("-noplg")) {
           if (lowArg.equals("-noplg") || lowArg.equals("-noplg=true")) {
             jopt.setCmdLineOption("JTB_NOPLG", true);
           } else if (lowArg.equals("-noplg=false")) {
             jopt.setCmdLineOption("JTB_NOPLG", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-noplg).");
           }
         } else if (uppArg.startsWith("-JTB_NOPLG=")) {
           if (uppArg.equals("-JTB_NOPLG=TRUE")) {
@@ -672,15 +672,17 @@ public class JTB {
           } else if (uppArg.equals("-JTB_NOPLG=FALSE")) {
             jopt.setCmdLineOption("JTB_NOPLG", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-JTB_NOPLG=).");
           }
-        } else if (lowArg.startsWith("-nosig")) {
+        }
+
+        else if (lowArg.startsWith("-nosig")) {
           if (lowArg.equals("-nosig") || lowArg.equals("-nosig=true")) {
             jopt.setCmdLineOption("JTB_NOSIG", true);
           } else if (lowArg.equals("-nosig=false")) {
             jopt.setCmdLineOption("JTB_NOSIG", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-nosig).");
           }
         } else if (uppArg.startsWith("-JTB_NOSIG=")) {
           if (uppArg.equals("-JTB_NOSIG=TRUE")) {
@@ -688,15 +690,17 @@ public class JTB {
           } else if (uppArg.equals("-JTB_NOSIG=FALSE")) {
             jopt.setCmdLineOption("JTB_NOSIG", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-nosig).");
           }
-        } else if (lowArg.startsWith("-novis")) {
+        }
+
+        else if (lowArg.startsWith("-novis")) {
           if (lowArg.equals("-novis") || lowArg.equals("-novis=true")) {
             jopt.setCmdLineOption("JTB_NOVIS", true);
           } else if (lowArg.equals("-novis=false")) {
             jopt.setCmdLineOption("JTB_NOVIS", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-nosig).");
           }
         } else if (uppArg.startsWith("-JTB_NOVIS=")) {
           if (uppArg.equals("-JTB_NOVIS=TRUE")) {
@@ -704,107 +708,112 @@ public class JTB {
           } else if (uppArg.equals("-JTB_NOVIS=FALSE")) {
             jopt.setCmdLineOption("JTB_NOVIS", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-JTB_NOVIS=).");
           }
-        } else if (lowArg.startsWith("-npfx")) {
+        }
+
+        else if (lowArg.startsWith("-npfx")) {
           if (lowArg.equals("-npfx")) {
             if (++i >= aArgs.length) {
               throw new InvalidCmdLineException("Missing prefix after option \"-npfx\".");
             }
-            jopt.setCmdLineOption("JTB_NPFX", aArgs[i]);
+            arg = removeDoubleQuotes(arg + " " + aArgs[i], aArgs[i]);
+            jopt.setCmdLineOption("JTB_NPFX", arg);
           } else if (lowArg.startsWith("-npfx=")) {
-            jopt.setCmdLineOption("JTB_NPFX", arg.substring(6));
+            arg = removeDoubleQuotes(arg, arg.substring(6));
+            jopt.setCmdLineOption("JTB_NPFX", arg);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-npfx).");
           }
         } else if (uppArg.startsWith("-JTB_NPFX=")) {
-          jopt.setCmdLineOption("JTB_NPFX", arg.substring(10));
-        } else if (lowArg.startsWith("-np")) {
-          if (!DEF_ND_PKG_NAME.equals(jopt.getOptions().get("JTB_NP"))) {
-            mess.warning("Option \"-p\" is already set so option \"-np pkg\" is not used.");
-          } else if (lowArg.equals("-np")) {
+          arg = removeDoubleQuotes(arg, arg.substring(10));
+          jopt.setCmdLineOption("JTB_NPFX", arg);
+        }
+
+        else if (lowArg.startsWith("-np")) { // after -npfx
+          if (lowArg.equals("-np")) {
             if (++i >= aArgs.length) {
               throw new InvalidCmdLineException("Missing package name after option \"-np\".");
             }
-            jopt.setCmdLineOption("JTB_NP", aArgs[i]);
+            arg = removeDoubleQuotes(arg + " " + aArgs[i], aArgs[i]);
+            jopt.setCmdLineOption("JTB_NP", arg);
           } else if (lowArg.startsWith("-np=")) {
-            jopt.setCmdLineOption("JTB_NP", arg.substring(4));
+            arg = removeDoubleQuotes(arg, arg.substring(4));
+            jopt.setCmdLineOption("JTB_NP", arg);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-np).");
           }
         } else if (uppArg.startsWith("-JTB_NP=")) {
-          if (!DEF_ND_PKG_NAME.equals(jopt.getOptions().get("JTB_NP"))) {
-            mess.warning("Option \"-p\" is already set so option \"-np pkg\" is not used.");
-          } else {
-            jopt.setCmdLineOption("JTB_NP", arg.substring(8));
-          }
+          arg = removeDoubleQuotes(arg, arg.substring(8));
+          jopt.setCmdLineOption("JTB_NP", arg);
         }
-        
+
         else if (lowArg.startsWith("-nsfx")) {
           if (lowArg.equals("-nsfx")) {
             if (++i >= aArgs.length) {
               throw new InvalidCmdLineException("Missing suffix after option \"-nsfx\".");
             }
-            jopt.setCmdLineOption("JTB_NSFX", aArgs[i]);
+            arg = removeDoubleQuotes(arg + " " + aArgs[i], aArgs[i]);
+            jopt.setCmdLineOption("JTB_NSFX", arg);
           } else if (lowArg.startsWith("-nsfx=")) {
-            jopt.setCmdLineOption("JTB_NSFX", arg.substring(6));
+            arg = removeDoubleQuotes(arg, arg.substring(6));
+            jopt.setCmdLineOption("JTB_NSFX", arg);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-nsfx).");
           }
         } else if (uppArg.startsWith("-JTB_NSFX=")) {
-          jopt.setCmdLineOption("JTB_NSFX", arg.substring(10));
-        } else if (lowArg.startsWith("-ns")) {
+          arg = removeDoubleQuotes(arg, arg.substring(10));
+          jopt.setCmdLineOption("JTB_NSFX", arg);
+        }
+
+        else if (lowArg.startsWith("-ns")) { // after -nsfx
           if (lowArg.equals("-ns")) {
             if (++i >= aArgs.length) {
               throw new InvalidCmdLineException("Missing class name after option \"-ns\".");
             }
-            jopt.setCmdLineOption("JTB_NS", aArgs[i]);
+            arg = removeDoubleQuotes(arg + " " + aArgs[i], aArgs[i]);
+            jopt.setCmdLineOption("JTB_NS", arg);
           } else if (lowArg.startsWith("-ns=")) {
-            jopt.setCmdLineOption("JTB_NS", arg.substring(4));
+            arg = removeDoubleQuotes(arg, arg.substring(4));
+            jopt.setCmdLineOption("JTB_NS", arg);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-ns).");
           }
         } else if (uppArg.startsWith("-JTB_NS=")) {
-          jopt.setCmdLineOption("JTB_NS", arg.substring(8));
-        } else if (lowArg.startsWith("-o")) {
+          arg = removeDoubleQuotes(arg, arg.substring(8));
+          jopt.setCmdLineOption("JTB_NS", arg);
+        }
+
+        else if (uppArg.startsWith("-OUTPUT_DIRECTORY")) {
+          final String od = arg.substring("-OUTPUT_DIRECTORY".length() + 1);
+          jopt.jjOutputDirName = removeDoubleQuotes(arg, od);
+        }
+
+        else if (lowArg.startsWith("-o")) {
           if (lowArg.equals("-o")) {
             if (++i >= aArgs.length) {
               throw new InvalidCmdLineException("Missing file name after option \"-o\".");
             }
-            jopt.setCmdLineOption("JTB_O", aArgs[i]);
+            arg = removeDoubleQuotes(arg + " " + aArgs[i], aArgs[i]);
+            jopt.setCmdLineOption("JTB_O", arg);
           } else if (lowArg.startsWith("-o=")) {
-            jopt.setCmdLineOption("JTB_O", arg.substring(3));
+            arg = removeDoubleQuotes(arg, arg.substring(3));
+            jopt.setCmdLineOption("JTB_O", arg);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-o).");
           }
         } else if (uppArg.startsWith("-JTB_O=")) {
-          jopt.setCmdLineOption("JTB_O", arg.substring(7));
-        } else if (lowArg.startsWith("-p")) {
-          if (lowArg.equals("-p")) {
-            if (++i >= aArgs.length) {
-              throw new InvalidCmdLineException("Missing package name after option \"-p\".");
-            }
-            arg = aArgs[i];
-            jopt.setCmdLineOption("JTB_P", arg);
-            updatePkgs(arg);
-          } else if (lowArg.startsWith("-p=")) {
-            jopt.setCmdLineOption("JTB_P", arg.substring(3));
-            updatePkgs(arg.substring(3));
-          } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
-          }
-        } else if (uppArg.startsWith("-JTB_P=")) {
-          jopt.setCmdLineOption("JTB_P", arg.substring(7));
-          updatePkgs(arg.substring(7));
+          arg = removeDoubleQuotes(arg, arg.substring(7));
+          jopt.setCmdLineOption("JTB_O", arg);
         }
-        
+
         else if (lowArg.startsWith("-pp")) {
           if (lowArg.equals("-pp") || lowArg.equals("-pp=true")) {
             jopt.setCmdLineOption("JTB_PP", true);
           } else if (lowArg.equals("-pp=false")) {
             jopt.setCmdLineOption("JTB_PP", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-pp).");
           }
         } else if (uppArg.startsWith("-JTB_PP=")) {
           if (uppArg.equals("-JTB_PP=TRUE")) {
@@ -812,15 +821,17 @@ public class JTB {
           } else if (uppArg.equals("-JTB_PP=FALSE")) {
             jopt.setCmdLineOption("JTB_PP", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-JTB_PP=).");
           }
-        } else if (lowArg.startsWith("-printer")) {
+        }
+
+        else if (lowArg.startsWith("-printer")) {
           if (lowArg.equals("-printer") || lowArg.equals("-printer=true")) {
             jopt.setCmdLineOption("JTB_PRINTER", true);
           } else if (lowArg.equals("-printer=false")) {
             jopt.setCmdLineOption("JTB_PRINTER", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-printer).");
           }
         } else if (uppArg.startsWith("-JTB_PRINTER=")) {
           if (uppArg.equals("-JTB_PRINTER=TRUE")) {
@@ -828,20 +839,76 @@ public class JTB {
           } else if (uppArg.equals("-JTB_PRINTER=FALSE")) {
             jopt.setCmdLineOption("JTB_PRINTER", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-JTB_PRINTER=).");
           }
-        } else if (lowArg.equals("-si")) {
+        }
+
+        else if (lowArg.startsWith("-p")) { // after -pp & -printer
+          if (lowArg.equals("-p")) {
+            if (++i >= aArgs.length) {
+              throw new InvalidCmdLineException("Missing package name after option \"-p\".");
+            }
+            arg = removeDoubleQuotes(arg + " " + aArgs[i], aArgs[i]);
+            jopt.setCmdLineOption("JTB_P", arg);
+          } else if (lowArg.startsWith("-p=")) {
+            arg = removeDoubleQuotes(arg, arg.substring(3));
+            jopt.setCmdLineOption("JTB_P", arg);
+          } else {
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-p).");
+          }
+        } else if (uppArg.startsWith("-JTB_P=")) {
+          arg = removeDoubleQuotes(arg, arg.substring(7));
+          jopt.setCmdLineOption("JTB_P", arg);
+        }
+
+        else if (lowArg.equals("-si")) {
           in = System.in;
           jtbInputFileName = "standard input";
         }
-        
+
+        else if (lowArg.startsWith("-sigd")) {
+          if (lowArg.equals("-sigd")) {
+            if (++i >= aArgs.length) {
+              throw new InvalidCmdLineException("Missing directory name after option \"-sigd\".");
+            }
+            arg = removeDoubleQuotes(arg + " " + aArgs[i], aArgs[i]);
+            jopt.setCmdLineOption("JTB_SIGD", arg);
+          } else if (lowArg.startsWith("-sigd=")) {
+            arg = removeDoubleQuotes(arg, arg.substring(6));
+            jopt.setCmdLineOption("JTB_SIGD", arg);
+          } else {
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-sigd).");
+          }
+        } else if (uppArg.startsWith("-JTB_SIGD=")) {
+          arg = removeDoubleQuotes(arg, arg.substring(10));
+          jopt.setCmdLineOption("JTB_SIGD", arg);
+        }
+
+        else if (lowArg.startsWith("-sigp")) {
+          if (lowArg.equals("-sigp")) {
+            if (++i >= aArgs.length) {
+              throw new InvalidCmdLineException("Missing package name after option \"-sigp\".");
+            }
+            arg = removeDoubleQuotes(arg + " " + aArgs[i], aArgs[i]);
+            jopt.setCmdLineOption("JTB_SIGP", arg);
+          } else if (lowArg.startsWith("-sigp=")) {
+            arg = removeDoubleQuotes(arg, arg.substring(6));
+            jopt.setCmdLineOption("JTB_SIGP", arg);
+          } else {
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-sigp).");
+          }
+        } else if (uppArg.startsWith("-JTB_SIGP=")) {
+          arg = removeDoubleQuotes(arg, arg.substring(10));
+          jopt.setCmdLineOption("JTB_SIGP", arg);
+        }
+
         else if (lowArg.startsWith("-tkjj")) {
           if (lowArg.equals("-tkjj") || lowArg.equals("-tkjj=true")) {
             jopt.setCmdLineOption("JTB_TKJJ", true);
           } else if (lowArg.equals("-tkjj=false")) {
             jopt.setCmdLineOption("JTB_TKJJ", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-tkjj).");
           }
         } else if (uppArg.startsWith("-JTB_TKJJ=")) {
           if (uppArg.equals("-JTB_TKJJ=TRUE")) {
@@ -849,15 +916,17 @@ public class JTB {
           } else if (uppArg.equals("-JTB_TKJJ=FALSE")) {
             jopt.setCmdLineOption("JTB_TKJJ", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-JTB_TKJJ=).");
           }
-        } else if (lowArg.startsWith("-tk")) {
+        }
+
+        else if (lowArg.startsWith("-tk")) { // after -tkjj
           if (lowArg.equals("-tk") || lowArg.equals("-tk=true")) {
             jopt.setCmdLineOption("JTB_TK", true);
           } else if (lowArg.equals("-tk=false")) {
             jopt.setCmdLineOption("JTB_TK", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-tk).");
           }
         } else if (uppArg.startsWith("-JTB_TK=")) {
           if (uppArg.equals("-JTB_TK=TRUE")) {
@@ -865,29 +934,28 @@ public class JTB {
           } else if (uppArg.equals("-JTB_TK=FALSE")) {
             jopt.setCmdLineOption("JTB_TK", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-JTB_TK=).");
           }
-        } else if (lowArg.startsWith("-vd")) {
-          if (!DEF_VIS_DIR_NAME.equals(jopt.getOptions().get("JTB_VD"))) {
-            mess.warning("Option \"-d\" is already set so option \"-vd dir\" is not used.");
-          } else if (lowArg.equals("-vd")) {
+        }
+
+        else if (lowArg.startsWith("-vd")) {
+          if (lowArg.equals("-vd")) {
             if (++i >= aArgs.length) {
               throw new InvalidCmdLineException("Missing directory name after option \"-vd\".");
             }
-            jopt.setCmdLineOption("JTB_VD", aArgs[i]);
+            arg = removeDoubleQuotes(arg + " " + aArgs[i], aArgs[i]);
+            jopt.setCmdLineOption("JTB_VD", arg);
           } else if (lowArg.startsWith("-vd=")) {
-            jopt.setCmdLineOption("JTB_VD", arg.substring(4));
+            arg = removeDoubleQuotes(arg, arg.substring(4));
+            jopt.setCmdLineOption("JTB_VD", arg);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-vd).");
           }
         } else if (uppArg.startsWith("-JTB_VD=")) {
-          if (!DEF_VIS_PKG_NAME.equals(jopt.getOptions().get("JTB_VD"))) {
-            mess.warning("Option \"-d\" is already set so option \"-vp dir\" is not used.");
-          } else {
-            jopt.setCmdLineOption("JTB_VD", arg.substring(8));
-          }
+          arg = removeDoubleQuotes(arg, arg.substring(8));
+          jopt.setCmdLineOption("JTB_VD", arg);
         }
-        
+
         else if (lowArg.startsWith("-vis")) {
           if (lowArg.equals("-vis")) {
             if (++i >= aArgs.length) {
@@ -905,43 +973,41 @@ public class JTB {
             }
             jopt.setCmdLineOption("JTB_VIS", str);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-vis=).");
           }
         } else if (uppArg.startsWith("-JTB_VIS=")) {
-          if (!jopt.createVisitorsList(arg.substring(9))) {
+          final String str = arg.substring(9);
+          if (!jopt.createVisitorsList(str)) {
             throw new InvalidCmdLineException("Invalid visitors specification \"" + arg + "\".");
           }
-          jopt.setCmdLineOption("JTB_VIS", arg.substring(9));
+          jopt.setCmdLineOption("JTB_VIS", str);
         }
-        
+
         else if (lowArg.startsWith("-vp")) {
-          if (!DEF_VIS_PKG_NAME.equals(jopt.getOptions().get("JTB_VP"))) {
-            mess.warning("Option \"-p\" is already set so option \"-vp pkg\" is not used.");
-          } else if (lowArg.equals("-vp")) {
+          if (lowArg.equals("-vp")) {
             if (++i >= aArgs.length) {
               throw new InvalidCmdLineException("Missing package name after option \"-vp\".");
             }
-            jopt.setCmdLineOption("JTB_VP", aArgs[i]);
+            arg = removeDoubleQuotes(arg + " " + aArgs[i], aArgs[i]);
+            jopt.setCmdLineOption("JTB_VP", arg);
           } else if (lowArg.startsWith("-vp=")) {
-            jopt.setCmdLineOption("JTB_VP", arg.substring(4));
+            arg = removeDoubleQuotes(arg, arg.substring(4));
+            jopt.setCmdLineOption("JTB_VP", arg);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-vp).");
           }
         } else if (uppArg.startsWith("-JTB_VP=")) {
-          if (!DEF_VIS_PKG_NAME.equals(jopt.getOptions().get("JTB_VP"))) {
-            mess.warning("Option \"-p\" is already set so option \"-vp pkg\" is not used.");
-          } else {
-            jopt.setCmdLineOption("JTB_VP", arg.substring(8));
-          }
+          arg = removeDoubleQuotes(arg, arg.substring(4));
+          jopt.setCmdLineOption("JTB_VP", arg);
         }
-        
+
         else if (lowArg.startsWith("-w")) {
           if (lowArg.equals("-w") || lowArg.equals("-w=true")) {
             jopt.setCmdLineOption("JTB_W", true);
           } else if (lowArg.equals("-w=false")) {
             jopt.setCmdLineOption("JTB_W", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-w).");
           }
         } else if (uppArg.startsWith("-JTB_W=")) {
           if (uppArg.equals("-JTB_W=TRUE")) {
@@ -949,79 +1015,62 @@ public class JTB {
           } else if (uppArg.equals("-JTB_W=FALSE")) {
             jopt.setCmdLineOption("JTB_W", false);
           } else {
-            throw new InvalidCmdLineException("Invalid option \"" + arg + "\".");
+            throw new InvalidCmdLineException("Invalid option \"" + arg + "\" (-JTB_W=).");
           }
         }
-        
-      }
-    }
-    
-    if (returnVal) {
+
+      } // end else -> arg.charAt(0) == '-'
+    } // end for
+
+    if (success) {
       return true;
     } else {
       printHelp();
       return false;
     }
   }
-  
+
   /**
-   * Update nodes / visitors / hook directories.
+   * Removes double quotes surrounding a string if they exist.
    *
-   * @param arg - the base directory
+   * @param ctx - the context
+   * @param str - the string surrounded or not by double quotes
+   * @return the string with the double quotes removed
+   * @throws InvalidCmdLineException - if incorrect surrounding quotes
    */
-  private void updateDirs(final String arg) {
-    if (!DEF_HOOK_DIR_NAME.equals(jopt.getOptions().get("JTB_HKD"))) {
-      mess.warning("Option \"-d\" overwrites option \"-hkd dir\".");
+  private String removeDoubleQuotes(final String ctx, final String str) throws InvalidCmdLineException {
+    if (str.length() < 2) {
+      return str;
     }
-    jopt.setCmdLineOption("JTB_HKD", arg + File.separator + DEF_HOOK_DIR_NAME);
-    
-    if (!DEF_ND_DIR_NAME.equals(jopt.getOptions().get("JTB_ND"))) {
-      mess.warning("Option \"-d\" overwrites option \"-nd pkg\".");
+    if (str.charAt(0) == '"') {
+      if (str.charAt(str.length() - 1) == '"') {
+        return str.substring(1, str.length() - 1);
+      } else {
+        throw new InvalidCmdLineException(
+            "argument starting but not ending with a double quote (" + str + ") in '" + ctx + "'");
+      }
     }
-    jopt.setCmdLineOption("JTB_ND", arg + File.separator + DEF_ND_DIR_NAME);
-    
-    if (!DEF_VIS_DIR_NAME.equals(jopt.getOptions().get("JTB_VD"))) {
-      mess.warning("Option \"-d\" overwrites option \"-vd dir\".");
+    if (str.charAt(str.length() - 1) == '"') {
+      throw new InvalidCmdLineException(
+          "argument ending but not starting with a double quote (" + str + ") in '" + ctx + "'");
     }
-    jopt.setCmdLineOption("JTB_VD", arg + File.separator + DEF_VIS_DIR_NAME);
+    return str;
   }
-  
+
   /**
-   * Update nodes / visitors / hook packages.
-   *
-   * @param arg - the base package
-   */
-  private void updatePkgs(final String arg) {
-    if (!DEF_HOOK_PKG_NAME.equals(jopt.getOptions().get("JTB_HKP"))) {
-      mess.warning("Option \"-p\" overwrites option \"-hkp pkg\".");
-    }
-    jopt.setCmdLineOption("JTB_HKP", arg + "." + DEF_HOOK_PKG_NAME);
-    
-    if (!DEF_ND_PKG_NAME.equals(jopt.getOptions().get("JTB_NP"))) {
-      mess.warning("Option \"-p\" overwrites option \"-np pkg\".");
-    }
-    jopt.setCmdLineOption("JTB_NP", arg + "." + DEF_ND_PKG_NAME);
-    
-    if (!DEF_VIS_PKG_NAME.equals(jopt.getOptions().get("JTB_VP"))) {
-      mess.warning("Option \"-p\" overwrites option \"-vp pkg\".");
-    }
-    jopt.setCmdLineOption("JTB_VP", arg + "." + DEF_VIS_PKG_NAME);
-  }
-  
-  /**
-   * Convert nodes and visitors output directories and jj output file (relatives to the grammar file) to
-   * normalized absolute paths.
+   * Convert the different input & output directories and the jj output file which are relative to the grammar
+   * directory or the output directory to normalized absolute paths.
    */
   private void convertPathsToAbsolute() {
     String dir = inDir + File.separator;
-    if (jopt.grammarDirectoryName != null) {
-      File ndn = new File(jopt.grammarDirectoryName);
-      if (!ndn.isAbsolute()) {
-        ndn = new File(dir + jopt.grammarDirectoryName);
-        jopt.grammarDirectoryName = ndn.toPath().normalize().toString();
+    if (jopt.baseDirName != null) {
+      File gdn = new File(jopt.baseDirName);
+      if (!gdn.isAbsolute()) {
+        gdn = new File(dir + jopt.baseDirName);
+        jopt.baseDirName = gdn.toPath().normalize().toString();
       }
     }
-    dir = jopt.jjOutDirName + File.separator;
+    dir = jopt.jjOutputDirName + File.separator;
     if (jopt.nodesDirName != null) {
       File ndn = new File(jopt.nodesDirName);
       if (!ndn.isAbsolute()) {
@@ -1029,21 +1078,21 @@ public class JTB {
         jopt.nodesDirName = ndn.toPath().normalize().toString();
       }
     }
-    if (jopt.visitorsDirName != null) {
+    if (!jopt.noVisitors && jopt.visitorsDirName != null) {
       File vdn = new File(jopt.visitorsDirName);
       if (!vdn.isAbsolute()) {
         vdn = new File(dir + jopt.visitorsDirName);
         jopt.visitorsDirName = vdn.toPath().normalize().toString();
       }
     }
-    if (jopt.signatureDirName != null) {
+    if (!jopt.noSignature && jopt.signatureDirName != null) {
       File sdn = new File(jopt.signatureDirName);
       if (!sdn.isAbsolute()) {
         sdn = new File(dir + jopt.signatureDirName);
         jopt.signatureDirName = sdn.toPath().normalize().toString();
       }
     }
-    if (jopt.hookDirName != null) {
+    if (jopt.hook && jopt.hookDirName != null) {
       File hdn = new File(jopt.hookDirName);
       if (!hdn.isAbsolute()) {
         hdn = new File(dir + jopt.hookDirName);
@@ -1052,11 +1101,12 @@ public class JTB {
     }
     File jjf = new File(jopt.jtbOutputFileName);
     if (!jjf.isAbsolute()) {
-      jjf = new File(dir + jopt.jtbOutputFileName);
+      jjf = new File(
+          (jopt.baseDirName != null ? jopt.baseDirName + File.separator : dir) + jopt.jtbOutputFileName);
       jopt.jtbOutputFileName = jjf.toPath().normalize().toString();
     }
   }
-  
+
   /**
    * Creates a directory if it does not exist.
    *
@@ -1076,7 +1126,7 @@ public class JTB {
     }
     return dir;
   }
-  
+
   /**
    * Creates a parent directory if it does not exist.
    *
@@ -1097,7 +1147,7 @@ public class JTB {
     }
     return dir;
   }
-  
+
   /**
    * Generates the syntax tree nodes files.
    *
@@ -1112,13 +1162,16 @@ public class JTB {
     int rc = aFg.genUserNodesFiles(aNodesDir);
     printlnInfo(
         rc + " syntax tree node class files " + "generated into directory \"" + jopt.nodesDirName + "\".");
-    
+
     final BaseNodesGenerator bg = new BaseNodesGenerator(jopt, ccg, mess);
     rc = bg.genBaseNodesFiles(aClasses);
     printlnInfo(
         rc + " base node class+interface files " + "generated into directory \"" + jopt.nodesDirName + "\".");
+
+    // rc = bg.genTokenFile(jopt.jjOutputDirName);
+    // printlnInfo(rc + " Token class file " + "generated into directory \"" + jopt.jjOutputDirName + "\".");
   }
-  
+
   /**
    * Generates visitors. CODEJAVA
    *
@@ -1127,7 +1180,7 @@ public class JTB {
    * @throws IOException - if IO Exception writing the files
    */
   private void generateVisitors(final VisitorsGenerator aVg, final File aVisitorDir) throws IOException {
-    
+
     String fn = "";
     for (final VisitorInfo vi : jopt.visitorsList) {
       fn = vi.interfaceName + ".java";
@@ -1140,7 +1193,7 @@ public class JTB {
             "\"" + fn + "\" already exists in directory \"" + jopt.visitorsDirName + "\".  Won't overwrite.");
       }
     }
-    
+
     for (final VisitorInfo vi : jopt.visitorsList) {
       fn = vi.dfVisitorName + ".java";
       final int rc = aVg.genDepthFirstVisitorFile(vi, aVisitorDir);
@@ -1153,7 +1206,7 @@ public class JTB {
       }
     }
   }
-  
+
   /**
    * Generates the signature files. CODEJAVA
    *
@@ -1171,7 +1224,7 @@ public class JTB {
       printlnInfo("\"" + sigAnnName + ".java\" already exists in directory \"" + aSignatureDir + "\"."
           + "  Won't overwrite.  Delete it if you want JTB to regenerate it.");
     }
-    
+
     rc = aVg.genSigAnnProcFile(aSignatureDir);
     if (rc == 0) {
       printlnInfo("Signature annotation processor \"" + sigAnnProcName + ".java\" generated into directory \""
@@ -1181,7 +1234,7 @@ public class JTB {
           + "  Won't overwrite.  Delete it if you want JTB to regenerate it.");
     }
   }
-  
+
   /**
    * Generates the node scope hook files.
    *
@@ -1197,7 +1250,7 @@ public class JTB {
     } else {
       printlnInfo("\"" + iEnterExitHook + ".java\" already exists.  Won't overwrite.");
     }
-    
+
     rc = aFg.genEmtpyEnterExitHookFile(aHookDir);
     if (rc == 0) {
       printlnInfo("Hook empty implementation \"" + emptyEnterExitHook + ".java\" generated into directory \""
@@ -1206,7 +1259,7 @@ public class JTB {
       printlnInfo("\"" + emptyEnterExitHook + ".java\" already exists.  Won't overwrite.");
     }
   }
-  
+
   /**
    * Calls the external generator class through Java Reflection API.
    *
@@ -1283,7 +1336,7 @@ public class JTB {
       return EG_ERR;
     }
   }
-  
+
   /**
    * Generates the TreeFormatter and TreeDumper visitors.
    *
@@ -1301,7 +1354,7 @@ public class JTB {
       printlnInfo("\"" + TreeDumperGenerator.outFilename + "\" already exists."
           + "  Won't overwrite.  Delete it if you want JTB to regenerate it.");
     }
-    
+
     final TreeFormatterGenerator tfg = new TreeFormatterGenerator(jopt, ccg, mess, aClasses);
     tfg.generateTreeFormatter();
     rc = tfg.saveToFile();
@@ -1313,7 +1366,7 @@ public class JTB {
           + "  Won't overwrite.  Delete it if you want JTB to regenerate it.");
     }
   }
-  
+
   /**
    * Prints an information message on stdout.
    *
@@ -1323,7 +1376,7 @@ public class JTB {
     System.err.flush();
     System.out.println(PROG_NAME + ": " + aMsg);
   }
-  
+
   /**
    * Prints an error message on stderr.
    *
@@ -1333,57 +1386,69 @@ public class JTB {
     System.out.flush();
     System.err.println(PROG_NAME + ": error: " + aMsg);
   }
-  
+
   /**
-   * Displays program usage.
+   * Displays program usage. TODO manage -va
    */
   private static void printHelp() {
-    System.out.print("Usage: " + PROG_NAME + " [OPTIONS] " + "[inputfile]\n" + "\n" + "Standard options:\n"
+    System.out.print("Usage: " + PROG_NAME + " [OPTIONS] " + "[inputfile]\n" //
+        + "\n" //
+        + "* Standard options:\n"//
         + "  -chm           Generate nodes children methods - since 1.5.0\n"
         + "  -cl            Print a list of the classes generated to standard out\n"
-        + "  -d dir         \"-d dir\" is short for (and overwrites) \"-nd dir/syntaxtree -vd dir/visitor -hkd dir/hook\"\n"
+        + "  -d b_dir       Prepend b_dir (with a /) to h_dir, n_dir, s_dir & v_dir\n"
         + "  -dl            Generate depth level info\n"
         + "  -do            Print a list of resulting (file and command line) options to standard out - since 1.5.0\n"
         + "  -e             Suppress JTB semantic error checking\n"
-        + "  -eg class      Calls class (to be found in the classpath) to run a user supplied generator - since 1.5.0\n"
+        + "  -eg e_class    Calls e_class (to be found in the classpath) to run a user supplied generator - since 1.5.0\n"
         + "  -f             Use descriptive node class field names\n"
         + "  -h             Display this help message and quit\n"
-        + "  -hk            Generate node scope hook inteface and implementation and method calls - since 1.5.0\n"
-        + "  -hkd dir       Use dir as the directory for the node scope hook interface and class - since 1.5.0\n"
-        + "  -hkp pkg       Use pkg as the package for the node scope hook interface and class - since 1.5.0\n"
+        + "  -hk            Generate node scope hook interface and implementation and method calls - since 1.5.0\n"
+        + "  -hkd h_dir     Use h_dir as the directory for the node scope hook interface and class - since 1.5.0\n"
+        + "  -hkp h_pkg     Use h_pkg as the package for the node scope hook interface and class - since 1.5.0\n"
         + "  -ia            Inline visitors accept methods on base classes\n"
         + "  -jd            Generate JavaDoc-friendly comments in the nodes and visitors\n"
-        + "  -nd dir        Use dir as the package for the syntax tree nodes\n"
+        + "  -nd n_dir      Use n_dir as the directory for the syntax tree nodes\n"
         + "  -noplg         Do not parallelize user nodes generation - since 1.5.0\n"
         + "  -nosig         Do not generate signature annotations in visitors - since 1.5.0\n"
         + "  -novis         Do not generate visitors interfaces and classes - since 1.5.0\n"
-        + "  -np pkg        Use pkg as the package for the syntax tree nodes\n"
-        + "  -npfx str      Use str as prefix for the syntax tree nodes\n"
-        + "  -ns class      Use class as the class which all node classes will extend\n"
-        + "  -nsfx str      Use str as suffix for the syntax tree nodes\n"
-        + "  -o file        Use file as the filename for the annotated output grammar\n"
-        + "  -p pkg         \"-p pkg\" is short for (and overwrites) \"-np pkg.syntaxtree -vp pkg.visitor -hkp pkg.hook\"\n"
+        + "  -np n_pkg      Use pkg as the package for the syntax tree nodes\n"
+        + "  -npfx p_str    Use p_str as prefix for the syntax tree nodes\n"
+        + "  -ns n_class    Use n_class as the class which all node classes will extend\n"
+        + "  -nsfx s_str    Use s_str as suffix for the syntax tree nodes\n"
+        + "  -o o_file      Use o_file as the filename for the annotated output grammar\n"
+        + "  -p b_pkg       Prepend b_pkg (with a .) to h_pkg, n_pkg, s_pkg & v_pkg\n"
         + "  -pp            Generate parent pointers in all node classes\n"
         + "  -printer       Generate a syntax tree dumping visitor\n"
         + "  -si            Read from standard input rather than a file\n"
+        + "  -sigd s_dir    Use s_dir as the directory for the signature interface and class - since 1.5.3\n"
+        + "  -sigp s_pkg    Use s_pkg as the package for the signature interface and class - since 1.5.3\n"
         + "  -tk            Generate special tokens in the tree's NodeTokens\n"
         + "  -tkjj          Generate special tokens in the annotated grammar (implies -tk) - since 1.5.0\n"
         + "  -va            Generate visitors with an argument of a vararg type\n"
-        + "  -vd dir        Use dir as the package for the default visitor classes\n"
-        + "  -vis str       Generate visitors with specified suffix, return type and argument(s) type(s) - since 1.5.0\n"
-        + "                 str: sfx,ret,args(;sfx,ret,args)* (ret can be 'void', args can be 'none')\n"
-        + "  -vp pkg        Use pkg as the package for the default visitor classes\n"
-        + "  -w             Do not overwrite existing files\n" + "\n");
+        + "  -vd v_dir      Use v_dir as the package for the default visitor classes\n"
+        + "  -vis v_str     Generate visitors with specified suffix, return type and argument(s) type(s) - since 1.5.0\n"
+        + "                 v_str is: sfx,ret,args(;sfx,ret,args)* (ret can be 'void', args can be 'none')\n"
+        + "  -vp v_pkg      Use v_pkg as the package for the default visitor classes\n"
+        + "  -w             Do not overwrite existing files\n" + "\n" //
+        + "\n" //
+        + "* All pairs (like -d d_dir) can be written with a '=' instead of a ' ' (-d=d_dir);" //
+        + "   the second arguments are strings that must be enclosed within double quotes\n" //
+        + "* All single argument options (like -e) are booleans set to true (-e is short for -e=true);" //
+        + "   they can be set to false - their default value - (-e=false)\n" //
+        + "* All options can be written in uppercase prefixed by JTB_ (-pp -> -JTB_PP);" //
+        + "\n" //
+    );
   }
-  
+
   /**
    * Inner class for managing command line errors.
    */
   class InvalidCmdLineException extends Exception {
-    
+
     /** Default serialVersionUID */
     static final long serialVersionUID = 1L;
-    
+
     /**
      * Standard constructor with a message.
      *
@@ -1393,5 +1458,5 @@ public class JTB {
       super(s);
     }
   }
-  
+
 }

@@ -2,18 +2,12 @@ package EDU.purdue.jtb.generate;
 
 import static EDU.purdue.jtb.common.Constants.DEBUG_CLASS;
 import static EDU.purdue.jtb.common.Constants.DEBUG_COMMENT;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_EXPANSION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_EXPANSIONCHOICES;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_EXPANSIONUNIT;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_EXPANSIONUNITTCF;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_IDENTIFIERASSTRING;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_STRINGLITERAL;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_EXPANSION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_EXPANSIONCHOICES;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_EXPANSIONUNIT;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_EXPANSIONUNITTCF;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_IDENTIFIERASSTRING;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_STRINGLITERAL;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXPANSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXPANSIONCHOICES;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXPANSIONUNIT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXPANSIONUNITTCF;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_IDENTIFIERASSTRING;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_STRINGLITERAL;
 import java.util.ArrayList;
 import java.util.List;
 import EDU.purdue.jtb.analyse.GlobalDataBuilder;
@@ -24,6 +18,7 @@ import EDU.purdue.jtb.common.UserClassInfo;
 import EDU.purdue.jtb.common.UserClassInfo.CommentData;
 import EDU.purdue.jtb.common.UserClassInfo.CommentLineData;
 import EDU.purdue.jtb.common.UserClassInfo.FieldInfo;
+import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.Expansion;
 import EDU.purdue.jtb.parser.syntaxtree.ExpansionChoices;
 import EDU.purdue.jtb.parser.syntaxtree.ExpansionUnit;
@@ -33,7 +28,7 @@ import EDU.purdue.jtb.parser.syntaxtree.IdentifierAsString;
 import EDU.purdue.jtb.parser.syntaxtree.NodeChoice;
 import EDU.purdue.jtb.parser.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.parser.Token;
+import EDU.purdue.jtb.parser.syntaxtree.NodeToken;
 import EDU.purdue.jtb.parser.syntaxtree.StringLiteral;
 import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
 
@@ -183,6 +178,7 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  *          grammars<br>
  * @version 1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
  *          replacement by Token
+ * @version 1.5.3 : 11/2025 : MMa : signature code made independent of parser
  */
 class CommentsPrinter extends JavaCCPrinter {
   
@@ -330,10 +326,10 @@ class CommentsPrinter extends JavaCCPrinter {
    * @param n - the Token
    */
   @Override
-  public void visit(final Token n) {
-    final int len = n.image.length();
+  public void visit(final NodeToken n) {
+    final int len = ((Token) n).image.length();
     for (int i = 0; i < len; ++i) {
-      final char c = n.image.charAt(i);
+      final char c = ((Token) n).image.charAt(i);
       if (c == '<') {
         // image is single character, add space !
         curCtn.addId("< ");
@@ -361,9 +357,7 @@ class CommentsPrinter extends JavaCCPrinter {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1726831935, JTB_SIG_EXPANSIONCHOICES, JTB_USER_EXPANSIONCHOICES
-  })
+  @NodeFieldsSignature(old_sig = -1726831935, new_sig = JTB_SIG_EXPANSIONCHOICES, name = "ExpansionChoices")
   public void visit(final ExpansionChoices n) {
     
     // if only f0
@@ -477,9 +471,7 @@ class CommentsPrinter extends JavaCCPrinter {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -2134365682, JTB_SIG_EXPANSION, JTB_USER_EXPANSION
-  })
+  @NodeFieldsSignature(old_sig = -2134365682, new_sig = JTB_SIG_EXPANSION, name = "Expansion")
   public void visit(final Expansion n) {
     // don't take f0, only f1
     
@@ -666,9 +658,7 @@ class CommentsPrinter extends JavaCCPrinter {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1116287061, JTB_SIG_EXPANSIONUNIT, JTB_USER_EXPANSIONUNIT
-  })
+  @NodeFieldsSignature(old_sig = 1116287061, new_sig = JTB_SIG_EXPANSIONUNIT, name = "ExpansionUnit")
   public void visit(final ExpansionUnit n) {
     NodeSequence seq;
     final NodeOptional opt;
@@ -800,9 +790,7 @@ class CommentsPrinter extends JavaCCPrinter {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1601707097, JTB_SIG_EXPANSIONUNITTCF, JTB_USER_EXPANSIONUNITTCF
-  })
+  @NodeFieldsSignature(old_sig = 1601707097, new_sig = JTB_SIG_EXPANSIONUNITTCF, name = "ExpansionUnitTCF")
   public void visit(final ExpansionUnitTCF n) {
     // if > 0 all the NodeTCF, if == 0 nothing
     if (gdbv.getNbSubNodesTbc(n.f2) > 0) {
@@ -836,11 +824,9 @@ class CommentsPrinter extends JavaCCPrinter {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1580059612, JTB_SIG_IDENTIFIERASSTRING, JTB_USER_IDENTIFIERASSTRING
-  })
+  @NodeFieldsSignature(old_sig = -1580059612, new_sig = JTB_SIG_IDENTIFIERASSTRING, name = "IdentifierAsString")
   public void visit(final IdentifierAsString n) {
-    curCtn.addId(UnicodeConverter.addUnicodeEscapes(n.f0.image));
+    curCtn.addId(UnicodeConverter.addUnicodeEscapes(((Token) n.f0).image));
   }
   
   /**
@@ -852,11 +838,9 @@ class CommentsPrinter extends JavaCCPrinter {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      241433948, JTB_SIG_STRINGLITERAL, JTB_USER_STRINGLITERAL
-  })
+  @NodeFieldsSignature(old_sig = 241433948, new_sig = JTB_SIG_STRINGLITERAL, name = "StringLiteral")
   public void visit(final StringLiteral n) {
-    curCtn.addId(UnicodeConverter.addUnicodeEscapes(n.f0.image));
+    curCtn.addId(UnicodeConverter.addUnicodeEscapes(((Token) n.f0).image));
   }
   
   /*

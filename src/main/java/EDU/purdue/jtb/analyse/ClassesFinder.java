@@ -35,36 +35,25 @@ import static EDU.purdue.jtb.common.Constants.nodeListOptional;
 import static EDU.purdue.jtb.common.Constants.nodeOptional;
 import static EDU.purdue.jtb.common.Constants.nodeSequence;
 import static EDU.purdue.jtb.common.Constants.nodeToken;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_BNFPRODUCTION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_EXPANSION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_EXPANSIONCHOICES;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_EXPANSIONUNIT;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_EXPANSIONUNITTCF;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_IDENTIFIERASSTRING;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_JAVACCINPUT;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_JAVACODEPRODUCTION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_LOCALLOOKAHEAD;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_REGULAREXPRESSION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_REGULAREXPRPRODUCTION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_TOKENMANAGERDECLS;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_BNFPRODUCTION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_EXPANSION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_EXPANSIONCHOICES;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_EXPANSIONUNIT;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_EXPANSIONUNITTCF;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_IDENTIFIERASSTRING;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_JAVACCINPUT;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_JAVACODEPRODUCTION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_LOCALLOOKAHEAD;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_REGULAREXPRESSION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_REGULAREXPRPRODUCTION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_TOKENMANAGERDECLS;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_BNFPRODUCTION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXPANSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXPANSIONCHOICES;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXPANSIONUNIT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXPANSIONUNITTCF;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_IDENTIFIERASSTRING;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_JAVACCINPUT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_JAVACODEPRODUCTION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_LOCALLOOKAHEAD;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_REGULAREXPRESSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_REGULAREXPRPRODUCTION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_TOKENMANAGERDECLS;
 import java.util.ArrayList;
 import java.util.List;
 import EDU.purdue.jtb.common.JTBOptions;
 import EDU.purdue.jtb.common.Messages;
 import EDU.purdue.jtb.common.ProgrammaticError;
 import EDU.purdue.jtb.common.UserClassInfo;
+import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.BNFProduction;
 import EDU.purdue.jtb.parser.syntaxtree.Expansion;
 import EDU.purdue.jtb.parser.syntaxtree.ExpansionChoices;
@@ -78,7 +67,6 @@ import EDU.purdue.jtb.parser.syntaxtree.LocalLookahead;
 import EDU.purdue.jtb.parser.syntaxtree.NodeChoice;
 import EDU.purdue.jtb.parser.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.RegularExprProduction;
 import EDU.purdue.jtb.parser.syntaxtree.RegularExpression;
 import EDU.purdue.jtb.parser.syntaxtree.TokenManagerDecls;
@@ -115,9 +103,10 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  *          related code<br>
  * @version 1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
  *          replacement by Token
+ * @version 1.5.3 : 11/2025 : MMa : signature code made independent of parser
  */
 public class ClassesFinder extends DepthFirstVoidVisitor {
-  
+
   /** The {@link GlobalDataBuilder} visitor */
   private final GlobalDataBuilder   gdbv;
   /** The messages handler */
@@ -132,7 +121,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
   private final FieldNameGenerator  fng;
   /** The global variable to pass IdentifierAsString info between methods (as they are recursive) */
   private String                    ident   = "";
-  
+
   /**
    * Constructor.
    *
@@ -144,7 +133,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
     mess = jopt.mess;
     fng = new FieldNameGenerator(jopt);
   }
-  
+
   /**
    * Getter for the class list.
    *
@@ -153,11 +142,11 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
   public List<UserClassInfo> getClasses() {
     return uciList;
   }
-  
+
   /*
    * User generated visitor methods below
    */
-  
+
   /**
    * Visits a {@link JavaCCInput} node, whose children are the following :
    * <p>
@@ -178,16 +167,14 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1465207473, JTB_SIG_JAVACCINPUT, JTB_USER_JAVACCINPUT
-  })
+  @NodeFieldsSignature(old_sig = 1465207473, new_sig = JTB_SIG_JAVACCINPUT, name = "JavaCCInput")
   public void visit(final JavaCCInput n) {
     // f10 -> ( Production() )+
     for (final INode e : n.f10.nodes) {
       e.accept(this);
     }
   }
-  
+
   /**
    * Visits a {@link JavaCodeProduction} node, whose children are the following :
    * <p>
@@ -205,21 +192,19 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -763138104, JTB_SIG_JAVACODEPRODUCTION, JTB_USER_JAVACODEPRODUCTION
-  })
+  @NodeFieldsSignature(old_sig = -763138104, new_sig = JTB_SIG_JAVACODEPRODUCTION, name = "JavaCodeProduction")
   public void visit(final JavaCodeProduction n) {
     // generate the class only if the node creation is requested
     if (n.f6.present()) {
       fng.reset();
       // f6 -> [ "%" ]
-      final String cn = n.f3.f0.image;
+      final String cn = ((Token) n.f3.f0).image;
       final String fcn = gdbv.getFixedName(cn);
       uci = new UserClassInfo(null, 0, cn, fcn);
       uciList.add(uci);
     }
   }
-  
+
   /**
    * Visits a {@link BNFProduction} node, whose children are the following :
    * <p>
@@ -240,16 +225,14 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1323482450, JTB_SIG_BNFPRODUCTION, JTB_USER_BNFPRODUCTION
-  })
+  @NodeFieldsSignature(old_sig = 1323482450, new_sig = JTB_SIG_BNFPRODUCTION, name = "BNFProduction")
   public void visit(final BNFProduction n) {
     // generate the class unless the node creation is not requested
     // f5 -> [ "!" ]
     if (!n.f5.present()) {
       fng.reset();
       final int nbFields = gdbv.getNbSubNodesTbc(n.f9);
-      final String cn = n.f2.f0.image;
+      final String cn = ((Token) n.f2.f0).image;
       final String fcn = gdbv.getFixedName(cn);
       uci = new UserClassInfo(n.f9, nbFields, cn, fcn);
       uciList.add(uci);
@@ -257,7 +240,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
       n.f9.accept(this);
     }
   }
-  
+
   /**
    * Visits a {@link RegularExprProduction} node, whose children are the following :
    * <p>
@@ -277,14 +260,12 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      484788342, JTB_SIG_REGULAREXPRPRODUCTION, JTB_USER_REGULAREXPRPRODUCTION
-  })
+  @NodeFieldsSignature(old_sig = 484788342, new_sig = JTB_SIG_REGULAREXPRPRODUCTION, name = "RegularExprProduction")
   public void visit(@SuppressWarnings("unused") final RegularExprProduction n) {
     // Don't visit : don't want to generate NodeTokens inside RegularExpression
     // if it's visited from a RegularExprProduction
   }
-  
+
   /**
    * Visits a {@link TokenManagerDecls} node, whose children are the following :
    * <p>
@@ -296,13 +277,11 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1566997219, JTB_SIG_TOKENMANAGERDECLS, JTB_USER_TOKENMANAGERDECLS
-  })
+  @NodeFieldsSignature(old_sig = -1566997219, new_sig = JTB_SIG_TOKENMANAGERDECLS, name = "TokenManagerDecls")
   public void visit(@SuppressWarnings("unused") final TokenManagerDecls n) {
     // Don't visit
   }
-  
+
   /**
    * Visits a {@link ExpansionChoices} node, whose children are the following :
    * <p>
@@ -313,9 +292,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1726831935, JTB_SIG_EXPANSIONCHOICES, JTB_USER_EXPANSIONCHOICES
-  })
+  @NodeFieldsSignature(old_sig = -1726831935, new_sig = JTB_SIG_EXPANSIONCHOICES, name = "ExpansionChoices")
   public void visit(final ExpansionChoices n) {
     if (!n.f1.present()) {
       // f0 -> Expansion()
@@ -326,7 +303,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
       uci.addField(nodeChoice, fng.genFieldName(nodeChoice));
     }
   }
-  
+
   /**
    * Visits a {@link Expansion} node, whose children are the following :
    * <p>
@@ -337,15 +314,13 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -2134365682, JTB_SIG_EXPANSION, JTB_USER_EXPANSION
-  })
+  @NodeFieldsSignature(old_sig = -2134365682, new_sig = JTB_SIG_EXPANSION, name = "Expansion")
   public void visit(final Expansion n) {
     // Don't visit LocalLookahead
     // f1 -> ( ExpansionUnit() )+
     n.f1.accept(this);
   }
-  
+
   /**
    * Visits a {@link LocalLookahead} node, whose children are the following :
    * <p>
@@ -361,13 +336,11 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1879920786, JTB_SIG_LOCALLOOKAHEAD, JTB_USER_LOCALLOOKAHEAD
-  })
+  @NodeFieldsSignature(old_sig = -1879920786, new_sig = JTB_SIG_LOCALLOOKAHEAD, name = "LocalLookahead")
   public void visit(@SuppressWarnings("unused") final LocalLookahead n) {
     // Don't visit
   }
-  
+
   /**
    * Visits a {@link ExpansionUnit} node, whose child is the following :
    * <p>
@@ -390,9 +363,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1116287061, JTB_SIG_EXPANSIONUNIT, JTB_USER_EXPANSIONUNIT
-  })
+  @NodeFieldsSignature(old_sig = 1116287061, new_sig = JTB_SIG_EXPANSIONUNIT, name = "ExpansionUnit")
   public void visit(final ExpansionUnit n) {
     NodeSequence seq;
     NodeChoice ch;
@@ -400,11 +371,11 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
     case 0:
       // %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"
       return;
-    
+
     case 1:
       // %1 Block()
       return;
-    
+
     case 2:
       // %2 #0 "[" #1 ExpansionChoices() #2 "]"
       final NodeSequence seq5 = (NodeSequence) n.f0.choice;
@@ -413,12 +384,12 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
         uci.addField(nodeOptional, fng.genFieldName(nodeOptional));
       }
       return;
-    
+
     case 3:
       // %3 ExpansionUnitTCF()
       n.f0.choice.accept(this);
       return;
-    
+
     case 4:
       // %4 #0 [ $0 PrimaryExpression() $1 "=" ]
       // .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()
@@ -444,7 +415,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
         seq1.elementAt(0).accept(this);
       }
       return;
-    
+
     case 5:
       // %5 #0 "(" #1 ExpansionChoices() #2 ")"
       // .. #3 ( &0 "+" | &1 "*" | &2 "?" )?
@@ -470,14 +441,14 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
         uci.addField(nodeSequence, fng.genFieldName(nodeSequence));
       }
       return;
-    
+
     default:
       final String msg = "Invalid n.f0.which = " + n.f0.which;
       Messages.hardErr(msg);
       throw new ProgrammaticError(msg);
     }
   }
-  
+
   /**
    * Visits a {@link ExpansionUnitTCF} node, whose children are the following :
    * <p>
@@ -495,9 +466,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1601707097, JTB_SIG_EXPANSIONUNITTCF, JTB_USER_EXPANSIONUNITTCF
-  })
+  @NodeFieldsSignature(old_sig = 1601707097, new_sig = JTB_SIG_EXPANSIONUNITTCF, name = "ExpansionUnitTCF")
   public void visit(final ExpansionUnitTCF n) {
     // if > 0 all the ExpansionChoices, if = 0 nothing
     if (gdbv.getNbSubNodesTbc(n.f2) > 0) {
@@ -505,7 +474,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
       n.f2.accept(this);
     }
   }
-  
+
   /**
    * Returns the base node name for a given modifier.
    *
@@ -525,7 +494,7 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
       throw new ProgrammaticError(msg);
     }
   }
-  
+
   /**
    * Visits a {@link RegularExpression} node, whose child is the following :
    * <p>
@@ -541,26 +510,24 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1719627151, JTB_SIG_REGULAREXPRESSION, JTB_USER_REGULAREXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = 1719627151, new_sig = JTB_SIG_REGULAREXPRESSION, name = "RegularExpression")
   public void visit(final RegularExpression n) {
     boolean addNodeToken = true;
     switch (n.f0.which) {
     case 0: // %0 StringLiteral()
       break;
-    
+
     case 1: // %1 #0 "<" #1 [ $0 [ "#" ] $1 IdentifierAsString() $2 ":" ] #2 ComplexRegularExpressionChoices()
             // #3 ">"
       break;
-    
+
     case 2: // %2 #0 "<" #1 IdentifierAsString() #2 ">"
       final NodeSequence seq = (NodeSequence) n.f0.choice;
       // ident will be set further down the tree of IdentifierAsString
       seq.elementAt(1).accept(this);
       final String regExpr = gdbv.getTokenHM().get(ident);
       if (regExpr == null) {
-        final Token ident_nt = ((IdentifierAsString) seq.elementAt(1)).f0;
+        final Token ident_nt = (Token) ((IdentifierAsString) seq.elementAt(1)).f0;
         mess.softErr("Undefined token \"" + ident_nt + "\".", ident_nt.beginLine, ident_nt.beginColumn);
         ident = "";
       } else if (DONT_CREATE.equals(regExpr)) {
@@ -571,21 +538,21 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
         addNodeToken = false;
       }
       break;
-    
+
     case 3: // %3 #0 "<" #1 "EOF" #2 ">"
       break;
-    
+
     default:
       final String msg = "Unreachable code executed!";
       Messages.hardErr(msg);
       throw new ProgrammaticError(msg);
-    
+
     }
     if (addNodeToken) {
       uci.addField(nodeToken, fng.genFieldName(nodeToken));
     }
   }
-  
+
   /**
    * Visits a {@link IdentifierAsString} node, whose child is the following :
    * <p>
@@ -595,11 +562,9 @@ public class ClassesFinder extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1580059612, JTB_SIG_IDENTIFIERASSTRING, JTB_USER_IDENTIFIERASSTRING
-  })
+  @NodeFieldsSignature(old_sig = -1580059612, new_sig = JTB_SIG_IDENTIFIERASSTRING, name = "IdentifierAsString")
   public void visit(final IdentifierAsString n) {
-    ident = n.f0.image;
+    ident = ((Token) n.f0).image;
   }
-  
+
 }

@@ -40,6 +40,7 @@ import java.util.List;
  * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : adapted to JavaCC v4.2 grammar and JDK 1.5
  * @version 1.4.7 : 08/2012 : MMa : optimization
+ * @version 1.5.3 : 11/2025 : MMa : removed commented code
  */
 public class Spacing {
   
@@ -69,28 +70,6 @@ public class Spacing {
       }
     }
   }
-  
-  // ModMMa 2017/03 commented as unused (UCDetector)
-  // /**
-  // * Constructor.
-  // *
-  // * @param aIndentAmt - the indentation amount
-  // * @param aIndentLevel - the initial indentation level
-  // */
-  // public Spacing(final int aIndentAmt, final int aIndentLevel) {
-  // this(aIndentAmt);
-  // if (aIndentLevel > 0)
-  // updateSpc(aIndentLevel);
-  // }
-  
-  // ModMMa 2017/03 commented as unused (UCDetector)
-  // /**
-  // * Resets the instance.
-  // */
-  // public void reset() {
-  // spc = str.get(0);
-  // indentLevel = 0;
-  // }
   
   /**
    * Returns the indentation string corresponding to the indentation amount and level.

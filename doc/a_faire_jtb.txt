@@ -74,6 +74,11 @@ A faire prochainement sur JTB
 - voir les aspects sécurité
 - voir le multi-release jar https://www.baeldung.com/java-multi-release-jar
 
+Fait sur JTB en 1.5.3
+- corrigé la gestion des arguments de la ligne de commande, ajouté la gestion des doubles quotes
+- repassé en 2 classes différentes NodeToken (JTB) et Token (JavaCC)
+- enlevé des attributs static
+
 Fait sur JTB en 1.5.2
 - changé la gestion du manifest
 - ajouté la publication sur Sonatype Central Portal, et effectué cette publication snapshots/release

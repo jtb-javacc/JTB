@@ -31,58 +31,34 @@
  */
 package EDU.purdue.jtb.generate;
 
-import static EDU.purdue.jtb.common.Constants.DEBUG_CLASS;
+import static EDU.purdue.jtb.common.Constants.*;
 import static EDU.purdue.jtb.common.Constants.FILE_EXISTS_RC;
 import static EDU.purdue.jtb.common.Constants.INDENT_AMT;
 import static EDU.purdue.jtb.common.Constants.OK_RC;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_ACCESSMODIFIER;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_BNFPRODUCTION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_CHARACTERDESCRIPTOR;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_CHARACTERLIST;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_COMPLEXREGULAREXPRESSION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_COMPLEXREGULAREXPRESSIONCHOICES;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_COMPLEXREGULAREXPRESSIONUNIT;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_EXPANSION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_EXPANSIONCHOICES;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_EXPANSIONUNIT;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_EXPANSIONUNITTCF;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_IDENTIFIERASSTRING;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_INTEGERLITERAL;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_JAVACCOPTIONS;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_JAVACODEPRODUCTION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_LOCALLOOKAHEAD;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_OPTIONBINDING;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_PRODUCTION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_REGEXPRKIND;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_REGEXPRSPEC;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_REGULAREXPRESSION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_REGULAREXPRPRODUCTION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_STRINGLITERAL;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_TOKENMANAGERDECLS;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_ACCESSMODIFIER;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_BNFPRODUCTION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_CHARACTERDESCRIPTOR;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_CHARACTERLIST;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_COMPLEXREGULAREXPRESSION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_COMPLEXREGULAREXPRESSIONCHOICES;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_COMPLEXREGULAREXPRESSIONUNIT;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_EXPANSION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_EXPANSIONCHOICES;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_EXPANSIONUNIT;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_EXPANSIONUNITTCF;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_IDENTIFIERASSTRING;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_INTEGERLITERAL;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_JAVACCOPTIONS;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_JAVACODEPRODUCTION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_LOCALLOOKAHEAD;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_OPTIONBINDING;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_PRODUCTION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_REGEXPRKIND;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_REGEXPRSPEC;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_REGULAREXPRESSION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_REGULAREXPRPRODUCTION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_STRINGLITERAL;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_TOKENMANAGERDECLS;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_ACCESSMODIFIER;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_BNFPRODUCTION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_CHARACTERDESCRIPTOR;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_CHARACTERLIST;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_COMPLEXREGULAREXPRESSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_COMPLEXREGULAREXPRESSIONCHOICES;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_COMPLEXREGULAREXPRESSIONUNIT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXPANSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXPANSIONCHOICES;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXPANSIONUNIT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXPANSIONUNITTCF;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_IDENTIFIERASSTRING;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_INTEGERLITERAL;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_JAVACCOPTIONS;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_JAVACODEPRODUCTION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_LOCALLOOKAHEAD;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_OPTIONBINDING;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_PRODUCTION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_REGEXPRKIND;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_REGEXPRSPEC;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_REGULAREXPRESSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_REGULAREXPRPRODUCTION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_STRINGLITERAL;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_TOKENMANAGERDECLS;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -96,6 +72,7 @@ import EDU.purdue.jtb.common.Messages;
 import EDU.purdue.jtb.common.ProgrammaticError;
 import EDU.purdue.jtb.common.Spacing;
 import EDU.purdue.jtb.common.UnicodeConverter;
+import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.AccessModifier;
 import EDU.purdue.jtb.parser.syntaxtree.BNFProduction;
 import EDU.purdue.jtb.parser.syntaxtree.CharacterDescriptor;
@@ -117,7 +94,7 @@ import EDU.purdue.jtb.parser.syntaxtree.NodeChoice;
 import EDU.purdue.jtb.parser.syntaxtree.NodeListOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.parser.Token;
+import EDU.purdue.jtb.parser.syntaxtree.NodeToken;
 import EDU.purdue.jtb.parser.syntaxtree.OptionBinding;
 import EDU.purdue.jtb.parser.syntaxtree.Production;
 import EDU.purdue.jtb.parser.syntaxtree.RegExprKind;
@@ -164,9 +141,10 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  *          1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
  *          replacement by Token<br>
  *          1.5.1 : 09/2023 : MMa : removed noDebugComment flag
+ * @version 1.5.3 : 11/2025 : MMa : signature code made independent of parser
  */
 class JavaCCPrinter extends DepthFirstVoidVisitor {
-  
+
   /** The {@link GlobalDataBuilder} visitor */
   protected final GlobalDataBuilder   gdbv;
   /** The {@link CommonCodeGenerator} */
@@ -189,16 +167,18 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * </ul>
    * Used to control spaces / new lines.
    */
-  protected int                       bnfLvl  = 0;
+  protected int                       bnfLvl            = 0;
   /** The OS line separator */
-  static final String                 LS      = System.getProperty("line.separator");
+  static final String                 LS                = System.getProperty("line.separator");
   /** The node class debug comment prefix */
-  String                              JJNCDCP = " //jccp ";
-  
+  String                              JJNCDCP           = " //jccp ";
+  /** The flag telling that the grammar contains the JavaCC option TOKEN_EXTENDS */
+  boolean                             foundTokenExtends = false;
+
   /*
    * Constructors
    */
-  
+
   /**
    * Constructor with a global data builder visitor reference, a given buffer and indentation.
    *
@@ -222,7 +202,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
     }
     jbp = new JavaBranchPrinter(aGdbv.jopt, spc);
   }
-  
+
   /**
    * Constructor which will allocate a default buffer and indentation.
    *
@@ -232,11 +212,11 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
   JavaCCPrinter(final GlobalDataBuilder aGdbv, final CommonCodeGenerator aCcg) {
     this(aGdbv, aCcg, null, null);
   }
-  
+
   /*
    * Convenience methods
    */
-  
+
   /**
    * Prints into the current buffer a node class debug comment and a new line.
    *
@@ -245,7 +225,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
   void oneNewLine(final INode n) {
     sb.append(nodeClassComment(n)).append(LS);
   }
-  
+
   /**
    * Prints into the current buffer a node class debug comment, an extra given debug comment, and a new line.
    *
@@ -255,7 +235,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
   void oneNewLine(final INode n, final String str) {
     sb.append(nodeClassComment(n, str)).append(LS);
   }
-  
+
   /**
    * Prints into the current buffer a full debug class block comment line with an indentation, a node class
    * comment, extra given comments, and a new line.
@@ -268,7 +248,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       sb.append(spc.spc).append("/*").append(nodeClassComment(n, str)).append(" */").append(LS);
     }
   }
-  
+
   /**
    * Prints into the current buffer a full debug class block comment line with an indentation, a node class
    * comment, extra given comments, and a new line.
@@ -282,7 +262,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       aSb.append(spc.spc).append("/*").append(nodeClassComment(n, str)).append(" */").append(LS);
     }
   }
-  
+
   /**
    * Prints into a given buffer a node class debug comment, an extra given debug comment, and a new line.
    *
@@ -293,7 +273,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
   void oneNewLine(final StringBuilder aSb, final INode n, final String str) {
     aSb.append(nodeClassComment(n, str)).append(LS);
   }
-  
+
   /**
    * Prints into the current buffer a node class debug comment, extra given debug comments, and a new line.
    *
@@ -303,7 +283,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
   void oneNewLine(final INode n, final Object... str) {
     sb.append(nodeClassComment(n, str)).append(LS);
   }
-  
+
   /**
    * Prints twice into the current buffer a node class comment and a new line.
    *
@@ -313,7 +293,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
     oneNewLine(n);
     oneNewLine(n);
   }
-  
+
   /**
    * Returns a node class comment with extra comments (a //jcp followed by the node class short name plus the
    * extra comment if global flag set, nothing otherwise).
@@ -337,7 +317,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       return "";
     }
   }
-  
+
   /**
    * Returns a node class comment with an extra comment (a //jcp followed by the node class short name plus
    * the extra comment if global flag set, nothing otherwise).
@@ -353,7 +333,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       return "";
     }
   }
-  
+
   /**
    * Returns a node class comment (a //jcp followed by the node class short name if global flag set, nothing
    * otherwise).
@@ -378,7 +358,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       return "";
     }
   }
-  
+
   /**
    * Saves the current buffer to an output file.
    *
@@ -401,7 +381,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       throw e;
     }
   }
-  
+
   /**
    * Generates a java node and its subtree with a JavaPrinter.
    *
@@ -411,29 +391,29 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
   protected final StringBuilder genJavaBranch(final INode n) {
     return jbp.genJavaBranch(n);
   }
-  
+
   /*
    * Base classes visit methods
    */
-  
+
   /**
    * Prints into the current buffer a Token image and its specials before if global flag set.
    *
    * @param n - the node to visit
    */
   @Override
-  public void visit(final Token n) {
+  public void visit(final NodeToken n) {
     if (gdbv.jopt.printSpecialTokensJJ) {
       sb.append(n.withSpecials(spc.spc, gvaStr));
     } else {
       if (gvaStr != null) {
         sb.append(gvaStr);
       }
-      sb.append(n.image);
+      sb.append(((Token) n).image);
     }
     gvaStr = null;
   }
-  
+
   /**
    * Visits a {@link JavaCCOptions} node, whose child is the following :
    * <p>
@@ -445,9 +425,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1270729337, JTB_SIG_JAVACCOPTIONS, JTB_USER_JAVACCOPTIONS
-  })
+  @NodeFieldsSignature(old_sig = -1270729337, new_sig = JTB_SIG_JAVACCOPTIONS, name = "JavaCCOptions")
   public void visit(final JavaCCOptions n) {
     if (n.f0.present()) {
       final NodeSequence seq = (NodeSequence) n.f0.node;
@@ -469,6 +447,17 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
           }
         }
         spc.updateSpc(-1);
+        oneNewLine(n, "d");
+      }
+      if (!foundTokenExtends) {
+        spc.updateSpc(+1);
+        oneNewLine(n, "e");
+        sb.append(spc.spc).append("TOKEN_EXTENDS = \"");
+        if (jopt.nodesPkgName != null) {
+          sb.append(jopt.nodesPkgName).append(".");
+        }
+        sb.append(nodeToken).append("\"; // added by JTB");
+        spc.updateSpc(-1);
         oneNewLine(n, "f");
       }
       // #3 "}"
@@ -477,7 +466,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       oneNewLine(n, "g");
     }
   }
-  
+
   /**
    * Visits a {@link OptionBinding} node, whose children are the following :
    * <p>
@@ -495,9 +484,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1998174573, JTB_SIG_OPTIONBINDING, JTB_USER_OPTIONBINDING
-  })
+  @NodeFieldsSignature(old_sig = -1998174573, new_sig = JTB_SIG_OPTIONBINDING, name = "OptionBinding")
   public void visit(final OptionBinding n) {
     // f0 -> ( %0 < IDENTIFIER > | %1 "LOOKAHEAD" | %2 "IGNORE_CASE" | %3 "static" )
     final Token nt0 = (Token) n.f0.choice;
@@ -511,6 +498,13 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
         nt0.image = "// " + tkim;
         nt0.accept(this);
         nt0.image = tkim;
+      } else if (nt0.image.equals("TOKEN_EXTENDS")) {
+        jopt.mess.warning(
+            "Existing TOKEN_EXTENDS option, so JTB will not generate its default one (to NodeToken); "
+                + "ensure that this class extends / replaces properly NodeToken",
+            nt0.beginLine, nt0.beginColumn);
+        nt0.accept(this);
+        foundTokenExtends = true;
       } else if (nt0.image.equals("TOKEN_FACTORY")) {
         jopt.mess.warning(
             "Existing TOKEN_FACTORY option; "
@@ -532,7 +526,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
     // f3 -> ";"
     n.f3.accept(this);
   }
-  
+
   /**
    * Visits a {@link Production} node, whose child is the following :
    * <p>
@@ -545,14 +539,12 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -120615333, JTB_SIG_PRODUCTION, JTB_USER_PRODUCTION
-  })
+  @NodeFieldsSignature(old_sig = -120615333, new_sig = JTB_SIG_PRODUCTION, name = "Production")
   public void visit(final Production n) {
     // no difference with super class
     n.f0.accept(this);
   }
-  
+
   /**
    * Visits a {@link JavaCodeProduction} node, whose children are the following :
    * <p>
@@ -570,9 +562,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -763138104, JTB_SIG_JAVACODEPRODUCTION, JTB_USER_JAVACODEPRODUCTION
-  })
+  @NodeFieldsSignature(old_sig = -763138104, new_sig = JTB_SIG_JAVACODEPRODUCTION, name = "JavaCodeProduction")
   public void visit(final JavaCodeProduction n) {
     // f0 -> "JAVACODE"
     n.f0.accept(this);
@@ -621,7 +611,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
     sb.append(genJavaBranch(n.f7));
     oneNewLine(n);
   }
-  
+
   /**
    * Visits a {@link BNFProduction} node, whose children are the following :
    * <p>
@@ -642,9 +632,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1323482450, JTB_SIG_BNFPRODUCTION, JTB_USER_BNFPRODUCTION
-  })
+  @NodeFieldsSignature(old_sig = 1323482450, new_sig = JTB_SIG_BNFPRODUCTION, name = "BNFProduction")
   public void visit(final BNFProduction n) {
     bnfLvl = -1;
     // f0 -> AccessModifier()
@@ -653,7 +641,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
     sb.append(genJavaBranch(n.f1));
     sb.append(' ');
     // f2 -> IdentifierAsString()
-    final String ident = n.f2.f0.image;
+    final String ident = ((Token) n.f2.f0).image;
     // must be prefixed / suffixed
     final String idfn = gdbv.getFixedName(ident);
     sb.append(idfn);
@@ -713,7 +701,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
     n.f10.accept(this);
     oneNewLine(n);
   }
-  
+
   /**
    * Visits a {@link AccessModifier} node, whose child is the following :
    * <p>
@@ -726,9 +714,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1053437682, JTB_SIG_ACCESSMODIFIER, JTB_USER_ACCESSMODIFIER
-  })
+  @NodeFieldsSignature(old_sig = -1053437682, new_sig = JTB_SIG_ACCESSMODIFIER, name = "AccessModifier")
   public void visit(final AccessModifier n) {
     if (n.f0.present()) {
       for (final INode e : n.f0.nodes) {
@@ -737,7 +723,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       }
     }
   }
-  
+
   /**
    * Visits a {@link RegularExprProduction} node, whose children are the following :
    * <p>
@@ -757,9 +743,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      484788342, JTB_SIG_REGULAREXPRPRODUCTION, JTB_USER_REGULAREXPRPRODUCTION
-  })
+  @NodeFieldsSignature(old_sig = 484788342, new_sig = JTB_SIG_REGULAREXPRPRODUCTION, name = "RegularExprProduction")
   public void visit(final RegularExprProduction n) {
     // f0 -> [ %0 #0 "<" #1 "*" #2 ">" | %1 #0 "<" #1 < IDENTIFIER > #2 ( $0 "," $1 < IDENTIFIER > )* #3 ">" ]
     if (n.f0.present()) {
@@ -803,7 +787,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
     n.f7.accept(this);
     oneNewLine(n);
   }
-  
+
   /**
    * Visits a {@link TokenManagerDecls} node, whose children are the following :
    * <p>
@@ -815,9 +799,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1566997219, JTB_SIG_TOKENMANAGERDECLS, JTB_USER_TOKENMANAGERDECLS
-  })
+  @NodeFieldsSignature(old_sig = -1566997219, new_sig = JTB_SIG_TOKENMANAGERDECLS, name = "TokenManagerDecls")
   public void visit(final TokenManagerDecls n) {
     // f0 -> "TOKEN_MGR_DECLS"
     n.f0.accept(this);
@@ -829,7 +811,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
     sb.append(genJavaBranch(n.f2));
     oneNewLine(n);
   }
-  
+
   /**
    * Visits a {@link RegExprKind} node, whose child is the following :
    * <p>
@@ -842,14 +824,12 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1874441621, JTB_SIG_REGEXPRKIND, JTB_USER_REGEXPRKIND
-  })
+  @NodeFieldsSignature(old_sig = -1874441621, new_sig = JTB_SIG_REGEXPRKIND, name = "RegExprKind")
   public void visit(final RegExprKind n) {
     // no difference with superclass
     n.f0.accept(this);
   }
-  
+
   /**
    * Visits a {@link RegExprSpec} node, whose children are the following :
    * <p>
@@ -862,9 +842,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1949948808, JTB_SIG_REGEXPRSPEC, JTB_USER_REGEXPRSPEC
-  })
+  @NodeFieldsSignature(old_sig = -1949948808, new_sig = JTB_SIG_REGEXPRSPEC, name = "RegExprSpec")
   public void visit(final RegExprSpec n) {
     // f0 -> RegularExpression()
     n.f0.accept(this);
@@ -892,7 +870,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       sb.append(seq.elementAt(1));
     }
   }
-  
+
   /**
    * Visits a {@link ExpansionChoices} node, whose children are the following :
    * <p>
@@ -903,9 +881,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1726831935, JTB_SIG_EXPANSIONCHOICES, JTB_USER_EXPANSIONCHOICES
-  })
+  @NodeFieldsSignature(old_sig = -1726831935, new_sig = JTB_SIG_EXPANSIONCHOICES, name = "ExpansionChoices")
   public void visit(final ExpansionChoices n) {
     if (!n.f1.present()) {
       // f0 -> Expansion()
@@ -934,7 +910,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       }
     }
   }
-  
+
   /**
    * Visits a {@link Expansion} node, whose children are the following :
    * <p>
@@ -945,9 +921,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -2134365682, JTB_SIG_EXPANSION, JTB_USER_EXPANSION
-  })
+  @NodeFieldsSignature(old_sig = -2134365682, new_sig = JTB_SIG_EXPANSION, name = "Expansion")
   public void visit(final Expansion n) {
     // f0 -> ( #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")" )?
     if (n.f0.present()) {
@@ -977,7 +951,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       }
     }
   }
-  
+
   /**
    * Visits a {@link LocalLookahead} node, whose children are the following :
    * <p>
@@ -993,9 +967,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1879920786, JTB_SIG_LOCALLOOKAHEAD, JTB_USER_LOCALLOOKAHEAD
-  })
+  @NodeFieldsSignature(old_sig = -1879920786, new_sig = JTB_SIG_LOCALLOOKAHEAD, name = "LocalLookahead")
   public void visit(final LocalLookahead n) {
     // f0 -> [ IntegerLiteral() ]
     if (n.f0.present()) {
@@ -1030,7 +1002,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       seq.elementAt(2).accept(this);
     }
   }
-  
+
   /**
    * Visits a {@link ExpansionUnit} node, whose child is the following :
    * <p>
@@ -1053,9 +1025,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1116287061, JTB_SIG_EXPANSIONUNIT, JTB_USER_EXPANSIONUNIT
-  })
+  @NodeFieldsSignature(old_sig = 1116287061, new_sig = JTB_SIG_EXPANSIONUNIT, name = "ExpansionUnit")
   public void visit(final ExpansionUnit n) {
     NodeSequence seq;
     NodeOptional opt;
@@ -1077,12 +1047,12 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       seq.elementAt(3).accept(this);
       oneNewLine(n, "la");
       break;
-    
+
     case 1:
       // %1 Block()
       sb.append(genJavaBranch(n.f0.choice));
       break;
-    
+
     case 2:
       // %2 #0 "[" #1 ExpansionChoices() #2 "]"
       seq = (NodeSequence) n.f0.choice;
@@ -1102,12 +1072,12 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       seq.elementAt(2).accept(this);
       oneNewLine(n, "]");
       break;
-    
+
     case 3:
       // %3 ExpansionUnitTCF()
       n.f0.choice.accept(this);
       break;
-    
+
     case 4:
       // %4 #0 [ $0 PrimaryExpression() $1 "=" ]
       // .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()
@@ -1135,7 +1105,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       final NodeSequence seq1 = (NodeSequence) ch.choice;
       if (ch.which == 0) {
         // $0 IdentifierAsString()
-        final String ias = ((IdentifierAsString) seq1.elementAt(0)).f0.image;
+        final String ias = ((Token) ((IdentifierAsString) seq1.elementAt(0)).f0).image;
         sb.append(gdbv.getFixedName(ias));
         // $1 Arguments()
         sb.append(genJavaBranch(seq1.elementAt(1)));
@@ -1160,7 +1130,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
         }
       }
       break;
-    
+
     case 5:
       // %5 #0 "(" #1 ExpansionChoices() #2 ")"
       // .. #3 ( &0 "+" | &1 "*" | &2 "?" )?
@@ -1185,15 +1155,15 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
         opt.node.accept(this);
       }
       break;
-    
+
     default:
       final String msg = "Invalid n.f0.which = " + n.f0.which;
       Messages.hardErr(msg);
       throw new ProgrammaticError(msg);
-    
+
     }
   }
-  
+
   /**
    * Visits a {@link ExpansionUnitTCF} node, whose children are the following :
    * <p>
@@ -1211,9 +1181,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1601707097, JTB_SIG_EXPANSIONUNITTCF, JTB_USER_EXPANSIONUNITTCF
-  })
+  @NodeFieldsSignature(old_sig = 1601707097, new_sig = JTB_SIG_EXPANSIONUNITTCF, name = "ExpansionUnitTCF")
   public void visit(final ExpansionUnitTCF n) {
     // f0 -> "try"
     n.f0.accept(this);
@@ -1287,7 +1255,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       oneNewLine(n);
     }
   }
-  
+
   /**
    * Visits a {@link RegularExpression} node, whose child is the following :
    * <p>
@@ -1303,9 +1271,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1719627151, JTB_SIG_REGULAREXPRESSION, JTB_USER_REGULAREXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = 1719627151, new_sig = JTB_SIG_REGULAREXPRESSION, name = "RegularExpression")
   public void visit(final RegularExpression n) {
     if (n.f0.which == 0) {
       // %0 StringLiteral()
@@ -1314,7 +1280,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       // %1 #0 "<" #1 [ $0 [ "#" ] $1 IdentifierAsString() $2 ":" ]
       // #2 ComplexRegularExpressionChoices() #3 ">"
       final NodeSequence seq = (NodeSequence) n.f0.choice;
-      ComplexRegularExpressionChoices crec = (ComplexRegularExpressionChoices) seq.elementAt(2);
+      final ComplexRegularExpressionChoices crec = (ComplexRegularExpressionChoices) seq.elementAt(2);
       // #0 "<"
       seq.elementAt(0).accept(this);
       sb.append(' ');
@@ -1361,7 +1327,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       ((NodeSequence) n.f0.choice).elementAt(2).accept(this);
     }
   }
-  
+
   /**
    * Visits a {@link ComplexRegularExpressionChoices} node, whose children are the following :
    * <p>
@@ -1372,9 +1338,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1240933595, JTB_SIG_COMPLEXREGULAREXPRESSIONCHOICES, JTB_USER_COMPLEXREGULAREXPRESSIONCHOICES
-  })
+  @NodeFieldsSignature(old_sig = -1240933595, new_sig = JTB_SIG_COMPLEXREGULAREXPRESSIONCHOICES, name = "ComplexRegularExpressionChoices")
   public void visit(final ComplexRegularExpressionChoices n) {
     // f0 -> ComplexRegularExpression()
     n.f0.accept(this);
@@ -1392,7 +1356,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       }
     }
   }
-  
+
   /**
    * Visits a {@link ComplexRegularExpression} node, whose child is the following :
    * <p>
@@ -1402,16 +1366,14 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      896313544, JTB_SIG_COMPLEXREGULAREXPRESSION, JTB_USER_COMPLEXREGULAREXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = 896313544, new_sig = JTB_SIG_COMPLEXREGULAREXPRESSION, name = "ComplexRegularExpression")
   public void visit(final ComplexRegularExpression n) {
     // f0 -> ( ComplexRegularExpressionUnit() )+
     for (int i = 0; i < n.f0.size(); i++) {
-      ComplexRegularExpressionUnit creu = (ComplexRegularExpressionUnit) n.f0.elementAt(i);
-      NodeChoice ch = creu.f0;
+      final ComplexRegularExpressionUnit creu = (ComplexRegularExpressionUnit) n.f0.elementAt(i);
+      final NodeChoice ch = creu.f0;
       if (ch.which == 3) {
-        ComplexRegularExpressionChoices crec = (ComplexRegularExpressionChoices) ((NodeSequence) ch.choice)
+        final ComplexRegularExpressionChoices crec = (ComplexRegularExpressionChoices) ((NodeSequence) ch.choice)
             .elementAt(1);
         if (crec.f1.present()) {
           oneNewLine(n, "w");
@@ -1426,7 +1388,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       creu.accept(this);
     }
   }
-  
+
   /**
    * Visits a {@link ComplexRegularExpressionUnit} node, whose child is the following :
    * <p>
@@ -1446,9 +1408,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1507427530, JTB_SIG_COMPLEXREGULAREXPRESSIONUNIT, JTB_USER_COMPLEXREGULAREXPRESSIONUNIT
-  })
+  @NodeFieldsSignature(old_sig = -1507427530, new_sig = JTB_SIG_COMPLEXREGULAREXPRESSIONUNIT, name = "ComplexRegularExpressionUnit")
   public void visit(final ComplexRegularExpressionUnit n) {
     if ((n.f0.which == 0) || (n.f0.which == 2)) {
       // %0 StringLiteral() OR %2 CharacterList(c)
@@ -1465,7 +1425,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       // %3 #0 "(" #1 ComplexRegularExpressionChoices() #2 ")" #3 ( &0 "+" | &1 "*" | &2 "?"
       // | &3 $0 "{" $1 IntegerLiteral() $2 [ ?0 "," ?1 [ IntegerLiteral() ] ] $3 "}" )?
       final NodeSequence seq = (NodeSequence) n.f0.choice;
-      ComplexRegularExpressionChoices crec = (ComplexRegularExpressionChoices) seq.elementAt(1);
+      final ComplexRegularExpressionChoices crec = (ComplexRegularExpressionChoices) seq.elementAt(1);
       // #0 "("
       seq.elementAt(0).accept(this);
       if (crec.f1.present()) {
@@ -1518,7 +1478,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       }
     }
   }
-  
+
   /**
    * Visits a {@link CharacterList} node, whose children are the following :
    * <p>
@@ -1532,9 +1492,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -966448889, JTB_SIG_CHARACTERLIST, JTB_USER_CHARACTERLIST
-  })
+  @NodeFieldsSignature(old_sig = -966448889, new_sig = JTB_SIG_CHARACTERLIST, name = "CharacterList")
   public void visit(final CharacterList n) {
     // f0 -> [ "~" ]
     if (n.f0.present()) {
@@ -1561,7 +1519,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
     // f3 -> "]"
     n.f3.accept(this);
   }
-  
+
   /**
    * Visits a {@link CharacterDescriptor} node, whose children are the following :
    * <p>
@@ -1572,9 +1530,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      895087809, JTB_SIG_CHARACTERDESCRIPTOR, JTB_USER_CHARACTERDESCRIPTOR
-  })
+  @NodeFieldsSignature(old_sig = 895087809, new_sig = JTB_SIG_CHARACTERDESCRIPTOR, name = "CharacterDescriptor")
   public void visit(final CharacterDescriptor n) {
     // f0 -> StringLiteral()
     n.f0.accept(this);
@@ -1587,7 +1543,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       seq.elementAt(1).accept(this);
     }
   }
-  
+
   /**
    * Visits a {@link IdentifierAsString} node, whose child is the following :
    * <p>
@@ -1597,14 +1553,12 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1580059612, JTB_SIG_IDENTIFIERASSTRING, JTB_USER_IDENTIFIERASSTRING
-  })
+  @NodeFieldsSignature(old_sig = -1580059612, new_sig = JTB_SIG_IDENTIFIERASSTRING, name = "IdentifierAsString")
   public void visit(final IdentifierAsString n) {
-    final String str = gdbv.jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : n.f0.image;
+    final String str = gdbv.jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : ((Token) n.f0).image;
     sb.append(str);
   }
-  
+
   /**
    * Visits a {@link IntegerLiteral} node, whose child is the following :
    * <p>
@@ -1614,14 +1568,12 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1048223857, JTB_SIG_INTEGERLITERAL, JTB_USER_INTEGERLITERAL
-  })
+  @NodeFieldsSignature(old_sig = -1048223857, new_sig = JTB_SIG_INTEGERLITERAL, name = "IntegerLiteral")
   public void visit(final IntegerLiteral n) {
-    final String str = gdbv.jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : n.f0.image;
+    final String str = gdbv.jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : ((Token) n.f0).image;
     sb.append(str);
   }
-  
+
   /**
    * Visits a {@link StringLiteral} node, whose child is the following :
    * <p>
@@ -1631,9 +1583,7 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      241433948, JTB_SIG_STRINGLITERAL, JTB_USER_STRINGLITERAL
-  })
+  @NodeFieldsSignature(old_sig = 241433948, new_sig = JTB_SIG_STRINGLITERAL, name = "StringLiteral")
   public void visit(final StringLiteral n) {
     if (gdbv.jopt.printSpecialTokensJJ) {
       sb.append(UnicodeConverter.addUnicodeEscapes(n.f0.withSpecials(spc.spc, gvaStr)));
@@ -1641,9 +1591,9 @@ class JavaCCPrinter extends DepthFirstVoidVisitor {
       if (gvaStr != null) {
         sb.append(gvaStr);
       }
-      sb.append(UnicodeConverter.addUnicodeEscapes(n.f0.image));
+      sb.append(UnicodeConverter.addUnicodeEscapes(((Token) n.f0).image));
     }
     gvaStr = null;
   }
-  
+
 }

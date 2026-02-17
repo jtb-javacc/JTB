@@ -11,6 +11,7 @@ import static EDU.purdue.jtb.common.Constants.genDepthLevelVar;
 import static EDU.purdue.jtb.common.Constants.genNodeVar;
 import static EDU.purdue.jtb.common.Constants.genVisVar;
 import static EDU.purdue.jtb.common.Constants.iNode;
+import static EDU.purdue.jtb.common.Constants.jjToken;
 import static EDU.purdue.jtb.common.Constants.nodeToken;
 import EDU.purdue.jtb.analyse.GlobalDataBuilder;
 import EDU.purdue.jtb.common.JTBOptions;
@@ -35,16 +36,17 @@ import EDU.purdue.jtb.common.VisitorInfo.ArgumentInfo;
  * @version 1.5.1 : 07/2023 : MMa : fixed issue on Token import<br>
  *          1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
  *          replacement by Token
+ * @version 1.5.3 : 11/2025 : MMa : fixed packages handling
  */
 public class CommonCodeGenerator {
-  
+
   /** The {@link GlobalDataBuilder} visitor */
   protected final GlobalDataBuilder          gdbv;
   /** The {@link CommentsPrinter} visitor */
   private final ThreadLocal<CommentsPrinter> tlcpv;
   /** The global JTB options (not thread safe but used only in read-access) */
   final JTBOptions                           jopt;
-  
+
   /**
    * Constructor. s
    *
@@ -55,7 +57,7 @@ public class CommonCodeGenerator {
     jopt = aGdbv.jopt;
     tlcpv = ThreadLocal.withInitial(() -> new CommentsPrinter(aGdbv, this));
   }
-  
+
   /**
    * Generates the serial version UID member.
    *
@@ -68,7 +70,7 @@ public class CommonCodeGenerator {
     aSb.append("  private static final long serialVersionUID = ").append(SERIALVERSIONUID).append("L;")
         .append(LS).append(LS);
   }
-  
+
   /**
    * Generates a comment header for visitors accept methods.
    *
@@ -86,7 +88,7 @@ public class CommonCodeGenerator {
     aSb.append(")").append(LS);
     aSb.append("   */").append(LS).append(LS);
   }
-  
+
   /**
    * Generates a comment header for parent pointer getter and setter methods.
    *
@@ -97,7 +99,7 @@ public class CommonCodeGenerator {
     aSb.append("   * Parent pointer getter and setter (-pp option)").append(LS);
     aSb.append("   */").append(LS).append(LS);
   }
-  
+
   /**
    * Generates a comment header for children methods.
    *
@@ -108,7 +110,7 @@ public class CommonCodeGenerator {
     aSb.append("   * Children methods (-chm option)").append(LS);
     aSb.append("   */").append(LS).append(LS);
   }
-  
+
   /**
    * Generates the list of all children field.
    *
@@ -120,7 +122,7 @@ public class CommonCodeGenerator {
     }
     aSb.append("  private List<INode> lac = null;").append(LS).append(LS);
   }
-  
+
   /**
    * Generates the number of base nodes children field.
    *
@@ -132,7 +134,7 @@ public class CommonCodeGenerator {
     }
     aSb.append("  private int nbLbc = -1;").append(LS).append(LS);
   }
-  
+
   /**
    * Generates the list of base nodes children field.
    *
@@ -144,7 +146,7 @@ public class CommonCodeGenerator {
     }
     aSb.append("  private List<INode> lbc = null;").append(LS).append(LS);
   }
-  
+
   /**
    * Generates the number of user nodes children field.
    *
@@ -156,7 +158,7 @@ public class CommonCodeGenerator {
     }
     aSb.append("  private int nbLuc = -1;").append(LS).append(LS);
   }
-  
+
   /**
    * Generates the list of user nodes children field.
    *
@@ -168,7 +170,7 @@ public class CommonCodeGenerator {
     }
     aSb.append("  private List<INode> luc = null;").append(LS).append(LS);
   }
-  
+
   /**
    * Generates an always true isBaseNode() method (implementation).
    *
@@ -183,7 +185,7 @@ public class CommonCodeGenerator {
     aSb.append("    return true;").append(LS);
     aSb.append("  }").append(LS).append(LS);
   }
-  
+
   /**
    * Generates an always false isBaseNode() method (implementation).
    *
@@ -198,7 +200,7 @@ public class CommonCodeGenerator {
     aSb.append("    return false;").append(LS);
     aSb.append("  }").append(LS).append(LS);
   }
-  
+
   /**
    * Generates the javadoc comment for the getXxxxAllChilren() method.
    *
@@ -215,7 +217,7 @@ public class CommonCodeGenerator {
     aSb.append(LS);
     aSb.append("   */").append(LS);
   }
-  
+
   /**
    * Generates the javadoc comment for the getXxxxBaseChilren() and getXxxxUserChilren() methods.
    *
@@ -235,7 +237,7 @@ public class CommonCodeGenerator {
     aSb.append(LS);
     aSb.append("   */").append(LS);
   }
-  
+
   /**
    * Generates the javadoc comment for the isBaseNode() method.
    *
@@ -251,7 +253,7 @@ public class CommonCodeGenerator {
     aSb.append(LS);
     aSb.append("   */").append(LS);
   }
-  
+
   /**
    * Generates the parameters comment (same for all visit methods).<br>
    *
@@ -271,7 +273,7 @@ public class CommonCodeGenerator {
     }
     aSb.append(aSpc.spc).append(" */").append(LS);
   }
-  
+
   /**
    * Generates javadoc comments for the type parameters.
    *
@@ -290,7 +292,7 @@ public class CommonCodeGenerator {
       }
     }
   }
-  
+
   /**
    * Generates the visitors classes accept methods (implementations).
    *
@@ -314,7 +316,7 @@ public class CommonCodeGenerator {
       }
     }
   }
-  
+
   /**
    * Generates the javadoc comment for an accept method.
    *
@@ -356,7 +358,7 @@ public class CommonCodeGenerator {
     }
     aSb.append("   */").append(LS);
   }
-  
+
   /**
    * Generates JavaCC Token import.
    *
@@ -366,53 +368,63 @@ public class CommonCodeGenerator {
     if (gdbv.packageName != null) {
       aSb.append("import ").append(gdbv.packageName).append(".Token").append(';').append(LS);
       aSb.append(LS);
-    } else if (jopt.grammarPackageName != null) {
-      aSb.append("import ").append(jopt.grammarPackageName).append(".Token").append(';').append(LS);
+    } else if (jopt.basePkgName != null) {
+      aSb.append("import ").append(jopt.basePkgName).append(".Token").append(';').append(LS);
       aSb.append(LS);
       // } else {
       // aSb.append("import Token").append(';').append(LS);
       // aSb.append(LS);
     }
   }
-  
+
   /**
    * Generates visitor classes & interfaces imports.
    *
    * @param aSb - a buffer to append to (must be non null)
    */
   void interfaceVisitorsImports(final StringBuilder aSb) {
-    if (jopt.visitorsPackageName != null && !jopt.noVisitors) {
+    if (jopt.visitorsPkgName != null && !jopt.noVisitors) {
       for (final VisitorInfo vi : jopt.visitorsList) {
-        aSb.append("import ").append(jopt.visitorsPackageName).append(".").append(vi.interfaceName)
-            .append(';').append(LS);
+        aSb.append("import ").append(jopt.visitorsPkgName).append(".").append(vi.interfaceName).append(';')
+            .append(LS);
       }
     }
     aSb.append(LS);
   }
-  
+
   /**
-   * Generates the Token import.
+   * Generates the NodeToken import.
    *
    * @param aSb - a buffer to append to (must be non null)
    */
-  void tokenImport(final StringBuilder aSb) {
-    if (jopt.grammarPackageName != null) {
-      aSb.append("import ").append(jopt.grammarPackageName).append(".").append(nodeToken).append(";")
-          .append(LS);
+  void nodeTokenImport(final StringBuilder aSb) {
+    if (jopt.nodesPkgName != null) {
+      aSb.append("import ").append(jopt.nodesPkgName).append(".").append(nodeToken).append(";").append(LS);
     }
   }
-  
+
   /**
-   * Generates the Token import.
+   * Generates the (JavaCC) Token import.
+   *
+   * @param aSb - a buffer to append to (must be non null)
+   */
+  void jjTokenImport(final StringBuilder aSb) {
+    if (jopt.basePkgName != null) {
+      aSb.append("import ").append(jopt.basePkgName).append(".").append(jjToken).append(";").append(LS);
+    }
+  }
+
+  /**
+   * Generates the INode import.
    *
    * @param aSb - a buffer to append to (must be non null)
    */
   void inodeImport(final StringBuilder aSb) {
-    if (jopt.grammarPackageName != null) {
-      aSb.append("import ").append(jopt.nodesPackageName).append(".").append(iNode).append(";").append(LS);
+    if (jopt.nodesPkgName != null) {
+      aSb.append("import ").append(jopt.nodesPkgName).append(".").append(iNode).append(";").append(LS);
     }
   }
-  
+
   /**
    * Generates parent pointer field.
    *
@@ -426,7 +438,7 @@ public class CommonCodeGenerator {
       aSb.append("  private ").append(iNode).append(" parent;").append(LS).append(LS);
     }
   }
-  
+
   /**
    * Generates parent pointer getter and setter methods (implementations in classes).
    *
@@ -435,7 +447,7 @@ public class CommonCodeGenerator {
   void parentPointerGetterSetterImpl(final StringBuilder aSb) {
     if (jopt.parentPointer) {
       cmtHeaderParentPointer(aSb);
-      
+
       if (jopt.javaDocComments) {
         aSb.append("  /**").append(LS);
         aSb.append("   * Gets the parent node.").append(LS);
@@ -447,7 +459,7 @@ public class CommonCodeGenerator {
       aSb.append("  public ").append(iNode).append(" getParent() {").append(LS);
       aSb.append("    return parent;").append(LS);
       aSb.append("  }").append(LS).append(LS);
-      
+
       if (jopt.javaDocComments) {
         aSb.append("  /**").append(LS);
         aSb.append("   * Sets the parent node.").append(LS);
@@ -462,7 +474,7 @@ public class CommonCodeGenerator {
       aSb.append("  }").append(LS).append(LS);
     }
   }
-  
+
   /**
    * Generates parent pointer getter and setter methods (declaration in interface).
    *
@@ -471,7 +483,7 @@ public class CommonCodeGenerator {
   void parentPointerGetterSetterDecl(final StringBuilder aSb) {
     if (jopt.parentPointer) {
       cmtHeaderParentPointer(aSb);
-      
+
       if (jopt.javaDocComments) {
         aSb.append("  /**").append(LS);
         aSb.append("   * Gets the parent node.").append(LS);
@@ -480,7 +492,7 @@ public class CommonCodeGenerator {
         aSb.append("   */").append(LS);
       }
       aSb.append("  public ").append(iNode).append(" getParent();").append(LS).append(LS);
-      
+
       if (jopt.javaDocComments) {
         aSb.append("  /**").append(LS);
         aSb.append("   * Sets the parent node. (It is the responsibility of each implementing class")
@@ -494,7 +506,7 @@ public class CommonCodeGenerator {
           .append(LS).append(LS);
     }
   }
-  
+
   /**
    * Generates parent pointer set call.
    *
@@ -507,7 +519,7 @@ public class CommonCodeGenerator {
       aSb.append("      ").append(aNode).append(".setParent(this);").append(LS);
     }
   }
-  
+
   /**
    * Append to a given buffer a set of javadoc lines comments (*) showing a BNF description of the current
    * class. They include the debug comments (after the break tag) if they have been produced, and the fields
@@ -569,7 +581,7 @@ public class CommonCodeGenerator {
     aSb.append(aSpc.spc).append(" * s: ").append(aUci.fieldsHashSig).append(BRLS);
     return;
   }
-  
+
   /**
    * Append to a given buffer a java code line comment (//) showing a BNF description of the current field. It
    * does not include the debug comments even if they have been produced.
@@ -605,7 +617,7 @@ public class CommonCodeGenerator {
     }
     return;
   }
-  
+
   /**
    * Append to a given buffer a java code (//) comment showing a BNF description of the current part. They do
    * not include the debug comments even if they have been produced.
@@ -642,7 +654,7 @@ public class CommonCodeGenerator {
     }
     return;
   }
-  
+
   /**
    * Generates if not already done the comments trees by delegating this to the {@link CommentsPrinter}
    * visitor.
@@ -654,7 +666,7 @@ public class CommonCodeGenerator {
       tlcpv.get().genCommentsData(aUci);
     }
   }
-  
+
   /**
    * Output code to decrease the depth level.
    *
@@ -664,7 +676,7 @@ public class CommonCodeGenerator {
   static void increaseDepthLevel(final StringBuilder aSb, final Spacing aSpc) {
     aSb.append(aSpc.spc).append("++").append(genDepthLevelVar).append(';').append(LS);
   }
-  
+
   /**
    * Output code to increase the depth level.
    *
@@ -674,5 +686,5 @@ public class CommonCodeGenerator {
   static void decreaseDepthLevel(final StringBuilder aSb, final Spacing aSpc) {
     aSb.append(aSpc.spc).append("--").append(genDepthLevelVar).append(';').append(LS);
   }
-  
+
 }

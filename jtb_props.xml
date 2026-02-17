@@ -49,10 +49,13 @@
   <!--property name="jtb_last_version" value="1.4.13" /-->
   <!-- temp version saved during 1.5.0 dev as visitors have changed -->
   <!--property name="jtb_last_version" value="1.5.1.temp.1" /-->
-  <property name="jtb_last_version" value="1.5.1" />
-  <property name="jtb_curr_version" value="1.5.2" />
+  <property name="jtb_last_version" value="1.5.3" />
+  <property name="jtb_curr_version" value="1.5.4" />
 
   <!-- Condition for some targets -->
+  <condition property="isLastVersion152">
+    <equals arg1="1.5.2" arg2="${jtb_last_version}" />
+  </condition>
   <condition property="isLastVersion150">
     <equals arg1="1.5.0" arg2="${jtb_last_version}" />
   </condition>
@@ -68,8 +71,8 @@
        May be older than the current one, may be a snapshot...,
         so set the 2 properties 'mvn-version' & 'ant-version' here and
         set the 'version' in pom.xml same as 'mvn-version' -->
-  <!--  <property name="mvn-version" value="${jtb_curr_version}-SNAPSHOT" />-->
-  <property name="mvn-version" value="${jtb_curr_version}" />
+  <property name="mvn-version" value="${jtb_curr_version}-SNAPSHOT" />
+  <!--  <property name="mvn-version" value="${jtb_curr_version}" />-->
   <!--  <property name="mvn-version" value="${jtb_last_version}-SNAPSHOT" />-->
   <!--  <property name="mvn-version" value="${jtb_last_version}" />-->
   <property name="ant-version" value="${jtb_curr_version}" />
@@ -92,8 +95,8 @@
   <property name="mvn-ns-pkg" value="edu.purdue.jtb.jtb" />
   <!-- use the non empty value for testing publishing (remoterepo will not be found in settings.xml,
         so that authorization will fail with error code 401), use the empty one for real publishing -->
-  <!--  <property name="mvn-just-test-publish" value="" />-->
-  <property name="mvn-just-test-publish" value="-JUST-TEST" />
+  <property name="mvn-just-test-publish" value="" />
+  <!--  <property name="mvn-just-test-publish" value="-JUST-TEST" />-->
 
   <!-- JTB files and classes -->
   <property name="jtb_parser" value="JTBParser" />
@@ -125,10 +128,10 @@
   <property name="jtb_new_jar" value="${jtb_lib_dir}/new_jtb-${jtb_curr_version}.jar" />
   <property name="jtb_new_jar_src" value="${jtb_lib_dir}/new_jtb-src-${jtb_curr_version}.jar" />
   <!-- current version accepted JTB jar (when new jar is ok) -->
-  <property name="jtb_acc_jar" value="${jtb_lib_dir}/jtb-${jtb_curr_version}.jar" />
-  <property name="jtb_acc_jar_src" value="${jtb_lib_dir}/jtb-src-${jtb_curr_version}.jar" />
-  <condition property="jtb_ok_jar" value="${jtb_acc_jar}">
-    <available file="${jtb_acc_jar}" />
+  <property name="jtb_acc_jar" value="${jtb_lib_dir}/jtb-${mvn-version}.jar" />
+  <property name="jtb_acc_jar_src" value="${jtb_lib_dir}/jtb-src-${mvn-version}.jar" />
+  <condition property="jtb_ok_jar" value="${jtb_lib_dir}/jtb-${jtb_curr_version}.jar">
+    <available file="${jtb_lib_dir}/jtb-${jtb_curr_version}.jar" />
   </condition>
   <condition property="jtb_ok_jar" value="${jtb_last_jar}">
     <not>
@@ -138,6 +141,7 @@
 
   <!-- Specific for compile time annotation processing -->
   <property name="jtb_ap_jar" value="${jtb_lib_dir}/ap.jar" />
+  <property name="jtb_skip_ap" value="true" />
 
   <!-- FreeMarker jar; tar.gz downloaded from Apache FreeMarker site and freemarker.jar extracted/renamed from tar.gz -->
   <property name="freemarker_jar" value="${jtb_lib_dir}/freemarker-2.3.27.jar" />
@@ -189,6 +193,7 @@
     <echo message="jtb_new_jar=${jtb_new_jar}" />
     <echo message="jtb_acc_jar=${jtb_acc_jar}" />
     <echo message="jtb_ok_jar=${jtb_ok_jar}" />
+    <echo message="jtb_skip_ap=${jtb_skip_ap}" />
   </target>
 
 </project>

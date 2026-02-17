@@ -34,9 +34,9 @@ import java.util.List;
  */
 @SuppressWarnings("javadoc")
 public abstract class JavaCCParserInternals extends JavaCCGlobals {
-  
+
   /** Initializes */
-  static protected void initialize() {
+  protected void initialize() {
     // ModMMa Integer(int) in Integer has been deprecated and marked for removal
     // final Integer i = new Integer(0);
     final Integer i = Integer.valueOf(0);
@@ -44,14 +44,14 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     lexstate_I2S.put(i, "DEFAULT");
     simple_tokens_table.put("DEFAULT", new Hashtable<>());
   }
-  
+
   /**
    * @param id - the Compilation Unit name
    */
-  static protected void addcuname(final String id) {
+  protected void addcuname(final String id) {
     cu_name = id;
   }
-  
+
   /**
    * Compares the second id with the first one and raises a parse error if not identical.
    *
@@ -65,13 +65,13 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
           "Name " + id2 + " must be the same as that used at PARSER_BEGIN (" + id1 + ")");
     }
   }
-  
-  static private List<Token> add_cu_token_here  = cu_to_insertion_point_1;
-  static private Token       first_cu_token;
-  static private boolean     insertionpoint1set = false;
-  static private boolean     insertionpoint2set = false;
-  
-  static protected void setinsertionpoint(final Token t, final int no) {
+
+  private List<Token> add_cu_token_here  = cu_to_insertion_point_1;
+  private Token       first_cu_token;
+  private boolean     insertionpoint1set = false;
+  private boolean     insertionpoint2set = false;
+
+  protected void setinsertionpoint(final Token t, final int no) {
     do {
       add_cu_token_here.add(first_cu_token);
       first_cu_token = first_cu_token.next;
@@ -89,8 +89,8 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     }
     first_cu_token = t;
   }
-  
-  static protected void insertionpointerrors(final Token t) {
+
+  protected void insertionpointerrors(final Token t) {
     while (first_cu_token != t) {
       add_cu_token_here.add(first_cu_token);
       first_cu_token = first_cu_token.next;
@@ -99,25 +99,25 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
       JavaCCErrors.parse_error(t, "Parser class has not been defined between PARSER_BEGIN and PARSER_END.");
     }
   }
-  
-  static protected void set_initial_cu_token(final Token t) {
+
+  protected void set_initial_cu_token(final Token t) {
     first_cu_token = t;
   }
-  
-  static protected void addproduction(final NormalProduction p) {
+
+  protected void addproduction(final NormalProduction p) {
     bnfproductions.add(p);
   }
-  
-  static protected void production_addexpansion(final BNFProduction_ p, final Expansion_ e) {
+
+  protected static void production_addexpansion(final BNFProduction_ p, final Expansion_ e) {
     e.parent = p;
     p.setExpansion(e);
   }
-  
-  static private int nextFreeLexState = 1;
-  
+
+  private int nextFreeLexState = 1;
+
   // ModMMa 2017/03 passed non static
   // static protected void addregexpr(final TokenProduction p) {
-  static protected void addregexpr(final TokenProduction p, final boolean userTokenManager) {
+  protected void addregexpr(final TokenProduction p, final boolean userTokenManager) {
     Integer ii;
     rexprlist.add(p);
     // if (Options.getUserTokenManager()) {
@@ -147,10 +147,10 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
       }
     }
   }
-  
+
   // ModMMa 2017/03 passed non static
   // static protected void add_token_manager_decls(final Token t, final List<Token> decls) {
-  static protected void add_token_manager_decls(final Token t, final List<Token> decls,
+  protected void add_token_manager_decls(final Token t, final List<Token> decls,
       final boolean userTokenManager) {
     if (token_mgr_decls != null) {
       JavaCCErrors.parse_error(t, "Multiple occurrence of \"TOKEN_MGR_DECLS\".");
@@ -163,8 +163,8 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
       }
     }
   }
-  
-  static protected void add_inline_regexpr(final RegularExpression_ r) {
+
+  protected void add_inline_regexpr(final RegularExpression_ r) {
     if (!(r instanceof REndOfFile)) {
       final TokenProduction p = new TokenProduction();
       p.isExplicit = false;
@@ -182,7 +182,7 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
       rexprlist.add(p);
     }
   }
-  
+
   static protected boolean hexchar(final char ch) {
     if ((ch >= '0') && (ch <= '9')) {
       return true;
@@ -195,7 +195,7 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     }
     return false;
   }
-  
+
   static protected int hexval(final char ch) {
     if ((ch >= '0') && (ch <= '9')) {
       return ch - '0';
@@ -205,7 +205,7 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     }
     return (ch - 'a') + 10;
   }
-  
+
   static protected String remove_escapes_and_quotes(final Token t, final String str) {
     final int strlen = str.length();
     final StringBuilder buff = new StringBuilder(strlen);
@@ -309,8 +309,8 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     }
     return buff.toString();
   }
-  
-  static protected char character_descriptor_assign(final Token t, final String s) {
+
+  protected static char character_descriptor_assign(final Token t, final String s) {
     if (s.length() != 1) {
       JavaCCErrors.parse_error(t, "String in character list may contain only one character.");
       return ' ';
@@ -318,8 +318,8 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
       return s.charAt(0);
     }
   }
-  
-  static protected char character_descriptor_assign(final Token t, final String s, final String left) {
+
+  protected static char character_descriptor_assign(final Token t, final String s, final String left) {
     if (s.length() != 1) {
       JavaCCErrors.parse_error(t, "String in character list may contain only one character.");
       return ' ';
@@ -331,8 +331,8 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
       return s.charAt(0);
     }
   }
-  
-  static protected void makeTryBlock(final Token tryLoc, final Container result, final Container nestedExp,
+
+  protected static void makeTryBlock(final Token tryLoc, final Container result, final Container nestedExp,
       final List<List<Token>> types, final List<Token> ids, final List<List<Token>> catchblks,
       final List<Token> finallyblk) {
     if ((catchblks.size() == 0) && (finallyblk == null)) {
@@ -351,8 +351,9 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     tblk.finallyblk = finallyblk;
     result.member = tblk;
   }
-  
-  public static void reInit() {
+
+  @Override
+  public void reInit() {
     add_cu_token_here = cu_to_insertion_point_1;
     first_cu_token = null;
     insertionpoint1set = false;

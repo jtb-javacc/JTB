@@ -1,5 +1,10 @@
-/*.java
+/NoOptionsSectionGrammar.java
+/NoOptionsSectionGrammarConstants.java
+/NoOptionsSectionGrammarTokenManager.java
+/ParseException.java
+/SimpleCharStream.java
+/Token.java
+/TokenMgrError.java
 /jtb.out.jj
 /syntaxtree/
 /visitor/
-/visitor/signature/

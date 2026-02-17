@@ -9,14 +9,10 @@ import static EDU.purdue.jtb.common.Constants.nodeList;
 import static EDU.purdue.jtb.common.Constants.nodeListOptional;
 import static EDU.purdue.jtb.common.Constants.nodeOptional;
 import static EDU.purdue.jtb.common.Constants.nodeSequence;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_EXPANSION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_EXPANSIONCHOICES;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_EXPANSIONUNIT;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_SIG_EXPANSIONUNITTCF;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_EXPANSION;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_EXPANSIONCHOICES;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_EXPANSIONUNIT;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.JTB_USER_EXPANSIONUNITTCF;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXPANSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXPANSIONCHOICES;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXPANSIONUNIT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXPANSIONUNITTCF;
 import EDU.purdue.jtb.analyse.GlobalDataBuilder;
 import EDU.purdue.jtb.common.JavaBranchPrinter;
 import EDU.purdue.jtb.common.Messages;
@@ -25,6 +21,7 @@ import EDU.purdue.jtb.common.Spacing;
 import EDU.purdue.jtb.common.UserClassInfo;
 import EDU.purdue.jtb.common.UserClassInfo.FieldInfo;
 import EDU.purdue.jtb.common.VisitorInfo;
+import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.Expansion;
 import EDU.purdue.jtb.parser.syntaxtree.ExpansionChoices;
 import EDU.purdue.jtb.parser.syntaxtree.ExpansionUnit;
@@ -35,7 +32,6 @@ import EDU.purdue.jtb.parser.syntaxtree.NodeList;
 import EDU.purdue.jtb.parser.syntaxtree.NodeListOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
 
 /**
@@ -59,7 +55,7 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  * parallel threads (on the same grammar).
  * </p>
  * TESTCASE some to add
- * 
+ *
  * @author Marc Mazas
  * @version 1.4.0 : 05-08/2009 : MMa : creation
  * @version 1.4.2 : 20/02/2010 : MMa : fixed inlining issue in {@link #visit(ExpansionChoices)}
@@ -82,9 +78,10 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  * @version 1.5.1 : 08/2023 : MMa : added optional annotations in catch of ExpansionUnitTCF ; fixed node
  *          choice generation issue; editing changes for coverage analysis; changes due to the NodeToken
  *          replacement by Token
+ * @version 1.5.3 : 11/2025 : MMa : signature code made independent of parser
  */
-public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
-  
+public class AcceptInliner extends JavaCCPrinter {
+
   /** The processed {@link UserClassInfo} */
   private UserClassInfo        uci;
   /** The {@link UserClassInfo} field number */
@@ -166,12 +163,12 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
   private int                  expLvl;
   /** The ExpansionUnitTCF level we are in : -1 : none; 0, 1, ... : first, second, ... */
   private int                  tcfLvl;
-  
+
   /** The node class debug comment prefix */
   {
     JJNCDCP = " //ai ";
   }
-  
+
   /**
    * Constructor which does nothing.
    *
@@ -182,7 +179,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
     super(aGdbv, aCcg);
     jopt = aGdbv.jopt;
   }
-  
+
   /**
    * Generates the accept methods for all the node tree.<br>
    *
@@ -210,11 +207,11 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
     ixEuOk = 0;
     aCI.astEcNode.accept(this);
   }
-  
+
   /*
    * Convenience methods
    */
-  
+
   // /**
   // * Outputs the current field comment or sub comment depending on the tcf level.
   // *
@@ -228,7 +225,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
   // outputSubComment("tcfLvl > 0, " + aStr);
   // }
   // }
-  
+
   /**
    * Outputs the current field comment on a line.
    *
@@ -237,7 +234,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
   private void outputFieldComment(final String aStr) {
     ccg.fmtOneJavaCodeFieldCmt(sb, spc, fn, aStr, uci);
   }
-  
+
   /**
    * Outputs the current sub comment on a line.
    *
@@ -247,11 +244,11 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
     CommonCodeGenerator.fmtOneJavaCodeSubCmt(sb, spc, scn, aStr, uci);
     scn++;
   }
-  
+
   /*
    * User grammar generated and overridden visit methods below
    */
-  
+
   /**
    * Visits a {@link ExpansionChoices} node, whose children are the following :
    * <p>
@@ -262,43 +259,41 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1726831935, JTB_SIG_EXPANSIONCHOICES, JTB_USER_EXPANSIONCHOICES
-  })
+  @NodeFieldsSignature(old_sig = -1726831935, new_sig = JTB_SIG_EXPANSIONCHOICES, name = "ExpansionChoices")
   public void visit(final ExpansionChoices n) {
     String oldRef = ref;
     String oldVar = var;
     String oldType = type;
     int oldCaseIx;
     int oldIxEuOk;
-    
+
     oneDebugClassNewLine(n,
         "a, expLvl = " + expLvl + ", loopIx = " + loopIx + ", fn = " + fn + ", tcfLvl = " + tcfLvl,
         ", ufs = " + uci.fields.size());
-    
+
     // only f0
     if (!n.f1.present()) {
       oneDebugClassNewLine(n, "b, only f0, ref = " + ref + ", var = " + var + ", type = " + type
           + ", caseIx = " + caseIx + ", ixEuOk = " + ixEuOk);
-      
+
       // visit Expansion()
       oldCaseIx = caseIx = -1;
       oldIxEuOk = ixEuOk;
       n.f0.accept(this);
       ixEuOk = oldIxEuOk;
-      
+
       oneDebugClassNewLine(n, "c, only f0, ixEuOk = " + ixEuOk);
-      
+
       return;
     }
-    
+
     // f0 and f1 : generate switch choice
-    
+
     // f0 -> Expansion() : generate variables and case 0
-    
+
     boolean genNode = true;
     String var1 = null;
-    
+
     if (expLvl == 0) {
       genNode = fn < uci.fields.size();
       if (genNode) {
@@ -356,15 +351,15 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
       ref = var.concat(".choice");
       var1 = var;
     }
-    
+
     if (genNode) {
-      
+
       if (tcfLvl >= 0) {
         sb.append(spc.spc).append("if (").append(var).append(" != null) {");
         oneNewLine(n, "f, if (tcfLvl >= 0)");
         spc.updateSpc(+1);
       }
-      
+
       if (LONGNAMES) {
         var += "H";
       } else {
@@ -381,14 +376,14 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
       oneNewLine(n, "h, switch");
       type = iNode;
       ref = var;
-      
+
       spc.updateSpc(+1);
       sb.append(spc.spc).append("case 0:");
       oneNewLine(n, "i, case 0, ixEuOk = " + ixEuOk);
       spc.updateSpc(+1);
       outputSubComment("ExpansionChoices, h");
     }
-    
+
     // visit Expansion
     oldRef = ref;
     oldVar = var;
@@ -403,25 +398,25 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
     type = oldType;
     caseIx = oldCaseIx;
     ixEuOk = oldIxEuOk;
-    
+
     if (genNode) {
       sb.append(spc.spc).append("break;");
       oneNewLine(n, "j, break 0");
       spc.updateSpc(-1);
     }
-    
+
     // f1 -> ( "|" Expansion() )* : generate other cases
     for (int i = 0; i < n.f1.size();) {
       final NodeSequence seq = (NodeSequence) n.f1.elementAt(i);
       i++;
-      
+
       if (genNode) {
         sb.append(spc.spc).append("case ").append(i).append(":");
         oneNewLine(n, "k, case, ixEuOk = " + ixEuOk);
         spc.updateSpc(+1);
         outputSubComment("ExpansionChoices, j");
       }
-      
+
       // visit Expansion
       oldCaseIx = caseIx = i;
       oldIxEuOk = ixEuOk;
@@ -433,14 +428,14 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
       type = oldType;
       caseIx = oldCaseIx;
       ixEuOk = oldIxEuOk;
-      
+
       if (genNode) {
         sb.append(spc.spc).append("break;");
         oneNewLine(n, "l, break n , ixEuOk = " + ixEuOk);
         spc.updateSpc(-1);
       }
     }
-    
+
     if (genNode) {
       // generate default and end of switch
       sb.append(spc.spc).append("default:");
@@ -451,11 +446,11 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
       sb.append(spc.spc).append("throw new ShouldNotOccurException(").append(var1).append(");");
       oneNewLine(n, "o, throw");
       spc.updateSpc(-1);
-      
+
       spc.updateSpc(-1);
       sb.append(spc.spc).append("}");
       oneNewLine(n, "p, }");
-      
+
       if (tcfLvl >= 0) {
         spc.updateSpc(-1);
         sb.append(spc.spc).append("}");
@@ -463,7 +458,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
       }
     }
   }
-  
+
   /**
    * Visits a {@link Expansion} node, whose children are the following :
    * <p>
@@ -474,14 +469,12 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -2134365682, JTB_SIG_EXPANSION, JTB_USER_EXPANSION
-  })
+  @NodeFieldsSignature(old_sig = -2134365682, new_sig = JTB_SIG_EXPANSION, name = "Expansion")
   public void visit(final Expansion n) {
     // don't take f0, only f1
-    
+
     // f1 -> ( ExpansionUnit() )+ : visit something within a sequence (nbEu > 1) or directly (nbEu == 1)
-    
+
     // count the number of non LocalLookahead nor Block nor not to be created nodes
     nbEu = 0;
     for (final INode e : n.f1.nodes) {
@@ -491,10 +484,10 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
       }
     }
     final int sz = n.f1.size();
-    
+
     oneDebugClassNewLine(n, "a, expLvl = " + expLvl + ", nbEu = " + nbEu + ", loopIx = " + loopIx + ", fn = "
         + fn + ", tcfLvl = " + tcfLvl + ", type = " + type + ", ixEuOk = " + ixEuOk + ", sz = " + sz);
-    
+
     if ((tcfLvl == -1) //
         && (expLvl > 0) //
         && (nbEu > 1) //
@@ -514,17 +507,17 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
           ") --> ", nodeSequence);
       type = nodeSequence;
     }
-    
+
     final String oldRef = ref;
     final String oldVar = var;
     final String oldType = type;
     final int oldNbEu = nbEu;
-    
+
     for (int i = 0; i < sz; i++) {
       final ExpansionUnit expUnit = (ExpansionUnit) n.f1.elementAt(i);
       // don't process LocalLookahead nor Block nor not to be created nodes
       if (gdbv.getNbSubNodesTbc(expUnit) != 0) {
-        
+
         // generate variables except for ExpansionUnitTCF
         if (expUnit.f0.which != 3) {
           // case an ExpansionUnit not an ExpansionUnitTCF
@@ -610,7 +603,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
           oneDebugClassNewLine(n, "g, euTCF, expLvl = " + expLvl + ", nbEu = " + nbEu + ", loopIx = " + loopIx
               + ", fn = " + fn + ", tcfLvl = " + tcfLvl + ", ixEuOk = " + ixEuOk + ", type = " + type);
         }
-        
+
         // visit ExpansionUnit
         final int oldNloeaiJx = nloeaiJx;
         ++expLvl;
@@ -621,14 +614,14 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
         type = oldType;
         nbEu = oldNbEu;
         nloeaiJx = oldNloeaiJx;
-        
+
         ixEuOk++;
-        
+
       }
     }
-    
+
   }
-  
+
   /**
    * Visits a {@link ExpansionUnit} node, whose child is the following :
    * <p>
@@ -651,9 +644,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1116287061, JTB_SIG_EXPANSIONUNIT, JTB_USER_EXPANSIONUNIT
-  })
+  @NodeFieldsSignature(old_sig = 1116287061, new_sig = JTB_SIG_EXPANSIONUNIT, name = "ExpansionUnit")
   public void visit(final ExpansionUnit n) {
     final NodeSequence seq;
     NodeOptional opt;
@@ -664,7 +655,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
     int oldLoopIx;
     String loopIxStr;
     final int oldIxEuOk = ixEuOk;
-    
+
     switch (n.f0.which) {
     case 0:
       // %0 #0 "LOOKAHEAD" #1 "(" #2 LocalLookahead() #3 ")"
@@ -672,14 +663,14 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
       String msg = "visit ExpansionUnit type 0 should not occur !";
       Messages.hardErr(msg);
       throw new ProgrammaticError(msg);
-    
+
     case 1:
       // %1 Block()
       // should not be called !
       msg = "visit ExpansionUnit type 1 should not occur !";
       Messages.hardErr(msg);
       throw new ProgrammaticError(msg);
-    
+
     case 2:
       // %2 #0 "[" #1 ExpansionChoices() #2 "]"
       // visit something within a node optional
@@ -687,9 +678,9 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
       oneDebugClassNewLine(n,
           "2, beg, ixEuOk = " + ixEuOk + " <- 0, tcfLvl = " + tcfLvl + ", expLvl = " + expLvl);
       ixEuOk = 0;
-      
+
       seq = (NodeSequence) n.f0.choice;
-      
+
       if ((tcfLvl == 0) //
           && (expLvl == 2)) {
         outputFieldComment("ExpansionUnit, EU type 2 [EC]");
@@ -716,7 +707,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
         oneNewLine(n, "2, type (", type, ") --> ", nodeOptional);
         type = nodeOptional;
       }
-      
+
       if (tcfLvl >= 0) {
         sb.append(spc.spc).append("if ((").append(var).append(" != null) && ").append(var)
             .append(".present()) {");
@@ -726,7 +717,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
       oneNewLine(n, "2, if");
       spc.updateSpc(+1);
       ref = var.concat(".node");
-      
+
       // visit ExpansionChoices
       ++expLvl;
       seq.elementAt(1).accept(this);
@@ -734,12 +725,12 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
       ref = oldRef;
       var = oldVar;
       type = oldType;
-      
+
       spc.updateSpc(-1);
       sb.append(spc.spc).append("}");
       oneNewLine(n, "2, end");
       break;
-    
+
     case 3:
       // %3 ExpansionUnitTCF()
       oneDebugClassNewLine(n, "3_beg, ixEuOk = " + ixEuOk + ", tcfLvl = " + tcfLvl);
@@ -750,7 +741,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
       var = oldVar;
       type = oldType;
       break;
-    
+
     case 4:
       // %4 #0 [ $0 PrimaryExpression() $1 "=" ]
       // .. #1 ( &0 $0 IdentifierAsString() $1 Arguments()
@@ -759,7 +750,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
       // .. .. . .. $1 [ ?0 "." ?1 < IDENTIFIER > ]
       // .. .. . .. $2 [ "!" ] )
       seq = (NodeSequence) n.f0.choice;
-      
+
       // #0 [ $0 PrimaryExpression() $1 "=" ]
       opt = (NodeOptional) seq.elementAt(0);
       if (opt.present()) {
@@ -774,7 +765,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
         // sb.append("// Please report to support : TO DO #0 [ $0 PrimaryExpression() $1 \"=\" ]");
         // oneNewLine(n, "4_._PrimaryExpression()");
       }
-      
+
       // #1 (&0 ... | &1 ...)
       ch = (NodeChoice) seq.elementAt(1);
       final NodeSequence seq1 = (NodeSequence) ch.choice;
@@ -841,7 +832,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
         }
       }
       break;
-    
+
     case 5:
       // %5 #0 "(" #1 ExpansionChoices() #2 ")"
       // .. #3 ( &0 "+" | &1 "*" | &2 "?" )?
@@ -849,9 +840,9 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
       // with a node optional for ?, and with a node sequence or a to be found deeper for nothing
       oneDebugClassNewLine(n, "5_beg, ixEuOk = " + ixEuOk + " <- 0");
       ixEuOk = 0;
-      
+
       seq = (NodeSequence) n.f0.choice;
-      
+
       // #3 ( &0 "+" | &1 "*" | &2 "?" )?
       opt = (NodeOptional) seq.elementAt(3);
       if (opt.present()) {
@@ -859,7 +850,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
         if (ch.which == 0) {
           // &0 "+" modifier : visit something within a node list
           oneDebugClassNewLine(n, "5_+ beg; tcfLvl = " + tcfLvl + ", expLvl = " + expLvl);
-          
+
           String var1 = var;
           if ((tcfLvl == 0) //
               && (expLvl == 2)) {
@@ -890,7 +881,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
             oneNewLine(n, "tcf || type (", type, ") --> ", nodeList);
             type = nodeList;
           }
-          
+
           oldLoopIx = loopIx;
           loopIxStr = loopIx == 0 ? "" : String.valueOf(loopIx);
           loopIx++;
@@ -898,7 +889,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
               .append(" < ").append(var1).append(".size(); i").append(loopIxStr).append("++) {");
           oneNewLine(n, "5_+_for");
           spc.updateSpc(+1);
-          
+
           ref = var1.concat(".elementAt(i").concat(String.valueOf(loopIxStr)).concat(")");
           if (LONGNAMES) {
             var = var.concat("Ei");
@@ -914,7 +905,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
           oneNewLine(n, "5_+_elem");
           ref = var;
           type = iNode;
-          
+
           // visit ExpansionChoices
           ++expLvl;
           seq.elementAt(1).accept(this);
@@ -923,15 +914,15 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
           var = oldVar;
           type = oldType;
           loopIx = oldLoopIx;
-          
+
           spc.updateSpc(-1);
           sb.append(spc.spc).append("}");
           oneNewLine(n, "5_+_}");
-          
+
         } else if (ch.which == 1) {
           // &1 "*" modifier : visit something within a node list optional
           oneDebugClassNewLine(n, "5_*, beg; tcfLvl = " + tcfLvl + ", expLvl = " + expLvl);
-          
+
           ref = var;
           if ((tcfLvl == 0) //
               && (expLvl == 2)) {
@@ -958,7 +949,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
             oneNewLine(n, "5_tcf || type (", type, ") --> ", nodeListOptional);
             type = nodeListOptional;
           }
-          
+
           if (tcfLvl >= 0) {
             sb.append(spc.spc).append("if ((").append(var).append(" != null) && ").append(var)
                 .append(".present()) {");
@@ -967,7 +958,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
           }
           oneNewLine(n, "5_*_if");
           spc.updateSpc(+1);
-          
+
           oldLoopIx = loopIx;
           loopIxStr = loopIx == 0 ? "" : String.valueOf(loopIx);
           loopIx++;
@@ -975,7 +966,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
               .append(" < ").append(var).append(".size(); i").append(loopIxStr).append("++) {");
           oneNewLine(n, "5_*_for");
           spc.updateSpc(+1);
-          
+
           ref = var.concat(".elementAt(i").concat(String.valueOf(loopIxStr)).concat(")");
           if (LONGNAMES) {
             var = var.concat("Mi");
@@ -993,7 +984,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
               .append(';');
           oneNewLine(n, "5_*_elem");
           ref = var;
-          
+
           // visit ExpansionChoices
           ++expLvl;
           seq.elementAt(1).accept(this);
@@ -1002,20 +993,20 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
           var = oldVar;
           type = oldType;
           loopIx = oldLoopIx;
-          
+
           spc.updateSpc(-1);
           sb.append(spc.spc).append("}");
           oneNewLine(n, "5_*_}_1");
-          
+
           spc.updateSpc(-1);
           sb.append(spc.spc).append("}");
           oneNewLine(n, "5_*_}_2");
-          
+
         } else {
           // &2 "?" modifier : visit something within a node optional
           // (similar to case 2)
           oneDebugClassNewLine(n, "5_?, beg; tcfLvl = " + tcfLvl + ", expLvl = " + expLvl);
-          
+
           if ((tcfLvl == 0) //
               && (expLvl == 2)) {
             outputFieldComment("ExpansionUnit, EU type 5_? (EC)?");
@@ -1046,7 +1037,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
             oneNewLine(n, "5_?, type (", type, ") --> ", nodeOptional);
             type = nodeOptional;
           }
-          
+
           if (tcfLvl >= 0) {
             sb.append(spc.spc).append("if ((").append(var).append(" != null) && ").append(var)
                 .append(".present()) {");
@@ -1056,7 +1047,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
           oneNewLine(n, "5_?, if");
           spc.updateSpc(+1);
           ref = var.concat(".node");
-          
+
           // visit ExpansionChoices
           ++expLvl;
           seq.elementAt(1).accept(this);
@@ -1064,16 +1055,16 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
           ref = oldRef;
           var = oldVar;
           type = oldType;
-          
+
           spc.updateSpc(-1);
           sb.append(spc.spc).append("}");
           oneNewLine(n, "5_?, end");
         }
-        
+
       } else {
         // no modifier : visit something with a node sequence
         oneDebugClassNewLine(n, "5_no, beg; tcfLvl = " + tcfLvl + ", expLvl = " + expLvl);
-        
+
         if ((tcfLvl == 0) //
             && (expLvl == 2)) {
           outputFieldComment("ExpansionUnit, EU type 5 (EC)");
@@ -1097,7 +1088,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
           type = nodeSequence;
           ref = var;
         }
-        
+
         // visit ExpansionChoices
         ++expLvl;
         seq.elementAt(1).accept(this);
@@ -1107,18 +1098,18 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
         type = oldType;
       }
       break;
-    
+
     default:
       msg = "Invalid n.f0.which = " + n.f0.which;
       Messages.hardErr(msg);
       throw new ProgrammaticError(msg);
-    
+
     }
-    
+
     ixEuOk = oldIxEuOk;
-    
+
   }
-  
+
   /**
    * Visits a {@link ExpansionUnitTCF} node, whose children are the following :
    * <p>
@@ -1136,9 +1127,7 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1601707097, JTB_SIG_EXPANSIONUNITTCF, JTB_USER_EXPANSIONUNITTCF
-  })
+  @NodeFieldsSignature(old_sig = 1601707097, new_sig = JTB_SIG_EXPANSIONUNITTCF, name = "ExpansionUnitTCF")
   public void visit(final ExpansionUnitTCF n) {
     tcfLvl++;
     if (tcfLvl > 0) {
@@ -1147,5 +1136,5 @@ public class AcceptInliner extends JavaCCPrinter { // NO_UCD (use default)
     n.f2.accept(this);
     tcfLvl--;
   }
-  
+
 }

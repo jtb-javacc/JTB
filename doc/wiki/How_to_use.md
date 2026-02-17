@@ -320,6 +320,8 @@ Two types of **syntax tree nodes** are generated, in the <a href="../../target/g
 
 Base nodes are invariant (i.e. they do not depend on the input grammar; they may vary over JTB's versions).
 
+If no (JavaCC) `TOKEN_EXTENDS` option is set (in the grammar or in the command line arguments), JTB generates a `TOKEN_EXTENDS="<syntaxtree-package>.NodeToken";` option in the **.jj** grammar; if the user wants its own super class for the JavaCC **Token.java** class by putting a `TOKEN_EXTENDS="<user-Token-superclass>";` option in the JTB grammar, this superclass must extend the JTB **NodeToken.java** class.
+
 User nodes are generated with as many (class) fields of (base or user) nodes as the nodes' children. See the 2 examples.
 
 These fields are by default named `f0`, `f1`, ... `fn`, but can be named like their type (class name) through the `-f` option. See the **SmallGrammar.jtb** example.  

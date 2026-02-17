@@ -1,18 +1,6 @@
 package examples.java.ex2jtb.visitor;
 
-import static examples.java.ex2jtb.syntaxtree.NodeConstants.JTB_USER_NODE_NAME;
-import static examples.java.ex2jtb.syntaxtree.NodeConstants.JTB_USER_ASTSTART;
-import static examples.java.ex2jtb.syntaxtree.NodeConstants.JTB_SIG_ASTADDITIVEEXPRESSION;
-import static examples.java.ex2jtb.syntaxtree.NodeConstants.JTB_SIG_ASTINTEGER;
-import static examples.java.ex2jtb.syntaxtree.NodeConstants.JTB_SIG_ASTMULTIPLICATIVEEXPRESSION;
-import static examples.java.ex2jtb.syntaxtree.NodeConstants.JTB_SIG_ASTMYID;
-import static examples.java.ex2jtb.syntaxtree.NodeConstants.JTB_SIG_ASTSTART;
-import static examples.java.ex2jtb.syntaxtree.NodeConstants.JTB_SIG_ASTUNARYEXPRESSION;
-import static examples.java.ex2jtb.syntaxtree.NodeConstants.JTB_USER_ASTADDITIVEEXPRESSION;
-import static examples.java.ex2jtb.syntaxtree.NodeConstants.JTB_USER_ASTINTEGER;
-import static examples.java.ex2jtb.syntaxtree.NodeConstants.JTB_USER_ASTMULTIPLICATIVEEXPRESSION;
-import static examples.java.ex2jtb.syntaxtree.NodeConstants.JTB_USER_ASTMYID;
-import static examples.java.ex2jtb.syntaxtree.NodeConstants.JTB_USER_ASTUNARYEXPRESSION;
+import static examples.java.ex2jtb.syntaxtree.Eg2NodeConstants.*;
 import examples.java.ex2jtb.visitor.signature.NodeFieldsSignature;
 import examples.java.ex2jtb.syntaxtree.ASTAdditiveExpression;
 import examples.java.ex2jtb.syntaxtree.ASTInteger;
@@ -71,9 +59,7 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({
-      2055660624, JTB_SIG_ASTSTART, JTB_USER_ASTSTART
-  })
+  @NodeFieldsSignature(old_sig = 2055660624, new_sig = JTB_SIG_ASTSTART, name = "ASTStart")
   public void visit(final ASTStart n, final String argu) {
     dump(JTB_USER_ASTSTART, argu);
     ++indent;
@@ -95,9 +81,7 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({
-      -1807059397, JTB_SIG_ASTADDITIVEEXPRESSION, JTB_USER_ASTADDITIVEEXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = -1807059397, new_sig = JTB_SIG_ASTADDITIVEEXPRESSION, name = "ASTAdditiveExpression")
   public void visit(final ASTAdditiveExpression n, final String argu) {
     if (n.f1.present()) {
       dump("Add", argu);
@@ -133,9 +117,7 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({
-      853643830, JTB_SIG_ASTMULTIPLICATIVEEXPRESSION, JTB_USER_ASTMULTIPLICATIVEEXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = 853643830, new_sig = JTB_SIG_ASTMULTIPLICATIVEEXPRESSION, name = "ASTMultiplicativeExpression")
   public void visit(final ASTMultiplicativeExpression n, final String argu) {
     if (n.f1.present()) {
       dump("Mult", argu);
@@ -171,9 +153,7 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({
-      953155740, JTB_SIG_ASTUNARYEXPRESSION, JTB_USER_ASTUNARYEXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = 953155740, new_sig = JTB_SIG_ASTUNARYEXPRESSION, name = "ASTUnaryExpression")
   public void visit(final ASTUnaryExpression n, final String argu) {
     dump(JTB_USER_ASTUNARYEXPRESSION, argu);
     ++indent;
@@ -194,9 +174,7 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({
-      -1580059612, JTB_SIG_ASTMYID, JTB_USER_ASTMYID
-  })
+  @NodeFieldsSignature(old_sig = -1580059612, new_sig = JTB_SIG_ASTMYID, name = "ASTMyID")
   public void visit(final ASTMyID n, final String argu) {
     dump("Identifier: " + n.f0.image, argu);
     ++indent;
@@ -215,9 +193,7 @@ public class DumpVisitor extends DepthFirstGenVisitor {
    * @param argu - the user argument 0
    */
   @Override
-  @NodeFieldsSignature({
-      -1048223857, JTB_SIG_ASTINTEGER, JTB_USER_ASTINTEGER
-  })
+  @NodeFieldsSignature(old_sig = -1048223857, new_sig = JTB_SIG_ASTINTEGER, name = "ASTInteger")
   public void visit(@SuppressWarnings("unused") final ASTInteger n, final String argu) {
     dump("Integer", argu);
     // no need to go further down

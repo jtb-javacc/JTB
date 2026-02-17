@@ -173,6 +173,9 @@ A specific concept of JTB is to build nodes - as long as it is meaningful - for 
 <td><b><code>[NodeListOptional](../../target/generated-tests/jtb/grammars/b/syntaxtree/NodeListOptional.java)</code></b></td>
 </tr>
 <tr>
+<td>a *Token node*</td><td>`"abc"` and `< ABC >`</td>
+<td><b><code>[NodeToken](../../target/generated-tests/jtb/grammars/b/syntaxtree/NodeToken.java)</code></b></td>
+</tr>
 </table>
 
 and that will intertwin with nodes that derive from:
@@ -184,14 +187,9 @@ and that will intertwin with nodes that derive from:
 <tr>
 <td>a *BNFProduction*</td><td>`bp()`</td><td><b><code>bp</code></b></td>
 </tr>
-<tr>
-<td>a *token node*</td><td>`"abc"` and `< ABC >`</td>
-<td><b><code>[Token](../../target/generated-tests/jtb/grammars/b/Token.java)</code></b></td>
-</tr>
 </table>  
 
-Note that in version 1.4.x there was another base class, <code>NodeToken</code>, which is starting with
- version 1.5.x the (enhanced) JavaCC class <code>Token</code>.  
+Note that in version 1.5.1 & 1.5.2 there was no base class <code>NodeToken</code>, the code was generated in a <code>Token</code> class which also included the JavaCC code for handling tokens.  
   
 Note that an *ExpansionUnit type 5 with no modifier* `( A )` gives a node of the inner node type
  (here `A`) which can be another base node or a user node. If `A` is not a *NodeSequence* nor a

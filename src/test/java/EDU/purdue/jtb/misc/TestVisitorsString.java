@@ -11,8 +11,8 @@ import EDU.purdue.jtb.JTB;
  * @author Marc Mazas
  * @version 1.5.0 : 01/2017 : MMa : created
  */
-public class TestVisitorsString { // NO_UCD (unused code)
-
+public class TestVisitorsString {
+  
   /**
    * Standard main method.
    *
@@ -56,10 +56,10 @@ public class TestVisitorsString { // NO_UCD (unused code)
     System.out.println("extract : " + jtb.jopt.createVisitorsList(s));
     spc = "";
   }
-
+  
   /** Indentation string */
   static String spc = "";
-
+  
   /**
    * Parses a specification string and displays its elements.
    *
@@ -111,5 +111,5 @@ public class TestVisitorsString { // NO_UCD (unused code)
       }
     }
   }
-
+  
 }

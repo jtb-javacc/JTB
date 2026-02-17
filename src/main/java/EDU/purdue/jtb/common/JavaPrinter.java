@@ -45,8 +45,81 @@ package EDU.purdue.jtb.common;
 
 import static EDU.purdue.jtb.common.Constants.DEBUG_CLASS;
 import static EDU.purdue.jtb.common.Constants.INDENT_AMT;
-import static EDU.purdue.jtb.parser.syntaxtree.NodeConstants.*;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_ADDITIVEEXPRESSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_ALLOCATIONEXPRESSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_ANDEXPRESSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_ANNOTATIONTYPEBODY;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_ANNOTATIONTYPEDECLARATION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_ANNOTATIONTYPEMEMBERDECLARATION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_ARGUMENTLIST;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_ARRAYINITIALIZER;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_ASSERTSTATEMENT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_BLOCK;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_BOOLEANLITERAL;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_BREAKSTATEMENT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_CASTLOOKAHEAD;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_CLASSORINTERFACEBODY;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_CLASSORINTERFACEDECLARATION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_COMPILATIONUNIT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_CONDITIONALANDEXPRESSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_CONDITIONALEXPRESSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_CONDITIONALOREXPRESSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_CONSTRUCTORDECLARATION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_CONTINUESTATEMENT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_DOSTATEMENT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_ENUMBODY;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_ENUMDECLARATION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EQUALITYEXPRESSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXCLUSIVEOREXPRESSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXPLICITCONSTRUCTORINVOCATION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXPRESSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_EXTENDSLIST;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_FIELDDECLARATION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_FORMALPARAMETER;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_FORMALPARAMETERS;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_FORSTATEMENT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_IFSTATEMENT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_IMPLEMENTSLIST;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_IMPORTDECLARATION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_INCLUSIVEOREXPRESSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_INITIALIZER;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_INSTANCEOFEXPRESSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_LABELEDSTATEMENT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_LITERAL;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_LOCALVARIABLEDECLARATION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_MEMBERVALUE;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_MEMBERVALUEARRAYINITIALIZER;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_MEMBERVALUEPAIR;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_MEMBERVALUEPAIRS;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_METHODDECLARATION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_MODIFIERS;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_MULTIPLICATIVEEXPRESSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_NAMELIST;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_NULLLITERAL;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_PACKAGEDECLARATION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_RELATIONALEXPRESSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_RETURNSTATEMENT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_SHIFTEXPRESSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_STATEMENT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_STATEMENTEXPRESSION;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_STATEMENTEXPRESSIONLIST;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_STRINGLITERAL;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_SWITCHLABEL;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_SWITCHSTATEMENT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_SYNCHRONIZEDSTATEMENT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_THROWSTATEMENT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_TRYSTATEMENT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_TYPEARGUMENT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_TYPEARGUMENTS;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_TYPEBOUND;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_TYPEPARAMETER;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_TYPEPARAMETERS;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_VARIABLEDECLARATOR;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_VARIABLEMODIFIERS;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_WHILESTATEMENT;
+import static EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants.JTB_SIG_WILDCARDBOUNDS;
 import java.util.Iterator;
+import EDU.purdue.jtb.parser.Token;
 import EDU.purdue.jtb.parser.syntaxtree.AdditiveExpression;
 import EDU.purdue.jtb.parser.syntaxtree.AllocationExpression;
 import EDU.purdue.jtb.parser.syntaxtree.AndExpression;
@@ -103,7 +176,7 @@ import EDU.purdue.jtb.parser.syntaxtree.NodeChoice;
 import EDU.purdue.jtb.parser.syntaxtree.NodeListOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeOptional;
 import EDU.purdue.jtb.parser.syntaxtree.NodeSequence;
-import EDU.purdue.jtb.parser.Token;
+import EDU.purdue.jtb.parser.syntaxtree.NodeToken;
 import EDU.purdue.jtb.parser.syntaxtree.NullLiteral;
 import EDU.purdue.jtb.parser.syntaxtree.PackageDeclaration;
 import EDU.purdue.jtb.parser.syntaxtree.RelationalExpression;
@@ -169,6 +242,7 @@ import EDU.purdue.jtb.parser.visitor.signature.NodeFieldsSignature;
  * @version 1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
  *          replacement by Token
  * @version 1.5.1 : 09/2023 : MMa : removed noDebugComment flag
+ * @version 1.5.3 : 11/2025 : MMa : signature code made independent of parser
  */
 public class JavaPrinter extends DepthFirstVoidVisitor {
   
@@ -222,11 +296,11 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  public void visit(final Token n) {
+  public void visit(final NodeToken n) {
     if (jopt.printSpecialTokensJJ) {
       sb.append(n.withSpecials(spc.spc));
     } else {
-      sb.append(n.image);
+      sb.append(((Token) n).image);
     }
   }
   
@@ -328,9 +402,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1761039264, JTB_SIG_COMPILATIONUNIT, JTB_USER_COMPILATIONUNIT
-  })
+  @NodeFieldsSignature(old_sig = 1761039264, new_sig = JTB_SIG_COMPILATIONUNIT, name = "CompilationUnit")
   public void visit(final CompilationUnit n) {
     // coverage: probably never used as JJFileAnnotator$CompilationUnitPrinter should be used
     // we do not use sb.append(spc.spc) as indent level should be 0 at this point
@@ -368,9 +440,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -2133750237, JTB_SIG_PACKAGEDECLARATION, JTB_USER_PACKAGEDECLARATION
-  })
+  @NodeFieldsSignature(old_sig = -2133750237, new_sig = JTB_SIG_PACKAGEDECLARATION, name = "PackageDeclaration")
   public void visit(final PackageDeclaration n) {
     // f0 -> "package"
     n.f0.accept(this);
@@ -394,9 +464,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1592912780, JTB_SIG_IMPORTDECLARATION, JTB_USER_IMPORTDECLARATION
-  })
+  @NodeFieldsSignature(old_sig = -1592912780, new_sig = JTB_SIG_IMPORTDECLARATION, name = "ImportDeclaration")
   public void visit(final ImportDeclaration n) {
     // probably never used as JJFileAnnotator$CompilationUnitPrinter should be used
     // f0 -> "import"
@@ -437,9 +505,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -2047145049, JTB_SIG_MODIFIERS, JTB_USER_MODIFIERS
-  })
+  @NodeFieldsSignature(old_sig = -2047145049, new_sig = JTB_SIG_MODIFIERS, name = "Modifiers")
   public void visit(final Modifiers n) {
     if (n.f0.present()) {
       for (final INode e : n.f0.nodes) {
@@ -465,9 +531,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      37426766, JTB_SIG_CLASSORINTERFACEDECLARATION, JTB_USER_CLASSORINTERFACEDECLARATION
-  })
+  @NodeFieldsSignature(old_sig = 37426766, new_sig = JTB_SIG_CLASSORINTERFACEDECLARATION, name = "ClassOrInterfaceDeclaration")
   public void visit(final ClassOrInterfaceDeclaration n) {
     // f0 -> ( %0 "class" | %1 "interface" )
     n.f0.accept(this);
@@ -505,9 +569,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      24279225, JTB_SIG_EXTENDSLIST, JTB_USER_EXTENDSLIST
-  })
+  @NodeFieldsSignature(old_sig = 24279225, new_sig = JTB_SIG_EXTENDSLIST, name = "ExtendsList")
   public void visit(final ExtendsList n) {
     // f0 -> "extends"
     n.f0.accept(this);
@@ -539,9 +601,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1830366786, JTB_SIG_IMPLEMENTSLIST, JTB_USER_IMPLEMENTSLIST
-  })
+  @NodeFieldsSignature(old_sig = 1830366786, new_sig = JTB_SIG_IMPLEMENTSLIST, name = "ImplementsList")
   public void visit(final ImplementsList n) {
     // f0 -> "implements"
     n.f0.accept(this);
@@ -574,9 +634,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      359041865, JTB_SIG_ENUMDECLARATION, JTB_USER_ENUMDECLARATION
-  })
+  @NodeFieldsSignature(old_sig = 359041865, new_sig = JTB_SIG_ENUMDECLARATION, name = "EnumDeclaration")
   public void visit(final EnumDeclaration n) {
     // f0 -> "enum"
     n.f0.accept(this);
@@ -608,9 +666,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1338633176, JTB_SIG_ENUMBODY, JTB_USER_ENUMBODY
-  })
+  @NodeFieldsSignature(old_sig = -1338633176, new_sig = JTB_SIG_ENUMBODY, name = "EnumBody")
   public void visit(final EnumBody n) {
     // f0 -> "{"
     n.f0.accept(this);
@@ -674,9 +730,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1962566888, JTB_SIG_TYPEPARAMETERS, JTB_USER_TYPEPARAMETERS
-  })
+  @NodeFieldsSignature(old_sig = 1962566888, new_sig = JTB_SIG_TYPEPARAMETERS, name = "TypeParameters")
   public void visit(final TypeParameters n) {
     // f0 -> "<"
     n.f0.accept(this);
@@ -707,12 +761,10 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1306471903, JTB_SIG_TYPEPARAMETER, JTB_USER_TYPEPARAMETER
-  })
+  @NodeFieldsSignature(old_sig = 1306471903, new_sig = JTB_SIG_TYPEPARAMETER, name = "TypeParameter")
   public void visit(final TypeParameter n) {
     // f0 -> < IDENTIFIER >
-    final Token n0 = n.f0;
+    final Token n0 = (Token) n.f0;
     n0.accept(this);
     // f1 -> [ TypeBound() ]
     final NodeOptional n1 = n.f1;
@@ -733,9 +785,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -2080520397, JTB_SIG_TYPEBOUND, JTB_USER_TYPEBOUND
-  })
+  @NodeFieldsSignature(old_sig = -2080520397, new_sig = JTB_SIG_TYPEBOUND, name = "TypeBound")
   public void visit(final TypeBound n) {
     // f0 -> "extends"
     n.f0.accept(this);
@@ -767,9 +817,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1154515364, JTB_SIG_CLASSORINTERFACEBODY, JTB_USER_CLASSORINTERFACEBODY
-  })
+  @NodeFieldsSignature(old_sig = 1154515364, new_sig = JTB_SIG_CLASSORINTERFACEBODY, name = "ClassOrInterfaceBody")
   public void visit(final ClassOrInterfaceBody n) {
     // f0 -> "{"
     n.f0.accept(this);
@@ -807,9 +855,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1567612384, JTB_SIG_FIELDDECLARATION, JTB_USER_FIELDDECLARATION
-  })
+  @NodeFieldsSignature(old_sig = 1567612384, new_sig = JTB_SIG_FIELDDECLARATION, name = "FieldDeclaration")
   public void visit(final FieldDeclaration n) {
     // f0 -> Type()
     n.f0.accept(this);
@@ -841,9 +887,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -484955779, JTB_SIG_VARIABLEDECLARATOR, JTB_USER_VARIABLEDECLARATOR
-  })
+  @NodeFieldsSignature(old_sig = -484955779, new_sig = JTB_SIG_VARIABLEDECLARATOR, name = "VariableDeclarator")
   public void visit(final VariableDeclarator n) {
     // f0 -> VariableDeclaratorId()
     n.f0.accept(this);
@@ -871,9 +915,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -251326055, JTB_SIG_ARRAYINITIALIZER, JTB_USER_ARRAYINITIALIZER
-  })
+  @NodeFieldsSignature(old_sig = -251326055, new_sig = JTB_SIG_ARRAYINITIALIZER, name = "ArrayInitializer")
   public void visit(final ArrayInitializer n) {
     // f0 -> "{"
     n.f0.accept(this);
@@ -904,9 +946,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -418256626, JTB_SIG_METHODDECLARATION, JTB_USER_METHODDECLARATION
-  })
+  @NodeFieldsSignature(old_sig = -418256626, new_sig = JTB_SIG_METHODDECLARATION, name = "MethodDeclaration")
   public void visit(final MethodDeclaration n) {
     // f0 -> [ TypeParameters() ]
     if (n.f0.present()) {
@@ -943,9 +983,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -97312104, JTB_SIG_FORMALPARAMETERS, JTB_USER_FORMALPARAMETERS
-  })
+  @NodeFieldsSignature(old_sig = -97312104, new_sig = JTB_SIG_FORMALPARAMETERS, name = "FormalParameters")
   public void visit(final FormalParameters n) {
     // f0 -> "("
     n.f0.accept(this);
@@ -980,9 +1018,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1358852705, JTB_SIG_FORMALPARAMETER, JTB_USER_FORMALPARAMETER
-  })
+  @NodeFieldsSignature(old_sig = -1358852705, new_sig = JTB_SIG_FORMALPARAMETER, name = "FormalParameter")
   public void visit(final FormalParameter n) {
     // f0 -> Modifiers()
     n.f0.accept(this);
@@ -1014,9 +1050,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1258397065, JTB_SIG_CONSTRUCTORDECLARATION, JTB_USER_CONSTRUCTORDECLARATION
-  })
+  @NodeFieldsSignature(old_sig = 1258397065, new_sig = JTB_SIG_CONSTRUCTORDECLARATION, name = "ConstructorDeclaration")
   public void visit(final ConstructorDeclaration n) {
     // f0 -> [ TypeParameters() ]
     if (n.f0.present()) {
@@ -1079,9 +1113,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -492225557, JTB_SIG_EXPLICITCONSTRUCTORINVOCATION, JTB_USER_EXPLICITCONSTRUCTORINVOCATION
-  })
+  @NodeFieldsSignature(old_sig = -492225557, new_sig = JTB_SIG_EXPLICITCONSTRUCTORINVOCATION, name = "ExplicitConstructorInvocation")
   public void visit(final ExplicitConstructorInvocation n) {
     // f0 -> ( %0 #0 [ $0 "<" $1 ReferenceType()
     // .. .. . .. .. . $2 ( ?0 "," ?1 ReferenceType() )*
@@ -1197,9 +1229,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -423135641, JTB_SIG_INITIALIZER, JTB_USER_INITIALIZER
-  })
+  @NodeFieldsSignature(old_sig = -423135641, new_sig = JTB_SIG_INITIALIZER, name = "Initializer")
   public void visit(final Initializer n) {
     // f0 -> [ "static" ]
     if (n.f0.present()) {
@@ -1222,9 +1252,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      131755052, JTB_SIG_TYPEARGUMENTS, JTB_USER_TYPEARGUMENTS
-  })
+  @NodeFieldsSignature(old_sig = 131755052, new_sig = JTB_SIG_TYPEARGUMENTS, name = "TypeArguments")
   public void visit(final TypeArguments n) {
     // f0 -> "<"
     n.f0.accept(this);
@@ -1257,9 +1285,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      36461692, JTB_SIG_TYPEARGUMENT, JTB_USER_TYPEARGUMENT
-  })
+  @NodeFieldsSignature(old_sig = 36461692, new_sig = JTB_SIG_TYPEARGUMENT, name = "TypeArgument")
   public void visit(final TypeArgument n) {
     if (n.f0.which == 0) {
       // %0 ReferenceType()
@@ -1288,9 +1314,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      122808000, JTB_SIG_WILDCARDBOUNDS, JTB_USER_WILDCARDBOUNDS
-  })
+  @NodeFieldsSignature(old_sig = 122808000, new_sig = JTB_SIG_WILDCARDBOUNDS, name = "WildcardBounds")
   public void visit(final WildcardBounds n) {
     final NodeSequence seq = (NodeSequence) n.f0.choice;
     // #0 "extends" | #0 "super"
@@ -1310,9 +1334,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1147957113, JTB_SIG_NAMELIST, JTB_USER_NAMELIST
-  })
+  @NodeFieldsSignature(old_sig = -1147957113, new_sig = JTB_SIG_NAMELIST, name = "NameList")
   public void visit(final NameList n) {
     // f0 -> Name()
     n.f0.accept(this);
@@ -1339,9 +1361,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1186270200, JTB_SIG_EXPRESSION, JTB_USER_EXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = -1186270200, new_sig = JTB_SIG_EXPRESSION, name = "Expression")
   public void visit(final Expression n) {
     // f0 -> ConditionalExpression()
     n.f0.accept(this);
@@ -1367,9 +1387,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1150694214, JTB_SIG_CONDITIONALEXPRESSION, JTB_USER_CONDITIONALEXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = -1150694214, new_sig = JTB_SIG_CONDITIONALEXPRESSION, name = "ConditionalExpression")
   public void visit(final ConditionalExpression n) {
     // f0 -> ConditionalOrExpression()
     n.f0.accept(this);
@@ -1401,9 +1419,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1592298777, JTB_SIG_CONDITIONALOREXPRESSION, JTB_USER_CONDITIONALOREXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = -1592298777, new_sig = JTB_SIG_CONDITIONALOREXPRESSION, name = "ConditionalOrExpression")
   public void visit(final ConditionalOrExpression n) {
     // f0 -> ConditionalAndExpression()
     n.f0.accept(this);
@@ -1431,9 +1447,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1425815203, JTB_SIG_CONDITIONALANDEXPRESSION, JTB_USER_CONDITIONALANDEXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = -1425815203, new_sig = JTB_SIG_CONDITIONALANDEXPRESSION, name = "ConditionalAndExpression")
   public void visit(final ConditionalAndExpression n) {
     // f0 -> InclusiveOrExpression()
     n.f0.accept(this);
@@ -1461,9 +1475,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      963402497, JTB_SIG_INCLUSIVEOREXPRESSION, JTB_USER_INCLUSIVEOREXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = 963402497, new_sig = JTB_SIG_INCLUSIVEOREXPRESSION, name = "InclusiveOrExpression")
   public void visit(final InclusiveOrExpression n) {
     // f0 -> ExclusiveOrExpression()
     n.f0.accept(this);
@@ -1491,9 +1503,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1241708769, JTB_SIG_EXCLUSIVEOREXPRESSION, JTB_USER_EXCLUSIVEOREXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = -1241708769, new_sig = JTB_SIG_EXCLUSIVEOREXPRESSION, name = "ExclusiveOrExpression")
   public void visit(final ExclusiveOrExpression n) {
     // f0 -> AndExpression()
     n.f0.accept(this);
@@ -1521,9 +1531,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -629554573, JTB_SIG_ANDEXPRESSION, JTB_USER_ANDEXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = -629554573, new_sig = JTB_SIG_ANDEXPRESSION, name = "AndExpression")
   public void visit(final AndExpression n) {
     // f0 -> EqualityExpression()
     n.f0.accept(this);
@@ -1553,9 +1561,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1053085061, JTB_SIG_EQUALITYEXPRESSION, JTB_USER_EQUALITYEXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = 1053085061, new_sig = JTB_SIG_EQUALITYEXPRESSION, name = "EqualityExpression")
   public void visit(final EqualityExpression n) {
     // f0 -> InstanceOfExpression()
     n.f0.accept(this);
@@ -1583,9 +1589,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      933354553, JTB_SIG_INSTANCEOFEXPRESSION, JTB_USER_INSTANCEOFEXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = 933354553, new_sig = JTB_SIG_INSTANCEOFEXPRESSION, name = "InstanceOfExpression")
   public void visit(final InstanceOfExpression n) {
     // f0 -> RelationalExpression()
     n.f0.accept(this);
@@ -1614,9 +1618,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1473482530, JTB_SIG_RELATIONALEXPRESSION, JTB_USER_RELATIONALEXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = 1473482530, new_sig = JTB_SIG_RELATIONALEXPRESSION, name = "RelationalExpression")
   public void visit(final RelationalExpression n) {
     // f0 -> ShiftExpression()
     n.f0.accept(this);
@@ -1647,9 +1649,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1210478291, JTB_SIG_SHIFTEXPRESSION, JTB_USER_SHIFTEXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = 1210478291, new_sig = JTB_SIG_SHIFTEXPRESSION, name = "ShiftExpression")
   public void visit(final ShiftExpression n) {
     // f0 -> AdditiveExpression()
     n.f0.accept(this);
@@ -1679,9 +1679,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1807059397, JTB_SIG_ADDITIVEEXPRESSION, JTB_USER_ADDITIVEEXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = -1807059397, new_sig = JTB_SIG_ADDITIVEEXPRESSION, name = "AdditiveExpression")
   public void visit(final AdditiveExpression n) {
     // f0 -> MultiplicativeExpression()
     n.f0.accept(this);
@@ -1712,9 +1710,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      853643830, JTB_SIG_MULTIPLICATIVEEXPRESSION, JTB_USER_MULTIPLICATIVEEXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = 853643830, new_sig = JTB_SIG_MULTIPLICATIVEEXPRESSION, name = "MultiplicativeExpression")
   public void visit(final MultiplicativeExpression n) {
     // f0 -> UnaryExpression()
     n.f0.accept(this);
@@ -1751,9 +1747,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      611584359, JTB_SIG_CASTLOOKAHEAD, JTB_USER_CASTLOOKAHEAD
-  })
+  @NodeFieldsSignature(old_sig = 611584359, new_sig = JTB_SIG_CASTLOOKAHEAD, name = "CASTLOOKAHEAD")
   public void visit(@SuppressWarnings("unused") final CastLookahead n) {
     sb.append("/* !!! CastLookahead visited in JavaPrinter but should not,"
         + " as it should be called only during parsing !!! */");
@@ -1773,9 +1767,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      454259936, JTB_SIG_LITERAL, JTB_USER_LITERAL
-  })
+  @NodeFieldsSignature(old_sig = 454259936, new_sig = JTB_SIG_LITERAL, name = "Literal")
   public void visit(final Literal n) {
     if (n.f0.which <= 1) {
       // %0 < INTEGER_LITERAL > | %1 < FLOATING_POINT_LITERAL >
@@ -1802,7 +1794,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    */
   @Override
   public void visit(final IntegerLiteral n) {
-    final String str = jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : n.f0.image;
+    final String str = jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : ((Token) n.f0).image;
     sb.append(str);
   }
   
@@ -1816,9 +1808,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1365265107, JTB_SIG_BOOLEANLITERAL, JTB_USER_BOOLEANLITERAL
-  })
+  @NodeFieldsSignature(old_sig = -1365265107, new_sig = JTB_SIG_BOOLEANLITERAL, name = "BooleanLiteral")
   public void visit(final BooleanLiteral n) {
     final String str = jopt.printSpecialTokensJJ ? ((Token) n.f0.choice).withSpecials(spc.spc)
         : ((Token) n.f0.choice).image;
@@ -1834,11 +1824,9 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      241433948, JTB_SIG_STRINGLITERAL, JTB_USER_STRINGLITERAL
-  })
+  @NodeFieldsSignature(old_sig = 241433948, new_sig = JTB_SIG_STRINGLITERAL, name = "StringLiteral")
   public void visit(final StringLiteral n) {
-    final String str = jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : n.f0.image;
+    final String str = jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : ((Token) n.f0).image;
     sb.append(UnicodeConverter.addUnicodeEscapes(str));
   }
   
@@ -1851,11 +1839,9 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1703344686, JTB_SIG_NULLLITERAL, JTB_USER_NULLLITERAL
-  })
+  @NodeFieldsSignature(old_sig = -1703344686, new_sig = JTB_SIG_NULLLITERAL, name = "NullLiteral")
   public void visit(final NullLiteral n) {
-    final String str = jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : n.f0.image;
+    final String str = jopt.printSpecialTokensJJ ? n.f0.withSpecials(spc.spc) : ((Token) n.f0).image;
     sb.append(str);
   }
   
@@ -1869,9 +1855,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -662366547, JTB_SIG_ARGUMENTLIST, JTB_USER_ARGUMENTLIST
-  })
+  @NodeFieldsSignature(old_sig = -662366547, new_sig = JTB_SIG_ARGUMENTLIST, name = "ArgumentList")
   public void visit(final ArgumentList n) {
     // f0 -> Expression()
     n.f0.accept(this);
@@ -1903,9 +1887,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1688598744, JTB_SIG_ALLOCATIONEXPRESSION, JTB_USER_ALLOCATIONEXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = 1688598744, new_sig = JTB_SIG_ALLOCATIONEXPRESSION, name = "AllocationExpression")
   public void visit(final AllocationExpression n) {
     final NodeSequence seq = (NodeSequence) n.f0.choice;
     if (n.f0.which == 0) {
@@ -1961,9 +1943,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -579866328, JTB_SIG_ASSERTSTATEMENT, JTB_USER_ASSERTSTATEMENT
-  })
+  @NodeFieldsSignature(old_sig = -579866328, new_sig = JTB_SIG_ASSERTSTATEMENT, name = "AssertStatement")
   public void visit(final AssertStatement n) {
     // f0 -> "assert"
     n.f0.accept(this);
@@ -1993,9 +1973,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1956923191, JTB_SIG_LABELEDSTATEMENT, JTB_USER_LABELEDSTATEMENT
-  })
+  @NodeFieldsSignature(old_sig = -1956923191, new_sig = JTB_SIG_LABELEDSTATEMENT, name = "LabeledStatement")
   public void visit(final LabeledStatement n) {
     // f0 -> < IDENTIFIER >
     n.f0.accept(this);
@@ -2018,9 +1996,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -47169424, JTB_SIG_BLOCK, JTB_USER_BLOCK
-  })
+  @NodeFieldsSignature(old_sig = -47169424, new_sig = JTB_SIG_BLOCK, name = "Block")
   public void visit(final Block n) {
     // f0 -> "{"
     n.f0.accept(this);
@@ -2053,9 +2029,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      225808290, JTB_SIG_LOCALVARIABLEDECLARATION, JTB_USER_LOCALVARIABLEDECLARATION
-  })
+  @NodeFieldsSignature(old_sig = 225808290, new_sig = JTB_SIG_LOCALVARIABLEDECLARATION, name = "LocalVariableDeclaration")
   public void visit(final LocalVariableDeclaration n) {
     // f0 -> VariableModifiers()
     n.f0.accept(this);
@@ -2088,9 +2062,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      2076055340, JTB_SIG_VARIABLEMODIFIERS, JTB_USER_VARIABLEMODIFIERS
-  })
+  @NodeFieldsSignature(old_sig = 2076055340, new_sig = JTB_SIG_VARIABLEMODIFIERS, name = "VariableModifiers")
   public void visit(final VariableModifiers n) {
     if (n.f0.present()) {
       for (final INode e : n.f0.nodes) {
@@ -2115,9 +2087,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      757890000, JTB_SIG_STATEMENTEXPRESSION, JTB_USER_STATEMENTEXPRESSION
-  })
+  @NodeFieldsSignature(old_sig = 757890000, new_sig = JTB_SIG_STATEMENTEXPRESSION, name = "StatementExpression")
   public void visit(final StatementExpression n) {
     if (n.f0.which < 2) {
       // %0 PreIncrementExpression() | %1 PreDecrementExpression()
@@ -2164,9 +2134,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      645895087, JTB_SIG_SWITCHSTATEMENT, JTB_USER_SWITCHSTATEMENT
-  })
+  @NodeFieldsSignature(old_sig = 645895087, new_sig = JTB_SIG_SWITCHSTATEMENT, name = "SwitchStatement")
   public void visit(final SwitchStatement n) {
     // f0 -> "switch"
     n.f0.accept(this);
@@ -2227,9 +2195,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      63513165, JTB_SIG_SWITCHLABEL, JTB_USER_SWITCHLABEL
-  })
+  @NodeFieldsSignature(old_sig = 63513165, new_sig = JTB_SIG_SWITCHLABEL, name = "SwitchLabel")
   public void visit(final SwitchLabel n) {
     final NodeSequence seq = (NodeSequence) n.f0.choice;
     if (n.f0.which == 0) {
@@ -2261,9 +2227,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1906079982, JTB_SIG_IFSTATEMENT, JTB_USER_IFSTATEMENT
-  })
+  @NodeFieldsSignature(old_sig = -1906079982, new_sig = JTB_SIG_IFSTATEMENT, name = "IfStatement")
   public void visit(final IfStatement n) {
     // f0 -> "if"
     n.f0.accept(this);
@@ -2329,9 +2293,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      503551312, JTB_SIG_WHILESTATEMENT, JTB_USER_WHILESTATEMENT
-  })
+  @NodeFieldsSignature(old_sig = 503551312, new_sig = JTB_SIG_WHILESTATEMENT, name = "WhileStatement")
   public void visit(final WhileStatement n) {
     // f0 -> "while"
     n.f0.accept(this);
@@ -2361,9 +2323,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1162769715, JTB_SIG_DOSTATEMENT, JTB_USER_DOSTATEMENT
-  })
+  @NodeFieldsSignature(old_sig = 1162769715, new_sig = JTB_SIG_DOSTATEMENT, name = "DoStatement")
   public void visit(final DoStatement n) {
     // f0 -> "do"
     n.f0.accept(this);
@@ -2400,9 +2360,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      755358653, JTB_SIG_FORSTATEMENT, JTB_USER_FORSTATEMENT
-  })
+  @NodeFieldsSignature(old_sig = 755358653, new_sig = JTB_SIG_FORSTATEMENT, name = "ForStatement")
   public void visit(final ForStatement n) {
     // f0 -> "for"
     n.f0.accept(this);
@@ -2482,9 +2440,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1394695492, JTB_SIG_STATEMENT, JTB_USER_STATEMENT
-  })
+  @NodeFieldsSignature(old_sig = 1394695492, new_sig = JTB_SIG_STATEMENT, name = "Statement")
   public void visit(final Statement n) {
     n.f0.choice.accept(this);
   }
@@ -2499,9 +2455,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      186773841, JTB_SIG_STATEMENTEXPRESSIONLIST, JTB_USER_STATEMENTEXPRESSIONLIST
-  })
+  @NodeFieldsSignature(old_sig = 186773841, new_sig = JTB_SIG_STATEMENTEXPRESSIONLIST, name = "StatementExpressionList")
   public void visit(final StatementExpressionList n) {
     // f0 -> StatementExpression()
     n.f0.accept(this);
@@ -2528,9 +2482,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      2096828507, JTB_SIG_BREAKSTATEMENT, JTB_USER_BREAKSTATEMENT
-  })
+  @NodeFieldsSignature(old_sig = 2096828507, new_sig = JTB_SIG_BREAKSTATEMENT, name = "BreakStatement")
   public void visit(final BreakStatement n) {
     // f0 -> "break"
     n.f0.accept(this);
@@ -2554,9 +2506,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1991535243, JTB_SIG_CONTINUESTATEMENT, JTB_USER_CONTINUESTATEMENT
-  })
+  @NodeFieldsSignature(old_sig = -1991535243, new_sig = JTB_SIG_CONTINUESTATEMENT, name = "ContinueStatement")
   public void visit(final ContinueStatement n) {
     // f0 -> "continue"
     n.f0.accept(this);
@@ -2580,9 +2530,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1971167888, JTB_SIG_RETURNSTATEMENT, JTB_USER_RETURNSTATEMENT
-  })
+  @NodeFieldsSignature(old_sig = -1971167888, new_sig = JTB_SIG_RETURNSTATEMENT, name = "ReturnStatement")
   public void visit(final ReturnStatement n) {
     // f0 -> "return"
     n.f0.accept(this);
@@ -2606,9 +2554,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      568421270, JTB_SIG_THROWSTATEMENT, JTB_USER_THROWSTATEMENT
-  })
+  @NodeFieldsSignature(old_sig = 568421270, new_sig = JTB_SIG_THROWSTATEMENT, name = "ThrowStatement")
   public void visit(final ThrowStatement n) {
     // f0 -> "throw"
     n.f0.accept(this);
@@ -2632,9 +2578,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      2040551171, JTB_SIG_SYNCHRONIZEDSTATEMENT, JTB_USER_SYNCHRONIZEDSTATEMENT
-  })
+  @NodeFieldsSignature(old_sig = 2040551171, new_sig = JTB_SIG_SYNCHRONIZEDSTATEMENT, name = "SynchronizedStatement")
   public void visit(final SynchronizedStatement n) {
     // f0 -> "synchronized"
     n.f0.accept(this);
@@ -2665,9 +2609,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      1108527850, JTB_SIG_TRYSTATEMENT, JTB_USER_TRYSTATEMENT
-  })
+  @NodeFieldsSignature(old_sig = 1108527850, new_sig = JTB_SIG_TRYSTATEMENT, name = "TryStatement")
   public void visit(final TryStatement n) {
     // f0 -> "try"
     n.f0.accept(this);
@@ -2715,9 +2657,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -113472239, JTB_SIG_MEMBERVALUEPAIRS, JTB_USER_MEMBERVALUEPAIRS
-  })
+  @NodeFieldsSignature(old_sig = -113472239, new_sig = JTB_SIG_MEMBERVALUEPAIRS, name = "MemberValuePairs")
   public void visit(final MemberValuePairs n) {
     // f0 -> MemberValuePair()
     n.f0.accept(this);
@@ -2745,9 +2685,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -476335468, JTB_SIG_MEMBERVALUEPAIR, JTB_USER_MEMBERVALUEPAIR
-  })
+  @NodeFieldsSignature(old_sig = -476335468, new_sig = JTB_SIG_MEMBERVALUEPAIR, name = "MemberValuePair")
   public void visit(final MemberValuePair n) {
     // f0 -> < IDENTIFIER >
     n.f0.accept(this);
@@ -2770,9 +2708,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1120846693, JTB_SIG_MEMBERVALUE, JTB_USER_MEMBERVALUE
-  })
+  @NodeFieldsSignature(old_sig = -1120846693, new_sig = JTB_SIG_MEMBERVALUE, name = "MemberValue")
   public void visit(final MemberValue n) {
     n.f0.choice.accept(this);
   }
@@ -2790,9 +2726,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      111140055, JTB_SIG_MEMBERVALUEARRAYINITIALIZER, JTB_USER_MEMBERVALUEARRAYINITIALIZER
-  })
+  @NodeFieldsSignature(old_sig = 111140055, new_sig = JTB_SIG_MEMBERVALUEARRAYINITIALIZER, name = "MemberValueArrayInitializer")
   public void visit(final MemberValueArrayInitializer n) {
     // f0 -> "{"
     n.f0.accept(this);
@@ -2831,9 +2765,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      383718196, JTB_SIG_ANNOTATIONTYPEDECLARATION, JTB_USER_ANNOTATIONTYPEDECLARATION
-  })
+  @NodeFieldsSignature(old_sig = 383718196, new_sig = JTB_SIG_ANNOTATIONTYPEDECLARATION, name = "AnnotationTypeDeclaration")
   public void visit(final AnnotationTypeDeclaration n) {
     // f0 -> "@"
     n.f0.accept(this);
@@ -2858,9 +2790,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -667465535, JTB_SIG_ANNOTATIONTYPEBODY, JTB_USER_ANNOTATIONTYPEBODY
-  })
+  @NodeFieldsSignature(old_sig = -667465535, new_sig = JTB_SIG_ANNOTATIONTYPEBODY, name = "AnnotationTypeBody")
   public void visit(final AnnotationTypeBody n) {
     // f0 -> "{"
     n.f0.accept(this);
@@ -2903,9 +2833,7 @@ public class JavaPrinter extends DepthFirstVoidVisitor {
    * @param n - the node to visit
    */
   @Override
-  @NodeFieldsSignature({
-      -1120210008, JTB_SIG_ANNOTATIONTYPEMEMBERDECLARATION, JTB_USER_ANNOTATIONTYPEMEMBERDECLARATION
-  })
+  @NodeFieldsSignature(old_sig = -1120210008, new_sig = JTB_SIG_ANNOTATIONTYPEMEMBERDECLARATION, name = "AnnotationTypeMemberDeclaration")
   public void visit(final AnnotationTypeMemberDeclaration n) {
     if (n.f0.which == 0) {
       // %0 #0 Modifiers() #1 ( &0 $0 Type() $1 < IDENTIFIER > $2 "(" $3 ")"$4 [ DefaultValue() ] $5 ";"

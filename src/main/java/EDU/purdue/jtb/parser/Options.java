@@ -40,15 +40,15 @@ import java.util.Set;
  *          option ; moved to non static ; added OUTPUT_LANGUAGE
  */
 public class Options {
-  
+
   /**
    * Limit sub classing to derived classes.<br>
    * MMa : modified (public) for JTB
    */
   public Options() {
-    
+
   }
-  
+
   /**
    * A mapping of option names (Strings) to values (Integer, Boolean, String). This table is initialized by
    * the main program. Its contents defines the set of legal options. Its initial values define the default
@@ -56,7 +56,7 @@ public class Options {
    * MMa : modified (allocated here) for JTB
    */
   protected Map<String, Object> optionValues = new HashMap<>(70);
-  
+
   /**
    * Convenience method to retrieve integer options.
    *
@@ -66,7 +66,7 @@ public class Options {
   protected int intValue(final String option) {
     return ((Integer) optionValues.get(option)).intValue();
   }
-  
+
   /**
    * Convenience method to retrieve boolean options.
    *
@@ -76,7 +76,7 @@ public class Options {
   protected boolean booleanValue(final String option) {
     return ((Boolean) optionValues.get(option)).booleanValue();
   }
-  
+
   /**
    * Convenience method to retrieve string options.
    *
@@ -86,7 +86,7 @@ public class Options {
   protected String stringValue(final String option) {
     return (String) optionValues.get(option);
   }
-  
+
   /**
    * @return the option string value corresponding to the option string key<br>
    *         MMa : modified (direct reference) for JTB
@@ -94,23 +94,23 @@ public class Options {
   public Map<String, Object> getOptions() {
     return optionValues;
   }
-  
+
   /**
    * Keep track of what options were set as a command line argument. We use this to see if the options set
    * from the command line and the ones set in the input files clash in any way.
    */
-  private Set<String> cmdLineSetting   = null;
+  protected Set<String> cmdLineSetting   = null;
   /**
    * Keep track of what options were set from the grammar file. We use this to see if the options set from the
    * command line and the ones set in the input files clash in any way.
    */
-  private Set<String> inputFileSetting = null;
-  
+  protected Set<String> inputFileSetting = null;
+
   /**
    * Initialize for JavaCC / JJTree / JTB
    */
   public void init() {
-    
+
     cmdLineSetting = new HashSet<>();
     inputFileSetting = new HashSet<>();
     // JavaCC & JJTree options
@@ -149,7 +149,7 @@ public class Options {
     optionValues.put("USER_CHAR_STREAM", Boolean.FALSE);
     optionValues.put("USER_TOKEN_MANAGER", Boolean.FALSE);
   }
-  
+
   /**
    * Returns a string representation of the specified options of interest. Used when, for example, generating
    * Token.java to record the JavaCC options that were used to generate the file. All of the options must be
@@ -171,7 +171,7 @@ public class Options {
     }
     return sb.toString();
   }
-  
+
   /**
    * Determine if a given command line argument might be an option flag. Command line options start with a
    * dash&nbsp;(-).
@@ -182,7 +182,7 @@ public class Options {
   public static boolean isOption(final String opt) {
     return (opt != null) && (opt.length() > 1) && (opt.charAt(0) == '-');
   }
-  
+
   /**
    * Help function to handle cases where the meaning of an option has changed over time. If the user has
    * supplied an option in the old format, it will be converted to the new format.
@@ -202,7 +202,7 @@ public class Options {
     }
     return val;
   }
-  
+
   /**
    * Sets an option for the input file.
    *
@@ -243,10 +243,10 @@ public class Options {
     optionValues.put(s, val);
     inputFileSetting.add(s);
   }
-  
+
   /**
-   * Process a single command line option. The option is parsed and stored in the optionValues map. (overriden
-   * by JTB).
+   * Process a single command line option. The option is parsed and stored in the optionValues map.<bs>
+   * (overriden in JTBOptions).
    *
    * @param arg - the command line option
    */
@@ -328,7 +328,7 @@ public class Options {
     optionValues.put(name, val);
     cmdLineSetting.add(name);
   }
-  
+
   /**
    * Normalizes the options (ie checks coherence and dependences).
    */
@@ -347,7 +347,7 @@ public class Options {
     optionValues.put("GENERATE_STRING_BUILDER", Boolean.valueOf(jdkVersionAtLeast(1.5)));
     optionValues.put("GENERATE_ANNOTATIONS", Boolean.valueOf(jdkVersionAtLeast(1.5)));
   }
-  
+
   /**
    * Find the build parser value.
    *
@@ -356,7 +356,7 @@ public class Options {
   public boolean getBuildParser() {
     return booleanValue("BUILD_PARSER");
   }
-  
+
   /**
    * Find the build token manager value.
    *
@@ -365,7 +365,7 @@ public class Options {
   public boolean getBuildTokenManager() {
     return booleanValue("BUILD_TOKEN_MANAGER");
   }
-  
+
   /**
    * Find the cache tokens value.
    *
@@ -374,7 +374,7 @@ public class Options {
   public boolean getCacheTokens() {
     return booleanValue("CACHE_TOKENS");
   }
-  
+
   /**
    * Find the choice ambiguity check value.
    *
@@ -383,7 +383,7 @@ public class Options {
   public int getChoiceAmbiguityCheck() {
     return intValue("CHOICE_AMBIGUITY_CHECK");
   }
-  
+
   /**
    * Find the common token action value.
    *
@@ -392,7 +392,7 @@ public class Options {
   public boolean getCommonTokenAction() {
     return booleanValue("COMMON_TOKEN_ACTION");
   }
-  
+
   /**
    * Find the debug parser value.
    *
@@ -401,7 +401,7 @@ public class Options {
   public boolean getDebugParser() {
     return booleanValue("DEBUG_PARSER");
   }
-  
+
   /**
    * Find the debug lookahead value.
    *
@@ -410,7 +410,7 @@ public class Options {
   public boolean getDebugLookahead() {
     return booleanValue("DEBUG_LOOKAHEAD");
   }
-  
+
   /**
    * Find the debug TokenManager value.
    *
@@ -419,7 +419,7 @@ public class Options {
   public boolean getDebugTokenManager() {
     return booleanValue("DEBUG_TOKEN_MANAGER");
   }
-  
+
   /**
    * Find the error reporting value.
    *
@@ -428,7 +428,7 @@ public class Options {
   public boolean getErrorReporting() {
     return booleanValue("ERROR_REPORTING");
   }
-  
+
   /**
    * Find the force lookahead check value.
    *
@@ -437,7 +437,7 @@ public class Options {
   public boolean getForceLaCheck() {
     return booleanValue("FORCE_LA_CHECK");
   }
-  
+
   /**
    * Should the generated code contain Annotations?
    *
@@ -446,7 +446,7 @@ public class Options {
   public boolean getGenerateAnnotations() {
     return booleanValue("GENERATE_ANNOTATIONS");
   }
-  
+
   /**
    * Should the generated code create Exceptions using a constructor taking a nested exception?
    *
@@ -455,7 +455,7 @@ public class Options {
   public boolean getGenerateChainedException() {
     return booleanValue("GENERATE_CHAINED_EXCEPTION");
   }
-  
+
   /**
    * Should the generated code contain Generics?
    *
@@ -464,7 +464,7 @@ public class Options {
   public boolean getGenerateGenerics() {
     return booleanValue("GENERATE_GENERICS");
   }
-  
+
   /**
    * Should the generated code use StringBuilder rather than StringBuilder?
    *
@@ -473,7 +473,7 @@ public class Options {
   public boolean getGenerateStringBuilder() {
     return booleanValue("GENERATE_STRING_BUILDER");
   }
-  
+
   /**
    * Find the ignore case value.
    *
@@ -482,7 +482,7 @@ public class Options {
   public boolean getIgnoreCase() {
     return booleanValue("IGNORE_CASE");
   }
-  
+
   /**
    * Find the Java Unicode escape value.
    *
@@ -491,7 +491,7 @@ public class Options {
   public boolean getJavaUnicodeEscape() {
     return booleanValue("JAVA_UNICODE_ESCAPE");
   }
-  
+
   /**
    * Find the JDK version.
    *
@@ -500,7 +500,7 @@ public class Options {
   public String getJdkVersion() {
     return stringValue("JDK_VERSION");
   }
-  
+
   /**
    * Find the keep line column value.
    *
@@ -509,7 +509,7 @@ public class Options {
   public boolean getKeepLineColumn() {
     return booleanValue("KEEP_LINE_COLUMN");
   }
-  
+
   /**
    * Find the lookahead setting.
    *
@@ -518,7 +518,7 @@ public class Options {
   public int getLookahead() {
     return intValue("LOOKAHEAD");
   }
-  
+
   /**
    * Find the other ambiguity check value.
    *
@@ -527,7 +527,7 @@ public class Options {
   public int getOtherAmbiguityCheck() {
     return intValue("OTHER_AMBIGUITY_CHECK");
   }
-  
+
   /**
    * Find the output directory.
    *
@@ -536,7 +536,7 @@ public class Options {
   public File getOutputDirectory() {
     return new File(stringValue("OUTPUT_DIRECTORY"));
   }
-  
+
   /**
    * Find the sanity check value.
    *
@@ -545,7 +545,7 @@ public class Options {
   public boolean getSanityCheck() {
     return booleanValue("SANITY_CHECK");
   }
-  
+
   /**
    * Find the static value.
    *
@@ -554,7 +554,7 @@ public class Options {
   public boolean getStatic() {
     return booleanValue("STATIC");
   }
-  
+
   /**
    * Should the generated code class visibility public?
    *
@@ -563,7 +563,7 @@ public class Options {
   public boolean getSupportClassVisibilityPublic() {
     return booleanValue("SUPPORT_CLASS_VISIBILITY_PUBLIC");
   }
-  
+
   /**
    * Return the Token's superclass.
    *
@@ -572,7 +572,7 @@ public class Options {
   public String getTokenExtends() {
     return stringValue("TOKEN_EXTENDS");
   }
-  
+
   /**
    * Find the token manager uses parser value.
    *
@@ -581,7 +581,7 @@ public class Options {
   public boolean getTokenManagerUsesParser() {
     return booleanValue("TOKEN_MANAGER_USES_PARSER");
   }
-  
+
   /**
    * Return the Token's factory class.
    *
@@ -590,7 +590,7 @@ public class Options {
   public String getTokenFactory() {
     return stringValue("TOKEN_FACTORY");
   }
-  
+
   /**
    * Find the Unicode input value.
    *
@@ -599,7 +599,7 @@ public class Options {
   public boolean getUnicodeInput() {
     return booleanValue("UNICODE_INPUT");
   }
-  
+
   /**
    * Find the user CharStream value.
    *
@@ -608,7 +608,7 @@ public class Options {
   public boolean getUserCharStream() {
     return booleanValue("USER_CHAR_STREAM");
   }
-  
+
   /**
    * Find the user TokenManager value.
    *
@@ -617,7 +617,7 @@ public class Options {
   public boolean getUserTokenManager() {
     return booleanValue("USER_TOKEN_MANAGER");
   }
-  
+
   /**
    * Determine if the output language is at least the specified version.
    *
@@ -629,7 +629,7 @@ public class Options {
     // Comparing doubles is safe here, as it is two simple assignments.
     return jdkVersion >= version;
   }
-  
+
   /**
    * @return the "StringBuilder" or "StringBuffer" string
    */

@@ -37,7 +37,7 @@ import static EDU.purdue.jtb.common.Constants.INDENT_AMT;
 import static EDU.purdue.jtb.common.Constants.LS;
 import static EDU.purdue.jtb.common.Constants.OK_RC;
 import static EDU.purdue.jtb.common.Constants.emptyEnterExitHook;
-import static EDU.purdue.jtb.common.Constants.fileHeaderComment;
+import static EDU.purdue.jtb.common.Constants.beginHeaderComment;
 import static EDU.purdue.jtb.common.Constants.genNodeVar;
 import static EDU.purdue.jtb.common.Constants.iEnterExitHook;
 import static EDU.purdue.jtb.common.Constants.iNode;
@@ -60,7 +60,7 @@ import EDU.purdue.jtb.common.Messages;
 import EDU.purdue.jtb.common.Spacing;
 import EDU.purdue.jtb.common.UserClassInfo;
 import EDU.purdue.jtb.common.UserClassInfo.FieldInfo;
-import EDU.purdue.jtb.parser.syntaxtree.NodeConstants;
+import EDU.purdue.jtb.parser.syntaxtree.JTBParserNodeConstants;
 
 /**
  * Class {@link UserFilesGenerator} contains methods to generate: CODEJAVA
@@ -88,9 +88,11 @@ import EDU.purdue.jtb.parser.syntaxtree.NodeConstants;
  * @version 1.5.1 : 07-08/2023 : MMa : changed no overwrite management<br>
  * @version 1.5.1 : 08/2023 : MMa : editing changes for coverage analysis; changes due to the NodeToken
  *          replacement by Token
+ * @version 1.5.3 : 11/2025 : MMa : NodeConstants replaced by &lt;Parser&gt;NodeConstants and signature code
+ *          made independent of parser
  */
 public class UserFilesGenerator {
-  
+
   /** The global JTB options */
   private final JTBOptions                 jopt;
   /** The messages handler */
@@ -107,7 +109,7 @@ public class UserFilesGenerator {
   private final ThreadLocal<StringBuilder> tlgsb;
   /** The BufferedWriter buffer size */
   private static final int                 BR_BUF_SZ = 16 * 1024;
-  
+
   /**
    * Constructor. Creates the syntaxtree and hook directories if they do not exist.
    *
@@ -125,7 +127,7 @@ public class UserFilesGenerator {
     tlgsb = jopt.noParallel ? null : ThreadLocal.withInitial(() -> new StringBuilder(BR_BUF_SZ));
     commonCode = genCommonCode();
   }
-  
+
   /**
    * Outputs the formatted nodes classes list.
    *
@@ -135,7 +137,7 @@ public class UserFilesGenerator {
     aPw.print(formatNodesClassesList(classes));
     aPw.flush();
   }
-  
+
   /**
    * Formats the nodes classes list.
    *
@@ -159,7 +161,7 @@ public class UserFilesGenerator {
     }
     return sb;
   }
-  
+
   /**
    * Generates user nodes (classes source) files.
    *
@@ -220,10 +222,10 @@ public class UserFilesGenerator {
           return 1;
         } catch (final IOException ex) {
           Messages.hardErr("IOException on " + uci.fixedClassName, ex);
-          return 1 + NodeConstants.NB_JTB_USER_NODES;
+          return 1 + JTBParserNodeConstants.NB_JTB_USER_NODES;
         } catch (final Exception ex) {
           Messages.hardErr("Exception on " + uci.fixedClassName, ex);
-          return 1 + (3 * NodeConstants.NB_JTB_USER_NODES);
+          return 1 + (3 * JTBParserNodeConstants.NB_JTB_USER_NODES);
         } finally {
           if (pw != null) {
             pw.print(sb);
@@ -232,16 +234,16 @@ public class UserFilesGenerator {
         }
         // end processing one stream item uci
       }).sum(); // sums the return codes
-      if (res > (3 * NodeConstants.NB_JTB_USER_NODES)) {
+      if (res > (3 * JTBParserNodeConstants.NB_JTB_USER_NODES)) {
         throw new Exception("Exception(s) on some user nodes class files");
       }
-      if (res > NodeConstants.NB_JTB_USER_NODES) {
+      if (res > JTBParserNodeConstants.NB_JTB_USER_NODES) {
         throw new IOException("IOException(s) on some user nodes class files");
       }
       return res;
     }
   }
-  
+
   /**
    * Generates a user node class source string.
    *
@@ -254,15 +256,16 @@ public class UserFilesGenerator {
       sb = new StringBuilder(BR_BUF_SZ);
     }
     final Spacing spc = new Spacing(INDENT_AMT);
-    
-    sb.append(fileHeaderComment).append(LS);
-    if (jopt.nodesPackageName != null)
-      sb.append("package ").append(jopt.nodesPackageName).append(";").append(LS).append(LS);
+
+    sb.append(beginHeaderComment).append(" (").append(this.getClass().getSimpleName()).append(") */")
+        .append(LS);
+    if (jopt.nodesPkgName != null) {
+      sb.append("package ").append(jopt.nodesPkgName).append(";").append(LS).append(LS);
+    }
     if (jopt.childrenMethods) {
       sb.append("import ").append("java.util.ArrayList").append(';').append(LS);
       sb.append("import ").append("java.util.List").append(';').append(LS);
     }
-    ccg.tokenImport(aSb);
     ccg.interfaceVisitorsImports(sb);
     sb.append(LS);
     if (jopt.javaDocComments) {
@@ -278,7 +281,7 @@ public class UserFilesGenerator {
     }
     genClassString(sb, spc, aUci);
   }
-  
+
   /**
    * Generates the IEnterExitHook (interface source) file.
    *
@@ -302,7 +305,7 @@ public class UserFilesGenerator {
       throw e;
     }
   }
-  
+
   /**
    * Generates the IEnterExitHook interface source.
    *
@@ -316,15 +319,16 @@ public class UserFilesGenerator {
     if (sb == null) {
       sb = new StringBuilder(1500);
     }
-    
-    sb.append(fileHeaderComment).append(LS);
-    if (jopt.hookPackageName != null) {
-      sb.append("package ").append(jopt.hookPackageName).append(";").append(LS).append(LS);
-      if (!jopt.hookPackageName.equals(jopt.nodesPackageName)) {
-        sb.append("import ").append(jopt.nodesPackageName).append(".*;").append(LS).append(LS);
+
+    sb.append(beginHeaderComment).append(" (").append(this.getClass().getSimpleName()).append(") */")
+        .append(LS);
+    if (jopt.hookPkgName != null) {
+      sb.append("package ").append(jopt.hookPkgName).append(";").append(LS).append(LS);
+    }
+    if (jopt.nodesPkgName != null) {
+      if (!jopt.hookPkgName.equals(jopt.nodesPkgName)) {
+        sb.append("import ").append(jopt.nodesPkgName).append(".*;").append(LS).append(LS);
       }
-    } else {
-      sb.append("import ").append("*;").append(LS).append(LS);
     }
     if (jopt.javaDocComments) {
       sb.append("/** All hooks must implement this interface. */").append(LS);
@@ -332,7 +336,7 @@ public class UserFilesGenerator {
       sb.append("@SuppressWarnings(\"javadoc\")").append(LS);
     }
     sb.append("public interface ").append(iEnterExitHook).append(" {").append(LS);
-    
+
     final Spacing spc = new Spacing(INDENT_AMT);
     spc.updateSpc(+1);
     // all enter methods first
@@ -366,7 +370,7 @@ public class UserFilesGenerator {
     sb.append(spc.spc).append("}").append(LS);
     return sb;
   }
-  
+
   /**
    * Generates the genEmtpyEnterExitHookFile (class source) file.
    *
@@ -390,7 +394,7 @@ public class UserFilesGenerator {
       throw e;
     }
   }
-  
+
   /**
    * Generates the EmtpyEnterExitHook class source.
    *
@@ -404,15 +408,16 @@ public class UserFilesGenerator {
     if (sb == null) {
       sb = new StringBuilder(1500);
     }
-    
-    sb.append(fileHeaderComment).append(LS);
-    if (jopt.hookPackageName != null) {
-      sb.append("package ").append(jopt.hookPackageName).append(";").append(LS).append(LS);
-      if (!jopt.hookPackageName.equals(jopt.nodesPackageName)) {
-        sb.append("import ").append(jopt.nodesPackageName).append(".*;").append(LS).append(LS);
+
+    sb.append(beginHeaderComment).append(" (").append(this.getClass().getSimpleName()).append(") */")
+        .append(LS);
+    if (jopt.hookPkgName != null) {
+      sb.append("package ").append(jopt.hookPkgName).append(";").append(LS).append(LS);
+    }
+    if (jopt.nodesPkgName != null) {
+      if (!jopt.hookPkgName.equals(jopt.nodesPkgName)) {
+        sb.append("import ").append(jopt.nodesPkgName).append(".*;").append(LS).append(LS);
       }
-    } else {
-      sb.append("import ").append("*;").append(LS).append(LS);
     }
     if (jopt.javaDocComments) {
       sb.append("/**").append(LS);
@@ -424,7 +429,7 @@ public class UserFilesGenerator {
     }
     sb.append("public class ").append(emptyEnterExitHook).append(" implements ").append(iEnterExitHook)
         .append(" {").append(LS);
-    
+
     final Spacing spc = new Spacing(INDENT_AMT);
     spc.updateSpc(+1);
     // all enter methods first
@@ -468,7 +473,7 @@ public class UserFilesGenerator {
     sb.append(spc.spc).append("}").append(LS);
     return sb;
   }
-  
+
   /**
    * Generates the node class code into a newly allocated buffer.
    *
@@ -485,7 +490,7 @@ public class UserFilesGenerator {
       genJavaCodeProductionClassString(aSb, aSpc, aUci);
     }
   }
-  
+
   /**
    * Generates the node class code for a BNFProduction into a newly allocated buffer.
    *
@@ -496,29 +501,29 @@ public class UserFilesGenerator {
    */
   private StringBuilder genBNFProductionClassString(final StringBuilder aSb, final Spacing aSpc,
       final UserClassInfo aUci) {
-    
+
     StringBuilder sb = aSb;
     if (sb == null) {
       sb = new StringBuilder(2048);
     }
     final int nbf = aUci.fields.size();
-    
+
     /*
      * class declaration
      */
-    
+
     sb.append(aSpc.spc).append("public class " + aUci.fixedClassName);
-    
+
     if (jopt.nodesSuperclass != null) {
       sb.append(" extends ").append(jopt.nodesSuperclass);
     }
     sb.append(" implements ").append(iNode).append(" {").append(LS).append(LS);
     aSpc.updateSpc(+1);
-    
+
     /*
      * data fields declarations
      */
-    
+
     for (int i = 0; i < nbf; i++) {
       final FieldInfo fi = aUci.fields.get(i);
       if (jopt.javaDocComments) {
@@ -527,15 +532,15 @@ public class UserFilesGenerator {
       sb.append(aSpc.spc).append("public ").append(fi.fixedType).append(' ').append(fi.name).append(";")
           .append(LS).append(LS);
     }
-    
+
     ccg.parentPointerDeclaration(sb);
-    
+
     ccg.genSerialUIDDeclaration(sb);
-    
+
     /*
      * standard constructor (header + body)
      */
-    
+
     // header
     if (jopt.javaDocComments) {
       sb.append(aSpc.spc).append("/**").append(LS);
@@ -567,7 +572,7 @@ public class UserFilesGenerator {
       sb.append("final ").append(fi.fixedType).append(' ').append(genNodeVar).append(i);
     }
     sb.append(") {").append(LS);
-    
+
     // body
     aSpc.updateSpc(+1);
     for (int i = 0; i < nbf; i++) {
@@ -575,18 +580,18 @@ public class UserFilesGenerator {
       sb.append(aSpc.spc).append(name).append(" = ").append(genNodeVar).append(i).append(";").append(LS);
       ccg.parentPointerSetCall(sb, name);
     }
-    
+
     aSpc.updateSpc(-1);
     sb.append(aSpc.spc).append("}").append(LS);
-    
+
     sb.append(commonCode);
-    
+
     /*
      * (class specific) children methods
      */
-    
+
     if (jopt.childrenMethods) {
-      
+
       int nbLbc = 0;
       int nbLuc = 0;
       for (final FieldInfo fi : aUci.fields) {
@@ -596,7 +601,7 @@ public class UserFilesGenerator {
           nbLuc++;
         }
       }
-      
+
       if (jopt.javaDocComments) {
         CommonCodeGenerator.childrenAllComment(sb, "number", "(always " + nbf + "))");
       }
@@ -604,7 +609,7 @@ public class UserFilesGenerator {
       sb.append("  public int getNbAllChildren() {").append(LS);
       sb.append("    return ").append(nbf).append(";").append(LS);
       sb.append("  }").append(LS).append(LS);
-      
+
       if (jopt.javaDocComments) {
         CommonCodeGenerator.childrenBaseorUserComment(sb, "number", "base", "(always " + nbLbc + "))");
       }
@@ -612,7 +617,7 @@ public class UserFilesGenerator {
       sb.append("  public int getNbBaseChildren() {").append(LS);
       sb.append("    return ").append(nbLbc).append(";").append(LS);
       sb.append("  }").append(LS).append(LS);
-      
+
       if (jopt.javaDocComments) {
         CommonCodeGenerator.childrenBaseorUserComment(sb, "number", "user", "(always " + nbLuc + "))");
       }
@@ -620,7 +625,7 @@ public class UserFilesGenerator {
       sb.append("  public int getNbUserChildren() {").append(LS);
       sb.append("    return ").append(nbLuc).append(";").append(LS);
       sb.append("  }").append(LS).append(LS);
-      
+
       if (jopt.javaDocComments) {
         CommonCodeGenerator.childrenAllComment(sb, "list", "(always " + nbf + " nodes))");
       }
@@ -634,7 +639,7 @@ public class UserFilesGenerator {
       sb.append("    }").append(LS);
       sb.append("    return lac;").append(LS);
       sb.append("  }").append(LS).append(LS);
-      
+
       if (jopt.javaDocComments) {
         CommonCodeGenerator.childrenAllComment(sb, "list", "(always " + nbLbc + " nodes))");
       }
@@ -650,7 +655,7 @@ public class UserFilesGenerator {
       sb.append("    }").append(LS);
       sb.append("    return lbc;").append(LS);
       sb.append("  }").append(LS).append(LS);
-      
+
       if (jopt.javaDocComments) {
         CommonCodeGenerator.childrenAllComment(sb, "list", "(always " + nbLuc + " nodes))");
       }
@@ -666,15 +671,15 @@ public class UserFilesGenerator {
       sb.append("    }").append(LS);
       sb.append("    return luc;").append(LS);
       sb.append("  }").append(LS).append(LS);
-      
+
     }
-    
+
     aSpc.updateSpc(-1);
     sb.append(aSpc.spc).append("}").append(LS);
     return sb;
-    
+
   }
-  
+
   /**
    * Generates the node class code for a JavaCodeProduction into a newly allocated buffer.
    *
@@ -685,36 +690,36 @@ public class UserFilesGenerator {
    */
   private StringBuilder genJavaCodeProductionClassString(final StringBuilder aSb, final Spacing aSpc,
       final UserClassInfo aUci) {
-    
+
     StringBuilder sb = aSb;
     if (sb == null) {
       sb = new StringBuilder(1024);
     }
-    
+
     /*
      * class declaration
      */
-    
+
     sb.append(aSpc.spc).append("public class " + aUci.fixedClassName);
-    
+
     if (jopt.nodesSuperclass != null) {
       sb.append(" extends ").append(jopt.nodesSuperclass);
     }
     sb.append(" implements ").append(iNode).append(" {").append(LS).append(LS);
     aSpc.updateSpc(+1);
-    
+
     /*
      * data fields declarations
      */
-    
+
     ccg.parentPointerDeclaration(sb);
-    
+
     ccg.genSerialUIDDeclaration(sb);
-    
+
     /*
      * standard constructor
      */
-    
+
     if (jopt.javaDocComments) {
       sb.append(aSpc.spc).append("/**").append(LS);
       sb.append(aSpc.spc).append(" * Constructs the node (which has no child).").append(LS);
@@ -722,19 +727,19 @@ public class UserFilesGenerator {
     }
     sb.append(aSpc.spc).append("public ").append(aUci.fixedClassName).append("() {").append(LS);
     sb.append(aSpc.spc).append("}").append(LS);
-    
+
     /*
      * Visit methods, parent methods, end class
      */
-    
+
     sb.append(commonCode);
-    
+
     /*
      * (class specific) children methods
      */
-    
+
     if (jopt.childrenMethods) {
-      
+
       if (jopt.javaDocComments) {
         CommonCodeGenerator.childrenAllComment(sb, "number", "(0))");
       }
@@ -742,7 +747,7 @@ public class UserFilesGenerator {
       sb.append("  public int getNbAllChildren() {").append(LS);
       sb.append("    return 0;").append(LS);
       sb.append("  }").append(LS).append(LS);
-      
+
       if (jopt.javaDocComments) {
         CommonCodeGenerator.childrenBaseorUserComment(sb, "number", "base", "(0))");
       }
@@ -750,7 +755,7 @@ public class UserFilesGenerator {
       sb.append("  public int getNbBaseChildren() {").append(LS);
       sb.append("    return 0;").append(LS);
       sb.append("  }").append(LS).append(LS);
-      
+
       if (jopt.javaDocComments) {
         CommonCodeGenerator.childrenBaseorUserComment(sb, "number", "user", "(0))");
       }
@@ -758,7 +763,7 @@ public class UserFilesGenerator {
       sb.append("  public int getNbUserChildren() {").append(LS);
       sb.append("    return 0;").append(LS);
       sb.append("  }").append(LS).append(LS);
-      
+
       if (jopt.javaDocComments) {
         CommonCodeGenerator.childrenAllComment(sb, "list", "(always 0 node))");
       }
@@ -769,7 +774,7 @@ public class UserFilesGenerator {
       sb.append("    }").append(LS);
       sb.append("    return lac;").append(LS);
       sb.append("  }").append(LS).append(LS);
-      
+
       if (jopt.javaDocComments) {
         CommonCodeGenerator.childrenAllComment(sb, "list", "(always 0 node))");
       }
@@ -780,7 +785,7 @@ public class UserFilesGenerator {
       sb.append("    }").append(LS);
       sb.append("    return lbc;").append(LS);
       sb.append("  }").append(LS).append(LS);
-      
+
       if (jopt.javaDocComments) {
         CommonCodeGenerator.childrenAllComment(sb, "list", "(always 0 node))");
       }
@@ -791,20 +796,20 @@ public class UserFilesGenerator {
       sb.append("    }").append(LS);
       sb.append("    return luc;").append(LS);
       sb.append("  }").append(LS).append(LS);
-      
+
     }
-    
+
     sb.append(aSpc.spc).append("}").append(LS);
     return sb;
   }
-  
+
   /**
    * Generates common code (visit methods, parent methods, end class).
    *
    * @return the generated common code
    */
   private StringBuilder genCommonCode() {
-    
+
     final StringBuilder sb = new StringBuilder(1024);
     ccg.classesAcceptMethods(sb);
     ccg.parentPointerGetterSetterImpl(sb);
@@ -818,7 +823,7 @@ public class UserFilesGenerator {
     sb.append(LS);
     return sb;
   }
-  
+
   /**
    * @param aNodeName - the Node name
    * @return - true if the node is a base node, false if a user node

@@ -242,7 +242,7 @@ public class LexGen extends JavaCCGlobals {
     out.println("");
   }
 
-  static void BuildLexStatesTable() {
+  void BuildLexStatesTable() {
     final Iterator<TokenProduction> it = rexprlist.iterator();
     TokenProduction tp;
     int i;
@@ -1452,7 +1452,8 @@ public class LexGen extends JavaCCGlobals {
   // out.println("}");
   // }
 
-  public static void reInit() {
+  @Override
+  public void reInit() {
     out = null;
     staticString = null;
     tokMgrClassName = null;
