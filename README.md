@@ -16,7 +16,7 @@ Version 1.5.0 brings interesting new features. See [Overview page](doc/wiki/Over
 
 ## Version
 
-Last update : May, 2025 - version 1.5.2 committed on GitHub and published on Sonatype Central Portal.
+Last update : Feb, 2026 - version 1.5.3 committed on GitHub and published on Sonatype Central Portal.
 
 ## Requirements
 
@@ -32,6 +32,8 @@ See the [project's Wiki page](doc/wiki/Home.md).
 See [Release notes page](doc/wiki/Release_notes.md) in Wiki.
 
 ## Short history
+
+02/2026 - 1.5.3 : Some enhancements, usable under the JavaCC Maven Plugin v3.8.0, aligned with JavaCC 8.1.0+ (see [Release notes](doc/wiki/Release_notes.md) and [How to use](doc/wiki/How_to_use.md)):  
 
 04/2021 - 1.5.0 : New features, some fixes, internal refactoring, still aligned with JavaCC 5.0 / 7.0.x (see [Release notes](doc/wiki/Release_notes.md) and [How to use](doc/wiki/How_to_use.md)):  
 
